@@ -35,7 +35,12 @@ watchEffect(() => {
 
 // 开启或关闭系统水印
 watchEffect(() => {
-  showWatermark.value ? setWatermark(import.meta.env.VITE_APP_TITLE) : clearWatermark()
+  const showWaterMarkEnv = import.meta.env.VITE_Show_Water_Mark
+  // Vite 注入的 env 變數一律為字串型別
+  const showWaterMarkFlag = showWaterMarkEnv === "true" || showWaterMarkEnv === true
+  if (showWaterMarkFlag) {
+    showWatermark.value ? setWatermark(import.meta.env.VITE_APP_TITLE) : clearWatermark()
+  }
 })
 </script>
 
