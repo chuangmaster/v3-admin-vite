@@ -2,6 +2,7 @@
 import type { TabPaneName } from "element-plus"
 import type { NotifyItem } from "./type"
 import { Bell } from "@element-plus/icons-vue"
+import { useI18n } from "vue-i18n"
 import { messageData, notifyData, todoData } from "./data"
 import List from "./List.vue"
 
@@ -10,6 +11,8 @@ interface DataItem {
   type: "primary" | "success" | "warning" | "danger" | "info"
   list: NotifyItem[]
 }
+
+const { t } = useI18n()
 
 /** 角標目前數量 */
 const badgeValue = computed(() => data.value.reduce((sum, item) => sum + item.list.length, 0))
@@ -21,32 +24,33 @@ const badgeMax = 99
 const popoverWidth = 350
 
 /** 目前分頁（標籤） */
-const activeName = ref<TabPaneName>("通知")
+const activeName = ref<TabPaneName>("notification")
 
 /** 全部資料 */
 const data = ref<DataItem[]>([
   // 通知資料
   {
-    name: "通知",
+    name: "notification",
     type: "primary",
     list: notifyData
   },
   // 訊息資料
   {
-    name: "訊息",
+    name: "message",
     type: "danger",
     list: messageData
   },
   // 待辦資料
   {
-    name: "待辦",
+    name: "todo",
     type: "warning",
     list: todoData
   }
 ])
 
 function handleHistory() {
-  ElMessage.success(`已前往${activeName.value}的歷史紀錄`)
+  const label = t(`components.notify.${activeName.value}`)
+  ElMessage.success(`已前往${label}的歷史紀錄`)
 }
 </script>
 
@@ -55,7 +59,7 @@ function handleHistory() {
     <el-popover placement="bottom" :width="popoverWidth" trigger="click">
       <template #reference>
         <el-badge :value="badgeValue" :max="badgeMax" :hidden="badgeValue === 0">
-          <el-tooltip effect="dark" content="訊息通知" placement="bottom">
+          <el-tooltip effect="dark" :content="t('components.notify.notification')" placement="bottom">
             <el-icon :size="20">
               <Bell />
             </el-icon>
@@ -66,7 +70,7 @@ function handleHistory() {
         <el-tabs v-model="activeName" stretch>
           <el-tab-pane v-for="(item, index) in data" :key="index" :name="item.name">
             <template #label>
-              {{ item.name }}
+              {{ t(`components.notify.${item.name}`) }}
               <el-badge :value="item.list.length" :max="badgeMax" :type="item.type" />
             </template>
             <el-scrollbar height="400px">
@@ -76,7 +80,7 @@ function handleHistory() {
         </el-tabs>
         <div class="notify-history">
           <el-button link @click="handleHistory">
-            查看{{ activeName }}歷史
+            查看{{ t(`components.notify.${activeName}`) }}歷史
           </el-button>
         </div>
       </template>

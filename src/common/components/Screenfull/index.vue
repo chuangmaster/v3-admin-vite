@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import screenfull from "screenfull"
+import { useI18n } from "vue-i18n"
 
 interface Props {
   /** 全螢幕的元素，預設為 html */
@@ -12,7 +13,16 @@ interface Props {
   content?: boolean
 }
 
-const { element = "html", openTips = "全螢幕", exitTips = "退出全螢幕", content = false } = defineProps<Props>()
+const { element = "html", openTips, exitTips, content = false } = defineProps<Props>()
+
+const { t } = useI18n()
+
+// 使用 i18n 翻譯或傳入的提示文字
+const fullscreenOpenTips = computed(() => openTips || t("components.screenfull.fullscreen"))
+const fullscreenExitTips = computed(() => exitTips || t("components.screenfull.exitFullscreen"))
+const contentLargeOpenTips = computed(() => t("components.screenfull.contentLargeOpen"))
+const contentLargeCloseTips = computed(() => t("components.screenfull.contentLargeClose"))
+const contentFullscreenTips = computed(() => t("components.screenfull.contentFullscreen"))
 
 const CONTENT_LARGE = "content-large"
 
@@ -25,7 +35,7 @@ const isEnabled = screenfull.isEnabled
 
 const isFullscreen = ref<boolean>(false)
 
-const fullscreenTips = computed(() => (isFullscreen.value ? exitTips : openTips))
+const fullscreenTips = computed(() => (isFullscreen.value ? fullscreenExitTips.value : fullscreenOpenTips.value))
 
 const fullscreenSvgName = computed(() => (isFullscreen.value ? "fullscreen-exit" : "fullscreen"))
 
@@ -55,7 +65,7 @@ watchEffect(() => {
 // #region 內容區
 const isContentLarge = ref<boolean>(false)
 
-const contentLargeTips = computed(() => (isContentLarge.value ? "內容區復原" : "內容區放大"))
+const contentLargeTips = computed(() => (isContentLarge.value ? contentLargeCloseTips.value : contentLargeOpenTips.value))
 
 const contentLargeSvgName = computed(() => (isContentLarge.value ? "fullscreen-exit" : "fullscreen"))
 
@@ -93,7 +103,7 @@ function handleContentFullClick() {
           </el-dropdown-item>
           <!-- 内容区全屏 -->
           <el-dropdown-item @click="handleContentFullClick">
-            內容區全螢幕
+            {{ contentFullscreenTips }}
           </el-dropdown-item>
         </el-dropdown-menu>
       </template>
