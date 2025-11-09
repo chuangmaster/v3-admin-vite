@@ -5,7 +5,7 @@ const DEFAULT_THEME_NAME = "normal"
 
 type DefaultThemeName = typeof DEFAULT_THEME_NAME
 
-/** 注册的主题名称, 其中 DefaultThemeName 是必填的 */
+/** 註冊的主題名稱，其中 DefaultThemeName 是必填的 */
 export type ThemeName = DefaultThemeName | "dark" | "dark-blue"
 
 interface ThemeList {
@@ -13,26 +13,26 @@ interface ThemeList {
   name: ThemeName
 }
 
-/** 主题列表 */
+/** 主題列表 */
 const themeList: ThemeList[] = [
   {
-    title: "默认",
+    title: "預設",
     name: DEFAULT_THEME_NAME
   },
   {
-    title: "黑暗",
+    title: "深色",
     name: "dark"
   },
   {
-    title: "深蓝",
+    title: "深藍",
     name: "dark-blue"
   }
 ]
 
-/** 正在应用的主题名称 */
+/** 正在套用的主題名稱 */
 const activeThemeName = ref<ThemeName>(getActiveThemeName() || DEFAULT_THEME_NAME)
 
-/** 设置主题 */
+/** 設定主題 */
 function setTheme({ clientX, clientY }: MouseEvent, value: ThemeName) {
   const maxRadius = Math.hypot(
     Math.max(clientX, window.innerWidth - clientX),
@@ -52,7 +52,7 @@ function addHtmlClass(value: ThemeName) {
   document.documentElement.classList.add(value)
 }
 
-/** 在 html 根元素上移除其他主题 class */
+/** 在 html 根元素上移除其他主題的 class */
 function removeHtmlClass(value: ThemeName) {
   const otherThemeNameList = themeList.map(item => item.name).filter(name => name !== value)
   document.documentElement.classList.remove(...otherThemeNameList)
@@ -60,7 +60,7 @@ function removeHtmlClass(value: ThemeName) {
 
 /** 初始化 */
 function initTheme() {
-  // watchEffect 来收集副作用
+  // 使用 watchEffect 收集副作用
   watchEffect(() => {
     const value = activeThemeName.value
     removeHtmlClass(value)
@@ -69,7 +69,7 @@ function initTheme() {
   })
 }
 
-/** 主题 Composable */
+/** 主題 Composable */
 export function useTheme() {
   return { themeList, activeThemeName, initTheme, setTheme }
 }
