@@ -78,11 +78,11 @@ function handleContentFullClick() {
 
 <template>
   <div>
-    <!-- 全屏 -->
+    <!-- 全螢幕 -->
     <el-tooltip v-if="!content" effect="dark" :content="fullscreenTips" placement="bottom">
       <SvgIcon :name="fullscreenSvgName" @click="handleFullscreenClick" class="svg-icon" />
     </el-tooltip>
-    <!-- 内容区 -->
+    <!-- 內容區 -->
     <el-dropdown v-else :disabled="isFullscreen">
       <SvgIcon :name="contentLargeSvgName" class="svg-icon" />
       <template #dropdown>
@@ -93,7 +93,7 @@ function handleContentFullClick() {
           </el-dropdown-item>
           <!-- 内容区全屏 -->
           <el-dropdown-item @click="handleContentFullClick">
-            内容区全屏
+            內容區全螢幕
           </el-dropdown-item>
         </el-dropdown-menu>
       </template>

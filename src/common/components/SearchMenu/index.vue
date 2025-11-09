@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import Modal from "./Modal.vue"
 
-/** 控制 modal 显隐 */
+/** 控制 modal 顯隱 */
 const visible = ref<boolean>(false)
 
-/** 打开 modal */
+/** 打開 modal */
 function handleOpen() {
   visible.value = true
 }
@@ -12,7 +12,7 @@ function handleOpen() {
 
 <template>
   <div>
-    <el-tooltip effect="dark" content="搜索菜单" placement="bottom">
+    <el-tooltip effect="dark" content="搜尋選單" placement="bottom">
       <SvgIcon name="search" @click="handleOpen" class="svg-icon" />
     </el-tooltip>
     <Modal v-model="visible" />
