@@ -17,24 +17,24 @@ const settingsStore = useSettingsStore()
 
 const { listenerRouteChange } = useRouteListener()
 
-/** 滚动条组件元素的引用 */
+/** 滾動條元件的引用 */
 const scrollbarRef = useTemplateRef("scrollbarRef")
 
-/** 滚动条内容元素的引用 */
+/** 滾動條內容元素的引用 */
 const scrollbarContentRef = useTemplateRef("scrollbarContentRef")
 
-/** 当前滚动条距离左边的距离 */
+/** 當前滾動條距離左側的距離 */
 let currentScrollLeft = 0
 
-/** 每次滚动距离 */
+/** 每次滾動距離 */
 const translateDistance = 200
 
-/** 滚动时触发 */
+/** 滾動時觸發 */
 function scroll({ scrollLeft }: { scrollLeft: number }) {
   currentScrollLeft = scrollLeft
 }
 
-/** 鼠标滚轮滚动时触发 */
+/** 滑鼠滾輪滾動時觸發 */
 function wheelScroll({ deltaY }: WheelEvent) {
   if (deltaY.toString().startsWith("-")) {
     scrollTo("left")
@@ -43,23 +43,23 @@ function wheelScroll({ deltaY }: WheelEvent) {
   }
 }
 
-/** 获取可能需要的宽度 */
+/** 取得可能需要的寬度 */
 function getWidth() {
-  // 可滚动内容的长度
+  // 可滾動內容的長度
   const scrollbarContentRefWidth = scrollbarContentRef.value!.clientWidth
-  // 滚动可视区宽度
+  // 滾動可視區寬度
   const scrollbarRefWidth = scrollbarRef.value!.wrapRef!.clientWidth
-  // 最后剩余可滚动的宽度
+  // 最後剩餘可滾動的寬度
   const lastDistance = scrollbarContentRefWidth - scrollbarRefWidth - currentScrollLeft
 
   return { scrollbarContentRefWidth, scrollbarRefWidth, lastDistance }
 }
 
-/** 左右滚动 */
+/** 左右滾動 */
 function scrollTo(direction: "left" | "right", distance: number = translateDistance) {
   let scrollLeft = 0
   const { scrollbarContentRefWidth, scrollbarRefWidth, lastDistance } = getWidth()
-  // 没有横向滚动条，直接结束
+  // 沒有橫向滾動條，直接結束
   if (scrollbarRefWidth > scrollbarContentRefWidth) return
   if (direction === "left") {
     scrollLeft = Math.max(0, currentScrollLeft - distance)
@@ -69,7 +69,7 @@ function scrollTo(direction: "left" | "right", distance: number = translateDista
   scrollbarRef.value!.setScrollLeft(scrollLeft)
 }
 
-/** 移动到目标位置 */
+/** 移動到目標位置 */
 function moveTo() {
   const tagRefs = props.tagRefs!
   for (let i = 0; i < tagRefs.length; i++) {
@@ -80,13 +80,13 @@ function moveTo() {
       const offsetWidth = el.offsetWidth
       const offsetLeft = el.offsetLeft
       const { scrollbarRefWidth } = getWidth()
-      // 当前 tag 在可视区域左边时
+      // 當前 tag 在可視區域左側時
       if (offsetLeft < currentScrollLeft) {
         const distance = currentScrollLeft - offsetLeft
         scrollTo("left", distance)
         return
       }
-      // 当前 tag 在可视区域右边时
+      // 當前 tag 在可視區域右側時
       const width = scrollbarRefWidth + currentScrollLeft - offsetWidth
       if (offsetLeft > width) {
         const distance = offsetLeft - width
@@ -97,7 +97,7 @@ function moveTo() {
   }
 }
 
-// 监听路由变化，移动到目标位置
+// 監聽路由變化，移動到目標位置
 listenerRouteChange(() => {
   nextTick(moveTo)
 })
@@ -105,7 +105,7 @@ listenerRouteChange(() => {
 
 <template>
   <div class="scroll-container">
-    <el-tooltip content="向左滚动标签（超出最大宽度可点击）">
+    <el-tooltip content="向左滾動標籤（超出最大寬度時可點擊）">
       <el-icon class="arrow left" @click="scrollTo('left')">
         <ArrowLeft />
       </el-icon>
@@ -115,7 +115,7 @@ listenerRouteChange(() => {
         <slot />
       </div>
     </el-scrollbar>
-    <el-tooltip content="向右滚动标签（超出最大宽度可点击）">
+    <el-tooltip content="向右滾動標籤（超出最大寬度時可點擊）">
       <el-icon class="arrow right" @click="scrollTo('right')">
         <ArrowRight />
       </el-icon>
