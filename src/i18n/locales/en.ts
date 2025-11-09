@@ -33,5 +33,13 @@ export default {
       contentLargeClose: "Restore Content",
       contentFullscreen: "Content Fullscreen"
     }
+  },
+  tagsView: {
+    refresh: "Refresh",
+    close: "Close",
+    closeOthers: "Close Others",
+    closeAll: "Close All",
+    scrollLeft: "Scroll tags left (clickable when overflow)",
+    scrollRight: "Scroll tags right (clickable when overflow)"
   }
 }

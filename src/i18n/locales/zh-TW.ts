@@ -33,5 +33,13 @@ export default {
       contentLargeClose: "內容區復原",
       contentFullscreen: "內容區全螢幕"
     }
+  },
+  tagsView: {
+    refresh: "重新整理",
+    close: "關閉",
+    closeOthers: "關閉其他",
+    closeAll: "關閉全部",
+    scrollLeft: "向左滾動標籤（超出最大寬度時可點擊）",
+    scrollRight: "向右滾動標籤（超出最大寬度時可點擊）"
   }
 }

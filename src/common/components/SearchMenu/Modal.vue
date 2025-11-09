@@ -35,11 +35,19 @@ const modalWidth = computed(() => (isMobile.value ? "80vw" : "40vw"))
 /** 樹狀選單 */
 const menus = computed(() => cloneDeep(usePermissionStore().routes))
 
+/** 將 title 物件轉換為字串 */
+function getTitleString(title: any): string {
+  if (!title) return ""
+  if (typeof title === "string") return title
+  // 如果是物件，優先取對應語言，否則取第一個值
+  return Object.values(title)[0] as string || ""
+}
+
 /** 搜尋（防抖） */
 const handleSearch = debounce(() => {
   const flatMenus = flatTree(menus.value)
   const _keywords = keyword.value.toLocaleLowerCase().trim()
-  result.value = flatMenus.filter(menu => keyword.value ? menu.meta?.title?.toLocaleLowerCase().includes(_keywords) : false)
+  result.value = flatMenus.filter(menu => keyword.value ? getTitleString(menu.meta?.title).toLocaleLowerCase().includes(_keywords) : false)
   // 預設選中搜尋結果的第一項
   const length = result.value?.length
   activeRouteName.value = length > 0 ? result.value[0].name : undefined

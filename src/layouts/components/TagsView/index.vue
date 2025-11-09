@@ -4,9 +4,15 @@ import type { TagView } from "@/pinia/stores/tags-view"
 import { useRouteListener } from "@@/composables/useRouteListener"
 import { Close } from "@element-plus/icons-vue"
 import path from "path-browserify"
+import { ref, watch } from "vue"
+import { useI18n } from "vue-i18n"
 import { usePermissionStore } from "@/pinia/stores/permission"
 import { useTagsViewStore } from "@/pinia/stores/tags-view"
 import ScrollPane from "./ScrollPane.vue"
+
+const { locale } = useI18n()
+
+const renderKey = ref(0)
 
 const router = useRouter()
 
@@ -35,6 +41,17 @@ const selectedTag = ref<TagView>({})
 
 /** 固定的标签页 */
 let affixTags: TagView[] = []
+
+/** 获取标题 */
+function getTitle(titleObj: any) {
+  if (!titleObj) return ""
+  if (typeof titleObj === "string") return titleObj
+  // 將 locale (如 "zh-TW") 轉換為對應的 key 格式 (如 "zhTW")
+  let key = locale.value
+  if (key === "zh-TW") key = "zhTW"
+  if (key === "zh-CN") key = "zhCN"
+  return titleObj[key] || titleObj.zhCN || titleObj["zh-CN"] || Object.values(titleObj)[0] || ""
+}
 
 /** 判断标签页是否激活 */
 function isActive(tag: TagView) {
@@ -157,7 +174,9 @@ function closeMenu() {
 watch(visible, (value) => {
   value ? document.body.addEventListener("click", closeMenu) : document.body.removeEventListener("click", closeMenu)
 })
-
+watch(locale, () => {
+  renderKey.value++
+})
 initTags()
 
 // 监听路由变化
@@ -171,7 +190,7 @@ listenerRouteChange((route) => {
     <ScrollPane class="tags-view-wrapper" :tag-refs="tagRefs">
       <router-link
         v-for="tag in tagsViewStore.visitedViews"
-        :key="tag.path"
+        :key="`${tag.path}-${renderKey}`"
         ref="tagRefs"
         :class="{ active: isActive(tag) }"
         class="tags-view-item"
@@ -179,7 +198,7 @@ listenerRouteChange((route) => {
         @click.middle="!isAffix(tag) && closeSelectedTag(tag)"
         @contextmenu.prevent="openMenu(tag, $event)"
       >
-        {{ tag.meta?.title }}
+        {{ getTitle(tag.meta?.title) }}
         <el-icon v-if="!isAffix(tag)" :size="12" @click.prevent.stop="closeSelectedTag(tag)">
           <Close />
         </el-icon>
@@ -187,16 +206,16 @@ listenerRouteChange((route) => {
     </ScrollPane>
     <ul v-show="visible" class="contextmenu" :style="{ left: `${left}px`, top: `${top}px` }">
       <li @click="refreshSelectedTag(selectedTag)">
-        刷新
+        {{ $t('tagsView.refresh') }}
       </li>
       <li v-if="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)">
-        关闭
+        {{ $t('tagsView.close') }}
       </li>
       <li @click="closeOthersTags">
-        关闭其它
+        {{ $t('tagsView.closeOthers') }}
       </li>
       <li @click="closeAllTags(selectedTag)">
-        关闭所有
+        {{ $t('tagsView.closeAll') }}
       </li>
     </ul>
   </div>
