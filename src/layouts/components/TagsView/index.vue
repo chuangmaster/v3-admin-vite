@@ -2,17 +2,13 @@
 import type { RouteLocationNormalizedGeneric, RouteRecordRaw, RouterLink } from "vue-router"
 import type { TagView } from "@/pinia/stores/tags-view"
 import { useRouteListener } from "@@/composables/useRouteListener"
+import { getRouteTitle } from "@@/utils/route"
 import { Close } from "@element-plus/icons-vue"
 import path from "path-browserify"
 import { ref, watch } from "vue"
-import { useI18n } from "vue-i18n"
 import { usePermissionStore } from "@/pinia/stores/permission"
 import { useTagsViewStore } from "@/pinia/stores/tags-view"
 import ScrollPane from "./ScrollPane.vue"
-
-const { locale } = useI18n()
-
-const renderKey = ref(0)
 
 const router = useRouter()
 
@@ -42,16 +38,8 @@ const selectedTag = ref<TagView>({})
 /** 固定的标签页 */
 let affixTags: TagView[] = []
 
-/** 获取标题 */
-function getTitle(titleObj: any) {
-  if (!titleObj) return ""
-  if (typeof titleObj === "string") return titleObj
-  // 將 locale (如 "zh-TW") 轉換為對應的 key 格式 (如 "zhTW")
-  let key = locale.value
-  if (key === "zh-TW") key = "zhTW"
-  if (key === "zh-CN") key = "zhCN"
-  return titleObj[key] || titleObj.zhCN || titleObj["zh-CN"] || Object.values(titleObj)[0] || ""
-}
+/** 用于强制重新渲染的键值 */
+const renderKey = ref(0)
 
 /** 判断标签页是否激活 */
 function isActive(tag: TagView) {
@@ -174,9 +162,7 @@ function closeMenu() {
 watch(visible, (value) => {
   value ? document.body.addEventListener("click", closeMenu) : document.body.removeEventListener("click", closeMenu)
 })
-watch(locale, () => {
-  renderKey.value++
-})
+
 initTags()
 
 // 监听路由变化
@@ -198,7 +184,7 @@ listenerRouteChange((route) => {
         @click.middle="!isAffix(tag) && closeSelectedTag(tag)"
         @contextmenu.prevent="openMenu(tag, $event)"
       >
-        {{ getTitle(tag.meta?.title) }}
+        {{ getRouteTitle(tag.meta?.title) }}
         <el-icon v-if="!isAffix(tag)" :size="12" @click.prevent.stop="closeSelectedTag(tag)">
           <Close />
         </el-icon>
