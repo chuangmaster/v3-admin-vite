@@ -1,73 +1,155 @@
-# [PROJECT_NAME] Constitution
+<!--
+SYNC IMPACT REPORT
+==================
+Version: 1.0.0 → 1.1.0
+Change Type: MINOR (Language update to English, principle refinement)
 
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+Modified Principles:
+- UPDATED: I. Traditional Chinese First → Documentation Language (expanded to support zh-TW for specs)
+- MAINTAINED: II. Simplified Architecture
+- MAINTAINED: III. Latest Tech Stack
+- MAINTAINED: IV. Code Quality & Testing
+- MAINTAINED: V. User Experience First
+
+Templates Requiring Updates:
+✅ plan-template.md - Constitution check section aligned
+✅ spec-template.md - User story requirements aligned (supports zh-TW)
+✅ tasks-template.md - Task categorization aligned
+
+Follow-up TODOs: None
+-->
+
+# V3 Admin Vite Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
+### I. Documentation Language
 
-<!-- Example: I. Library-First -->
+**All specifications, plans, and user-facing documentation MUST be written in Traditional Chinese (zh-TW)**
 
-[PRINCIPLE_1_DESCRIPTION]
+- Technical specifications MUST use Traditional Chinese
+- Implementation plans MUST use Traditional Chinese
+- User guides and documentation MUST use Traditional Chinese
+- Code comments SHOULD use Traditional Chinese or English (based on team convention)
+- API documentation and README MUST provide Traditional Chinese versions
+- Constitution and governance documents MAY use English for broader accessibility
 
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+**Rationale**: Ensures team communication consistency, reduces language barriers, improves documentation readability and maintainability.
 
-### [PRINCIPLE_2_NAME]
+### II. Simplified Architecture
 
-<!-- Example: II. CLI Interface -->
+**Keep architecture simple, avoid over-engineering and complex type gymnastics**
 
-[PRINCIPLE_2_DESCRIPTION]
+- Do not create unnecessary abstraction layers
+- Avoid over-designed patterns
+- Code structure should be "just enough," not over-engineered
+- Prioritize readability and maintainability over excessive abstraction
+- Each file and module MUST have a clear single responsibility
 
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+**Rationale**: Lower learning curve, faster development speed, reduced maintenance costs, enables new team members to onboard quickly.
 
-### [PRINCIPLE_3_NAME]
+### III. Latest Tech Stack
 
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
+**All third-party dependencies MUST be kept at the latest stable versions**
 
-[PRINCIPLE_3_DESCRIPTION]
+- Regularly update all npm packages to latest stable versions
+- Use latest Vue 3 Composition API with script setup syntax
+- Adopt modern build tools (Vite) and development tools
+- Technology selection MUST prioritize ecosystem activity and community support
+- MUST run complete tests before each update
 
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+**Rationale**: Enjoy latest features and performance improvements, patch security vulnerabilities promptly, maintain project competitiveness.
 
-### [PRINCIPLE_4_NAME]
+### IV. Code Quality & Testing
 
-<!-- Example: IV. Integration Testing -->
+**Ensure code quality and establish reasonable test coverage**
 
-[PRINCIPLE_4_DESCRIPTION]
+- All code MUST pass ESLint checks
+- Critical features and utility functions MUST have unit tests
+- Use Vitest for testing
+- Code MUST follow unified naming conventions and style guides
+- Each configuration item SHOULD have detailed comments explaining purpose
 
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**Rationale**: Reduce bug occurrence, improve code maintainability, ensure refactoring safety.
 
-### [PRINCIPLE_5_NAME]
+### V. User Experience First
 
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
+**Build user-friendly management systems with UX as the core focus**
 
-[PRINCIPLE_5_DESCRIPTION]
+- Support multiple layout modes (left, top, hybrid)
+- Support multiple themes (normal, dark, deep blue)
+- Ensure mobile compatibility
+- Provide clear error messages and user feedback
+- Optimize loading performance and interaction experience
+- Implement permission management (page-level and button-level)
 
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+**Rationale**: Improve end-user satisfaction, reduce learning costs, increase system adoption rate.
 
-## [SECTION_2_NAME]
+## Technical Standards
 
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### Required Tech Stack
 
-[SECTION_2_CONTENT]
+- **Frontend Framework**: Vue 3 + TypeScript + Vite
+- **UI Framework**: Element Plus
+- **State Management**: Pinia
+- **Routing**: Vue Router
+- **Styling**: SCSS + CSS Variables + UnoCSS
+- **Code Standards**: ESLint + Prettier
+- **Package Manager**: pnpm
+- **Testing Framework**: Vitest
 
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### Performance Requirements
 
-## [SECTION_3_NAME]
+- Initial load time < 3 seconds (production)
+- Route transition time < 500ms
+- Support lazy loading and code splitting
+- Optimize bundle size
 
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+### Security Requirements
 
-[SECTION_3_CONTENT]
+- Implement complete authentication and authorization mechanisms
+- Sensitive data MUST NOT be stored in plaintext on frontend
+- All API requests MUST include appropriate authentication information
+- Prevent common attacks including XSS, CSRF
 
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+## Development Workflow
+
+### Commit Convention
+
+MUST follow Conventional Commits specification:
+
+- `feat`: New feature
+- `fix`: Bug fix
+- `perf`: Performance improvement
+- `refactor`: Code refactoring
+- `docs`: Documentation and comments
+- `types`: Type-related changes
+- `test`: Unit test related
+- `ci`: Continuous integration, workflows
+- `revert`: Revert changes
+- `chore`: Chores (update dependencies, modify configs, etc.)
+
+### Code Review
+
+- All changes MUST go through Pull Request review
+- Ensure compliance with all constitution principles
+- Check code style and comment completeness
+- Verify test pass rate
+
+### Quality Gates
+
+- ESLint checks MUST pass (no errors or warnings)
+- Related unit tests MUST pass
+- Critical feature changes MUST include test cases
 
 ## Governance
 
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+This constitution serves as the highest guiding principle for project development:
 
-[GOVERNANCE_RULES]
+- Any changes violating the constitution MUST explicitly explain rationale in PR
+- Complexity increases MUST be thoroughly justified
+- Constitution amendments MUST go through team discussion and record decision process
+- Version numbers MUST follow Semantic Versioning
+- All team members are responsible for maintaining the authority of this constitution
 
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
-
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.1.0 | **Ratified**: 2025-11-11 | **Last Amended**: 2025-11-11
