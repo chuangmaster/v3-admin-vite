@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import type { RouteRecordNameGeneric, RouteRecordRaw } from "vue-router"
 import { useDevice } from "@@/composables/useDevice"
+import { getRouteTitle } from "@@/utils/route"
 import { isExternal } from "@@/utils/validate"
 import { cloneDeep, debounce } from "lodash-es"
 import { usePermissionStore } from "@/pinia/stores/permission"
@@ -39,7 +40,7 @@ const menus = computed(() => cloneDeep(usePermissionStore().routes))
 const handleSearch = debounce(() => {
   const flatMenus = flatTree(menus.value)
   const _keywords = keyword.value.toLocaleLowerCase().trim()
-  result.value = flatMenus.filter(menu => keyword.value ? menu.meta?.title?.toLocaleLowerCase().includes(_keywords) : false)
+  result.value = flatMenus.filter(menu => keyword.value ? getRouteTitle(menu.meta?.title).toLocaleLowerCase().includes(_keywords) : false)
   // 預設選中搜尋結果的第一項
   const length = result.value?.length
   activeRouteName.value = length > 0 ? result.value[0].name : undefined

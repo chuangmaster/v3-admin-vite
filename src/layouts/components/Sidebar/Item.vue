@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import type { RouteRecordRaw } from "vue-router"
+import { getRouteTitle } from "@@/utils/route"
 import { isExternal } from "@@/utils/validate"
 import path from "path-browserify"
+import { computed, ref, watch } from "vue"
+import { useI18n } from "vue-i18n"
 import Link from "./Link.vue"
 
 interface Props {
@@ -10,6 +13,10 @@ interface Props {
 }
 
 const { item, basePath = "" } = defineProps<Props>()
+
+const { locale } = useI18n()
+
+const renderKey = ref(0)
 
 /** 是否始终显示根菜单 */
 const alwaysShowRootMenu = computed(() => item.meta?.alwaysShow)
@@ -44,25 +51,29 @@ function resolvePath(routePath: string) {
       return path.resolve(basePath, routePath)
   }
 }
+
+watch(locale, () => {
+  renderKey.value++
+})
 </script>
 
 <template>
   <template v-if="!alwaysShowRootMenu && theOnlyOneChild && !theOnlyOneChild.children">
     <Link v-if="theOnlyOneChild.meta" :to="resolvePath(theOnlyOneChild.path)">
-      <el-menu-item :index="resolvePath(theOnlyOneChild.path)">
+      <el-menu-item :index="resolvePath(theOnlyOneChild.path)" :key="renderKey">
         <SvgIcon v-if="theOnlyOneChild.meta.svgIcon" :name="theOnlyOneChild.meta.svgIcon" class="svg-icon" />
         <component v-else-if="theOnlyOneChild.meta.elIcon" :is="theOnlyOneChild.meta.elIcon" class="el-icon" />
         <template v-if="theOnlyOneChild.meta.title" #title>
-          <span class="title">{{ theOnlyOneChild.meta.title }}</span>
+          <span class="title">{{ getRouteTitle(theOnlyOneChild.meta.title) }}</span>
         </template>
       </el-menu-item>
     </Link>
   </template>
-  <el-sub-menu v-else :index="resolvePath(item.path)" teleported>
+  <el-sub-menu v-else :index="resolvePath(item.path)" teleported :key="renderKey">
     <template #title>
       <SvgIcon v-if="item.meta?.svgIcon" :name="item.meta.svgIcon" class="svg-icon" />
       <component v-else-if="item.meta?.elIcon" :is="item.meta.elIcon" class="el-icon" />
-      <span v-if="item.meta?.title" class="title">{{ item.meta.title }}</span>
+      <span v-if="item.meta?.title" class="title">{{ getRouteTitle(item.meta.title) }}</span>
     </template>
     <template v-if="item.children">
       <Item

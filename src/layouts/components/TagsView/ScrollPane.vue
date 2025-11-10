@@ -105,7 +105,7 @@ listenerRouteChange(() => {
 
 <template>
   <div class="scroll-container">
-    <el-tooltip content="向左滾動標籤（超出最大寬度時可點擊）">
+    <el-tooltip :content="$t('tagsView.scrollLeft')">
       <el-icon class="arrow left" @click="scrollTo('left')">
         <ArrowLeft />
       </el-icon>
@@ -115,7 +115,7 @@ listenerRouteChange(() => {
         <slot />
       </div>
     </el-scrollbar>
-    <el-tooltip content="向右滾動標籤（超出最大寬度時可點擊）">
+    <el-tooltip :content="$t('tagsView.scrollRight')">
       <el-icon class="arrow right" @click="scrollTo('right')">
         <ArrowRight />
       </el-icon>

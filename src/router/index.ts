@@ -56,7 +56,8 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/pages/dashboard/index.vue"),
         name: "Dashboard",
         meta: {
-          title: "首页",
+          title: { zhCN: "首页", zhTW: "首頁", en: "Dashboard" },
+          titleKey: "dashboard",
           svgIcon: "dashboard",
           affix: true
         }
@@ -69,7 +70,8 @@ export const constantRoutes: RouteRecordRaw[] = [
     redirect: "/demo/unocss",
     name: "Demo",
     meta: {
-      title: "示例集合",
+      title: { zhCN: "示例集合", zhTW: "範例集合", en: "Demo Collection" },
+      titleKey: "demo",
       elIcon: "DataBoard"
     },
     children: [
@@ -78,7 +80,8 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/pages/demo/element-plus/index.vue"),
         name: "ElementPlus",
         meta: {
-          title: "Element Plus",
+          title: { zhCN: "Element Plus", zhTW: "Element Plus", en: "Element Plus" },
+          titleKey: "elementPlus",
           keepAlive: true
         }
       },
@@ -87,7 +90,8 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/pages/demo/vxe-table/index.vue"),
         name: "VxeTable",
         meta: {
-          title: "Vxe Table",
+          title: { zhCN: "Vxe Table", zhTW: "Vxe Table", en: "Vxe Table" },
+          titleKey: "vxeTable",
           keepAlive: true
         }
       },
@@ -97,7 +101,8 @@ export const constantRoutes: RouteRecordRaw[] = [
         redirect: "/demo/level2/level3",
         name: "Level2",
         meta: {
-          title: "二级路由",
+          title: { zhCN: "二级路由", zhTW: "二級路由", en: "Level 2" },
+          titleKey: "level2",
           alwaysShow: true
         },
         children: [
@@ -106,7 +111,8 @@ export const constantRoutes: RouteRecordRaw[] = [
             component: () => import("@/pages/demo/level2/level3/index.vue"),
             name: "Level3",
             meta: {
-              title: "三级路由",
+              title: { zhCN: "三级路由", zhTW: "三級路由", en: "Level 3" },
+              titleKey: "level3",
               keepAlive: true
             }
           }
@@ -117,7 +123,8 @@ export const constantRoutes: RouteRecordRaw[] = [
         redirect: "/demo/composable-demo/use-fetch-select",
         name: "ComposableDemo",
         meta: {
-          title: "组合式函数"
+          title: { zhCN: "组合式函数", zhTW: "組合式函式", en: "Composable Functions" },
+          titleKey: "composable"
         },
         children: [
           {
@@ -125,7 +132,8 @@ export const constantRoutes: RouteRecordRaw[] = [
             component: () => import("@/pages/demo/composable-demo/use-fetch-select.vue"),
             name: "UseFetchSelect",
             meta: {
-              title: "useFetchSelect"
+              title: { zhCN: "useFetchSelect", zhTW: "useFetchSelect", en: "useFetchSelect" },
+              titleKey: "useFetchSelect"
             }
           },
           {
@@ -133,7 +141,8 @@ export const constantRoutes: RouteRecordRaw[] = [
             component: () => import("@/pages/demo/composable-demo/use-fullscreen-loading.vue"),
             name: "UseFullscreenLoading",
             meta: {
-              title: "useFullscreenLoading"
+              title: { zhCN: "useFullscreenLoading", zhTW: "useFullscreenLoading", en: "useFullscreenLoading" },
+              titleKey: "useFullscreenLoading"
             }
           },
           {
@@ -141,7 +150,8 @@ export const constantRoutes: RouteRecordRaw[] = [
             component: () => import("@/pages/demo/composable-demo/use-watermark.vue"),
             name: "UseWatermark",
             meta: {
-              title: "useWatermark"
+              title: { zhCN: "useWatermark", zhTW: "useWatermark", en: "useWatermark" },
+              titleKey: "useWatermark"
             }
           }
         ]
@@ -151,7 +161,8 @@ export const constantRoutes: RouteRecordRaw[] = [
   {
     path: "/link",
     meta: {
-      title: "文档链接",
+      title: { zhCN: "文档链接", zhTW: "文件連結", en: "Docs Link" },
+      titleKey: "docsLink",
       elIcon: "Link"
     },
     children: [
@@ -160,7 +171,8 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => {},
         name: "Link1",
         meta: {
-          title: "中文文档"
+          title: { zhCN: "中文文档", zhTW: "中文文件", en: "Chinese Docs" },
+          titleKey: "chineseDocs"
         }
       },
       {
@@ -168,7 +180,8 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => {},
         name: "Link2",
         meta: {
-          title: "新手教程"
+          title: { zhCN: "新手教程", zhTW: "新手教學", en: "Beginner Guide" },
+          titleKey: "beginnerGuide"
         }
       }
     ]
@@ -187,7 +200,8 @@ export const dynamicRoutes: RouteRecordRaw[] = [
     redirect: "/permission/page-level",
     name: "Permission",
     meta: {
-      title: "权限演示",
+      title: { zhCN: "权限演示", zhTW: "權限展示", en: "Permission Demo" },
+      titleKey: "permissionDemo",
       elIcon: "Lock",
       // 可以在根路由中设置角色
       roles: ["admin", "editor"],
@@ -199,7 +213,8 @@ export const dynamicRoutes: RouteRecordRaw[] = [
         component: () => import("@/pages/demo/permission/page-level.vue"),
         name: "PermissionPageLevel",
         meta: {
-          title: "页面级",
+          title: { zhCN: "页面级", zhTW: "頁面級", en: "Page Level" },
+          titleKey: "pageLevel",
           // 或者在子路由中设置角色
           roles: ["admin"]
         }
@@ -209,7 +224,8 @@ export const dynamicRoutes: RouteRecordRaw[] = [
         component: () => import("@/pages/demo/permission/button-level.vue"),
         name: "PermissionButtonLevel",
         meta: {
-          title: "按钮级",
+          title: { zhCN: "按钮级", zhTW: "按鈕級", en: "Button Level" },
+          titleKey: "buttonLevel",
           // 如果未设置角色，则表示：该页面不需要权限，但会继承根路由的角色
           roles: undefined
         }

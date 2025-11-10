@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import LanguageSwitch from "@@/components/LanguageSwitch/index.vue"
 import Notify from "@@/components/Notify/index.vue"
 import Screenfull from "@@/components/Screenfull/index.vue"
 import SearchMenu from "@@/components/SearchMenu/index.vue"
@@ -50,6 +51,7 @@ function logout() {
     <div class="right-menu">
       <SearchMenu v-if="showSearchMenu" class="right-menu-item" />
       <Screenfull v-if="showScreenfull" class="right-menu-item" />
+      <LanguageSwitch class="right-menu-item" />
       <ThemeSwitch v-if="showThemeSwitch" class="right-menu-item" />
       <Notify v-if="showNotify" class="right-menu-item" />
       <el-dropdown>

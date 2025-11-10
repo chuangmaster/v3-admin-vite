@@ -2,8 +2,10 @@
 import type { RouteLocationNormalizedGeneric, RouteRecordRaw, RouterLink } from "vue-router"
 import type { TagView } from "@/pinia/stores/tags-view"
 import { useRouteListener } from "@@/composables/useRouteListener"
+import { getRouteTitle } from "@@/utils/route"
 import { Close } from "@element-plus/icons-vue"
 import path from "path-browserify"
+import { ref, watch } from "vue"
 import { usePermissionStore } from "@/pinia/stores/permission"
 import { useTagsViewStore } from "@/pinia/stores/tags-view"
 import ScrollPane from "./ScrollPane.vue"
@@ -35,6 +37,9 @@ const selectedTag = ref<TagView>({})
 
 /** 固定的标签页 */
 let affixTags: TagView[] = []
+
+/** 用于强制重新渲染的键值 */
+const renderKey = ref(0)
 
 /** 判断标签页是否激活 */
 function isActive(tag: TagView) {
@@ -171,7 +176,7 @@ listenerRouteChange((route) => {
     <ScrollPane class="tags-view-wrapper" :tag-refs="tagRefs">
       <router-link
         v-for="tag in tagsViewStore.visitedViews"
-        :key="tag.path"
+        :key="`${tag.path}-${renderKey}`"
         ref="tagRefs"
         :class="{ active: isActive(tag) }"
         class="tags-view-item"
@@ -179,7 +184,7 @@ listenerRouteChange((route) => {
         @click.middle="!isAffix(tag) && closeSelectedTag(tag)"
         @contextmenu.prevent="openMenu(tag, $event)"
       >
-        {{ tag.meta?.title }}
+        {{ getRouteTitle(tag.meta?.title) }}
         <el-icon v-if="!isAffix(tag)" :size="12" @click.prevent.stop="closeSelectedTag(tag)">
           <Close />
         </el-icon>
@@ -187,16 +192,16 @@ listenerRouteChange((route) => {
     </ScrollPane>
     <ul v-show="visible" class="contextmenu" :style="{ left: `${left}px`, top: `${top}px` }">
       <li @click="refreshSelectedTag(selectedTag)">
-        刷新
+        {{ $t('tagsView.refresh') }}
       </li>
       <li v-if="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)">
-        关闭
+        {{ $t('tagsView.close') }}
       </li>
       <li @click="closeOthersTags">
-        关闭其它
+        {{ $t('tagsView.closeOthers') }}
       </li>
       <li @click="closeAllTags(selectedTag)">
-        关闭所有
+        {{ $t('tagsView.closeAll') }}
       </li>
     </ul>
   </div>

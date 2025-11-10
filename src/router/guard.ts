@@ -53,7 +53,15 @@ export function registerNavigationGuard(router: Router) {
   // 全局后置钩子
   router.afterEach((to) => {
     setRouteChange(to)
-    setTitle(to.meta.title)
+    // 处理 title 对象或字符串
+    const title = to.meta.title
+    let titleString: string | undefined
+    if (typeof title === "string") {
+      titleString = title
+    } else if (title && typeof title === "object") {
+      titleString = Object.values(title)[0] as string
+    }
+    setTitle(titleString)
     NProgress.done()
   })
 }

@@ -10,8 +10,9 @@ declare module "vue-router" {
   interface RouteMeta {
     /**
      * @description 设置该路由在侧边栏和面包屑中展示的名字
+     * 支援多語系物件 { zhCN, zhTW, en }
      */
-    title?: string
+    title?: string | Record<string, string>
     /**
      * @description 设置该路由的图标，记得将 svg 导入 src/common/assets/icons
      */
