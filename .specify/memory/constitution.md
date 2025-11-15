@@ -1,20 +1,23 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version: 1.0.0 → 1.1.0
-Change Type: MINOR (Language update to English, principle refinement)
+Version: 1.1.0 → 1.2.0
+Change Type: MINOR (Added Brownfield protection principle)
 
 Modified Principles:
-- UPDATED: I. Traditional Chinese First → Documentation Language (expanded to support zh-TW for specs)
+- MAINTAINED: I. Documentation Language
 - MAINTAINED: II. Simplified Architecture
 - MAINTAINED: III. Latest Tech Stack
 - MAINTAINED: IV. Code Quality & Testing
 - MAINTAINED: V. User Experience First
+- ADDED: VI. Brownfield Project Protection (new governance principle)
 
 Templates Requiring Updates:
 ✅ plan-template.md - Constitution check section aligned
-✅ spec-template.md - User story requirements aligned (supports zh-TW)
+✅ spec-template.md - User story requirements aligned
 ✅ tasks-template.md - Task categorization aligned
+✅ checklist-template.md - No updates needed (generic template)
+✅ agent-file-template.md - No updates needed (generic template)
 
 Follow-up TODOs: None
 -->
@@ -85,6 +88,18 @@ Follow-up TODOs: None
 
 **Rationale**: Improve end-user satisfaction, reduce learning costs, increase system adoption rate.
 
+### VI. Brownfield Project Protection
+
+**Prohibit unauthorized modification of existing code unless refactoring is explicitly requested**
+
+- Any modification to existing code MUST obtain explicit consent in advance
+- New feature development MUST prioritize extension over modification of existing code
+- Refactoring requests MUST clearly explain the scope of changes and impact
+- Code changes MUST provide detailed change descriptions
+- Maintain consistency with existing architectural style and coding conventions
+
+**Rationale**: Protect existing system stability, reduce destructive change risks, ensure changes are traceable and controllable.
+
 ## Technical Standards
 
 ### Required Tech Stack
@@ -152,4 +167,4 @@ This constitution serves as the highest guiding principle for project developmen
 - Version numbers MUST follow Semantic Versioning
 - All team members are responsible for maintaining the authority of this constitution
 
-**Version**: 1.1.0 | **Ratified**: 2025-11-11 | **Last Amended**: 2025-11-11
+**Version**: 1.2.0 | **Ratified**: 2025-11-11 | **Last Amended**: 2025-11-15
