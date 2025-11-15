@@ -2,6 +2,7 @@ import type { Router } from "vue-router"
 import { setRouteChange } from "@@/composables/useRouteListener"
 import { useTitle } from "@@/composables/useTitle"
 import { getToken } from "@@/utils/cache/cookies"
+import { ElMessage } from "element-plus"
 import NProgress from "nprogress"
 import { usePermissionStore } from "@/pinia/stores/permission"
 import { useUserStore } from "@/pinia/stores/user"
@@ -21,16 +22,21 @@ export function registerNavigationGuard(router: Router) {
     const userStore = useUserStore()
     const permissionStore = usePermissionStore()
     // 如果没有登录
-    if (!getToken()) {
+    const token = getToken()
+    if (!token) {
       // 如果在免登录的白名单中，则直接进入
       if (isWhiteList(to)) return true
       // 其他没有访问权限的页面将被重定向到登录页面
       return `${LOGIN_PATH}?redirect=${encodeURIComponent(to.fullPath)}`
     }
     // 如果已经登录，并准备进入 Login 页面，则重定向到主页
-    if (to.path === LOGIN_PATH) return "/"
+    if (to.path === LOGIN_PATH) {
+      return "/"
+    }
     // 如果用户已经获得其权限角色
-    if (userStore.roles.length !== 0) return true
+    if (userStore.roles.length !== 0) {
+      return true
+    }
     // 否则要重新获取权限角色
     try {
       await userStore.getInfo()

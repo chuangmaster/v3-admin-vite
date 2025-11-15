@@ -7,7 +7,7 @@ import {
 import { getToken } from "@@/utils/cache/cookies"
 import axios from "axios"
 import { get, merge } from "lodash-es"
-import { useI18n } from "vue-i18n"
+import i18n from "@/i18n"
 import { useUserStore } from "@/pinia/stores/user"
 
 /** 登出並強制重新整理頁面（會重新導向到登入頁） */
@@ -30,7 +30,8 @@ function createInstance() {
   // 響應攔截器（可根據具體業務作出相應的調整）
   instance.interceptors.response.use(
     (response) => {
-      const { t } = useI18n()
+      // 使用全局 i18n 實例
+      const t = i18n.global.t
       // apiData 是 api 回傳的資料
       const apiData = response.data
       // 二進制資料則直接回傳
