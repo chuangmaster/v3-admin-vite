@@ -41,5 +41,27 @@ export default {
     closeAll: "關閉全部",
     scrollLeft: "向左滾動標籤（超出最大寬度時可點擊）",
     scrollRight: "向右滾動標籤（超出最大寬度時可點擊）"
+  },
+  api: {
+    validationError: "輸入驗證錯誤",
+    invalidCredentials: "帳號或密碼錯誤",
+    unauthorized: "未授權，請重新登入",
+    forbidden: "禁止操作",
+    notFound: "資源不存在",
+    usernameExists: "帳號已存在",
+    passwordSameAsOld: "新密碼與舊密碼相同",
+    cannotDeleteSelf: "無法刪除當前登入的帳號",
+    lastAccountCannotDelete: "無法刪除最後一個有效帳號",
+    permissionNotFound: "權限不存在",
+    roleNotFound: "角色不存在",
+    userNotFound: "用戶不存在",
+    auditLogNotFound: "稽核日誌不存在",
+    permissionInUse: "權限正被角色使用，無法刪除",
+    roleInUse: "角色正被用戶使用，無法刪除",
+    duplicatePermissionCode: "權限代碼已存在",
+    duplicateRoleName: "角色名稱已存在",
+    concurrentUpdateConflict: "資料已被其他使用者修改",
+    internalError: "系統內部錯誤",
+    invalidInterface: "非本系統的介面"
   }
 }

@@ -5,7 +5,7 @@ import ThemeSwitch from "@@/components/ThemeSwitch/index.vue"
 import { Key, Loading, Lock, Picture, User } from "@element-plus/icons-vue"
 import { useSettingsStore } from "@/pinia/stores/settings"
 import { useUserStore } from "@/pinia/stores/user"
-import { getCaptchaApi, loginApi } from "./apis"
+import { loginApi } from "./apis"
 import Owl from "./components/Owl.vue"
 import { useFocus } from "./composables/useFocus"
 
@@ -31,7 +31,7 @@ const codeUrl = ref("")
 /** 登录表单数据 */
 const loginFormData: LoginRequestData = reactive({
   username: "admin",
-  password: "12345678",
+  password: "Admin@12345",
   code: ""
 })
 
@@ -45,7 +45,7 @@ const loginFormRules: FormRules = {
     { min: 8, max: 16, message: "长度在 8 到 16 个字符", trigger: "blur" }
   ],
   code: [
-    { required: true, message: "请输入验证码", trigger: "blur" }
+    { required: false, message: "请输入验证码", trigger: "blur" }
   ]
 }
 
@@ -59,9 +59,9 @@ function handleLogin() {
     loading.value = true
     loginApi(loginFormData).then(({ data }) => {
       userStore.setToken(data.token)
-      router.push(route.query.redirect ? decodeURIComponent(route.query.redirect as string) : "/")
+      const redirectPath = route.query.redirect ? decodeURIComponent(route.query.redirect as string) : "/"
+      router.push(redirectPath)
     }).catch(() => {
-      createCode()
       loginFormData.password = ""
     }).finally(() => {
       loading.value = false
@@ -76,9 +76,9 @@ function createCode() {
   // 清空验证图片
   codeUrl.value = ""
   // 获取验证码图片
-  getCaptchaApi().then((res) => {
-    codeUrl.value = res.data
-  })
+  // getCaptchaApi().then((res) => {
+  //   codeUrl.value = res.data
+  // })
 }
 
 // 初始化验证码
