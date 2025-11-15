@@ -1,8 +1,8 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version: 1.1.0 → 1.2.0
-Change Type: MINOR (Added Brownfield protection principle)
+Version: 1.2.0 → 1.3.0
+Change Type: MINOR (Added Backend API Contract Compliance principle)
 
 Modified Principles:
 - MAINTAINED: I. Documentation Language
@@ -10,12 +10,13 @@ Modified Principles:
 - MAINTAINED: III. Latest Tech Stack
 - MAINTAINED: IV. Code Quality & Testing
 - MAINTAINED: V. User Experience First
-- ADDED: VI. Brownfield Project Protection (new governance principle)
+- MAINTAINED: VI. Brownfield Project Protection
+- ADDED: VII. Backend API Contract Compliance (new governance principle for frontend-backend separation)
 
 Templates Requiring Updates:
 ✅ plan-template.md - Constitution check section aligned
-✅ spec-template.md - User story requirements aligned
-✅ tasks-template.md - Task categorization aligned
+✅ spec-template.md - User story requirements aligned (API contract reference)
+✅ tasks-template.md - Task categorization aligned (API integration tasks)
 ✅ checklist-template.md - No updates needed (generic template)
 ✅ agent-file-template.md - No updates needed (generic template)
 
@@ -100,6 +101,21 @@ Follow-up TODOs: None
 
 **Rationale**: Protect existing system stability, reduce destructive change risks, ensure changes are traceable and controllable.
 
+### VII. Backend API Contract Compliance
+
+**All frontend API integrations MUST strictly follow the backend API specification documented in V3.Admin.Backend.API.yaml**
+
+- All API requests MUST use the endpoints, methods, and parameters defined in the OpenAPI specification
+- All API responses MUST be handled according to the `ApiResponseModel<T>` format (success, code, message, data, timestamp, traceId)
+- Authentication MUST use JWT Bearer Token in Authorization header (except `/api/auth/login`)
+- Error handling MUST process all business logic codes defined in the specification (e.g., VALIDATION_ERROR, UNAUTHORIZED, NOT_FOUND, CONCURRENT_UPDATE_CONFLICT)
+- Pagination MUST use standard parameters: pageNumber (starting from 1), pageSize (1-100)
+- Request/response data types MUST match the schema definitions exactly
+- Do NOT assume or invent API behaviors not documented in the specification
+- When API requirements are unclear, reference the specification first before making assumptions
+
+**Rationale**: Ensure frontend-backend contract consistency, prevent integration errors, enable parallel development, maintain API versioning discipline, reduce debugging time from contract mismatches.
+
 ## Technical Standards
 
 ### Required Tech Stack
@@ -167,4 +183,4 @@ This constitution serves as the highest guiding principle for project developmen
 - Version numbers MUST follow Semantic Versioning
 - All team members are responsible for maintaining the authority of this constitution
 
-**Version**: 1.2.0 | **Ratified**: 2025-11-11 | **Last Amended**: 2025-11-15
+**Version**: 1.3.0 | **Ratified**: 2025-11-11 | **Last Amended**: 2025-11-15
