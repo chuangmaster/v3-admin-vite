@@ -125,17 +125,17 @@
 
 ### Tests for User Story 4
 
-- [ ] T035 [P] [US4] 單元測試擴充 `tests/composables/useUserManagement.test.ts`（測試 handleDelete 成功場景、二次確認取消場景）
-- [ ] T036 [P] [US4] 整合測試（測試刪除自己帳號時顯示 403 錯誤）
+- [x] T035 [P] [US4] 單元測試擴充 `tests/composables/useUserManagement.test.ts`（測試 handleDelete 成功場景、二次確認取消場景）
+- [x] T036 [P] [US4] 整合測試（測試刪除自己帳號時顯示 403 錯誤）
 
 ### Implementation for User Story 4
 
-- [ ] T037 [US4] 在 UserTable 新增「刪除」按鈕（v-permission="[USER_PERMISSIONS.DELETE]"）
-- [ ] T038 [US4] 實作刪除二次確認邏輯（ElMessageBox.confirm）
-- [ ] T039 [US4] 整合 handleDelete 至表格操作欄
-- [ ] T040 [US4] 處理刪除錯誤（403 CANNOT_DELETE_SELF、422 LAST_ACCOUNT_CANNOT_DELETE）
-- [ ] T041 [US4] 測試權限控制（account.delete 權限）- 驗證無權限時按鈕隱藏
-- [ ] T042 [US4] 驗證已停用用戶無法登入（後端驗證，前端顯示錯誤訊息）
+- [x] T037 [US4] 在 UserTable 新增「刪除」按鈕（v-permission="[USER_PERMISSIONS.DELETE]"）
+- [x] T038 [US4] 實作刪除二次確認邏輯（ElMessageBox.confirm）
+- [x] T039 [US4] 整合 handleDelete 至表格操作欄
+- [x] T040 [US4] 處理刪除錯誤（403 CANNOT_DELETE_SELF、422 LAST_ACCOUNT_CANNOT_DELETE）
+- [x] T041 [US4] 測試權限控制（account.delete 權限）- 驗證無權限時按鈕隱藏
+- [x] T042 [US4] 驗證已停用用戶無法登入（後端驗證，前端顯示錯誤訊息）
 
 **Checkpoint**: User Stories 1-4 都能獨立運作
 

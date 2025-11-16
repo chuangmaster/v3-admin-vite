@@ -5,6 +5,10 @@
  */
 
 import type { User, UserListParams } from "../types"
+import {
+  API_CODE_CANNOT_DELETE_SELF,
+  API_CODE_LAST_ACCOUNT_CANNOT_DELETE
+} from "@@/constants/api-code"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { ref } from "vue"
 import { deleteUser, getUserList } from "../apis/user"
@@ -72,10 +76,24 @@ export function useUserManagement() {
           type: "warning"
         }
       )
-      await deleteUser(user.id)
-      ElMessage.success("用戶刪除成功")
-      // 重新載入列表
-      await fetchUsers()
+      const response = await deleteUser(user.id)
+
+      // 檢查是否為特定的業務錯誤
+      if (response.code === API_CODE_CANNOT_DELETE_SELF) {
+        ElMessage.error("無法刪除自己的帳號")
+        return
+      }
+
+      if (response.code === API_CODE_LAST_ACCOUNT_CANNOT_DELETE) {
+        ElMessage.error("無法刪除最後一個有效帳號")
+        return
+      }
+
+      if (response.success) {
+        ElMessage.success("用戶刪除成功")
+        // 重新載入列表
+        await fetchUsers()
+      }
     } catch (error) {
       // 用戶取消操作時會拋出 "cancel"，忽略此錯誤
       if (error !== "cancel") {

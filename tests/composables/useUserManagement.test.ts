@@ -105,4 +105,94 @@ describe("useUserManagement", () => {
 
     expect(pagination.value.total).toBe(100)
   })
+
+  it("should handle delete user with CANNOT_DELETE_SELF error", async () => {
+    vi.mocked(userApi.deleteUser).mockResolvedValue({
+      success: false,
+      code: "CANNOT_DELETE_SELF",
+      message: "無法刪除自己的帳號",
+      data: null,
+      timestamp: "2025-11-16T00:00:00Z",
+      traceId: "trace-123"
+    } as any)
+
+    vi.mocked(userApi.getUserList).mockResolvedValue({
+      success: true,
+      code: "SUCCESS",
+      message: "查詢成功",
+      data: {
+        items: [],
+        totalCount: 0,
+        pageNumber: 1,
+        pageSize: 20,
+        totalPages: 0
+      },
+      timestamp: "2025-11-16T00:00:00Z",
+      traceId: "trace-123"
+    } as any)
+
+    const mockUser: User = {
+      id: "1",
+      username: "testuser",
+      displayName: "Test User",
+      status: "active",
+      createdAt: "2025-11-16T00:00:00Z",
+      updatedAt: null
+    }
+
+    const { handleDelete } = useUserManagement()
+    // 模擬確認對話框
+    vi.stubGlobal("ElMessageBox", {
+      confirm: vi.fn().mockResolvedValue(true)
+    })
+
+    await handleDelete(mockUser)
+
+    expect(vi.mocked(userApi.deleteUser)).toHaveBeenCalledWith("1")
+  })
+
+  it("should handle delete user with LAST_ACCOUNT_CANNOT_DELETE error", async () => {
+    vi.mocked(userApi.deleteUser).mockResolvedValue({
+      success: false,
+      code: "LAST_ACCOUNT_CANNOT_DELETE",
+      message: "無法刪除最後一個有效帳號",
+      data: null,
+      timestamp: "2025-11-16T00:00:00Z",
+      traceId: "trace-123"
+    } as any)
+
+    vi.mocked(userApi.getUserList).mockResolvedValue({
+      success: true,
+      code: "SUCCESS",
+      message: "查詢成功",
+      data: {
+        items: [],
+        totalCount: 0,
+        pageNumber: 1,
+        pageSize: 20,
+        totalPages: 0
+      },
+      timestamp: "2025-11-16T00:00:00Z",
+      traceId: "trace-123"
+    } as any)
+
+    const mockUser: User = {
+      id: "1",
+      username: "testuser",
+      displayName: "Test User",
+      status: "active",
+      createdAt: "2025-11-16T00:00:00Z",
+      updatedAt: null
+    }
+
+    const { handleDelete } = useUserManagement()
+    // 模擬確認對話框
+    vi.stubGlobal("ElMessageBox", {
+      confirm: vi.fn().mockResolvedValue(true)
+    })
+
+    await handleDelete(mockUser)
+
+    expect(vi.mocked(userApi.deleteUser)).toHaveBeenCalledWith("1")
+  })
 })
