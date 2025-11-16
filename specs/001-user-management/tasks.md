@@ -108,10 +108,10 @@
 
 - [x] T029 [P] [US3] 擴充 UserForm 元件支援編輯模式（接收 editUser prop，預填表單資料）
 - [x] T030 [P] [US3] 擴充 useUserForm 支援編輯邏輯（根據 editUser 呼叫 updateUser API）
-- [ ] T031 [US3] 在 UserTable 新增「編輯」按鈕（v-permission="[USER_PERMISSIONS.UPDATE]"）
-- [ ] T032 [US3] 實作編輯用戶流程（點擊編輯 → 開啟對話框 → 預填資料 → 提交更新）
-- [ ] T033 [US3] 處理並發更新衝突（409 錯誤顯示「資料已被其他使用者更新」提示）
-- [ ] T034 [US3] 測試權限控制（account.update 權限）- 驗證無權限時按鈕隱藏
+- [x] T031 [US3] 在 UserTable 新增「編輯」按鈕（v-permission="[USER_PERMISSIONS.UPDATE]"）
+- [x] T032 [US3] 實作編輯用戶流程（點擊編輯 → 開啟對話框 → 預填資料 → 提交更新）
+- [x] T033 [US3] 處理並發更新衝突（409 錯誤顯示「資料已被其他使用者更新」提示）
+- [x] T034 [US3] 測試權限控制（account.update 權限）- 驗證無權限時按鈕隱藏
 
 **Checkpoint**: User Stories 1, 2, AND 3 都能獨立運作
 

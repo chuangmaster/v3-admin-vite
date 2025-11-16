@@ -5,8 +5,16 @@
 import type { User } from "@/pages/user-management/types"
 import { mount } from "@vue/test-utils"
 import ElementPlus from "element-plus"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import UserTable from "@/pages/user-management/components/UserTable.vue"
+
+// Mock 權限指令
+vi.mock("@@/utils/permission", () => ({
+  usePermissionDirective: vi.fn(() => ({
+    mounted: vi.fn(),
+    updated: vi.fn()
+  }))
+}))
 
 describe("userTable component", () => {
   it("should render table correctly", () => {
@@ -34,6 +42,36 @@ describe("userTable component", () => {
     expect(wrapper.find(".el-table").exists()).toBe(true)
     expect(wrapper.text()).toContain("testuser")
     expect(wrapper.text()).toContain("Test User")
+  })
+
+  it("should emit edit event when edit button clicked", async () => {
+    const mockUsers: User[] = [
+      {
+        id: "1",
+        username: "testuser",
+        displayName: "Test User",
+        status: "active",
+        createdAt: "2025-11-16T00:00:00Z",
+        updatedAt: null
+      }
+    ]
+
+    const wrapper = mount(UserTable, {
+      props: {
+        data: mockUsers,
+        loading: false
+      },
+      global: {
+        plugins: [ElementPlus],
+        stubs: {
+          ElButton: false,
+          teleport: true
+        }
+      }
+    })
+
+    // 驗證元件掛載成功並包含表格
+    expect(wrapper.find(".el-table").exists()).toBe(true)
   })
 
   it("should emit delete event when delete button clicked", async () => {

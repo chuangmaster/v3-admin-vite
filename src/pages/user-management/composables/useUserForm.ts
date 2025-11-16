@@ -6,6 +6,8 @@
 
 import type { FormInstance, FormRules } from "element-plus"
 import type { CreateUserRequest, UpdateUserRequest, User } from "../types"
+import { API_CODE_CONCURRENT_UPDATE_CONFLICT } from "@@/constants/api-code"
+import { ElMessage } from "element-plus"
 import { reactive, ref } from "vue"
 import { createUser, updateUser } from "../apis/user"
 
@@ -102,6 +104,19 @@ export function useUserForm() {
         return true
       }
 
+      // 檢查是否為並發更新衝突 (409)
+      if (response.code === API_CODE_CONCURRENT_UPDATE_CONFLICT) {
+        ElMessage.error("資料已被其他使用者更新，請重新載入後再試")
+        return false
+      }
+
+      return false
+    } catch (error) {
+      // 捕獲任何異常（包括 409 衝突等其他 HTTP 錯誤）
+      const errorMessage = error instanceof Error ? error.message : "提交失敗"
+      if (!errorMessage.includes("資料已被其他使用者更新")) {
+        ElMessage.error(errorMessage)
+      }
       return false
     } finally {
       formLoading.value = false
