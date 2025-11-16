@@ -30,6 +30,10 @@ declare module "vue-router" {
      */
     roles?: string[]
     /**
+     * @description 設置能進入該路由的權限，支援多個權限疊加（例如: ["account.read", "account.create"]）
+     */
+    permissions?: string[]
+    /**
      * @description 默认 true，如果设置为 false，则不会在面包屑中显示
      */
     breadcrumb?: boolean

@@ -10,6 +10,7 @@ export const useUserStore = defineStore("user", () => {
   const token = ref<string>(getToken() || "")
 
   const roles = ref<string[]>([])
+  const permissions = ref<string[]>([])
 
   const username = ref<string>("")
 
@@ -27,8 +28,10 @@ export const useUserStore = defineStore("user", () => {
   const getInfo = async () => {
     const { data } = await getCurrentUserApi()
     username.value = data.username
-    // 验证返回的 roles 是否为一个非空数组，否则塞入一个没有任何作用的默认角色，防止路由守卫逻辑进入无限循环
-    roles.value = data.roles?.length > 0 ? data.roles : routerConfig.defaultRoles
+    // 验证返回的 roles 是否为一个非空数组（保留用於向後兼容）
+    roles.value = data.roles ?? []
+    // 验证返回的 permissions 是否为一个非空数组，否则塞入一个没有任何作用的默认权限，防止路由守卫逻辑进入无限循环
+    permissions.value = data.permissions?.length > 0 ? data.permissions : routerConfig.defaultPermissions
   }
 
   // 模拟角色变化
@@ -45,6 +48,7 @@ export const useUserStore = defineStore("user", () => {
     removeToken()
     token.value = ""
     roles.value = []
+    permissions.value = []
     resetRouter()
     resetTagsView()
   }
@@ -54,6 +58,7 @@ export const useUserStore = defineStore("user", () => {
     removeToken()
     token.value = ""
     roles.value = []
+    permissions.value = []
   }
 
   // 重置 Visited Views 和 Cached Views
@@ -64,7 +69,7 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
-  return { token, roles, username, setToken, getInfo, changeRoles, logout, resetToken }
+  return { token, roles, permissions, username, setToken, getInfo, changeRoles, logout, resetToken }
 })
 
 /**

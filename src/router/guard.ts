@@ -33,18 +33,19 @@ export function registerNavigationGuard(router: Router) {
     if (to.path === LOGIN_PATH) {
       return "/"
     }
-    // 如果用户已经获得其权限角色
-    if (userStore.roles.length !== 0) {
+    // 如果已取得 permissions（以 permissions 陣列為判斷基準）
+    if (userStore.permissions && userStore.permissions.length !== 0) {
       return true
     }
     // 否则要重新获取权限角色
     try {
       await userStore.getInfo()
-      // 注意：角色必须是一个数组！ 例如: ["admin"] 或 ["developer", "editor"]
-      const roles = userStore.roles
-      // 生成可访问的 Routes
-      routerConfig.dynamic ? permissionStore.setRoutes(roles) : permissionStore.setAllRoutes()
-      // 将 "有访问权限的动态路由" 添加到 Router 中
+      // 注意：permissions 必須是一個陣列！例如: ["account.read", "account.create", "account.update", "account.delete"]
+      const permissions = userStore.permissions
+
+      // 根據 permissions 生成可訪問的 Routes
+      routerConfig.dynamic ? permissionStore.setRoutes(permissions) : permissionStore.setAllRoutes()
+      // 將 "有訪問權限的動態路由" 添加到 Router 中
       permissionStore.addRoutes.forEach(route => router.addRoute(route))
       // 设置 replace: true, 因此导航将不会留下历史记录
       return { ...to, replace: true }
