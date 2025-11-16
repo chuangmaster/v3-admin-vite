@@ -149,14 +149,14 @@
 
 ### Tests for User Story 5
 
-- [ ] T043 [P] [US5] 單元測試 `tests/composables/useExportExcel.test.ts`（測試 exportUsers 資料格式化、XLSX 生成）
+- [x] T043 [P] [US5] 單元測試 `tests/composables/useExportExcel.test.ts`（測試 exportUsers 資料格式化、XLSX 生成）
 
 ### Implementation for User Story 5
 
-- [ ] T044 [US5] 在主頁面新增「匯出報表」按鈕（無 v-permission，所有用戶可用）
-- [ ] T045 [US5] 整合 useExportExcel 至主頁面（點擊按鈕觸發 exportUsers(users.value)）
-- [ ] T046 [US5] 驗證匯出資料格式（用戶名、顯示名稱、狀態、建立時間、最後更新時間）
-- [ ] T047 [US5] 測試大量資料匯出（500 筆 < 5 秒）
+- [x] T044 [US5] 在主頁面新增「匯出報表」按鈕（無 v-permission，所有用戶可用）
+- [x] T045 [US5] 整合 useExportExcel 至主頁面（點擊按鈕觸發 exportUsers(users.value)）
+- [x] T046 [US5] 驗證匯出資料格式（用戶名、顯示名稱、狀態、建立時間、最後更新時間）
+- [x] T047 [US5] 測試大量資料匯出（500 筆 < 5 秒）
 
 **Checkpoint**: 所有 User Stories 都能獨立運作
 
