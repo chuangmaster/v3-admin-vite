@@ -1,92 +1,71 @@
-# Implementation Plan: User Management System
+# Implementation Plan: 用戶管理（User Management）
 
-**Branch**: `001-user-management` | **Date**: 2025-01-24 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/001-user-management/spec.md`
-
-**Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
+**Branch**: `001-user-management` | **Date**: 2025-11-16 | **Spec**: `specs/001-user-management/spec.md`
+**Input**: 依據 `spec.md` 與後端 API 規格 `V3.Admin.Backend.API.yaml` 重新規劃
 
 ## Summary
 
-實作使用者帳號管理系統，包含帳號的 CRUD 操作、角色與權限控制。採用 Vue 3 Composition API + Element Plus 構建前端介面，使用 SheetJS 進行前端 Excel 匯出，無需後端報表服務。權限系統採用 `account.read`、`account.create`、`account.update`、`account.delete` 四種權限代碼進行精細化訪問控制。
+此計畫旨在於前端實作「用戶管理」模組，提供用戶列表（分頁/搜尋）、新增、編輯、刪除（軟刪除）、變更密碼與匯出 Excel 等功能。實作以 Vue 3 + TypeScript 為主，使用 Element Plus 作為 UI 元件，並嚴格依照後端 OpenAPI 規格（`V3.Admin.Backend.API.yaml`）進行 API 呼叫與錯誤處理。
+
+主要技術與作法：
+- 前端使用組合式函式（Composables）封裝模組邏輯，必要時才使用 Pinia。
+- 權限採路由守衛（route meta）與 `v-permission` 指令（按鈕級）結合。
+- Excel 匯出優先採 client-side（SheetJS），若面臨資料量/效能問題再提出後端導出 API。
+- 以 `ApiResponseModel<T>` 的 `code` 與 `message` 統一處理錯誤；在 `@/http/axios.ts` 建置 response handler。
 
 ## Technical Context
 
-**Language/Version**: TypeScript 5.9.2, Vue 3.5.21
-**Primary Dependencies**: Element Plus 2.11.2, Pinia 3.0.3, Axios 1.12.2, xlsx (SheetJS)
-**Storage**: 後端 API (REST, JWT Bearer Token, ApiResponseModel<T> 格式)
-**Testing**: Vitest 3.2.4, @vue/test-utils 2.4.6
-**Target Platform**: 現代瀏覽器 (ES2020+)
-**Project Type**: Web application (Frontend only, backend API exists)
-**Performance Goals**: <500ms 頁面載入時間, <100ms 互動回應時間
-**Constraints**: 前端 Excel 匯出 (無後端依賴), 權限驗證 (v-permission 指令 + 路由守衛)
-**Scale/Scope**: ~10 個元件, ~500 行業務邏輯代碼, 支援數千筆用戶數據分頁查詢
+**Language/Version**: Vue 3.5+, TypeScript 5.x
+**Primary Dependencies**: Vite 7+, Element Plus, Pinia (按需), axios, xlsx (SheetJS), dayjs
+**Storage**: 後端為 API（無專用前端 DB）；前端使用記憶體/頁面快取，必要時 localStorage（短期快取）
+**Testing**: Vitest + @vue/test-utils
+**Target Platform**: 現代 Web 瀏覽器（desktop 優先）
+**Project Type**: Web application（前端模組在 `src/pages/user-management`）
+**Performance Goals**: 首次載入在常見情境下 < 2s（資料量 1,000 筆、分頁載入）；匯出 500 筆 .xlsx < 5s
+**Constraints**: 頁面分頁依 API 使用 `pageNumber`（從 1 開始）與 `pageSize`（1-100）；所有 API 呼叫需提供 JWT Bearer Token（除 `/api/auth/login` 以外）；不可假設後端未定義行為
+**Scale/Scope**: 支援至少 10k 用戶的分頁瀏覽（以後端分頁為主）；並發使用者數 50+ 為目標
 
 ## Constitution Check
 
-_GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
+以下以 `.specify/memory/constitution.md` 為準則檢查：
 
-[Gates determined based on constitution file]
+- **I. Documentation Language**: PASS（計畫與產出檔案皆為繁體中文）
+- **II. Simplified Architecture**: PASS（優先 Composables，僅必要時使用 Pinia，避免過度抽象）
+- **III. Latest Tech Stack**: PASS（採用 Vue3 + Vite + Element Plus）
+- **IV. Code Quality & Testing**: PASS（測試策略已規劃：Vitest 與元件測試）
+- **V. User Experience First**: PASS（提供即時驗證、清晰錯誤提示、匯出 UX）
+- **VI. Brownfield Project Protection**: PASS（將變更限制於 `src/pages/user-management`，避免無必要修改既有程式）
+- **VII. Backend API Contract Compliance**: PARTIAL PASS — 需確認以下 gating 項目：
+  - 是否需後端新增 `export` 專用 API（若匯出大量資料或因合規需由後端產生檔案）；目前採用前端匯出策略，但若遇到大資料量會提出後端變更請求。
+  - 權限代碼命名（`user.create` / `user.update` / `user.delete` / `user.export`）需與後端現有權限碼核對或協商。
+
+結論：憲章檢查無阻礙性違反，但有兩項需在 Phase 1 前與後端確認（export API 與最終權限碼）。若後端拒絕或無對應權限，需在 tasks 中補上同步變更工作。
 
 ## Project Structure
 
-### Documentation (this feature)
+選擇 Web application 前端模組方式，實作檔案置於：
 
 ```text
-specs/[###-feature]/
-├── plan.md              # This file (/speckit.plan command output)
-├── research.md          # Phase 0 output (/speckit.plan command)
-├── data-model.md        # Phase 1 output (/speckit.plan command)
-├── quickstart.md        # Phase 1 output (/speckit.plan command)
-├── contracts/           # Phase 1 output (/speckit.plan command)
-└── tasks.md             # Phase 2 output (/speckit.tasks command - NOT created by /speckit.plan)
+src/pages/user-management/
+├── apis/                # API 封裝（對應 contracts）
+├── components/          # 小型元件（UserTable, UserForm）
+├── composables/         # 用戶管理邏輯（useUserManagement, useUserForm, useExportExcel）
+├── types.ts             # 模組型別定義
+└── index.vue            # 主頁面
 ```
 
-### Source Code (repository root)
-
-```text
-src/
-├── pages/
-│   └── user-management/           # 使用者管理模組 (本功能)
-│       ├── index.vue              # 主頁面
-│       ├── components/            # 私有元件
-│       │   ├── UserTable.vue      # 使用者表格元件
-│       │   └── UserForm.vue       # 使用者表單元件 (新增/編輯)
-│       ├── composables/           # 私有組合式函式
-│       │   ├── useUserManagement.ts   # 使用者列表邏輯 (查詢/刪除)
-│       │   ├── useUserForm.ts         # 表單邏輯 (新增/編輯/驗證)
-│       │   └── useExportExcel.ts      # Excel 匯出邏輯 (SheetJS)
-│       └── apis/                  # 私有 API
-│           └── user.ts            # 使用者 API 服務
-│
-├── common/
-│   ├── constants/
-│   │   └── permissions.ts         # 權限常數 (包含 account.read/create/update/delete)
-│   └── utils/
-│       └── permission.ts          # 權限工具函式 (已存在，用於 v-permission 指令)
-│
-├── router/
-│   └── index.ts                   # 路由設定 (添加 user-management 路由與權限守衛)
-│
-└── plugins/
-    └── permission-directive.ts    # v-permission 自訂指令 (已存在)
-
-tests/
-├── components/
-│   ├── UserTable.test.ts          # UserTable 元件測試
-│   └── UserForm.test.ts           # UserForm 元件測試
-└── composables/
-    ├── useUserManagement.test.ts  # useUserManagement 組合式函式測試
-    ├── useUserForm.test.ts        # useUserForm 組合式函式測試
-    └── useExportExcel.test.ts     # useExportExcel 組合式函式測試
-```
-
-**Structure Decision**: 採用專案現有的模組化結構，所有使用者管理相關程式碼集中於 `@/pages/user-management/` 目錄下，遵循「同一業務邏輯的程式碼與資源集中在一起」的原則。權限常數放置於 `@/common/constants/` 以供全域使用。測試檔案按元件與組合式函式分類放置於 `tests/` 目錄。
+**Structure Decision**: 使用現有專案結構，不新增獨立前端專案，僅在 `src/pages/user-management` 上擴充，遵循憲章的 Brownfield 原則。
 
 ## Complexity Tracking
 
-> **Fill ONLY if Constitution Check has violations that must be justified**
+無憲章違規需特殊說明；所有設計選擇優先符合「簡化架構」原則。
 
-| Violation                  | Why Needed         | Simpler Alternative Rejected Because |
-| -------------------------- | ------------------ | ------------------------------------ |
-| [e.g., 4th project]        | [current need]     | [why 3 projects insufficient]        |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient]  |
+## Next Steps / Phase 0→1 交接
+
+1. Phase 0 已完成研究並生成 `research.md`（已存在）。
+2. Phase 1（Design & Contracts）：生成 `data-model.md`、`contracts/api-contracts.md`、`quickstart.md`（均已生成/存在）。
+3. 與後端同步：確認 `user.export` 權限與是否需要新增後端匯出 API（列入 gating 項）。
+4. 執行 agent context 更新腳本：`.specify/scripts/powershell/update-agent-context.ps1 -AgentType copilot`。
+
+產物：`specs/001-user-management/{plan.md,research.md,data-model.md,quickstart.md,contracts/*}`
+
