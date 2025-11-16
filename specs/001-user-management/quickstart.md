@@ -639,7 +639,6 @@ onMounted(() => {
             新增用戶
           </el-button>
           <el-button
-            v-permission="[USER_PERMISSIONS.EXPORT]"
             icon="Download"
             @click="handleExport"
           >
@@ -707,7 +706,7 @@ import { USER_PERMISSIONS } from '@@/constants/permissions'
   meta: {
     title: '用戶管理',
     icon: 'User',
-    permissions: [USER_PERMISSIONS.VIEW],
+    permissions: [USER_PERMISSIONS.READ],
     hidden: false,
     alwaysShow: false
   }

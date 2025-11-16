@@ -187,15 +187,13 @@ export interface Permission {
  */
 export const USER_PERMISSIONS = {
   /** 查看用戶列表（路由權限） */
-  VIEW: "user:view",
+  READ: "account.read",
   /** 新增用戶（功能權限） */
-  CREATE: "user:create",
+  CREATE: "account.create",
   /** 修改用戶（功能權限） */
-  UPDATE: "user:update",
+  UPDATE: "account.update",
   /** 刪除用戶（功能權限） */
-  DELETE: "user:delete",
-  /** 匯出報表（功能權限） */
-  EXPORT: "user:export"
+  DELETE: "account.delete"
 } as const
 ```
 

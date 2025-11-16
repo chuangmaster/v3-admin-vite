@@ -85,11 +85,10 @@ export function exportToExcel(data: any[], filename: string) {
 ```typescript
 // 1. 定義權限碼常數 (@/common/constants/permissions.ts)
 export const USER_PERMISSIONS = {
-  VIEW: 'user:view',         // 查看用戶列表（路由權限）
-  CREATE: 'user:create',     // 新增用戶（按鈕權限）
-  UPDATE: 'user:update',     // 修改用戶（按鈕權限）
-  DELETE: 'user:delete',     // 刪除用戶（按鈕權限）
-  EXPORT: 'user:export'      // 匯出報表（按鈕權限）
+  READ: 'account.read',      // 查看用戶列表（路由權限）
+  CREATE: 'account.create',  // 新增用戶（按鈕權限）
+  UPDATE: 'account.update',  // 修改用戶（按鈕權限）
+  DELETE: 'account.delete'   // 刪除用戶（按鈕權限）
 }
 
 // 2. 路由設定 (@/router/index.ts)
@@ -99,7 +98,7 @@ export const USER_PERMISSIONS = {
   component: () => import('@/pages/user-management/index.vue'),
   meta: {
     title: '用戶管理',
-    permissions: [USER_PERMISSIONS.VIEW]
+    permissions: [USER_PERMISSIONS.READ]
   }
 }
 
