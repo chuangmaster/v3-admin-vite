@@ -19,10 +19,10 @@
 
 **目的**: 安裝依賴套件與建立基礎目錄結構
 
-- [ ] T001 安裝 xlsx 套件（`pnpm add xlsx`）
-- [ ] T002 安裝 xlsx 型別定義（`pnpm add -D @types/xlsx`）
-- [ ] T003 建立目錄結構 `src/pages/user-management/{components,composables,apis}`
-- [ ] T004 建立測試目錄結構 `tests/{components,composables}`
+- [x] T001 安裝 xlsx 套件（`pnpm add xlsx`）
+- [x] T002 安裝 xlsx 型別定義（`pnpm add -D @types/xlsx`）
+- [x] T003 建立目錄結構 `src/pages/user-management/{components,composables,apis}`
+- [x] T004 建立測試目錄結構 `tests/{components,composables}`
 
 ---
 
@@ -32,14 +32,14 @@
 
 **⚠️ CRITICAL**: 此階段完成前，所有 User Story 無法開始
 
-- [ ] T005 [P] 定義型別檔案 `src/pages/user-management/types.ts`（User, CreateUserRequest, UpdateUserRequest, DeleteUserRequest, UserListParams, UserListResponse, ApiResponse）
-- [ ] T006 [P] 定義權限常數 `src/common/constants/permissions.ts`（USER_PERMISSIONS.READ/CREATE/UPDATE/DELETE）
-- [ ] T007 [P] 實作 API 封裝 `src/pages/user-management/apis/user.ts`（getUserList, getUserById, createUser, updateUser, deleteUser）
-- [ ] T008 [P] 建立 Excel 匯出組合式函式 `src/pages/user-management/composables/useExportExcel.ts`
-- [ ] T009 [P] 建立用戶管理組合式函式 `src/pages/user-management/composables/useUserManagement.ts`（列表查詢、刪除、分頁）
-- [ ] T010 [P] 建立表單組合式函式 `src/pages/user-management/composables/useUserForm.ts`（新增/編輯表單、驗證規則）
-- [ ] T011 設定路由 `src/router/index.ts`（新增 /user-management 路由，meta.permissions: [USER_PERMISSIONS.READ]）
-- [ ] T012 驗證路由守衛生效（確認無 account.read 權限時無法訪問）
+- [x] T005 [P] 定義型別檔案 `src/pages/user-management/types.ts`（User, CreateUserRequest, UpdateUserRequest, DeleteUserRequest, UserListParams, UserListResponse, ApiResponse）
+- [x] T006 [P] 定義權限常數 `src/common/constants/permissions.ts`（USER_PERMISSIONS.READ/CREATE/UPDATE/DELETE）
+- [x] T007 [P] 實作 API 封裝 `src/pages/user-management/apis/user.ts`（getUserList, getUserById, createUser, updateUser, deleteUser）
+- [x] T008 [P] 建立 Excel 匯出組合式函式 `src/pages/user-management/composables/useExportExcel.ts`
+- [x] T009 [P] 建立用戶管理組合式函式 `src/pages/user-management/composables/useUserManagement.ts`（列表查詢、刪除、分頁）
+- [x] T010 [P] 建立表單組合式函式 `src/pages/user-management/composables/useUserForm.ts`（新增/編輯表單、驗證規則）
+- [x] T011 設定路由 `src/router/index.ts`（新增 /user-management 路由，meta.permissions: [USER_PERMISSIONS.READ]）
+- [x] T012 驗證路由守衛生效（確認無 account.read 權限時無法訪問）
 
 **Checkpoint**: 基礎設施就緒 - User Story 實作可以開始
 
@@ -55,16 +55,16 @@
 
 > **NOTE: 先寫測試，確保測試 FAIL 後再實作**
 
-- [ ] T013 [P] [US1] 單元測試 `tests/composables/useUserManagement.test.ts`（測試 fetchUsers 成功場景）
-- [ ] T014 [P] [US1] 元件測試 `tests/components/UserTable.test.ts`（測試表格渲染與欄位顯示）
+- [x] T013 [P] [US1] 單元測試 `tests/composables/useUserManagement.test.ts`（測試 fetchUsers 成功場景）
+- [x] T014 [P] [US1] 元件測試 `tests/components/UserTable.test.ts`（測試表格渲染與欄位顯示）
 
 ### Implementation for User Story 1
 
-- [ ] T015 [P] [US1] 建立 UserTable 元件 `src/pages/user-management/components/UserTable.vue`（顯示用戶列表、狀態標籤、無操作按鈕）
-- [ ] T016 [US1] 建立主頁面 `src/pages/user-management/index.vue`（整合 UserTable、分頁元件、搜尋列）
-- [ ] T017 [US1] 實作分頁邏輯（Element Plus Pagination 整合至 useUserManagement）
-- [ ] T018 [US1] 實作搜尋功能（searchKeyword 與 resetSearch）
-- [ ] T019 [US1] 測試權限控制（account.read 權限）- 驗證無權限時拒絕訪問並顯示提示
+- [x] T015 [P] [US1] 建立 UserTable 元件 `src/pages/user-management/components/UserTable.vue`（顯示用戶列表、狀態標籤、無操作按鈕）
+- [x] T016 [US1] 建立主頁面 `src/pages/user-management/index.vue`（整合 UserTable、分頁元件、搜尋列）
+- [x] T017 [US1] 實作分頁邏輯（Element Plus Pagination 整合至 useUserManagement）
+- [x] T018 [US1] 實作搜尋功能（searchKeyword 與 resetSearch）
+- [x] T019 [US1] 測試權限控制（account.read 權限）- 驗證無權限時拒絕訪問並顯示提示
 
 **Checkpoint**: User Story 1 功能完整且可獨立測試
 
@@ -78,16 +78,16 @@
 
 ### Tests for User Story 2
 
-- [ ] T020 [P] [US2] 單元測試 `tests/composables/useUserForm.test.ts`（測試表單驗證規則、submitForm）
-- [ ] T021 [P] [US2] 元件測試 `tests/components/UserForm.test.ts`（測試表單渲染、驗證錯誤顯示）
+- [x] T020 [P] [US2] 單元測試 `tests/composables/useUserForm.test.ts`（測試表單驗證規則、submitForm）
+- [x] T021 [P] [US2] 元件測試 `tests/components/UserForm.test.ts`（測試表單渲染、驗證錯誤顯示）
 
 ### Implementation for User Story 2
 
-- [ ] T022 [P] [US2] 建立 UserForm 元件 `src/pages/user-management/components/UserForm.vue`（新增模式，包含 username, password, displayName 欄位）
-- [ ] T023 [US2] 在主頁面新增「新增用戶」按鈕與對話框（v-permission="[USER_PERMISSIONS.CREATE]"）
-- [ ] T024 [US2] 整合 UserForm 至對話框，實作提交成功後重新整理列表
-- [ ] T025 [US2] 實作密碼複雜度驗證（最少 8 字元、包含大小寫字母與數字）
-- [ ] T026 [US2] 測試權限控制（account.create 權限）- 驗證無權限時按鈕隱藏
+- [x] T022 [P] [US2] 建立 UserForm 元件 `src/pages/user-management/components/UserForm.vue`（新增模式，包含 username, password, displayName 欄位）
+- [x] T023 [US2] 在主頁面新增「新增用戶」按鈕與對話框（v-permission="[USER_PERMISSIONS.CREATE]"）
+- [x] T024 [US2] 整合 UserForm 至對話框，實作提交成功後重新整理列表
+- [x] T025 [US2] 實作密碼複雜度驗證（最少 8 字元、包含大小寫字母與數字）
+- [x] T026 [US2] 測試權限控制（account.create 權限）- 驗證無權限時按鈕隱藏
 
 **Checkpoint**: User Stories 1 AND 2 都能獨立運作
 

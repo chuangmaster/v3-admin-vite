@@ -195,6 +195,29 @@ export const constantRoutes: RouteRecordRaw[] = [
  */
 export const dynamicRoutes: RouteRecordRaw[] = [
   {
+    path: "/user-management",
+    component: Layouts,
+    name: "UserManagement",
+    meta: {
+      title: { zhCN: "用户管理", zhTW: "用戶管理", en: "User Management" },
+      titleKey: "userManagement",
+      elIcon: "User",
+      permissions: ["account.read"]
+    },
+    children: [
+      {
+        path: "",
+        component: () => import("@/pages/user-management/index.vue"),
+        name: "UserManagementPage",
+        meta: {
+          title: { zhCN: "用户管理", zhTW: "用戶管理", en: "User Management" },
+          titleKey: "userManagement",
+          keepAlive: true
+        }
+      }
+    ]
+  },
+  {
     path: "/permission",
     component: Layouts,
     redirect: "/permission/page-level",
