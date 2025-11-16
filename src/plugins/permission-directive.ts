@@ -9,9 +9,10 @@ import { useUserStore } from "@/pinia/stores/user"
 const permission: Directive = {
   mounted(el, binding) {
     const { value: permissionRoles } = binding
-    const { roles } = useUserStore()
+    const { permissions } = useUserStore()
     if (isArray(permissionRoles) && permissionRoles.length > 0) {
-      const hasPermission = roles.some(role => permissionRoles.includes(role))
+      // 支援基於 permission (如: 'account.create')
+      const hasPermission = (Array.isArray(permissions) && permissions.some(p => permissionRoles.includes(p)))
       hasPermission || el.parentNode?.removeChild(el)
     } else {
       throw new Error(`参数必须是一个数组且长度大于 0，参考：v-permission="['admin', 'editor']"`)
