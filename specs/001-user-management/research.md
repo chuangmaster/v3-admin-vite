@@ -323,7 +323,7 @@ axios.interceptors.response.use(
 import { describe, expect, it, vi } from "vitest"
 import { useUserManagement } from "@/pages/user-management/composables/useUserManagement"
 
-vi.mock("@/pages/user-management/apis/user", () => ({
+vi.mock("@/pages/user-management/apis/account", () => ({
   getUserList: vi.fn(() => Promise.resolve({
     data: { items: [], totalCount: 0 }
   }))

@@ -9,7 +9,7 @@ import type { CreateUserRequest, UpdateUserRequest, User } from "../types"
 import { API_CODE_CONCURRENT_UPDATE_CONFLICT } from "@@/constants/api-code"
 import { ElMessage } from "element-plus"
 import { reactive, ref } from "vue"
-import { createUser, updateUser } from "../apis/user"
+import { createUser, updateUser } from "../apis/account"
 
 /** 表單數據類型 */
 type FormData = CreateUserRequest & {

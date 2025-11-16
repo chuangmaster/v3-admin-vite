@@ -499,42 +499,42 @@ import type {
   UserListParams,
   UserListResponse
 } from "../types"
-// @/pages/user-management/apis/user.ts
+// @/pages/user-management/apis/account.ts
 import axios from "@/http/axios"
 
 /**
  * 查詢用戶列表
  */
 export async function getUserList(params: UserListParams): Promise<ApiResponse<UserListResponse>> {
-  return axios.get("/api/accounts", { params })
+  return axios.get("/api/account", { params })
 }
 
 /**
  * 查詢單一用戶
  */
 export async function getUserById(id: string): Promise<ApiResponse<User>> {
-  return axios.get(`/api/accounts/${id}`)
+  return axios.get(`/api/account/${id}`)
 }
 
 /**
  * 新增用戶
  */
 export async function createUser(data: CreateUserRequest): Promise<ApiResponse<User>> {
-  return axios.post("/api/accounts", data)
+  return axios.post("/api/account", data)
 }
 
 /**
  * 更新用戶資訊
  */
 export async function updateUser(id: string, data: UpdateUserRequest): Promise<ApiResponse<User>> {
-  return axios.put(`/api/accounts/${id}`, data)
+  return axios.put(`/api/account/${id}`, data)
 }
 
 /**
  * 刪除用戶（軟刪除）
  */
 export async function deleteUser(id: string): Promise<ApiResponse<null>> {
-  return axios.delete(`/api/accounts/${id}`, {
+  return axios.delete(`/api/account/${id}`, {
     data: { confirmation: "CONFIRM" } as DeleteUserRequest
   })
 }
@@ -543,7 +543,7 @@ export async function deleteUser(id: string): Promise<ApiResponse<null>> {
  * 變更密碼
  */
 export async function changePassword(id: string, data: ChangePasswordRequest): Promise<ApiResponse<null>> {
-  return axios.put(`/api/accounts/${id}/password`, data)
+  return axios.put(`/api/account/${id}/password`, data)
 }
 ```
 

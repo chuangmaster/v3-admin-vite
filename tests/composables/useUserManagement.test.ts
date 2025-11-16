@@ -4,14 +4,28 @@
 
 import type { User, UserListResponse } from "@/pages/user-management/types"
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import * as userApi from "@/pages/user-management/apis/user"
-import { useUserManagement } from "@/pages/user-management/composables/useUserManagement"
 
-// Mock API 模組
-vi.mock("@/pages/user-management/apis/user")
+// Mock ElMessageBox first, at module level
+vi.stubGlobal("ElMessageBox", {
+  confirm: vi.fn().mockResolvedValue(true)
+})
+
+// Mock functions for the account API module
+const mockGetUserList = vi.fn()
+const mockDeleteUser = vi.fn()
+
+// Mock API 模組（工廠函式），確保動態匯入時會取得下列 mock 實作
+vi.mock("@/pages/user-management/apis/account", () => ({
+  getUserList: mockGetUserList,
+  deleteUser: mockDeleteUser,
+  createUser: vi.fn(),
+  updateUser: vi.fn(),
+  changePassword: vi.fn()
+}))
 
 describe("useUserManagement", () => {
   beforeEach(() => {
+    vi.resetModules()
     vi.clearAllMocks()
   })
 
@@ -42,8 +56,9 @@ describe("useUserManagement", () => {
       traceId: "trace-123"
     }
 
-    vi.mocked(userApi.getUserList).mockResolvedValue(mockData as any)
+    mockGetUserList.mockResolvedValue(mockData as any)
 
+    const { useUserManagement } = await import("@/pages/user-management/composables/useUserManagement")
     const { users, pagination, fetchUsers } = useUserManagement()
     await fetchUsers()
 
@@ -68,14 +83,15 @@ describe("useUserManagement", () => {
       traceId: "trace-123"
     }
 
-    vi.mocked(userApi.getUserList).mockResolvedValue(mockData as any)
+    mockGetUserList.mockResolvedValue(mockData as any)
 
+    const { useUserManagement } = await import("@/pages/user-management/composables/useUserManagement")
     const { searchKeyword, fetchUsers, resetSearch } = useUserManagement()
 
     searchKeyword.value = "test"
     await fetchUsers()
 
-    expect(vi.mocked(userApi.getUserList)).toHaveBeenCalled()
+    expect(mockGetUserList).toHaveBeenCalled()
 
     resetSearch()
     expect(searchKeyword.value).toBe("")
@@ -97,8 +113,9 @@ describe("useUserManagement", () => {
       traceId: "trace-123"
     }
 
-    vi.mocked(userApi.getUserList).mockResolvedValue(mockData as any)
+    mockGetUserList.mockResolvedValue(mockData as any)
 
+    const { useUserManagement } = await import("@/pages/user-management/composables/useUserManagement")
     const { pagination, fetchUsers } = useUserManagement()
     pagination.value.pageNumber = 2
     await fetchUsers()
@@ -107,7 +124,7 @@ describe("useUserManagement", () => {
   })
 
   it("should handle delete user with CANNOT_DELETE_SELF error", async () => {
-    vi.mocked(userApi.deleteUser).mockResolvedValue({
+    mockDeleteUser.mockResolvedValue({
       success: false,
       code: "CANNOT_DELETE_SELF",
       message: "無法刪除自己的帳號",
@@ -116,7 +133,7 @@ describe("useUserManagement", () => {
       traceId: "trace-123"
     } as any)
 
-    vi.mocked(userApi.getUserList).mockResolvedValue({
+    mockGetUserList.mockResolvedValue({
       success: true,
       code: "SUCCESS",
       message: "查詢成功",
@@ -140,19 +157,16 @@ describe("useUserManagement", () => {
       updatedAt: null
     }
 
+    const { useUserManagement } = await import("@/pages/user-management/composables/useUserManagement")
     const { handleDelete } = useUserManagement()
-    // 模擬確認對話框
-    vi.stubGlobal("ElMessageBox", {
-      confirm: vi.fn().mockResolvedValue(true)
-    })
 
     await handleDelete(mockUser)
 
-    expect(vi.mocked(userApi.deleteUser)).toHaveBeenCalledWith("1")
+    expect(mockDeleteUser).toHaveBeenCalledWith("1")
   })
 
   it("should handle delete user with LAST_ACCOUNT_CANNOT_DELETE error", async () => {
-    vi.mocked(userApi.deleteUser).mockResolvedValue({
+    mockDeleteUser.mockResolvedValue({
       success: false,
       code: "LAST_ACCOUNT_CANNOT_DELETE",
       message: "無法刪除最後一個有效帳號",
@@ -161,7 +175,7 @@ describe("useUserManagement", () => {
       traceId: "trace-123"
     } as any)
 
-    vi.mocked(userApi.getUserList).mockResolvedValue({
+    mockGetUserList.mockResolvedValue({
       success: true,
       code: "SUCCESS",
       message: "查詢成功",
@@ -185,14 +199,11 @@ describe("useUserManagement", () => {
       updatedAt: null
     }
 
+    const { useUserManagement } = await import("@/pages/user-management/composables/useUserManagement")
     const { handleDelete } = useUserManagement()
-    // 模擬確認對話框
-    vi.stubGlobal("ElMessageBox", {
-      confirm: vi.fn().mockResolvedValue(true)
-    })
 
     await handleDelete(mockUser)
 
-    expect(vi.mocked(userApi.deleteUser)).toHaveBeenCalledWith("1")
+    expect(mockDeleteUser).toHaveBeenCalledWith("1")
   })
 })

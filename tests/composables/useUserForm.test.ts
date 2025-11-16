@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { useUserForm } from "@/pages/user-management/composables/useUserForm"
 
 // Mock API 模組
-vi.mock("@/pages/user-management/apis/user", () => ({
+vi.mock("@/pages/user-management/apis/account", () => ({
   updateUser: vi.fn().mockResolvedValue({ code: 0 })
 }))
 

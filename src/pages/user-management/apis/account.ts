@@ -1,6 +1,6 @@
 /**
- * 用戶管理 API 服務
- * @module @/pages/user-management/apis/user
+ * 帳號/用戶管理 API 服務（採用後端 API 規格的 /api/account 路徑）
+ * @module @/pages/user-management/apis/account
  */
 
 import type {
@@ -23,7 +23,7 @@ import { request } from "@/http/axios"
 export async function getUserList(
   params: UserListParams
 ): Promise<ApiResponse<UserListResponse>> {
-  return request({ url: "/api/accounts", method: "GET", params })
+  return request({ url: "/api/account", method: "GET", params })
 }
 
 /**
@@ -32,7 +32,7 @@ export async function getUserList(
  * @returns 用戶資料
  */
 export async function getUserById(id: string): Promise<ApiResponse<User>> {
-  return request({ url: `/api/accounts/${id}`, method: "GET" })
+  return request({ url: `/api/account/${id}`, method: "GET" })
 }
 
 /**
@@ -41,7 +41,7 @@ export async function getUserById(id: string): Promise<ApiResponse<User>> {
  * @returns 建立的用戶資料
  */
 export async function createUser(data: CreateUserRequest): Promise<ApiResponse<User>> {
-  return request({ url: "/api/accounts", method: "POST", data })
+  return request({ url: "/api/account", method: "POST", data })
 }
 
 /**
@@ -54,7 +54,7 @@ export async function updateUser(
   id: string,
   data: UpdateUserRequest
 ): Promise<ApiResponse<User>> {
-  return request({ url: `/api/accounts/${id}`, method: "PUT", data })
+  return request({ url: `/api/account/${id}`, method: "PUT", data })
 }
 
 /**
@@ -64,7 +64,7 @@ export async function updateUser(
  */
 export async function deleteUser(id: string): Promise<ApiResponse<null>> {
   return request({
-    url: `/api/accounts/${id}`,
+    url: `/api/account/${id}`,
     method: "DELETE",
     data: { confirmation: "CONFIRM" } as DeleteUserRequest
   })
@@ -80,5 +80,5 @@ export async function changePassword(
   id: string,
   data: ChangePasswordRequest
 ): Promise<ApiResponse<null>> {
-  return request({ url: `/api/accounts/${id}/password`, method: "PUT", data })
+  return request({ url: `/api/account/${id}/password`, method: "PUT", data })
 }

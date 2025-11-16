@@ -34,7 +34,7 @@
 
 - [x] T005 [P] 定義型別檔案 `src/pages/user-management/types.ts`（User, CreateUserRequest, UpdateUserRequest, DeleteUserRequest, UserListParams, UserListResponse, ApiResponse）
 - [x] T006 [P] 定義權限常數 `src/common/constants/permissions.ts`（USER_PERMISSIONS.READ/CREATE/UPDATE/DELETE）
-- [x] T007 [P] 實作 API 封裝 `src/pages/user-management/apis/user.ts`（getUserList, getUserById, createUser, updateUser, deleteUser）
+- [x] T007 [P] 實作 API 封裝 `src/pages/user-management/apis/account.ts`（getUserList, getUserById, createUser, updateUser, deleteUser）
 - [x] T008 [P] 建立 Excel 匯出組合式函式 `src/pages/user-management/composables/useExportExcel.ts`
 - [x] T009 [P] 建立用戶管理組合式函式 `src/pages/user-management/composables/useUserManagement.ts`（列表查詢、刪除、分頁）
 - [x] T010 [P] 建立表單組合式函式 `src/pages/user-management/composables/useUserForm.ts`（新增/編輯表單、驗證規則）

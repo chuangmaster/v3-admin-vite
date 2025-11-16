@@ -143,7 +143,7 @@ export const USER_PERMISSIONS = {
 
 ### Step 2: 實作 API 封裝（30 分鐘）
 
-**檔案**: `@/pages/user-management/apis/user.ts`
+**檔案**: `@/pages/user-management/apis/account.ts`
 
 ```typescript
 import type {
@@ -197,7 +197,7 @@ export async function deleteUser(id: string): Promise<ApiResponse<null>> {
 import type { User, UserListParams } from "../types"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { ref } from "vue"
-import { deleteUser, getUserList } from "../apis/user"
+import { deleteUser, getUserList } from "../apis/account"
 
 export function useUserManagement() {
   const users = ref<User[]>([])
@@ -277,7 +277,7 @@ export function useUserManagement() {
 import type { FormInstance, FormRules } from "element-plus"
 import type { CreateUserRequest, UpdateUserRequest, User } from "../types"
 import { reactive, ref } from "vue"
-import { createUser, updateUser } from "../apis/user"
+import { createUser, updateUser } from "../apis/account"
 
 export function useUserForm() {
   const formRef = ref<FormInstance>()
@@ -723,10 +723,10 @@ import { USER_PERMISSIONS } from '@@/constants/permissions'
 
 ```typescript
 import { beforeEach, describe, expect, it, vi } from "vitest"
-import * as userApi from "@/pages/user-management/apis/user"
+import * as userApi from "@/pages/user-management/apis/account"
 import { useUserManagement } from "@/pages/user-management/composables/useUserManagement"
 
-vi.mock("@/pages/user-management/apis/user")
+vi.mock("@/pages/user-management/apis/account")
 
 describe("useUserManagement", () => {
   beforeEach(() => {
@@ -774,7 +774,7 @@ describe("useUserManagement", () => {
 
 ### Q1: 如何測試後端 API？
 
-**A**: 使用 Postman 或 cURL 測試 `/api/accounts` 端點，確保後端正常運作後再整合前端。
+**A**: 使用 Postman 或 cURL 測試 `/api/account` 端點，確保後端正常運作後再整合前端。
 
 ### Q2: 如何模擬權限？
 
