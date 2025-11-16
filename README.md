@@ -165,6 +165,15 @@ pnpm test
 
 **User Management**: Login, logout demonstration
 
+**User Administration**: Complete CRUD system for user management with Excel export
+
+- View user list with pagination and search
+- Add new users with password complexity validation
+- Edit existing user information
+- Delete users with confirmation and error handling
+- Export user data to Excel files
+- Role-based access control for all operations
+
 **Permission Management**: Page-level permissions (dynamic routing), button-level permissions (permission directives, permission functions), route guards
 
 **Multiple Environments**: Development, staging, and production environments

@@ -15,7 +15,11 @@ export default antfu(
       semi: false
     },
     // 忽略文件
-    ignores: []
+    ignores: [
+      "specs/**/*.md",
+      "dist",
+      "node_modules"
+    ]
   },
   {
     // 对所有文件都生效的规则
