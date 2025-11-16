@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { User } from "./types"
 import { USER_PERMISSIONS } from "@@/constants/permissions"
 import { onMounted, ref } from "vue"
 import UserForm from "./components/UserForm.vue"
@@ -10,8 +11,11 @@ const { users, loading, pagination, searchKeyword, fetchUsers, handleDelete, res
   = useUserManagement()
 const { exportUsers } = useExportExcel()
 
-/** 新增對話框可見性 */
+/** 對話框可見性 */
 const dialogVisible = ref(false)
+
+/** 對話框標題 */
+const dialogTitle = ref("新增用戶")
 
 /** UserForm 元件 ref */
 const userFormRef = ref<InstanceType<typeof UserForm>>()
@@ -20,15 +24,19 @@ const userFormRef = ref<InstanceType<typeof UserForm>>()
  * 處理新增用戶按鈕點擊
  */
 function handleCreate(): void {
+  dialogTitle.value = "新增用戶"
+  userFormRef.value?.resetForm()
   dialogVisible.value = true
 }
 
 /**
  * 處理編輯用戶
+ * @param user - 待編輯的用戶
  */
-function handleEdit(): void {
-  // TODO: 實作編輯邏輯（Phase 5）
-  console.log("編輯用戶 - 未實作")
+function handleEdit(user: User): void {
+  dialogTitle.value = "編輯用戶"
+  userFormRef.value?.setupEdit(user)
+  dialogVisible.value = true
 }
 
 /**
@@ -109,10 +117,10 @@ onMounted(() => {
       </div>
     </el-card>
 
-    <!-- 新增用戶對話框 -->
+    <!-- 新增/編輯用戶對話框 -->
     <el-dialog
       v-model="dialogVisible"
-      title="新增用戶"
+      :title="dialogTitle"
       width="600px"
       :close-on-click-modal="false"
     >

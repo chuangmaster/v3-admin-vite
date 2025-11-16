@@ -2,11 +2,14 @@
  * useUserForm 組合式函式單元測試
  */
 
+import type { User } from "@/pages/user-management/types"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import { useUserForm } from "@/pages/user-management/composables/useUserForm"
 
 // Mock API 模組
-vi.mock("@/pages/user-management/apis/user")
+vi.mock("@/pages/user-management/apis/user", () => ({
+  updateUser: vi.fn().mockResolvedValue({ code: 0 })
+}))
 
 describe("useUserForm composable", () => {
   beforeEach(() => {
@@ -64,5 +67,26 @@ describe("useUserForm composable", () => {
     const { isEditMode } = useUserForm()
 
     expect(isEditMode.value).toBe(false)
+  })
+
+  it("should set edit mode when setEditMode is called", () => {
+    const { isEditMode, formData, setEditMode } = useUserForm()
+
+    const mockUser: User = {
+      id: "1",
+      username: "testuser",
+      displayName: "Test User",
+      status: "active",
+      createdAt: "2024-01-01",
+      updatedAt: "2024-01-02"
+    }
+
+    setEditMode(mockUser)
+
+    expect(isEditMode.value).toBe(true)
+    expect(formData.editUserId).toBe("1")
+    expect(formData.username).toBe("testuser")
+    expect(formData.displayName).toBe("Test User")
+    expect(formData.password).toBe("")
   })
 })

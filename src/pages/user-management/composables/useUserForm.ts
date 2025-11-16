@@ -87,11 +87,16 @@ export function useUserForm() {
 
       formLoading.value = true
 
-      const response = isEditMode.value && formData.editUserId
-        ? await updateUser(formData.editUserId, {
-            displayName: formData.displayName
-          } as UpdateUserRequest)
-        : await createUser(formData as CreateUserRequest)
+      let response
+      if (isEditMode.value && formData.editUserId) {
+        // 編輯模式：只提交 displayName
+        response = await updateUser(formData.editUserId, {
+          displayName: formData.displayName
+        } as UpdateUserRequest)
+      } else {
+        // 新增模式：提交完整表單資料
+        response = await createUser(formData as CreateUserRequest)
+      }
 
       if (response.success) {
         return true

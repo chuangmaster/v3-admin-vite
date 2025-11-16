@@ -101,13 +101,13 @@
 
 ### Tests for User Story 3
 
-- [ ] T027 [P] [US3] 單元測試擴充 `tests/composables/useUserForm.test.ts`（測試編輯模式、updateUser API 呼叫）
-- [ ] T028 [P] [US3] 元件測試擴充 `tests/components/UserForm.test.ts`（測試編輯模式表單預填）
+- [x] T027 [P] [US3] 單元測試擴充 `tests/composables/useUserForm.test.ts`（測試編輯模式、updateUser API 呼叫）
+- [x] T028 [P] [US3] 元件測試擴充 `tests/components/UserForm.test.ts`（測試編輯模式表單預填）
 
 ### Implementation for User Story 3
 
-- [ ] T029 [P] [US3] 擴充 UserForm 元件支援編輯模式（接收 editUser prop，預填表單資料）
-- [ ] T030 [P] [US3] 擴充 useUserForm 支援編輯邏輯（根據 editUser 呼叫 updateUser API）
+- [x] T029 [P] [US3] 擴充 UserForm 元件支援編輯模式（接收 editUser prop，預填表單資料）
+- [x] T030 [P] [US3] 擴充 useUserForm 支援編輯邏輯（根據 editUser 呼叫 updateUser API）
 - [ ] T031 [US3] 在 UserTable 新增「編輯」按鈕（v-permission="[USER_PERMISSIONS.UPDATE]"）
 - [ ] T032 [US3] 實作編輯用戶流程（點擊編輯 → 開啟對話框 → 預填資料 → 提交更新）
 - [ ] T033 [US3] 處理並發更新衝突（409 錯誤顯示「資料已被其他使用者更新」提示）
