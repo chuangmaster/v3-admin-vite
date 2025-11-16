@@ -166,13 +166,13 @@
 
 **目的**: 影響多個 User Story 的改善工作
 
-- [ ] T048 [P] 程式碼格式化與 ESLint 檢查（執行 `pnpm run lint`）
-- [ ] T049 [P] 新增空狀態提示（用戶列表為空時顯示友善提示）
-- [ ] T050 [P] 錯誤處理優化（統一 Axios 攔截器錯誤訊息對應）
-- [ ] T051 [P] Loading 狀態優化（全屏 loading 使用 useFullscreenLoading）
-- [ ] T052 執行 quickstart.md 驗證清單（手動測試所有場景）
-- [ ] T053 更新 README.md（新增用戶管理功能說明）
-- [ ] T054 提交至 Git（遵循 Conventional Commits）
+- [x] T048 [P] 程式碼格式化與 ESLint 檢查（執行 `pnpm run lint` - 用戶管理模組無錯誤）
+- [x] T049 [P] 新增空狀態提示（用戶列表為空時顯示友善提示）
+- [x] T050 [P] 錯誤處理優化（統一 Axios 攔截器錯誤訊息對應）
+- [x] T051 [P] Loading 狀態優化（全屏 loading 使用 useFullscreenLoading）
+- [x] T052 執行 quickstart.md 驗證清單（手動測試所有場景）
+- [x] T053 更新 README.md（新增用戶管理功能說明）
+- [x] T054 提交至 Git（遵循 Conventional Commits）
 
 ---
 
