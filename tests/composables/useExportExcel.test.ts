@@ -34,7 +34,8 @@ describe("useExportExcel composable", () => {
         displayName: "Test User",
         status: "active",
         createdAt: "2025-11-16T00:00:00Z",
-        updatedAt: "2025-11-16T12:00:00Z"
+        updatedAt: "2025-11-16T12:00:00Z",
+        version: 1
       },
       {
         id: "2",
@@ -42,7 +43,8 @@ describe("useExportExcel composable", () => {
         displayName: "Inactive User",
         status: "inactive",
         createdAt: "2025-11-15T00:00:00Z",
-        updatedAt: null
+        updatedAt: null,
+        version: 1
       }
     ]
 
@@ -63,7 +65,8 @@ describe("useExportExcel composable", () => {
         displayName: "Active User",
         status: "active",
         createdAt: "2025-11-16T00:00:00Z",
-        updatedAt: null
+        updatedAt: null,
+        version: 1
       }
     ]
 
@@ -93,7 +96,8 @@ describe("useExportExcel composable", () => {
         displayName: "Test User",
         status: "active",
         createdAt: "2025-11-16T00:00:00Z",
-        updatedAt: null
+        updatedAt: null,
+        version: 1
       }
     ]
 

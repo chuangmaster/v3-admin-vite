@@ -25,7 +25,8 @@ describe("userTable component", () => {
         displayName: "Test User",
         status: "active",
         createdAt: "2025-11-16T00:00:00Z",
-        updatedAt: null
+        updatedAt: null,
+        version: 1
       }
     ]
 
@@ -52,7 +53,8 @@ describe("userTable component", () => {
         displayName: "Test User",
         status: "active",
         createdAt: "2025-11-16T00:00:00Z",
-        updatedAt: null
+        updatedAt: null,
+        version: 1
       }
     ]
 
@@ -82,7 +84,8 @@ describe("userTable component", () => {
         displayName: "Test User",
         status: "active",
         createdAt: "2025-11-16T00:00:00Z",
-        updatedAt: null
+        updatedAt: null,
+        version: 1
       }
     ]
 
@@ -113,7 +116,8 @@ describe("userTable component", () => {
         displayName: "Active User",
         status: "active",
         createdAt: "2025-11-16T00:00:00Z",
-        updatedAt: null
+        updatedAt: null,
+        version: 1
       },
       {
         id: "2",
@@ -121,7 +125,8 @@ describe("userTable component", () => {
         displayName: "Inactive User",
         status: "inactive",
         createdAt: "2025-11-16T00:00:00Z",
-        updatedAt: null
+        updatedAt: null,
+        version: 1
       }
     ]
 

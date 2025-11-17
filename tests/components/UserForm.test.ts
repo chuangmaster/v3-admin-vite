@@ -83,7 +83,8 @@ describe("userForm component", () => {
       displayName: "Test User",
       status: "active",
       createdAt: "2024-01-01",
-      updatedAt: "2024-01-02"
+      updatedAt: "2024-01-02",
+      version: 1
     }
 
     wrapper.vm.setupEdit(mockUser)

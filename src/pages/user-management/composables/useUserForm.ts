@@ -15,6 +15,8 @@ import { createUser, updateUser } from "../apis/account"
 type FormData = CreateUserRequest & {
   /** 編輯模式下用於追蹤原用戶 ID */
   editUserId?: string
+  /** 版本號，用於並發控制 */
+  version?: number
 }
 
 /**
@@ -93,7 +95,8 @@ export function useUserForm() {
       if (isEditMode.value && formData.editUserId) {
         // 編輯模式：只提交 displayName
         response = await updateUser(formData.editUserId, {
-          displayName: formData.displayName
+          displayName: formData.displayName,
+          version: formData.version
         } as UpdateUserRequest)
       } else {
         // 新增模式：提交完整表單資料
@@ -143,6 +146,7 @@ export function useUserForm() {
     formData.displayName = user.displayName
     // 編輯模式下密碼不需要填寫（可選）
     formData.password = ""
+    formData.version = user.version
   }
 
   return {
