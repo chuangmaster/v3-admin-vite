@@ -127,12 +127,9 @@ export function useUserForm() {
       }
 
       return false
-    } catch (error) {
+    } catch {
       // 捕獲任何異常（包括 409 衝突等其他 HTTP 錯誤）
-      const errorMessage = error instanceof Error ? error.message : "提交失敗"
-      if (!errorMessage.includes("資料已被其他使用者更新")) {
-        ElMessage.error(errorMessage)
-      }
+      // 註：全域的 axios 攔截器已負責顯示錯誤訊息，避免在此重複顯示。
       return false
     } finally {
       formLoading.value = false
