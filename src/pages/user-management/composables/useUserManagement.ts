@@ -11,7 +11,7 @@ import {
 } from "@@/constants/api-code"
 import { ElMessage } from "element-plus"
 import { ref } from "vue"
-import * as accountApi from "@/pages/user-management/apis/account"
+import * as accountApi from "@/pages/user-management/apis/user"
 
 // Import ElMessageBox lazily to support mocking in tests
 let ElMessageBox: any
