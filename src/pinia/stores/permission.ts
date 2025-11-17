@@ -4,18 +4,19 @@ import { constantRoutes, dynamicRoutes } from "@/router"
 import { routerConfig } from "@/router/config"
 import { flatMultiLevelRoutes } from "@/router/helper"
 
-function hasPermission(roles: string[], route: RouteRecordRaw) {
-  const routeRoles = route.meta?.roles
-  return routeRoles ? roles.some(role => routeRoles.includes(role)) : true
+function hasPermission(permissions: string[], route: RouteRecordRaw) {
+  const routePermissions = route.meta?.permissions
+  // 如果路由沒有定義 permissions，則允許訪問（向後兼容舊的 roles 方式）
+  return routePermissions ? permissions.some(permission => routePermissions.includes(permission)) : true
 }
 
-function filterDynamicRoutes(routes: RouteRecordRaw[], roles: string[]) {
+function filterDynamicRoutes(routes: RouteRecordRaw[], permissions: string[]) {
   const res: RouteRecordRaw[] = []
   routes.forEach((route) => {
     const tempRoute = { ...route }
-    if (hasPermission(roles, tempRoute)) {
+    if (hasPermission(permissions, tempRoute)) {
       if (tempRoute.children) {
-        tempRoute.children = filterDynamicRoutes(tempRoute.children, roles)
+        tempRoute.children = filterDynamicRoutes(tempRoute.children, permissions)
       }
       res.push(tempRoute)
     }
@@ -30,9 +31,9 @@ export const usePermissionStore = defineStore("permission", () => {
   // 有访问权限的动态路由
   const addRoutes = ref<RouteRecordRaw[]>([])
 
-  // 根据角色生成可访问的 Routes（可访问的路由 = 常驻路由 + 有访问权限的动态路由）
-  const setRoutes = (roles: string[]) => {
-    const accessedRoutes = filterDynamicRoutes(dynamicRoutes, roles)
+  // 根據 permissions 生成可訪問的 Routes（可訪問的路由 = 常駐路由 + 有訪問權限的動態路由）
+  const setRoutes = (permissions: string[]) => {
+    const accessedRoutes = filterDynamicRoutes(dynamicRoutes, permissions)
     set(accessedRoutes)
   }
 
