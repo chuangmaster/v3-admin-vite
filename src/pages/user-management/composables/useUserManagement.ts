@@ -9,12 +9,9 @@ import {
   API_CODE_CANNOT_DELETE_SELF,
   API_CODE_LAST_ACCOUNT_CANNOT_DELETE
 } from "@@/constants/api-code"
-import { ElMessage } from "element-plus"
+import { ElMessage, ElMessageBox } from "element-plus"
 import { ref } from "vue"
 import * as accountApi from "@/pages/user-management/apis/user"
-
-// Import ElMessageBox lazily to support mocking in tests
-let ElMessageBox: any
 
 /**
  * 用戶管理組合式函式
@@ -69,11 +66,6 @@ export function useUserManagement() {
    * @param user - 待刪除的用戶物件
    */
   async function handleDelete(user: User): Promise<void> {
-    // Lazy load ElMessageBox from global scope (supports test mocking)
-    if (!ElMessageBox) {
-      ElMessageBox = (window as any).ElMessageBox
-    }
-
     try {
       await ElMessageBox.confirm(
         `確定要刪除用戶「${user.displayName}」嗎？此操作無法復原。`,
@@ -81,7 +73,8 @@ export function useUserManagement() {
         {
           confirmButtonText: "確定刪除",
           cancelButtonText: "取消",
-          type: "warning"
+          type: "warning",
+          appendTo: "body"
         }
       )
       const response = await accountApi.deleteUser(user.id)

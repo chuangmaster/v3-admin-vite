@@ -1,4 +1,92 @@
-// 自定义 Element Plus 样式
+// 自定義 Element Plus 樣式
+
+// MessageBox 對話框定位修正
+.el-overlay-message-box {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding-top: 15vh;
+  box-sizing: border-box;
+}
+
+// MessageBox 對話框樣式
+.el-message-box {
+  background-color: var(--el-bg-color);
+  border: none;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  width: 420px;
+  padding-bottom: 10px;
+
+  .el-message-box__header {
+    padding: 20px 20px 10px;
+    position: relative;
+
+    .el-message-box__title {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--el-text-color-primary);
+      line-height: 1;
+      padding-right: 30px;
+    }
+
+    .el-message-box__headerbtn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 0;
+      border: none;
+      outline: none;
+      background: transparent;
+      cursor: pointer;
+
+      .el-message-box__close {
+        color: var(--el-text-color-secondary);
+
+        &:hover {
+          color: var(--el-color-primary);
+        }
+      }
+    }
+  }
+
+  .el-message-box__content {
+    padding: 30px 20px;
+    color: var(--el-text-color-regular);
+    font-size: 14px;
+
+    .el-message-box__container {
+      .el-message-box__status {
+        display: inline-block;
+        margin-right: 12px;
+        font-size: 24px;
+        vertical-align: middle;
+      }
+
+      .el-message-box__message {
+        display: inline-block;
+        vertical-align: middle;
+
+        p {
+          margin: 0;
+          line-height: 24px;
+        }
+      }
+    }
+  }
+
+  .el-message-box__btns {
+    padding: 5px 20px 0;
+    text-align: right;
+
+    .el-button {
+      &:not(:first-child) {
+        margin-left: 10px;
+      }
+    }
+  }
+}
 
 // 卡片
 .el-card {
