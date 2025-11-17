@@ -72,7 +72,20 @@ export function useUserForm() {
         trigger: "blur"
       }
     ],
-    password: [{ validator: passwordValidator, trigger: "blur" }],
+    password: [
+      {
+        validator: (_rule: any, value: string, callback: any) => {
+          // 編輯模式下，密碼非必填
+          if (isEditMode.value) {
+            callback()
+            return
+          }
+          // 新增模式下，執行完整驗證
+          passwordValidator(_rule, value, callback)
+        },
+        trigger: "blur"
+      }
+    ],
     displayName: [
       { required: true, message: "請輸入顯示名稱", trigger: "blur" },
       { max: 100, message: "顯示名稱最多 100 字元", trigger: "blur" }

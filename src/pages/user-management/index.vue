@@ -48,6 +48,13 @@ function handleFormSuccess(): void {
 }
 
 /**
+ * 處理表單取消
+ */
+function handleFormCancel(): void {
+  dialogVisible.value = false
+}
+
+/**
  * 處理匯出報表
  */
 function handleExport(): void {
@@ -124,7 +131,15 @@ onMounted(() => {
       width="600px"
       :close-on-click-modal="false"
     >
-      <UserForm ref="userFormRef" @success="handleFormSuccess" />
+      <UserForm ref="userFormRef" @success="handleFormSuccess" @cancel="handleFormCancel" />
+      <template #footer>
+        <el-button @click="handleFormCancel">
+          取消
+        </el-button>
+        <el-button type="primary" @click="userFormRef?.handleSubmit?.()">
+          {{ dialogTitle === "新增用戶" ? "提交" : "確認" }}
+        </el-button>
+      </template>
     </el-dialog>
   </div>
 </template>
