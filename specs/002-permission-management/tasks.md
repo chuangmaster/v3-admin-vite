@@ -28,10 +28,10 @@ description: "Task list for permission management feature implementation"
 
 **目的**：專案初始化與權限管理模組的基本結構
 
-- [ ] T001 建立目錄結構 `src/pages/permission-management/{apis,components,composables}`
-- [ ] T002 根據 data-model.md 在 `src/pages/permission-management/types.ts` 建立 TypeScript 型別定義
-- [ ] T003 [P] 在 `@@/constants/permissions.ts` 更新權限常數，新增 PERMISSION_PERMISSIONS 常數
-- [ ] T004 [P] 建立測試目錄結構 `tests/pages/permission-management/{components,composables}`
+- [x] T001 建立目錄結構 `src/pages/permission-management/{apis,components,composables}`
+- [x] T002 根據 data-model.md 在 `src/pages/permission-management/types.ts` 建立 TypeScript 型別定義
+- [x] T003 [P] 在 `@@/constants/permissions.ts` 更新權限常數，新增 PERMISSION_PERMISSIONS 常數
+- [x] T004 [P] 建立測試目錄結構 `tests/pages/permission-management/{components,composables}`
 
 ---
 
@@ -41,11 +41,11 @@ description: "Task list for permission management feature implementation"
 
 **⚠️ 關鍵**：在此階段完成前，不能開始任何使用者故事的工作
 
-- [ ] T005 在 `src/pages/permission-management/apis/permission.ts` 實作 API 客戶端基礎設定與 Axios 攔截器
-- [ ] T006 [P] 在 `@@/utils/validate.ts` 建立工具函式 `validatePermissionCode` 用於權限代碼格式驗證
-- [ ] T007 [P] 在 `src/pages/permission-management/types.ts` 建立 Element Plus 表單驗證規則
-- [ ] T008 在 `src/router/index.ts` 新增權限管理路由，包含 meta 權限檢查
-- [ ] T009 [P] 在 `tests/pages/permission-management/test-utils.ts` 建立測試工具函式，用於模擬 API 回應
+- [x] T005 在 `src/pages/permission-management/apis/permission.ts` 實作 API 客戶端基礎設定與 Axios 攔截器
+- [x] T006 [P] 在 `@@/utils/validate.ts` 建立工具函式 `validatePermissionCode` 用於權限代碼格式驗證
+- [x] T007 [P] 在 `src/pages/permission-management/types.ts` 建立 Element Plus 表單驗證規則
+- [x] T008 在 `src/router/index.ts` 新增權限管理路由，包含 meta 權限檢查
+- [x] T009 [P] 在 `tests/pages/permission-management/test-utils.ts` 建立測試工具函式，用於模擬 API 回應
 
 **檢查點**：基礎建設完成 - 可以開始並行實作使用者故事
 
@@ -61,19 +61,19 @@ description: "Task list for permission management feature implementation"
 
 > **注意：先撰寫這些測試，確保實作前測試會失敗**
 
-- [ ] T010 [P] [US1] 在 `tests/pages/permission-management/composables/usePermissionManagement.test.ts` 建立 `usePermissionManagement` 組合式函式的單元測試
-- [ ] T011 [P] [US1] 在 `tests/pages/permission-management/components/PermissionTable.test.ts` 建立 PermissionTable 元件測試
+- [x] T010 [P] [US1] 在 `tests/pages/permission-management/composables/usePermissionManagement.test.ts` 建立 `usePermissionManagement` 組合式函式的單元測試
+- [x] T011 [P] [US1] 在 `tests/pages/permission-management/components/PermissionTable.test.ts` 建立 PermissionTable 元件測試
 
 ### 使用者故事 1 的實作
 
-- [ ] T012 [US1] 在 `src/pages/permission-management/apis/permission.ts` 實作 `getPermissions` API 函式，對應 GET /api/permissions
-- [ ] T013 [US1] 在 `src/pages/permission-management/apis/permission.ts` 實作 `getPermission` API 函式，對應 GET /api/permissions/{id}
-- [ ] T014 [US1] 在 `src/pages/permission-management/apis/permission.ts` 實作 `getPermissionUsage` API 函式，對應 GET /api/permissions/{id}/usage
-- [ ] T015 [US1] 在 `src/pages/permission-management/composables/usePermissionManagement.ts` 實作 `usePermissionManagement` 組合式函式，包含狀態管理、fetchPermissions、搜尋與分頁邏輯
-- [ ] T016 [P] [US1] 在 `src/pages/permission-management/components/PermissionTable.vue` 建立 PermissionTable 元件，使用 el-table，包含 id/name/code/description/usage/actions 欄位
-- [ ] T017 [US1] 在 `src/pages/permission-management/index.vue` 建立主頁面版型，整合搜尋輸入、PermissionTable 與 el-pagination
-- [ ] T018 [US1] 在 usePermissionManagement 組合式函式中新增錯誤處理與載入狀態
-- [ ] T019 [US1] 在 PermissionTable 元件中新增權限使用狀態顯示（roleCount 徽章）
+- [x] T012 [US1] 在 `src/pages/permission-management/apis/permission.ts` 實作 `getPermissions` API 函式，對應 GET /api/permissions
+- [x] T013 [US1] 在 `src/pages/permission-management/apis/permission.ts` 實作 `getPermission` API 函式，對應 GET /api/permissions/{id}
+- [x] T014 [US1] 在 `src/pages/permission-management/apis/permission.ts` 實作 `getPermissionUsage` API 函式，對應 GET /api/permissions/{id}/usage
+- [x] T015 [US1] 在 `src/pages/permission-management/composables/usePermissionManagement.ts` 實作 `usePermissionManagement` 組合式函式，包含狀態管理、fetchPermissions、搜尋與分頁邏輯
+- [x] T016 [P] [US1] 在 `src/pages/permission-management/components/PermissionTable.vue` 建立 PermissionTable 元件，使用 el-table，包含 id/name/code/description/usage/actions 欄位
+- [x] T017 [US1] 在 `src/pages/permission-management/index.vue` 建立主頁面版型，整合搜尋輸入、PermissionTable 與 el-pagination
+- [x] T018 [US1] 在 usePermissionManagement 組合式函式中新增錯誤處理與載入狀態
+- [x] T019 [US1] 在 PermissionTable 元件中新增權限使用狀態顯示（roleCount 徽章）
 
 **檢查點**：此時使用者故事 1 應該完全可用 - 使用者可以檢視、搜尋與分頁瀏覽權限
 
