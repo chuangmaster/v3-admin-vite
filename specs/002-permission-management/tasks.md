@@ -185,19 +185,19 @@ description: "Task list for permission management feature implementation"
 
 **目的**：影響多個使用者故事的改善與最終品質保證
 
-- [ ] T058 [P] 在 PermissionTable 元件中新增載入骨架，提升資料載入期間的使用者體驗
-- [ ] T059 [P] 在 PermissionTable 元件中新增空狀態 UI，當無權限存在時顯示
-- [ ] T060 [P] 在主頁面的搜尋輸入中實作防抖，減少 API 呼叫次數
-- [ ] T061 [P] 在 PermissionTable 與 PermissionForm 中新增行動裝置檢視的響應式設計調整
-- [ ] T062 程式碼清理與重構：移除 console.logs，確保命名一致性
-- [ ] T063 [P] 在組合式函式與 API 檔案的所有公開函式中新增 JSDoc 註解
-- [ ] T064 效能優化：若權限數量 > 1000 則實作虛擬捲動（選擇性增強）
-- [ ] T065 [P] 執行 ESLint 檢查並修正所有 linting 錯誤：`pnpm lint`
-- [ ] T066 [P] 執行所有測試並確保 100% 通過率：`pnpm test permission-management`
-- [ ] T067 安全性檢查：確保所有路由與操作的權限檢查都已就位
-- [ ] T068 手動執行 quickstart.md 驗證情境，確認所有驗收標準
-- [ ] T069 若需要則更新文件（README 更新、行內程式碼註解）
-- [ ] T070 最終整合測試：測試從登入 → 檢視 → 新增 → 編輯 → 刪除 → 批次操作的完整工作流程
+- [x] T058 [P] 在 PermissionTable 元件中新增載入骨架，提升資料載入期間的使用者體驗
+- [x] T059 [P] 在 PermissionTable 元件中新增空狀態 UI，當無權限存在時顯示
+- [x] T060 [P] 在主頁面的搜尋輸入中實作防抖，減少 API 呼叫次數
+- [x] T061 [P] 在 PermissionTable 與 PermissionForm 中新增行動裝置檢視的響應式設計調整
+- [x] T062 程式碼清理與重構：移除 console.logs，確保命名一致性
+- [x] T063 [P] 在組合式函式與 API 檔案的所有公開函式中新增 JSDoc 註解
+- [x] T064 效能優化：若權限數量 > 1000 則實作虛擬捲動（選擇性增強）
+- [x] T065 [P] 執行 ESLint 檢查並修正所有 linting 錯誤：`pnpm lint`
+- [x] T066 [P] 執行所有測試並確保 100% 通過率：`pnpm test permission-management`
+- [x] T067 安全性檢查：確保所有路由與操作的權限檢查都已就位
+- [x] T068 手動執行 quickstart.md 驗證情境，確認所有驗收標準
+- [x] T069 若需要則更新文件（README 更新、行內程式碼註解）
+- [x] T070 最終整合測試：測試從登入 → 檢視 → 新增 → 編輯 → 刪除 → 批次操作的完整工作流程
 
 ---
 
