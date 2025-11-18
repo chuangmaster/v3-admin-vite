@@ -1,0 +1,9 @@
+node_modules/
+dist/
+build/
+coverage/
+*.min.js
+.idea/
+*.log
+.env*
+pnpm-lock.yaml

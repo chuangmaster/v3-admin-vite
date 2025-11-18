@@ -13,3 +13,15 @@ export function isExternal(path: string) {
   const reg = /^(https?:|mailto:|tel:)/
   return reg.test(path)
 }
+/**
+ * 驗證權限代碼格式
+ * 格式：module:action 或 module:submodule:action（最多三層）
+ * 範例：permission:read, user:profile:edit
+ *
+ * @param code - 權限代碼
+ * @returns 是否符合格式
+ */
+export function validatePermissionCode(code: string): boolean {
+  const pattern = /^\w+:\w+(:\w+)?$/
+  return pattern.test(code)
+}
