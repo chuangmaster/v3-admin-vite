@@ -17,6 +17,8 @@ export interface User {
   createdAt: string
   /** 最後更新時間（ISO 8601，可為 null） */
   updatedAt: string | null
+  /** 版本號，用於並發控制 */
+  version: number
 }
 
 /** 新增用戶請求 */
@@ -33,6 +35,8 @@ export interface CreateUserRequest {
 export interface UpdateUserRequest {
   /** 顯示名稱（1-100 字元） */
   displayName: string
+  /** 版本號，用於並發控制 */
+  version: number
 }
 
 /** 變更密碼請求 */

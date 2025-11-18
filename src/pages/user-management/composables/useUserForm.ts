@@ -9,12 +9,14 @@ import type { CreateUserRequest, UpdateUserRequest, User } from "../types"
 import { API_CODE_CONCURRENT_UPDATE_CONFLICT } from "@@/constants/api-code"
 import { ElMessage } from "element-plus"
 import { reactive, ref } from "vue"
-import { createUser, updateUser } from "../apis/account"
+import { createUser, updateUser } from "../apis/user"
 
 /** 表單數據類型 */
 type FormData = CreateUserRequest & {
   /** 編輯模式下用於追蹤原用戶 ID */
   editUserId?: string
+  /** 版本號，用於並發控制 */
+  version?: number
 }
 
 /**
@@ -70,7 +72,20 @@ export function useUserForm() {
         trigger: "blur"
       }
     ],
-    password: [{ validator: passwordValidator, trigger: "blur" }],
+    password: [
+      {
+        validator: (_rule: any, value: string, callback: any) => {
+          // 編輯模式下，密碼非必填
+          if (isEditMode.value) {
+            callback()
+            return
+          }
+          // 新增模式下，執行完整驗證
+          passwordValidator(_rule, value, callback)
+        },
+        trigger: "blur"
+      }
+    ],
     displayName: [
       { required: true, message: "請輸入顯示名稱", trigger: "blur" },
       { max: 100, message: "顯示名稱最多 100 字元", trigger: "blur" }
@@ -93,7 +108,8 @@ export function useUserForm() {
       if (isEditMode.value && formData.editUserId) {
         // 編輯模式：只提交 displayName
         response = await updateUser(formData.editUserId, {
-          displayName: formData.displayName
+          displayName: formData.displayName,
+          version: formData.version
         } as UpdateUserRequest)
       } else {
         // 新增模式：提交完整表單資料
@@ -111,12 +127,9 @@ export function useUserForm() {
       }
 
       return false
-    } catch (error) {
+    } catch {
       // 捕獲任何異常（包括 409 衝突等其他 HTTP 錯誤）
-      const errorMessage = error instanceof Error ? error.message : "提交失敗"
-      if (!errorMessage.includes("資料已被其他使用者更新")) {
-        ElMessage.error(errorMessage)
-      }
+      // 註：全域的 axios 攔截器已負責顯示錯誤訊息，避免在此重複顯示。
       return false
     } finally {
       formLoading.value = false
@@ -143,6 +156,7 @@ export function useUserForm() {
     formData.displayName = user.displayName
     // 編輯模式下密碼不需要填寫（可選）
     formData.password = ""
+    formData.version = user.version
   }
 
   return {
