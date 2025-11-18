@@ -87,19 +87,19 @@ description: "Task list for permission management feature implementation"
 
 ### 使用者故事 2 的測試
 
-- [ ] T020 [P] [US2] 在 `tests/pages/permission-management/composables/usePermissionForm.test.ts` 建立 `usePermissionForm` 組合式函式的單元測試
-- [ ] T021 [P] [US2] 在 `tests/pages/permission-management/components/PermissionForm.test.ts` 建立 PermissionForm 元件測試
-- [ ] T022 [P] [US2] 在 `tests/utils/validate.test.ts` 建立 `validatePermissionCode` 工具函式的單元測試
+- [x] T020 [P] [US2] 在 `tests/pages/permission-management/composables/usePermissionForm.test.ts` 建立 `usePermissionForm` 組合式函式的單元測試
+- [x] T021 [P] [US2] 在 `tests/pages/permission-management/components/PermissionForm.test.ts` 建立 PermissionForm 元件測試
+- [x] T022 [P] [US2] 在 `tests/utils/validate.test.ts` 建立 `validatePermissionCode` 工具函式的單元測試
 
 ### 使用者故事 2 的實作
 
-- [ ] T023 [US2] 在 `src/pages/permission-management/apis/permission.ts` 實作 `createPermission` API 函式，對應 POST /api/permissions
-- [ ] T024 [US2] 在 `src/pages/permission-management/composables/usePermissionForm.ts` 實作 `usePermissionForm` 組合式函式，包含表單狀態、驗證與新增模式的提交邏輯
-- [ ] T025 [US2] 在 `src/pages/permission-management/components/PermissionForm.vue` 建立 PermissionForm 元件，使用 el-form、el-input 欄位（name/code/description）與驗證規則
-- [ ] T026 [US2] 在 `src/pages/permission-management/index.vue` 新增「新增權限」按鈕與 el-dialog，以新增模式開啟 PermissionForm
-- [ ] T027 [US2] 在 usePermissionForm 中處理 DUPLICATE_CODE 錯誤回應，並顯示使用者友善的錯誤訊息
-- [ ] T028 [US2] 在 PermissionForm 元件中新增表單重置與取消功能
-- [ ] T029 [US2] 在主頁面中，於成功建立後重新整理權限清單
+- [x] T023 [US2] 在 `src/pages/permission-management/apis/permission.ts` 實作 `createPermission` API 函式，對應 POST /api/permissions
+- [x] T024 [US2] 在 `src/pages/permission-management/composables/usePermissionForm.ts` 實作 `usePermissionForm` 組合式函式，包含表單狀態、驗證與新增模式的提交邏輯
+- [x] T025 [US2] 在 `src/pages/permission-management/components/PermissionForm.vue` 建立 PermissionForm 元件，使用 el-form、el-input 欄位（name/code/description）與驗證規則
+- [x] T026 [US2] 在 `src/pages/permission-management/index.vue` 新增「新增權限」按鈕與 el-dialog，以新增模式開啟 PermissionForm
+- [x] T027 [US2] 在 usePermissionForm 中處理 DUPLICATE_CODE 錯誤回應，並顯示使用者友善的錯誤訊息
+- [x] T028 [US2] 在 PermissionForm 元件中新增表單重置與取消功能
+- [x] T029 [US2] 在主頁面中，於成功建立後重新整理權限清單
 
 **檢查點**：此時使用者故事 1 與 2 應該都能獨立運作 - 使用者可以檢視權限並建立新權限
 
@@ -113,18 +113,18 @@ description: "Task list for permission management feature implementation"
 
 ### 使用者故事 3 的測試
 
-- [ ] T030 [P] [US3] 在 `tests/pages/permission-management/composables/usePermissionForm.test.ts` 新增編輯模式測試
-- [ ] T031 [P] [US3] 在 `tests/pages/permission-management/composables/usePermissionForm.test.ts` 新增樂觀鎖定衝突測試
+- [x] T030 [P] [US3] 在 `tests/pages/permission-management/composables/usePermissionForm.test.ts` 新增編輯模式測試
+- [x] T031 [P] [US3] 在 `tests/pages/permission-management/composables/usePermissionForm.test.ts` 新增樂觀鎖定衝突測試
 
 ### 使用者故事 3 的實作
 
-- [ ] T032 [US3] 在 `src/pages/permission-management/apis/permission.ts` 實作 `updatePermission` API 函式，對應 PUT /api/permissions/{id}
-- [ ] T033 [US3] 在 `src/pages/permission-management/composables/usePermissionForm.ts` 擴充 `usePermissionForm` 組合式函式，支援編輯模式與版本追蹤
-- [ ] T034 [US3] 在 `src/pages/permission-management/components/PermissionTable.vue` 的 PermissionTable 元件操作欄位中新增編輯按鈕
-- [ ] T035 [US3] 在 `src/pages/permission-management/components/PermissionForm.vue` 擴充 PermissionForm 元件，處理編輯模式與預填資料
-- [ ] T036 [US3] 在 usePermissionForm 中實作 CONCURRENT_UPDATE_CONFLICT 錯誤處理，通知使用者重新載入
-- [ ] T037 [US3] 實作 SYSTEM_PERMISSION_PROTECTED 檢查，停用系統權限的編輯功能（isSystem=true）
-- [ ] T038 [US3] 在主頁面中，於成功更新後重新整理權限清單
+- [x] T032 [US3] 在 `src/pages/permission-management/apis/permission.ts` 實作 `updatePermission` API 函式，對應 PUT /api/permissions/{id}
+- [x] T033 [US3] 在 `src/pages/permission-management/composables/usePermissionForm.ts` 擴充 `usePermissionForm` 組合式函式，支援編輯模式與版本追蹤
+- [x] T034 [US3] 在 `src/pages/permission-management/components/PermissionTable.vue` 的 PermissionTable 元件操作欄位中新增編輯按鈕
+- [x] T035 [US3] 在 `src/pages/permission-management/components/PermissionForm.vue` 擴充 PermissionForm 元件，處理編輯模式與預填資料
+- [x] T036 [US3] 在 usePermissionForm 中實作 CONCURRENT_UPDATE_CONFLICT 錯誤處理，通知使用者重新載入
+- [x] T037 [US3] 實作 SYSTEM_PERMISSION_PROTECTED 檢查，停用系統權限的編輯功能（isSystem=true）
+- [x] T038 [US3] 在主頁面中，於成功更新後重新整理權限清單
 
 **檢查點**：所有 CRUD 的讀取/新增/更新操作應該都能獨立運作
 
@@ -164,18 +164,18 @@ description: "Task list for permission management feature implementation"
 ### 使用者故事 5 的測試
 
 - [ ] T048 [P] [US5] 在 `tests/pages/permission-management/composables/usePermissionManagement.test.ts` 新增批次刪除測試
-- [ ] T049 [P] [US5] 在 `tests/pages/permission-management/composables/useExportExcel.test.ts` 建立 Excel 匯出的單元測試
+- [x] T049 [P] [US5] 在 `tests/pages/permission-management/composables/useExportExcel.test.ts` 建立 Excel 匯出的單元測試
 
 ### 使用者故事 5 的實作
 
-- [ ] T050 [US5] 在 `src/pages/permission-management/components/PermissionTable.vue` 的 PermissionTable 中新增選取變更處理器，使用 el-table type="selection"
-- [ ] T051 [US5] 在 `src/pages/permission-management/composables/usePermissionManagement.ts` 的 `usePermissionManagement` 組合式函式中新增 `handleBatchDelete` 函式
-- [ ] T052 [US5] 在 `src/pages/permission-management/index.vue` 的主頁面工具列中建立批次刪除按鈕（當選取項目 > 0 時顯示）
-- [ ] T053 [US5] 實作批次刪除確認對話框，列出選取的權限
-- [ ] T054 [US5] 處理部分成功的情況（部分權限使用中、部分可刪除），提供詳細回饋
-- [ ] T055 [P] [US5] 在 `src/pages/permission-management/composables/useExportExcel.ts` 實作 `useExportExcel` 組合式函式，用於 Excel 匯出功能
-- [ ] T056 [US5] 在 `src/pages/permission-management/index.vue` 的主頁面工具列中新增匯出按鈕
-- [ ] T057 [US5] 實作匯出邏輯，產生包含所有權限資料的 Excel 檔案
+- [x] T050 [US5] 在 `src/pages/permission-management/components/PermissionTable.vue` 的 PermissionTable 中新增選取變更處理器，使用 el-table type="selection"
+- [x] T051 [US5] 在 `src/pages/permission-management/composables/usePermissionManagement.ts` 的 `usePermissionManagement` 組合式函式中新增 `handleBatchDelete` 函式
+- [x] T052 [US5] 在 `src/pages/permission-management/index.vue` 的主頁面工具列中建立批次刪除按鈕（當選取項目 > 0 時顯示）
+- [x] T053 [US5] 實作批次刪除確認對話框，列出選取的權限
+- [x] T054 [US5] 處理部分成功的情況（部分權限使用中、部分可刪除），提供詳細回饋
+- [x] T055 [P] [US5] 在 `src/pages/permission-management/composables/useExportExcel.ts` 實作 `useExportExcel` 組合式函式，用於 Excel 匯出功能
+- [x] T056 [US5] 在 `src/pages/permission-management/index.vue` 的主頁面工具列中新增匯出按鈕
+- [x] T057 [US5] 實作匯出邏輯，產生包含所有權限資料的 Excel 檔案
 
 **檢查點**：所有使用者故事（包含批次操作）應該都能獨立運作
 
