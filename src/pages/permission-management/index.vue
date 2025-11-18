@@ -28,9 +28,6 @@ const dialogVisible = ref(false)
 /** 對話框標題 */
 const dialogTitle = ref("新增權限")
 
-/** 表單模式 */
-const formMode = ref<"create" | "edit">("create")
-
 /** PermissionTable 元件 ref */
 const permissionTableRef = ref<InstanceType<typeof PermissionTable>>()
 
@@ -45,7 +42,6 @@ const selectedPermissions = ref<Permission[]>([])
  */
 function handleCreate(): void {
   dialogTitle.value = "新增權限"
-  formMode.value = "create"
   permissionFormRef.value?.resetForm()
   dialogVisible.value = true
 }
@@ -55,7 +51,6 @@ function handleCreate(): void {
  */
 function handleEdit(permission: Permission): void {
   dialogTitle.value = "編輯權限"
-  formMode.value = "edit"
   permissionFormRef.value?.loadPermission(permission)
   dialogVisible.value = true
 }
@@ -218,7 +213,6 @@ onMounted(() => {
     >
       <PermissionForm
         ref="permissionFormRef"
-        :mode="formMode"
         @success="handleFormSuccess"
         @close="dialogVisible = false"
       />
