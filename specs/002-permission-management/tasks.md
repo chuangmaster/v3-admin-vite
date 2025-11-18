@@ -138,18 +138,18 @@ description: "Task list for permission management feature implementation"
 
 ### 使用者故事 4 的測試
 
-- [ ] T039 [P] [US4] 在 `tests/pages/permission-management/composables/usePermissionManagement.test.ts` 新增刪除操作測試
-- [ ] T040 [P] [US4] 在 `tests/pages/permission-management/composables/usePermissionManagement.test.ts` 新增權限使用中驗證測試
+- [x] T039 [P] [US4] 在 `tests/pages/permission-management/composables/usePermissionManagement.test.ts` 新增刪除操作測試
+- [x] T040 [P] [US4] 在 `tests/pages/permission-management/composables/usePermissionManagement.test.ts` 新增權限使用中驗證測試
 
 ### 使用者故事 4 的實作
 
-- [ ] T041 [US4] 在 `src/pages/permission-management/apis/permission.ts` 實作 `deletePermission` API 函式，對應 DELETE /api/permissions/{id}
-- [ ] T042 [US4] 在 `src/pages/permission-management/composables/usePermissionManagement.ts` 的 `usePermissionManagement` 組合式函式中新增 `handleDelete` 函式
-- [ ] T043 [US4] 在 `src/pages/permission-management/components/PermissionTable.vue` 的 PermissionTable 元件操作欄位中新增刪除按鈕
-- [ ] T044 [US4] 實作 ElMessageBox 確認對話框，在刪除前顯示警告訊息
-- [ ] T045 [US4] 處理 PERMISSION_IN_USE 錯誤回應，並顯示哪些角色正在使用該權限
-- [ ] T046 [US4] 處理 SYSTEM_PERMISSION_PROTECTED 錯誤，防止刪除系統權限（isSystem=true）
-- [ ] T047 [US4] 在成功刪除後重新整理權限清單
+- [x] T041 [US4] 在 `src/pages/permission-management/apis/permission.ts` 實作 `deletePermission` API 函式，對應 DELETE /api/permissions/{id}
+- [x] T042 [US4] 在 `src/pages/permission-management/composables/usePermissionManagement.ts` 的 `usePermissionManagement` 組合式函式中新增 `handleDelete` 函式
+- [x] T043 [US4] 在 `src/pages/permission-management/components/PermissionTable.vue` 的 PermissionTable 元件操作欄位中新增刪除按鈕
+- [x] T044 [US4] 實作 ElMessageBox 確認對話框，在刪除前顯示警告訊息
+- [x] T045 [US4] 處理 PERMISSION_IN_USE 錯誤回應，並顯示哪些角色正在使用該權限
+- [x] T046 [US4] 處理 SYSTEM_PERMISSION_PROTECTED 錯誤，防止刪除系統權限（isSystem=true）
+- [x] T047 [US4] 在成功刪除後重新整理權限清單
 
 **檢查點**：完整的 CRUD 操作（新增、讀取、更新、刪除）應該都能獨立運作並處理邊界情況
 
@@ -163,7 +163,7 @@ description: "Task list for permission management feature implementation"
 
 ### 使用者故事 5 的測試
 
-- [ ] T048 [P] [US5] 在 `tests/pages/permission-management/composables/usePermissionManagement.test.ts` 新增批次刪除測試
+- [x] T048 [P] [US5] 在 `tests/pages/permission-management/composables/usePermissionManagement.test.ts` 新增批次刪除測試
 - [x] T049 [P] [US5] 在 `tests/pages/permission-management/composables/useExportExcel.test.ts` 建立 Excel 匯出的單元測試
 
 ### 使用者故事 5 的實作
