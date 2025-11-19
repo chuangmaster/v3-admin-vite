@@ -218,6 +218,29 @@ export const dynamicRoutes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: "/permission-management",
+    component: Layouts,
+    name: "PermissionManagement",
+    meta: {
+      title: { zhCN: "权限管理", zhTW: "權限管理", en: "Permission Management" },
+      titleKey: "permissionManagement",
+      elIcon: "Key",
+      permissions: ["permission.read"]
+    },
+    children: [
+      {
+        path: "",
+        component: () => import("@/pages/permission-management/index.vue"),
+        name: "PermissionManagementPage",
+        meta: {
+          title: { zhCN: "权限管理", zhTW: "權限管理", en: "Permission Management" },
+          titleKey: "permissionManagement",
+          keepAlive: true
+        }
+      }
+    ]
+  },
+  {
     path: "/permission",
     component: Layouts,
     redirect: "/permission/page-level",
