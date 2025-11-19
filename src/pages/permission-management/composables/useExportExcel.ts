@@ -7,6 +7,7 @@
 import type { Permission } from "../types"
 import { ElMessage } from "element-plus"
 import { ref } from "vue"
+import * as XLSX from "xlsx"
 
 /**
  * Excel 匯出組合式函式
@@ -38,18 +39,30 @@ export function useExportExcel() {
         版本: permission.version,
         建立時間: formatDate(permission.createdAt),
         更新時間: formatDate(permission.updatedAt),
-        建立者: permission.createdBy || "-",
-        更新者: permission.updatedBy || "-"
+        建立者: (permission as any).createdBy || "-",
+        更新者: (permission as any).updatedBy || "-"
       }))
 
-      // 建立 CSV 內容
-      const csv = convertToCSV(data)
+      // 使用 xlsx 將資料轉成 worksheet
+      const ws = XLSX.utils.json_to_sheet(data)
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, "Permissions")
+
+      // 產生 binary array
+      const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" })
 
       // 下載檔案
-      downloadFile(csv, "permissions.csv")
+      const blob = new Blob([wbout], { type: "application/octet-stream" })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = "permissions.xlsx"
+      link.click()
+      URL.revokeObjectURL(url)
 
       ElMessage.success("匯出成功")
-    } catch {
+    } catch (err) {
+      console.error(err)
       ElMessage.error("匯出失敗")
     } finally {
       exporting.value = false
@@ -59,42 +72,7 @@ export function useExportExcel() {
   /**
    * 將資料轉換為 CSV 格式
    */
-  function convertToCSV(data: any[]): string {
-    if (data.length === 0) return ""
-
-    // 取得表頭
-    const headers = Object.keys(data[0])
-    const headerRow = headers.map(h => `"${h}"`).join(",")
-
-    // 取得資料行
-    const dataRows = data.map((row) => {
-      return headers.map((header) => {
-        const value = row[header]
-        // 轉義引號並使用雙引號包裝
-        return `"${String(value).replace(/"/g, "\"\"")}"`
-      }).join(",")
-    })
-
-    return [headerRow, ...dataRows].join("\n")
-  }
-
-  /**
-   * 下載檔案
-   */
-  function downloadFile(content: string, filename: string): void {
-    // 使用 BOM 以確保 UTF-8 編碼在 Excel 中正確顯示
-    const bom = "\uFEFF"
-    const blob = new Blob([bom + content], { type: "text/csv;charset=utf-8" })
-    const url = URL.createObjectURL(blob)
-
-    const link = document.createElement("a")
-    link.href = url
-    link.download = filename
-    link.click()
-
-    // 清理
-    URL.revokeObjectURL(url)
-  }
+  // CSV 轉換與下載相關函式已移除，改為使用 xlsx 套件產生 .xlsx
 
   /**
    * 格式化日期

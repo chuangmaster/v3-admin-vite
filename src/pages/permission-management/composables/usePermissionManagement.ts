@@ -43,7 +43,7 @@ export function usePermissionManagement() {
     loading.value = true
     try {
       const query: PermissionQuery = {
-        keyword: searchKeyword.value || undefined,
+        searchKeyword: searchKeyword.value || undefined,
         pageNumber: pagination.value.pageNumber,
         pageSize: pagination.value.pageSize
       }

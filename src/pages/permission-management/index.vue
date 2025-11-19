@@ -87,6 +87,14 @@ function handleReset(): void {
 }
 
 /**
+ * 處理搜尋清空
+ */
+function handleSearchClear(): void {
+  pagination.value.pageNumber = 1
+  fetchPermissions()
+}
+
+/**
  * 處理匯出 Excel
  */
 function handleExport(): void {
@@ -156,6 +164,8 @@ onMounted(() => {
           placeholder="搜尋權限名稱或代碼..."
           clearable
           style="width: 250px"
+          @keyup.enter="fetchPermissions"
+          @clear="handleSearchClear"
         >
           <template #prefix>
             <ElIcon><Search /></ElIcon>

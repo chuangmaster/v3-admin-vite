@@ -84,7 +84,7 @@ export interface UpdatePermissionDto {
  */
 export interface PermissionQuery {
   /** 搜尋關鍵字（搜尋 name 或 code） */
-  keyword?: string
+  searchKeyword?: string
 
   /** 頁碼（從 1 開始） */
   pageNumber: number
