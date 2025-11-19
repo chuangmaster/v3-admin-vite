@@ -41,7 +41,7 @@ describe("usePermissionForm", () => {
     )
 
     expect(formData.value.name).toBe("")
-    expect(formData.value.code).toBe("")
+    expect(formData.value.permissionCode).toBe("")
     expect(formData.value.description).toBe("")
     expect(isEditMode.value).toBe(false)
   })
@@ -65,7 +65,7 @@ describe("usePermissionForm", () => {
 
     // 填入表單資料
     formData.value.name = "新增權限"
-    formData.value.code = "permission:create"
+    formData.value.permissionCode = "permission:create"
     formData.value.description = "允許建立新的權限"
 
     await handleSubmit()
@@ -93,7 +93,7 @@ describe("usePermissionForm", () => {
     })
 
     formData.value.name = "新增權限"
-    formData.value.code = "permission:read"
+    formData.value.permissionCode = "permission:read"
     formData.value.description = "允許查看權限"
 
     await handleSubmit()
@@ -113,7 +113,7 @@ describe("usePermissionForm", () => {
 
     const mockPermission = createMockPermission({
       name: "編輯權限",
-      code: "permission:edit",
+      permissionCode: "permission:edit",
       description: "允許編輯權限"
     })
 
@@ -121,7 +121,7 @@ describe("usePermissionForm", () => {
 
     expect(isEditMode.value).toBe(true)
     expect(formData.value.name).toBe("編輯權限")
-    expect(formData.value.code).toBe("permission:edit")
+    expect(formData.value.permissionCode).toBe("permission:edit")
     expect(formData.value.description).toBe("允許編輯權限")
   })
 
@@ -137,7 +137,7 @@ describe("usePermissionForm", () => {
 
     const mockPermission = createMockPermission({
       name: "舊名稱",
-      code: "permission:old"
+      permissionCode: "permission:old"
     })
 
     mockUpdatePermission.mockResolvedValue({
@@ -203,7 +203,7 @@ describe("usePermissionForm", () => {
     const { formData, handleSubmit } = usePermissionForm(mockEmit as any)
 
     formData.value.name = "新增權限"
-    formData.value.code = "invalid-code" // 不符合 module:action 格式
+    formData.value.permissionCode = "invalid-code" // 不符合 module:action 格式
 
     await handleSubmit()
 
@@ -218,7 +218,7 @@ describe("usePermissionForm", () => {
     const mockEmit = vi.fn()
     const { formData, handleSubmit } = usePermissionForm(mockEmit as any)
 
-    formData.value.code = "permission:create"
+    formData.value.permissionCode = "permission:create"
     // 不填 name
 
     await handleSubmit()
@@ -246,7 +246,7 @@ describe("usePermissionForm", () => {
 
     // 確認已重置為初始狀態
     expect(formData.value.name).toBe("")
-    expect(formData.value.code).toBe("")
+    expect(formData.value.permissionCode).toBe("")
     expect(formData.value.description).toBe("")
     expect(isEditMode.value).toBe(false)
   })

@@ -19,7 +19,7 @@ export async function getPermissions(
   query: PermissionQuery
 ): Promise<ApiResponse<PagedResult<Permission>>> {
   return request({
-    url: "/permissions",
+    url: "/permission",
     method: "GET",
     params: query
   })
@@ -35,7 +35,7 @@ export async function getPermission(
   id: string
 ): Promise<ApiResponse<Permission>> {
   return request({
-    url: `/permissions/${id}`,
+    url: `/permission/${id}`,
     method: "GET"
   })
 }
@@ -50,7 +50,7 @@ export async function createPermission(
   data: CreatePermissionDto
 ): Promise<ApiResponse<Permission>> {
   return request({
-    url: "/permissions",
+    url: "/permission",
     method: "POST",
     data
   })
@@ -68,7 +68,7 @@ export async function updatePermission(
   data: UpdatePermissionDto
 ): Promise<ApiResponse<Permission>> {
   return request({
-    url: `/permissions/${id}`,
+    url: `/permission/${id}`,
     method: "PUT",
     data
   })
@@ -84,7 +84,7 @@ export async function deletePermission(
   id: string
 ): Promise<ApiResponse<null>> {
   return request({
-    url: `/permissions/${id}`,
+    url: `/permission/${id}`,
     method: "DELETE"
   })
 }
@@ -99,7 +99,7 @@ export async function getPermissionUsage(
   id: string
 ): Promise<ApiResponse<PermissionUsage>> {
   return request({
-    url: `/permissions/${id}/usage`,
+    url: `/permission/${id}/usage`,
     method: "GET"
   })
 }

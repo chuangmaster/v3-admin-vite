@@ -12,13 +12,16 @@ export interface Permission {
 
   /**
    * 權限代碼（唯一識別碼）
-   * 格式：module:action 或 module:submodule:action
-   * 範例：permission:read, user:profile:edit
+   * 格式：module.action 或 module.submodule.action
+   * 範例：permission.read, user.profile.edit
    */
-  code: string
+  permissionCode: string
 
   /** 權限描述（可選） */
   description?: string
+
+  /** 權限類型 (function 或 view) */
+  permissionType: string
 
   /** 是否為系統內建權限（內建權限不可刪除） */
   isSystem: boolean
@@ -47,10 +50,13 @@ export interface CreatePermissionDto {
   name: string
 
   /** 權限代碼 */
-  code: string
+  permissionCode: string
 
   /** 權限描述（可選） */
   description?: string
+
+  /** 權限類型 (function 或 view) */
+  permissionType: string
 }
 
 /**
@@ -61,10 +67,13 @@ export interface UpdatePermissionDto {
   name: string
 
   /** 權限代碼 */
-  code: string
+  permissionCode: string
 
   /** 權限描述（可選） */
   description?: string
+
+  /** 權限類型 (function 或 view) */
+  permissionType: string
 
   /** 當前版本號（用於樂觀鎖定） */
   version: number

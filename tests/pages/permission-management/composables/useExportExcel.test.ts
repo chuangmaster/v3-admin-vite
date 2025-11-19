@@ -57,7 +57,7 @@ describe("useExportExcel", () => {
 
     const mockPermission = createMockPermission({
       name: "新增權限",
-      code: "permission:create"
+      permissionCode: "permission:create"
     })
 
     const { exportPermissions } = useExportExcel()
@@ -73,9 +73,9 @@ describe("useExportExcel", () => {
     )
 
     const permissions = [
-      createMockPermission({ name: "查看權限", code: "permission:read" }),
-      createMockPermission({ name: "新增權限", code: "permission:create" }),
-      createMockPermission({ name: "編輯權限", code: "permission:edit" })
+      createMockPermission({ name: "查看權限", permissionCode: "permission:read" }),
+      createMockPermission({ name: "新增權限", permissionCode: "permission:create" }),
+      createMockPermission({ name: "編輯權限", permissionCode: "permission:edit" })
     ]
 
     const { exportPermissions } = useExportExcel()

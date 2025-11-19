@@ -11,8 +11,9 @@ export function createMockPermission(overrides?: Partial<Permission>): Permissio
   return {
     id: "550e8400-e29b-41d4-a716-446655440001",
     name: "新增權限",
-    code: "permission:create",
+    permissionCode: "permission:create",
     description: "允許建立新的權限",
+    permissionType: "function",
     isSystem: false,
     version: 1,
     createdAt: "2025-11-19T10:00:00Z",

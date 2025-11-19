@@ -109,6 +109,13 @@ function handleFormSuccess(): void {
 }
 
 /**
+ * 處理表單更新列表請求
+ */
+function handleFormRefresh(): void {
+  fetchPermissions()
+}
+
+/**
  * 處理對話框關閉
  */
 function handleDialogClose(): void {
@@ -215,6 +222,7 @@ onMounted(() => {
         ref="permissionFormRef"
         @success="handleFormSuccess"
         @close="dialogVisible = false"
+        @refresh="handleFormRefresh"
       />
     </el-dialog>
   </div>

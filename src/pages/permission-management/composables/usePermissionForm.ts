@@ -16,6 +16,7 @@ import * as permissionApi from "../apis/permission"
 type UsePermissionFormEmit = ((evt: "success") => void)
   & ((evt: "close") => void)
   & ((evt: "conflict") => void)
+  & ((evt: "refresh") => void)
 
 /**
  * 權限表單組合式函式
@@ -26,8 +27,9 @@ export function usePermissionForm(emit: UsePermissionFormEmit) {
   /** 表單資料 */
   const formData = ref<CreatePermissionDto>({
     name: "",
-    code: "",
-    description: ""
+    permissionCode: "",
+    description: "",
+    permissionType: ""
   })
 
   /** 當前權限 ID（編輯模式使用） */
@@ -48,8 +50,9 @@ export function usePermissionForm(emit: UsePermissionFormEmit) {
   function resetForm(): void {
     formData.value = {
       name: "",
-      code: "",
-      description: ""
+      permissionCode: "",
+      description: "",
+      permissionType: ""
     }
     currentPermissionId.value = ""
     currentVersion.value = 1
@@ -65,8 +68,9 @@ export function usePermissionForm(emit: UsePermissionFormEmit) {
     currentVersion.value = permission.version
     formData.value = {
       name: permission.name,
-      code: permission.code,
-      description: permission.description || ""
+      permissionCode: permission.permissionCode,
+      description: permission.description || "",
+      permissionType: permission.permissionType
     }
   }
 
@@ -80,15 +84,20 @@ export function usePermissionForm(emit: UsePermissionFormEmit) {
       return
     }
 
-    if (!formData.value.code.trim()) {
+    if (!formData.value.permissionCode.trim()) {
       ElMessage.error("請輸入權限代碼")
       return
     }
 
+    if (!formData.value.permissionType.trim()) {
+      ElMessage.error("請選擇權限類型")
+      return
+    }
+
     // 驗證權限代碼格式
-    const codePattern = /^\w+:\w+(?::\w+)?$/
-    if (!codePattern.test(formData.value.code)) {
-      ElMessage.error("權限代碼格式不正確（格式：module:action，最多三層）")
+    const codePattern = /^\w+\.\w+(?:\.\w+)?$/
+    if (!codePattern.test(formData.value.permissionCode)) {
+      ElMessage.error("權限代碼格式不正確（格式：module.action，最多三層）")
       return
     }
 
@@ -107,6 +116,8 @@ export function usePermissionForm(emit: UsePermissionFormEmit) {
 
         if (response.success) {
           ElMessage.success("權限更新成功")
+          resetForm()
+          emit("refresh")
           emit("success")
         } else if (response.code === "CONCURRENT_UPDATE_CONFLICT") {
           ElMessage.error("資料已被其他使用者修改，請重新載入")
@@ -126,6 +137,7 @@ export function usePermissionForm(emit: UsePermissionFormEmit) {
         if (response.success) {
           ElMessage.success("權限建立成功")
           resetForm()
+          emit("refresh")
           emit("success")
         } else if (response.code === "DUPLICATE_CODE") {
           ElMessage.error(response.message || "權限代碼已存在")

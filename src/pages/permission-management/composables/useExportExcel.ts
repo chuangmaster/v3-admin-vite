@@ -32,7 +32,7 @@ export function useExportExcel() {
       const data = permissions.map(permission => ({
         ID: permission.id,
         權限名稱: permission.name,
-        權限代碼: permission.code,
+        權限代碼: permission.permissionCode,
         描述: permission.description || "-",
         系統權限: permission.isSystem ? "是" : "否",
         版本: permission.version,

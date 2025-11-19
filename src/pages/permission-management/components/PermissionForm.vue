@@ -6,6 +6,7 @@ const emit = defineEmits<{
   success: []
   close: []
   conflict: []
+  refresh: []
 }>()
 
 const { formData, isEditMode, loading, resetForm, loadPermission, handleSubmit, handleCancel }
@@ -25,9 +26,9 @@ const codeRules: FormItemRule[] = [
         callback()
         return
       }
-      const pattern = /^\w+:\w+(?::\w+)?$/
+      const pattern = /^\w+\.\w+(?:\.\w+)?$/
       if (!pattern.test(value)) {
-        callback(new Error("權限代碼格式不正確（格式：module:action，最多三層）"))
+        callback(new Error("權限代碼格式不正確（格式：module.action，最多三層）"))
       } else {
         callback()
       }
@@ -36,8 +37,17 @@ const codeRules: FormItemRule[] = [
   }
 ]
 
+const permissionTypeRules: FormItemRule[] = [
+  { required: true, message: "請選擇權限類型", trigger: "change" }
+]
+
 const descriptionRules: FormItemRule[] = [
   { max: 500, message: "描述最多 500 字元", trigger: "blur" }
+]
+
+const permissionTypeOptions = [
+  { label: "功能", value: "function" },
+  { label: "頁面", value: "view" }
 ]
 
 defineExpose({
@@ -62,15 +72,32 @@ defineExpose({
     <!-- 權限代碼 -->
     <el-form-item label="權限代碼" :rules="codeRules">
       <el-input
-        v-model="formData.code"
-        placeholder="格式：module:action（如：permission:create）"
+        v-model="formData.permissionCode"
+        placeholder="格式：module.action（如：permission.create）"
         maxlength="100"
         clearable
         :disabled="isEditMode"
       />
       <template #description>
-        格式為 module:action 或 module:submodule:action（最多三層），允許英文字母、數字、底線
+        格式為 module.action 或 module.submodule.action（最多三層），允許英文字母、數字、底線
       </template>
+    </el-form-item>
+
+    <!-- 權限類型 -->
+    <el-form-item label="權限類型" :rules="permissionTypeRules">
+      <el-select
+        v-model="formData.permissionType"
+        placeholder="請選擇權限類型"
+        clearable
+        :disabled="isEditMode"
+      >
+        <el-option
+          v-for="option in permissionTypeOptions"
+          :key="option.value"
+          :label="option.label"
+          :value="option.value"
+        />
+      </el-select>
     </el-form-item>
 
     <!-- 權限描述 -->

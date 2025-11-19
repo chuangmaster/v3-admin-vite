@@ -45,8 +45,9 @@ describe("usePermissionManagement", () => {
       {
         id: "1",
         name: "新增權限",
-        code: "permission:create",
+        permissionCode: "permission:create",
         description: "允許建立新的權限",
+        permissionType: "function",
         isSystem: false,
         version: 1,
         createdAt: "2025-11-19T10:00:00Z",
