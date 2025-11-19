@@ -3,7 +3,7 @@ import type { Permission } from "./types"
 import { PERMISSION_PERMISSIONS } from "@@/constants/permissions"
 import { Delete, Download, Plus, RefreshRight, Search } from "@element-plus/icons-vue"
 import { ElIcon, ElMessage } from "element-plus"
-import { onMounted, ref } from "vue"
+import { nextTick, onMounted, ref } from "vue"
 import PermissionForm from "./components/PermissionForm.vue"
 import PermissionTable from "./components/PermissionTable.vue"
 import { useExportExcel } from "./composables/useExportExcel"
@@ -51,8 +51,10 @@ function handleCreate(): void {
  */
 function handleEdit(permission: Permission): void {
   dialogTitle.value = "編輯權限"
-  permissionFormRef.value?.loadPermission(permission)
   dialogVisible.value = true
+  nextTick(() => {
+    permissionFormRef.value?.loadPermission(permission)
+  })
 }
 
 /**
@@ -66,8 +68,7 @@ async function handleDelete(permission: Permission): Promise<void> {
  * 處理批次刪除權限
  */
 async function handleBatchDelete(): Promise<void> {
-  const ids = selectedPermissions.value.map(p => p.id)
-  await handleBatchDeletePermissions(ids)
+  await handleBatchDeletePermissions(selectedPermissions.value)
   permissionTableRef.value?.clearSelection()
 }
 

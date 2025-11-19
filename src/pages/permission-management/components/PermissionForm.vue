@@ -57,9 +57,9 @@ defineExpose({
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit">
+  <el-form :model="formData" @submit.prevent="handleSubmit">
     <!-- 權限名稱 -->
-    <el-form-item label="權限名稱" :rules="nameRules">
+    <el-form-item label="權限名稱" prop="name" :rules="nameRules">
       <el-input
         v-model="formData.name"
         placeholder="請輸入權限名稱"
@@ -70,7 +70,7 @@ defineExpose({
     </el-form-item>
 
     <!-- 權限代碼 -->
-    <el-form-item label="權限代碼" :rules="codeRules">
+    <el-form-item label="權限代碼" prop="permissionCode" :rules="codeRules">
       <el-input
         v-model="formData.permissionCode"
         placeholder="格式：module.action（如：permission.create）"
@@ -84,7 +84,7 @@ defineExpose({
     </el-form-item>
 
     <!-- 權限類型 -->
-    <el-form-item label="權限類型" :rules="permissionTypeRules">
+    <el-form-item label="權限類型" prop="permissionType" :rules="permissionTypeRules">
       <el-select
         v-model="formData.permissionType"
         placeholder="請選擇權限類型"
@@ -101,7 +101,7 @@ defineExpose({
     </el-form-item>
 
     <!-- 權限描述 -->
-    <el-form-item label="權限描述" :rules="descriptionRules">
+    <el-form-item label="權限描述" prop="description" :rules="descriptionRules">
       <el-input
         v-model="formData.description"
         type="textarea"
@@ -121,7 +121,7 @@ defineExpose({
         取消
       </el-button>
     </div>
-  </form>
+  </el-form>
 </template>
 
 <style scoped lang="scss">

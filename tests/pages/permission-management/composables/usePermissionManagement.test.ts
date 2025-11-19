@@ -285,9 +285,11 @@ describe("usePermissionManagement", () => {
     })
 
     const { handleBatchDelete } = usePermissionManagement()
-    const permissionIds = ["perm-1", "perm-2"]
+    const permission1 = createMockPermission({ id: "perm-1" })
+    const permission2 = createMockPermission({ id: "perm-2" })
+    const permissions = [permission1, permission2]
 
-    await handleBatchDelete(permissionIds)
+    await handleBatchDelete(permissions)
 
     expect(mockDeletePermission).toHaveBeenCalled()
   })
@@ -319,9 +321,11 @@ describe("usePermissionManagement", () => {
     mockDeletePermission.mockResolvedValue(mockBatchDeleteResponse)
 
     const { handleBatchDelete } = usePermissionManagement()
-    const permissionIds = ["perm-1", "perm-2"]
+    const permission1 = createMockPermission({ id: "perm-1" })
+    const permission2 = createMockPermission({ id: "perm-2" })
+    const permissions = [permission1, permission2]
 
-    await handleBatchDelete(permissionIds)
+    await handleBatchDelete(permissions)
 
     expect(mockDeletePermission).toHaveBeenCalled()
   })

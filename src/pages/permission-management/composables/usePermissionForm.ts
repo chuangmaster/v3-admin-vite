@@ -67,10 +67,10 @@ export function usePermissionForm(emit: UsePermissionFormEmit) {
     currentPermissionId.value = permission.id
     currentVersion.value = permission.version
     formData.value = {
-      name: permission.name,
-      permissionCode: permission.permissionCode,
-      description: permission.description || "",
-      permissionType: permission.permissionType
+      name: permission.name || "",
+      permissionCode: permission.permissionCode || "",
+      description: permission.description ?? "",
+      permissionType: permission.permissionType || ""
     }
   }
 

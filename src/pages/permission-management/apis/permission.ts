@@ -78,14 +78,17 @@ export async function updatePermission(
  * 刪除權限
  *
  * @param id - 權限 ID
+ * @param version - 版本號（用於樂觀鎖定）
  * @returns 刪除結果
  */
 export async function deletePermission(
-  id: string
+  id: string,
+  version: number
 ): Promise<ApiResponse<null>> {
   return request({
     url: `/permission/${id}`,
-    method: "DELETE"
+    method: "DELETE",
+    data: { version }
   })
 }
 

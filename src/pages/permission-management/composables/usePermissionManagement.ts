@@ -88,7 +88,7 @@ export function usePermissionManagement() {
 
     loading.value = true
     try {
-      const response = await permissionApi.deletePermission(permission.id)
+      const response = await permissionApi.deletePermission(permission.id, permission.version)
       if (response.success) {
         ElMessage.success("刪除成功")
         await fetchPermissions()
@@ -99,6 +99,9 @@ export function usePermissionManagement() {
         )
       } else if (response.code === "SYSTEM_PERMISSION_PROTECTED") {
         ElMessage.error("系統內建權限無法刪除")
+      } else if (response.code === "CONCURRENT_UPDATE_CONFLICT") {
+        ElMessage.error("該權限已被其他使用者修改，請重新載入")
+        await fetchPermissions()
       } else {
         ElMessage.error(response.message || "刪除失敗")
       }
@@ -111,17 +114,17 @@ export function usePermissionManagement() {
 
   /**
    * 批次刪除權限
-   * @param permissionIds - 待刪除的權限 ID 列表
+   * @param permissions - 待刪除的權限物件列表
    */
-  async function handleBatchDelete(permissionIds: string[]): Promise<void> {
-    if (permissionIds.length === 0) {
+  async function handleBatchDelete(permissions: Permission[]): Promise<void> {
+    if (permissions.length === 0) {
       ElMessage.warning("請選擇要刪除的權限")
       return
     }
 
     try {
       await ElMessageBox.confirm(
-        `確定要刪除選中的 ${permissionIds.length} 個權限嗎？`,
+        `確定要刪除選中的 ${permissions.length} 個權限嗎？`,
         "批次刪除確認",
         {
           confirmButtonText: "確定",
@@ -137,9 +140,9 @@ export function usePermissionManagement() {
     let successCount = 0
     let failureCount = 0
 
-    for (const id of permissionIds) {
+    for (const permission of permissions) {
       try {
-        const response = await permissionApi.deletePermission(id)
+        const response = await permissionApi.deletePermission(permission.id, permission.version)
         if (response.success) {
           successCount++
         } else {
@@ -158,7 +161,7 @@ export function usePermissionManagement() {
     }
 
     if (failureCount > 0) {
-      ElMessage.warning(`有 ${failureCount} 個權限刪除失敗，可能是因為被使用中`)
+      ElMessage.warning(`有 ${failureCount} 個權限刪除失敗，可能是因為被使用中或並行更新衝突`)
     }
   }
 
