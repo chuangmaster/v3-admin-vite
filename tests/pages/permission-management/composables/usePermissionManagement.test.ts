@@ -22,6 +22,23 @@ const mockGetPermissions = vi.fn()
 const mockDeletePermission = vi.fn()
 const mockGetPermissionUsage = vi.fn()
 
+// Mock lodash debounce to call immediately in tests
+vi.mock("lodash-es", () => ({
+  debounce: (fn: any) => fn
+}))
+
+// Mock element-plus module used by the composable
+vi.mock("element-plus", () => ({
+  ElMessageBox: {
+    confirm: vi.fn().mockResolvedValue(true)
+  },
+  ElMessage: {
+    error: vi.fn(),
+    success: vi.fn(),
+    warning: vi.fn()
+  }
+}))
+
 vi.mock("@/pages/permission-management/apis/permission", () => ({
   getPermissions: mockGetPermissions,
   getPermission: vi.fn(),
@@ -34,6 +51,16 @@ vi.mock("@/pages/permission-management/apis/permission", () => ({
 describe("usePermissionManagement", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Ensure globals are stubbed fresh each test (clearAllMocks may reset mock state)
+    vi.stubGlobal("ElMessageBox", {
+      confirm: vi.fn().mockResolvedValue(true)
+    })
+
+    vi.stubGlobal("ElMessage", {
+      error: vi.fn(),
+      success: vi.fn(),
+      warning: vi.fn()
+    })
   })
 
   it("should fetch permissions successfully", async () => {
@@ -116,7 +143,7 @@ describe("usePermissionManagement", () => {
 
     expect(mockGetPermissions).toHaveBeenCalledWith(
       expect.objectContaining({
-        keyword: "test"
+        searchKeyword: "test"
       })
     )
   })
@@ -192,7 +219,10 @@ describe("usePermissionManagement", () => {
 
     await handleDelete(mockPermission)
 
-    expect(mockDeletePermission).toHaveBeenCalledWith(mockPermission.id)
+    expect(mockDeletePermission).toHaveBeenCalledWith(
+      mockPermission.id,
+      mockPermission.version
+    )
   })
 
   it("should handle permission in use error", async () => {
@@ -223,7 +253,10 @@ describe("usePermissionManagement", () => {
 
     await handleDelete(mockPermission)
 
-    expect(mockDeletePermission).toHaveBeenCalledWith(mockPermission.id)
+    expect(mockDeletePermission).toHaveBeenCalledWith(
+      mockPermission.id,
+      mockPermission.version
+    )
   })
 
   it("should handle system permission protection", async () => {
@@ -244,7 +277,7 @@ describe("usePermissionManagement", () => {
 
     await handleDelete(systemPermission)
 
-    expect(mockDeletePermission).toHaveBeenCalledWith(systemPermission.id)
+    expect(mockDeletePermission).not.toHaveBeenCalled()
   })
 
   it("should handle batch delete successfully", async () => {
