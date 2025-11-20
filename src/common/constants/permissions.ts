@@ -37,9 +37,28 @@ export const PERMISSION_PERMISSIONS = {
 } as const
 
 /**
+ * 角色管理模組權限常數
+ */
+export const ROLE_PERMISSIONS = {
+  /** 查看角色列表（路由權限） */
+  READ: "role.read",
+  /** 新增角色（功能權限） */
+  CREATE: "role.create",
+  /** 修改角色（功能權限） */
+  UPDATE: "role.update",
+  /** 刪除角色（功能權限） */
+  DELETE: "role.delete",
+  /** 為用戶指派角色（功能權限） */
+  ASSIGN: "role.assign",
+  /** 移除用戶的角色（功能權限） */
+  REMOVE: "role.remove"
+} as const
+
+/**
  * 系統所有權限常數集合
  */
 export const SYSTEM_PERMISSIONS = {
   ...USER_PERMISSIONS,
-  ...PERMISSION_PERMISSIONS
+  ...PERMISSION_PERMISSIONS,
+  ...ROLE_PERMISSIONS
 } as const

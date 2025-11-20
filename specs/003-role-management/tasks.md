@@ -19,11 +19,11 @@
 
 **目的**: 專案初始化與基本結構建立
 
-- [ ] T001 建立角色管理模組目錄結構 src/pages/role-management/{apis,components,composables}
-- [ ] T002 [P] 定義角色管理 TypeScript 型別介面 src/pages/role-management/types.ts
-- [ ] T003 [P] 建立角色管理 API 客戶端封裝 src/pages/role-management/apis/role.ts
-- [ ] T004 [P] 更新權限常數定義 src/common/constants/permissions.ts（新增 ROLE_PERMISSIONS）
-- [ ] T005 新增角色管理路由配置 src/router/index.ts（新增 /role-management 路由）
+- [x] T001 建立角色管理模組目錄結構 src/pages/role-management/{apis,components,composables}
+- [x] T002 [P] 定義角色管理 TypeScript 型別介面 src/pages/role-management/types.ts
+- [x] T003 [P] 建立角色管理 API 客戶端封裝 src/pages/role-management/apis/role.ts
+- [x] T004 [P] 更新權限常數定義 src/common/constants/permissions.ts（新增 ROLE_PERMISSIONS）
+- [x] T005 新增角色管理路由配置 src/router/index.ts（新增 /role-management 路由）
 
 ---
 
@@ -33,9 +33,9 @@
 
 **⚠️ 關鍵**: 在此階段完成前，無法開始任何用戶故事的工作
 
-- [ ] T006 實作角色管理核心邏輯組合式函式 src/pages/role-management/composables/useRoleManagement.ts
-- [ ] T007 [P] 實作角色表單邏輯組合式函式 src/pages/role-management/composables/useRoleForm.ts
-- [ ] T008 [P] 擴展全域 Axios 錯誤處理器 src/http/axios.ts（新增角色管理錯誤代碼處理：CONCURRENT_UPDATE_CONFLICT、DUPLICATE_NAME、ROLE_IN_USE）
+- [x] T006 實作角色管理核心邏輯組合式函式 src/pages/role-management/composables/useRoleManagement.ts
+- [x] T007 [P] 實作角色表單邏輯組合式函式 src/pages/role-management/composables/useRoleForm.ts
+- [x] T008 [P] 擴展全域 Axios 錯誤處理器 src/http/axios.ts（新增角色管理錯誤代碼處理：CONCURRENT_UPDATE_CONFLICT、DUPLICATE_NAME、ROLE_IN_USE）
 
 **Checkpoint**: 基礎就緒 - 用戶故事實作現在可以平行開始
 
@@ -49,13 +49,13 @@
 
 ### 實作 User Story 1
 
-- [ ] T009 [P] [US1] 建立角色表格元件 src/pages/role-management/components/RoleTable.vue
-- [ ] T010 [P] [US1] 建立角色表單對話框元件 src/pages/role-management/components/RoleForm.vue（基本資訊區域：角色名稱、描述）
-- [ ] T011 [US1] 建立角色管理主頁面 src/pages/role-management/index.vue（整合 RoleTable、RoleForm、工具列、分頁）
-- [ ] T012 [US1] 實作角色建立功能（表單驗證、API 呼叫、成功回饋）
-- [ ] T013 [US1] 實作角色編輯功能（載入角色資料、版本號處理、樂觀鎖衝突處理）
-- [ ] T014 [US1] 實作角色刪除功能（確認對話框、版本號驗證、使用中角色阻止刪除）
-- [ ] T015 [US1] 實作角色列表查詢功能（分頁、排序、載入狀態）
+- [x] T009 [P] [US1] 建立角色表格元件 src/pages/role-management/components/RoleTable.vue
+- [x] T010 [P] [US1] 建立角色表單對話框元件 src/pages/role-management/components/RoleForm.vue（基本資訊區域：角色名稱、描述）
+- [x] T011 [US1] 建立角色管理主頁面 src/pages/role-management/index.vue（整合 RoleTable、RoleForm、工具列、分頁）
+- [x] T012 [US1] 實作角色建立功能（表單驗證、API 呼叫、成功回饋）
+- [x] T013 [US1] 實作角色編輯功能（載入角色資料、版本號處理、樂觀鎖衝突處理）
+- [x] T014 [US1] 實作角色刪除功能（確認對話框、版本號驗證、使用中角色阻止刪除）
+- [x] T015 [US1] 實作角色列表查詢功能（分頁、排序、載入狀態）
 
 **Checkpoint**: 此時 User Story 1 應完全可運作並可獨立測試
 
@@ -69,12 +69,12 @@
 
 ### 實作 User Story 2
 
-- [ ] T016 [P] [US2] 建立權限選擇器元件 src/pages/role-management/components/PermissionSelector.vue（使用 el-tree 展示權限樹狀結構）
-- [ ] T017 [P] [US2] 實作權限樹狀結構轉換邏輯 src/pages/role-management/composables/usePermissionTree.ts
-- [ ] T018 [US2] 擴展角色表單元件 src/pages/role-management/components/RoleForm.vue（新增權限設定折疊面板區域）
-- [ ] T019 [US2] 實作角色權限分配 API 整合（在 useRoleForm 中整合 assignPermissions API）
-- [ ] T020 [US2] 實作權限樹載入與勾選狀態同步（載入角色詳細資訊、顯示已分配權限）
-- [ ] T021 [US2] 實作父子節點聯動與搜尋過濾功能（el-tree 配置）
+- [x] T016 [P] [US2] 建立權限選擇器元件 src/pages/role-management/components/PermissionSelector.vue（使用 el-tree 展示權限樹狀結構）
+- [x] T017 [P] [US2] 實作權限樹狀結構轉換邏輯 src/pages/role-management/composables/usePermissionTree.ts
+- [x] T018 [US2] 擴展角色表單元件 src/pages/role-management/components/RoleForm.vue（新增權限設定折疊面板區域）
+- [x] T019 [US2] 實作角色權限分配 API 整合（在 useRoleForm 中整合 assignPermissions API）
+- [x] T020 [US2] 實作權限樹載入與勾選狀態同步（載入角色詳細資訊、顯示已分配權限）
+- [x] T021 [US2] 實作父子節點聯動與搜尋過濾功能（el-tree 配置）
 
 **Checkpoint**: 此時 User Stories 1 和 2 應都能獨立運作
 
@@ -88,13 +88,13 @@
 
 ### 實作 User Story 3
 
-- [ ] T022 [P] [US3] 建立角色選擇器元件 src/pages/user-management/components/RoleSelector.vue（多選下拉選擇器，支援搜尋）
-- [ ] T023 [P] [US3] 建立用戶角色 API 封裝 src/pages/user-management/apis/user-roles.ts
-- [ ] T024 [P] [US3] 實作用戶角色邏輯組合式函式 src/pages/user-management/composables/useUserRoles.ts
-- [ ] T025 [US3] 擴展 UserForm 元件 src/pages/user-management/components/UserForm.vue（新增角色選擇器欄位，最小侵入式修改）
-- [ ] T026 [US3] 實作用戶角色分配功能（整合 assignUserRoles API）
-- [ ] T027 [US3] 實作用戶角色移除功能（整合 removeUserRole API）
-- [ ] T028 [US3] 在用戶列表表格新增角色顯示欄位（使用 el-tag 顯示多個角色）
+- [x] T022 [P] [US3] 建立角色選擇器元件 src/pages/user-management/components/RoleSelector.vue（多選下拉選擇器，支援搜尋）
+- [x] T023 [P] [US3] 建立用戶角色 API 封裝 src/pages/user-management/apis/user-roles.ts
+- [x] T024 [P] [US3] 實作用戶角色邏輯組合式函式 src/pages/user-management/composables/useUserRoles.ts
+- [x] T025 [US3] 擴展 UserForm 元件 src/pages/user-management/components/UserForm.vue（新增角色選擇器欄位，最小侵入式修改）
+- [x] T026 [US3] 實作用戶角色分配功能（整合 assignUserRoles API）
+- [x] T027 [US3] 實作用戶角色移除功能（整合 removeUserRole API）
+- [x] T028 [US3] 在用戶列表表格新增角色顯示欄位（使用 el-tag 顯示多個角色）
 
 **Checkpoint**: 所有用戶故事現在應都能獨立運作
 
@@ -108,10 +108,10 @@
 
 ### 實作 User Story 4
 
-- [ ] T029 [P] [US4] 實作 Excel 匯出邏輯組合式函式 src/pages/role-management/composables/useExportExcel.ts（使用 SheetJS）
-- [ ] T030 [US4] 整合匯出按鈕至角色管理主頁面 src/pages/role-management/index.vue（工具列新增「匯出報表」按鈕）
-- [ ] T031 [US4] 實作當前篩選資料匯出功能（匯出當前顯示的角色資料）
-- [ ] T032 [US4] 實作匯出資料筆數提示（顯示「即將匯出 N 筆資料」）
+- [x] T029 [P] [US4] 實作 Excel 匯出邏輯組合式函式 src/pages/role-management/composables/useExportExcel.ts（使用 SheetJS）
+- [x] T030 [US4] 整合匯出按鈕至角色管理主頁面 src/pages/role-management/index.vue（工具列新增「匯出報表」按鈕）
+- [x] T031 [US4] 實作當前篩選資料匯出功能（匯出當前顯示的角色資料）
+- [x] T032 [US4] 實作匯出資料筆數提示（顯示「即將匯出 N 筆資料」）
 
 **Checkpoint**: 所有功能現在應完整可用
 
@@ -121,13 +121,13 @@
 
 **目的**: 影響多個用戶故事的改進
 
-- [ ] T033 [P] 更新專案 README.md（新增角色管理功能說明、路由資訊）
-- [ ] T034 程式碼清理與重構（移除未使用的匯入、統一命名風格）
-- [ ] T035 效能優化（檢查角色列表載入時間 < 2 秒、匯出 100 筆資料 < 10 秒）
-- [ ] T036 安全性強化（確認所有 API 端點權限檢查、XSS 防護）
-- [ ] T037 執行 quickstart.md 驗證（按照開發指南完整測試所有功能）
-- [ ] T038 ESLint 檢查（執行 pnpm lint 確保無錯誤）
-- [ ] T039 [P] 新增程式碼註解（為複雜邏輯新增開發者友善註解）
+- [x] T033 [P] 更新專案 README.md（新增角色管理功能說明、路由資訊）
+- [x] T034 程式碼清理與重構（移除未使用的匯入、統一命名風格）
+- [x] T035 效能優化（檢查角色列表載入時間 < 2 秒、匯出 100 筆資料 < 10 秒）
+- [x] T036 安全性強化（確認所有 API 端點權限檢查、XSS 防護）
+- [x] T037 執行 quickstart.md 驗證（按照開發指南完整測試所有功能）
+- [x] T038 ESLint 檢查（執行 pnpm lint 確保無錯誤）
+- [x] T039 [P] 新增程式碼註解（為複雜邏輯新增開發者友善註解）
 
 ---
 

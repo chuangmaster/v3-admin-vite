@@ -241,6 +241,29 @@ export const dynamicRoutes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: "/role-management",
+    component: Layouts,
+    name: "RoleManagement",
+    meta: {
+      title: { zhCN: "角色管理", zhTW: "角色管理", en: "Role Management" },
+      titleKey: "roleManagement",
+      elIcon: "CircleCloseFilled",
+      permissions: ["role.read"]
+    },
+    children: [
+      {
+        path: "",
+        component: () => import("@/pages/role-management/index.vue"),
+        name: "RoleManagementPage",
+        meta: {
+          title: { zhCN: "角色管理", zhTW: "角色管理", en: "Role Management" },
+          titleKey: "roleManagement",
+          keepAlive: true
+        }
+      }
+    ]
+  },
+  {
     path: "/permission",
     component: Layouts,
     redirect: "/permission/page-level",
