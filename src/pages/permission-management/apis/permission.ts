@@ -1,7 +1,7 @@
+import type { PagedApiResponse } from "types/api-paged-response"
 import type {
   ApiResponse,
   CreatePermissionDto,
-  PagedResult,
   Permission,
   PermissionQuery,
   PermissionUsage,
@@ -17,7 +17,7 @@ import { request } from "@/http/axios"
  */
 export async function getPermissions(
   query: PermissionQuery
-): Promise<ApiResponse<PagedResult<Permission>>> {
+): Promise<PagedApiResponse<Permission>> {
   return request({
     url: "/permission",
     method: "GET",

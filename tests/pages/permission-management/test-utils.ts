@@ -1,4 +1,5 @@
-import type { PagedResult, Permission, PermissionUsage } from "@/pages/permission-management/types"
+import type { PagedApiResponse } from "types/api-paged-response"
+import type { Permission, PermissionUsage } from "@/pages/permission-management/types"
 import { vi } from "vitest"
 
 /**
@@ -53,8 +54,8 @@ export function createMockPermissionUsage(
  */
 export function createMockPagedResult<T>(
   items: T[],
-  overrides?: Partial<PagedResult<T>>
-): PagedResult<T> {
+  overrides?: Partial<PagedApiResponse<T>>
+): PagedApiResponse<T> {
   const totalCount = items.length
   const pageSize = overrides?.pageSize || 20
   const totalPages = Math.ceil(totalCount / pageSize)

@@ -100,32 +100,6 @@ export interface PermissionQuery {
 }
 
 /**
- * 分頁結果
- */
-export interface PagedResult<T> {
-  /** 資料列表 */
-  items: T[]
-
-  /** 當前頁碼 */
-  pageNumber: number
-
-  /** 每頁筆數 */
-  pageSize: number
-
-  /** 總筆數 */
-  totalCount: number
-
-  /** 總頁數 */
-  totalPages: number
-
-  /** 是否有上一頁 */
-  hasPreviousPage: boolean
-
-  /** 是否有下一頁 */
-  hasNextPage: boolean
-}
-
-/**
  * 權限使用情況
  */
 export interface PermissionUsage {
