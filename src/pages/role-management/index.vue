@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue"
+import { computed, nextTick, onMounted, ref, watch } from "vue"
 
 import RoleForm from "./components/RoleForm.vue"
 import RoleTable from "./components/RoleTable.vue"
@@ -23,6 +23,20 @@ const roleForm = useRoleForm(() => {
   loadRoles()
 })
 
+// 創建模板引用來訪問 RoleForm 組件
+const roleFormRef = ref()
+
+// 監聽對話框狀態變化，當對話框打開時同步 formRef
+watch(() => roleForm.dialogVisible.value, async (visible) => {
+  if (visible) {
+    // 等待 DOM 更新
+    await nextTick()
+    if (roleFormRef.value?.formRef) {
+      roleForm.formRef.value = roleFormRef.value.formRef
+    }
+  }
+})
+
 const { exportRoles } = useExportExcel()
 
 // 建立計算屬性確保類型正確
@@ -30,7 +44,7 @@ const rolesList = computed(() => roles.value)
 const isLoading = computed(() => loading.value)
 const totalCount = computed(() => total.value)
 
-// 在頁面掛載時載入角色列表
+// 頁面掛載時加載角色列表
 onMounted(() => {
   loadRoles()
 })
@@ -53,10 +67,6 @@ function handleSubmitForm() {
 
 function handleExport() {
   exportRoles(roles.value)
-}
-
-function handleUpdateFormData(newFormData: any) {
-  Object.assign(roleForm.formData, newFormData)
 }
 </script>
 
@@ -108,14 +118,14 @@ function handleUpdateFormData(newFormData: any) {
 
     <!-- 角色表單對話框 -->
     <RoleForm
+      ref="roleFormRef"
       :model-value="roleForm.dialogVisible.value"
       :title="roleForm.isEditMode.value ? '編輯角色' : '新增角色'"
       :loading="roleForm.formLoading.value"
-      :form-data="roleForm.formData"
+      :form-data="roleForm.formData.value"
       :rules="roleForm.rules"
       :permissions="roleForm.permissions.value"
       @update:model-value="(value) => { roleForm.dialogVisible.value = value }"
-      @update:form-data="handleUpdateFormData"
       @submit="handleSubmitForm"
     />
   </div>

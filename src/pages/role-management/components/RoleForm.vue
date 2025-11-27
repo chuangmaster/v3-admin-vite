@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormInstance, FormRules } from "element-plus"
-import { ref } from "vue"
+import { ref, watch } from "vue"
 
 import PermissionSelector from "./PermissionSelector.vue"
 
@@ -16,13 +16,25 @@ interface Props {
 interface Emits {
   (e: "update:modelValue", value: boolean): void
   (e: "submit"): void
-  (e: "update:formData", value: any): void
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const formRef = ref<FormInstance>()
+
+// 創建本地表單數據副本，確保雙向綁定工作正常
+const localFormData = ref({ ...props.formData })
+
+// 監聽 prop 的變更
+watch(() => props.formData, (newVal) => {
+  Object.assign(localFormData.value, newVal)
+}, { deep: true })
+
+// 監聽本地表單數據的變更，同步回 prop
+watch(() => localFormData.value, (newVal) => {
+  Object.assign(props.formData, newVal)
+}, { deep: true })
 
 defineExpose({ formRef })
 
@@ -32,27 +44,6 @@ function handleClose() {
 
 function handleSubmit() {
   emit("submit")
-}
-
-function handleRoleNameChange(val: string) {
-  emit("update:formData", {
-    ...props.formData,
-    roleName: val
-  })
-}
-
-function handleDescriptionChange(val: string) {
-  emit("update:formData", {
-    ...props.formData,
-    description: val
-  })
-}
-
-function handlePermissionChange(permissions: string[]) {
-  emit("update:formData", {
-    ...props.formData,
-    selectedPermissionIds: permissions
-  })
 }
 </script>
 
@@ -67,39 +58,37 @@ function handlePermissionChange(permissions: string[]) {
   >
     <el-form
       ref="formRef"
-      :model="props.formData"
+      :model="localFormData"
       :rules="props.rules"
       label-width="100px"
       v-loading="props.loading"
     >
       <el-form-item label="角色名稱" prop="roleName">
         <el-input
-          :value="props.formData.roleName"
+          v-model="localFormData.roleName"
           placeholder="請輸入角色名稱 (1-100 字元)"
           maxlength="100"
           clearable
-          @input="handleRoleNameChange"
         />
       </el-form-item>
 
       <el-form-item label="角色描述" prop="description">
         <el-input
-          :value="props.formData.description"
+          v-model="localFormData.description"
           type="textarea"
           :rows="3"
           placeholder="請輸入角色描述（選填，最多 500 字元）"
           maxlength="500"
           show-word-limit
-          @input="handleDescriptionChange"
         />
       </el-form-item>
 
       <el-collapse>
         <el-collapse-item title="權限設定" name="permissions">
           <PermissionSelector
-            :model-value="props.formData.selectedPermissionIds"
+            :model-value="localFormData.selectedPermissionIds"
             :permissions="props.permissions"
-            @update:model-value="handlePermissionChange"
+            @update:model-value="(val) => localFormData.selectedPermissionIds = val"
           />
         </el-collapse-item>
       </el-collapse>

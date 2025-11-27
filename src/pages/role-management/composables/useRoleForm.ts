@@ -12,9 +12,9 @@ import type {
 } from "../types"
 import { ElMessage } from "element-plus"
 
-import { reactive, ref } from "vue"
+import { ref } from "vue"
 
-import { assignPermissions, createRole, getPermissions, getRoleDetail, updateRole } from "../apis/role"
+import { assignPermissions, createRole, getRoleDetail, getRoles, updateRole } from "../apis/role"
 import { usePermissionTree } from "./usePermissionTree"
 
 /**
@@ -32,7 +32,8 @@ export function useRoleForm(onSuccess?: () => void) {
 
   const { buildPermissionTree } = usePermissionTree()
 
-  const formData = reactive<
+  // 使用 ref 而非 reactive，確保能夠正確追蹤完整對象
+  const formData = ref<
     CreateRoleRequest & { version?: number, selectedPermissionIds?: string[] }
   >({
     roleName: "",
@@ -67,11 +68,11 @@ export function useRoleForm(onSuccess?: () => void) {
     dialogVisible.value = true
     resetForm()
 
-    // 載入權限列表
+    // 載入角色列表
     if (permissions.value.length === 0) {
       formLoading.value = true
       try {
-        const response = await getPermissions()
+        const response = await getRoles(1, 1000)
         if (response.success && response.data?.items) {
           permissions.value = buildPermissionTree(response.data.items)
         }
@@ -90,27 +91,27 @@ export function useRoleForm(onSuccess?: () => void) {
     currentRoleId.value = role.id
     dialogVisible.value = true
 
-    // 載入角色詳細資訊（含權限）和權限列表
+    // 載入角色詳細資訊（含權限）和角色列表
     formLoading.value = true
     try {
-      // 並行載入角色詳細資訊和權限列表
-      const [roleResponse, permResponse] = await Promise.all([
+      // 並行載入角色詳細資訊和角色列表
+      const [roleResponse, rolesResponse] = await Promise.all([
         getRoleDetail(role.id),
-        getPermissions()
+        getRoles(1, 1000)
       ])
 
       if (roleResponse.success && roleResponse.data) {
-        formData.roleName = roleResponse.data.roleName
-        formData.description = roleResponse.data.description || ""
-        formData.version = roleResponse.data.version
-        formData.selectedPermissionIds = roleResponse.data.permissions.map(p => p.id)
+        formData.value.roleName = roleResponse.data.roleName
+        formData.value.description = roleResponse.data.description || ""
+        formData.value.version = roleResponse.data.version
+        formData.value.selectedPermissionIds = roleResponse.data.permissions.map(p => p.id)
       } else {
         ElMessage.error(roleResponse.message || "載入角色資訊失敗")
         dialogVisible.value = false
       }
 
-      if (permResponse.success && permResponse.data?.items) {
-        permissions.value = buildPermissionTree(permResponse.data.items)
+      if (rolesResponse.success && rolesResponse.data?.items) {
+        permissions.value = buildPermissionTree(rolesResponse.data.items)
       }
     } finally {
       formLoading.value = false
@@ -123,77 +124,83 @@ export function useRoleForm(onSuccess?: () => void) {
   const submitForm = async () => {
     if (!formRef.value) return
 
-    await formRef.value.validate(async (valid) => {
-      if (!valid) return
+    try {
+      // 使用 Promise 方式進行表單驗證
+      await formRef.value.validate()
 
       formLoading.value = true
-      try {
-        if (isEditMode.value && currentRoleId.value) {
-          // 更新角色
-          const updateData: UpdateRoleRequest = {
-            roleName: formData.roleName,
-            description: formData.description,
-            version: formData.version!
-          }
-          const response = await updateRole(currentRoleId.value, updateData)
-          if (!response.success) {
-            ElMessage.error(response.message || "角色更新失敗")
-            return
-          }
 
-          // 更新權限
-          if (formData.selectedPermissionIds?.length) {
-            const permResponse = await assignPermissions(currentRoleId.value, {
-              permissionIds: formData.selectedPermissionIds
-            } as AssignRolePermissionsRequest)
-            if (!permResponse.success) {
-              ElMessage.error(permResponse.message || "權限分配失敗")
-              return
-            }
-          }
-
-          ElMessage.success("角色更新成功")
-        } else {
-          // 新增角色
-          const createData: CreateRoleRequest = {
-            roleName: formData.roleName,
-            description: formData.description
-          }
-          const response = await createRole(createData)
-          if (!response.success) {
-            ElMessage.error(response.message || "角色建立失敗")
-            return
-          }
-
-          // 分配權限
-          if (response.data && formData.selectedPermissionIds?.length) {
-            const permResponse = await assignPermissions(response.data.id, {
-              permissionIds: formData.selectedPermissionIds
-            } as AssignRolePermissionsRequest)
-            if (!permResponse.success) {
-              ElMessage.warning("角色已建立，但權限分配失敗")
-            }
-          }
-
-          ElMessage.success("角色建立成功")
+      if (isEditMode.value && currentRoleId.value) {
+        // 更新角色
+        const updateData: UpdateRoleRequest = {
+          roleName: formData.value.roleName,
+          description: formData.value.description,
+          version: formData.value.version!
+        }
+        const response = await updateRole(currentRoleId.value, updateData)
+        if (!response.success) {
+          ElMessage.error(response.message || "角色更新失敗")
+          formLoading.value = false
+          return
         }
 
-        dialogVisible.value = false
-        onSuccess?.()
-      } finally {
-        formLoading.value = false
+        // 更新權限
+        if (formData.value.selectedPermissionIds?.length) {
+          const permResponse = await assignPermissions(currentRoleId.value, {
+            permissionIds: formData.value.selectedPermissionIds
+          } as AssignRolePermissionsRequest)
+          if (!permResponse.success) {
+            ElMessage.error(permResponse.message || "權限分配失敗")
+            formLoading.value = false
+            return
+          }
+        }
+
+        ElMessage.success("角色更新成功")
+      } else {
+        // 新增角色
+        const createData: CreateRoleRequest = {
+          roleName: formData.value.roleName,
+          description: formData.value.description
+        }
+        const response = await createRole(createData)
+        if (!response.success) {
+          ElMessage.error(response.message || "角色建立失敗")
+          formLoading.value = false
+          return
+        }
+
+        // 分配權限
+        if (response.data && formData.value.selectedPermissionIds?.length) {
+          const permResponse = await assignPermissions(response.data.id, {
+            permissionIds: formData.value.selectedPermissionIds
+          } as AssignRolePermissionsRequest)
+          if (!permResponse.success) {
+            ElMessage.warning("角色已建立，但權限分配失敗")
+          }
+        }
+
+        ElMessage.success("角色建立成功")
       }
-    })
+
+      dialogVisible.value = false
+      onSuccess?.()
+    } catch (error) {
+      // 驗證失敗，不進行任何操作（Element Plus 會顯示驗證錯誤）
+      console.error("表單驗證失敗:", error)
+    } finally {
+      formLoading.value = false
+    }
   }
 
   /**
    * 重置表單
    */
   const resetForm = () => {
-    formData.roleName = ""
-    formData.description = ""
-    formData.selectedPermissionIds = []
-    delete formData.version
+    formData.value.roleName = ""
+    formData.value.description = ""
+    formData.value.selectedPermissionIds = []
+    delete formData.value.version
     formRef.value?.resetFields()
   }
 

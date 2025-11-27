@@ -120,21 +120,6 @@ export interface AssignUserRoleRequest {
   roleIds: string[]
 }
 
-/** 角色列表分頁回應 */
-export interface RoleListResponse {
-  /** 角色清單 */
-  items: RoleDto[]
-
-  /** 總筆數 */
-  totalCount: number
-
-  /** 當前頁碼（從 1 開始） */
-  pageNumber: number
-
-  /** 每頁筆數 */
-  pageSize: number
-}
-
 /** API 統一回應格式 */
 export interface ApiResponse<T = any> {
   /** 操作是否成功 */

@@ -28,11 +28,11 @@ export function useRoleManagement() {
     loading.value = true
     try {
       const response = await getRoles(currentPage.value, pageSize.value)
-      if (response.success && response.data) {
-        roles.value = response.data.items
-        total.value = response.data.totalCount
+      if (response.success) {
+        roles.value = response.items
+        total.value = response.totalCount
       } else {
-        ElMessage.error(response.message || "載入角色列表失敗")
+        ElMessage.error("載入角色列表失敗")
       }
     } finally {
       loading.value = false

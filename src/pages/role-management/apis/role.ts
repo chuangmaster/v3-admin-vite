@@ -4,6 +4,7 @@
  * @module @/pages/role-managements/role
  */
 
+import type { PagedApiResponse } from "types/api-paged-response"
 import type {
   ApiResponse,
   AssignRolePermissionsRequest,
@@ -12,7 +13,6 @@ import type {
   PermissionDto,
   RoleDetailDto,
   RoleDto,
-  RoleListResponse,
   UpdateRoleRequest
 } from "../types"
 
@@ -27,7 +27,7 @@ import { request } from "@/http/axios"
 export async function getRoles(
   pageNumber = 1,
   pageSize = 10
-): Promise<ApiResponse<RoleListResponse>> {
+): Promise<PagedApiResponse<RoleDto>> {
   return request({
     url: "/role",
     method: "GET",
