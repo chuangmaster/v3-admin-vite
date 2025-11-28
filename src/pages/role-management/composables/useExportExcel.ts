@@ -3,7 +3,7 @@
  * @module @/pages/role-management/composables/useExportExcel
  */
 
-import type { RoleDto } from "../types"
+import type { Role } from "../types"
 
 import { ElMessageBox } from "element-plus"
 import * as XLSX from "xlsx"
@@ -17,7 +17,7 @@ export function useExportExcel() {
    * @param roles 角色陣列
    * @param filename 檔案名稱（不包含副檔名）
    */
-  function exportRoles(roles: RoleDto[], filename = "角色列表") {
+  function exportRoles(roles: Role[], filename = "角色列表") {
     if (!roles.length) {
       ElMessageBox.alert("沒有可匯出的資料", "提示")
       return

@@ -4,7 +4,6 @@
 
 import type { User } from "@/pages/user-management/types"
 import { mount } from "@vue/test-utils"
-import ElementPlus from "element-plus"
 import { describe, expect, it, vi } from "vitest"
 import UserForm from "@/pages/user-management/components/UserForm.vue"
 
@@ -21,7 +20,6 @@ describe("userForm component", () => {
   it("should render form elements", () => {
     const wrapper = mount(UserForm, {
       global: {
-        plugins: [ElementPlus],
         stubs: {
           teleport: true
         }
@@ -34,7 +32,6 @@ describe("userForm component", () => {
   it("should have two tabs by default", () => {
     const wrapper = mount(UserForm, {
       global: {
-        plugins: [ElementPlus],
         stubs: {
           teleport: true
         }
@@ -49,7 +46,6 @@ describe("userForm component", () => {
   it("should emit success event on form submit", async () => {
     const wrapper = mount(UserForm, {
       global: {
-        plugins: [ElementPlus],
         stubs: {
           teleport: true
         }
@@ -63,7 +59,6 @@ describe("userForm component", () => {
   it("should have reset form method exposed", () => {
     const wrapper = mount(UserForm, {
       global: {
-        plugins: [ElementPlus],
         stubs: {
           teleport: true
         }
@@ -76,7 +71,6 @@ describe("userForm component", () => {
   it("should have setupEdit method exposed", () => {
     const wrapper = mount(UserForm, {
       global: {
-        plugins: [ElementPlus],
         stubs: {
           teleport: true
         }
@@ -89,7 +83,6 @@ describe("userForm component", () => {
   it("should have handleSubmit method exposed", () => {
     const wrapper = mount(UserForm, {
       global: {
-        plugins: [ElementPlus],
         stubs: {
           teleport: true
         }
@@ -102,7 +95,6 @@ describe("userForm component", () => {
   it("should have handleCancel method exposed", () => {
     const wrapper = mount(UserForm, {
       global: {
-        plugins: [ElementPlus],
         stubs: {
           teleport: true
         }
@@ -115,7 +107,6 @@ describe("userForm component", () => {
   it("should initialize with info tab active", () => {
     const wrapper = mount(UserForm, {
       global: {
-        plugins: [ElementPlus],
         stubs: {
           teleport: true
         }
@@ -128,7 +119,6 @@ describe("userForm component", () => {
   it("should hide password field in create mode then appear password tab in edit mode", async () => {
     const wrapper = mount(UserForm, {
       global: {
-        plugins: [ElementPlus],
         stubs: {
           teleport: true
         }
@@ -157,7 +147,6 @@ describe("userForm component", () => {
   it("should emit cancel event", () => {
     const wrapper = mount(UserForm, {
       global: {
-        plugins: [ElementPlus],
         stubs: {
           teleport: true
         }
@@ -172,7 +161,6 @@ describe("userForm component", () => {
   it("should reset both forms on cancel", async () => {
     const wrapper = mount(UserForm, {
       global: {
-        plugins: [ElementPlus],
         stubs: {
           teleport: true
         }

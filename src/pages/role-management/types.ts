@@ -3,8 +3,8 @@
  * @module @/pages/role-management/types
  */
 
-/** 角色 DTO */
-export interface RoleDto {
+/** 角色 */
+export interface Role {
   /** 角色唯一識別碼 (UUID) */
   id: string
 
@@ -21,14 +21,14 @@ export interface RoleDto {
   version: number
 }
 
-/** 角色詳細資訊 DTO（包含權限） */
-export interface RoleDetailDto extends RoleDto {
+/** 角色詳細資訊（包含權限） */
+export interface RoleDetail extends Role {
   /** 角色擁有的權限清單 */
-  permissions: PermissionDto[]
+  permissions: Permission[]
 }
 
-/** 權限 DTO */
-export interface PermissionDto {
+/** 權限 */
+export interface Permission {
   /** 權限唯一識別碼 (UUID) */
   id: string
 
@@ -54,8 +54,8 @@ export interface PermissionDto {
   version: number
 }
 
-/** 使用者角色關聯 DTO */
-export interface UserRoleDto {
+/** 使用者角色關聯 */
+export interface UserRole {
   /** 使用者 ID */
   userId: string
 

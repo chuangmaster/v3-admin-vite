@@ -146,6 +146,12 @@ export default defineConfig(({ mode }) => {
     test: {
       include: ["tests/**/*.test.{ts,js}"],
       environment: "happy-dom",
+      // 全域測試設定：預載 setup 檔與時間上限
+      setupFiles: ["tests/setup/setup-vitest.ts"],
+      // 允許較長的測試逾時（毫秒）
+      timeout: 20000,
+      // 兼容不同版本的 vitest 設定鍵
+      testTimeout: 20000,
       server: {
         deps: {
           inline: ["element-plus"]

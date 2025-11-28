@@ -48,8 +48,8 @@ export function usePermissionManagement() {
         pageSize: pagination.value.pageSize
       }
       const response = await permissionApi.getPermissions(query)
-      if (response.success && response.items) {
-        permissions.value = response.items
+      if (response.success && response.data) {
+        permissions.value = response.data
         pagination.value.total = response.totalCount
       } else {
         ElMessage.error(response.message || "載入失敗")

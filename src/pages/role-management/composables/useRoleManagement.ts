@@ -3,7 +3,7 @@
  * @module @/pages/role-management/composables/useRoleManagement
  */
 
-import type { RoleDto } from "../types"
+import type { Role } from "../types"
 
 import { ElMessage, ElMessageBox } from "element-plus"
 import { ref } from "vue"
@@ -15,7 +15,7 @@ import { deleteRole, getRoles } from "../apis/role"
  * 負責角色列表載入、刪除、分頁等操作
  */
 export function useRoleManagement() {
-  const roles = ref<RoleDto[]>([])
+  const roles = ref<Role[]>([])
   const loading = ref(false)
   const total = ref(0)
   const currentPage = ref(1)
@@ -29,7 +29,7 @@ export function useRoleManagement() {
     try {
       const response = await getRoles(currentPage.value, pageSize.value)
       if (response.success) {
-        roles.value = response.items
+        roles.value = response.data
         total.value = response.totalCount
       } else {
         ElMessage.error("載入角色列表失敗")
@@ -43,7 +43,7 @@ export function useRoleManagement() {
    * 刪除角色
    * @param role 要刪除的角色
    */
-  const handleDeleteRole = async (role: RoleDto) => {
+  const handleDeleteRole = async (role: Role) => {
     try {
       await ElMessageBox.confirm(
         `確定要刪除角色「${role.roleName}」嗎？此操作無法撤銷。`,

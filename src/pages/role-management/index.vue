@@ -45,7 +45,15 @@ const isLoading = computed(() => loading.value)
 const totalCount = computed(() => total.value)
 
 // 頁面掛載時加載角色列表
-onMounted(() => {
+onMounted(async () => {
+  // 先預載全部權限，讓新增對話框可以立即顯示
+  try {
+    await roleForm.preloadPermissions()
+  } catch (e) {
+    // 預載失敗不影響頁面其他功能
+    console.warn("preloadPermissions failed:", e)
+  }
+
   loadRoles()
 })
 

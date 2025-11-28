@@ -15,7 +15,8 @@ const mockGetUserList = vi.fn()
 const mockDeleteUser = vi.fn()
 
 // Mock API 模組（工廠函式），確保動態匯入時會取得下列 mock 實作
-vi.mock("@/pages/user-management/apis/account", () => ({
+// 注意：實作檔案 `useUserManagement.ts` 會從 `apis/user` 匯入，因此在測試中模擬相同路徑
+vi.mock("@/pages/user-management/apis/user", () => ({
   getUserList: mockGetUserList,
   deleteUser: mockDeleteUser,
   createUser: vi.fn(),

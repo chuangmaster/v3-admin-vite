@@ -7,14 +7,15 @@ import type { FormInstance, FormRules } from "element-plus"
 import type {
   AssignRolePermissionsRequest,
   CreateRoleRequest,
-  RoleDto,
+  PermissionTreeNode,
+  Role,
   UpdateRoleRequest
 } from "../types"
 import { ElMessage } from "element-plus"
 
 import { ref } from "vue"
 
-import { assignPermissions, createRole, getRoleDetail, getRoles, updateRole } from "../apis/role"
+import { assignPermissions, createRole, getPermissions, getRoleDetail, updateRole } from "../apis/role"
 import { usePermissionTree } from "./usePermissionTree"
 
 /**
@@ -28,9 +29,29 @@ export function useRoleForm(onSuccess?: () => void) {
   const formLoading = ref(false)
   const isEditMode = ref(false)
   const currentRoleId = ref<string>()
-  const permissions = ref<any[]>([])
+  const permissions = ref<PermissionTreeNode[]>([])
 
   const { buildPermissionTree } = usePermissionTree()
+
+  /**
+   * 預載所有權限清單，供 index 頁面在進入時呼叫
+   */
+  const preloadPermissions = async () => {
+    debugger
+    if (permissions.value.length > 0) return
+    formLoading.value = true
+    try {
+      const resp = await getPermissions()
+      if (resp.success && resp.data) {
+        permissions.value = buildPermissionTree(resp.data)
+        console.log("[useRoleForm] permissions preloaded:", permissions.value)
+      }
+    } catch (e) {
+      console.warn("[useRoleForm] preload permissions failed:", e)
+    } finally {
+      formLoading.value = false
+    }
+  }
 
   // 使用 ref 而非 reactive，確保能夠正確追蹤完整對象
   const formData = ref<
@@ -65,41 +86,25 @@ export function useRoleForm(onSuccess?: () => void) {
    */
   const openCreate = async () => {
     isEditMode.value = false
-    dialogVisible.value = true
     resetForm()
-
-    // 載入角色列表
+    // 若尚未 preload，嘗試載入（fallback）
     if (permissions.value.length === 0) {
-      formLoading.value = true
-      try {
-        const response = await getRoles(1, 1000)
-        if (response.success && response.data?.items) {
-          permissions.value = buildPermissionTree(response.data.items)
-        }
-      } finally {
-        formLoading.value = false
-      }
+      await preloadPermissions()
     }
+    dialogVisible.value = true
   }
 
   /**
    * 開啟編輯對話框
    * @param role 要編輯的角色
    */
-  const openEdit = async (role: RoleDto) => {
+  const openEdit = async (role: Role) => {
     isEditMode.value = true
     currentRoleId.value = role.id
-    dialogVisible.value = true
-
-    // 載入角色詳細資訊（含權限）和角色列表
+    // 只載入單一角色的權限資訊（全部權限應已 preload）
     formLoading.value = true
     try {
-      // 並行載入角色詳細資訊和角色列表
-      const [roleResponse, rolesResponse] = await Promise.all([
-        getRoleDetail(role.id),
-        getRoles(1, 1000)
-      ])
-
+      const roleResponse = await getRoleDetail(role.id)
       if (roleResponse.success && roleResponse.data) {
         formData.value.roleName = roleResponse.data.roleName
         formData.value.description = roleResponse.data.description || ""
@@ -107,15 +112,17 @@ export function useRoleForm(onSuccess?: () => void) {
         formData.value.selectedPermissionIds = roleResponse.data.permissions.map(p => p.id)
       } else {
         ElMessage.error(roleResponse.message || "載入角色資訊失敗")
-        dialogVisible.value = false
+        return
       }
-
-      if (rolesResponse.success && rolesResponse.data?.items) {
-        permissions.value = buildPermissionTree(rolesResponse.data.items)
+      // 若尚未 preload 全部權限，嘗試載入（fallback）
+      if (permissions.value.length === 0) {
+        await preloadPermissions()
       }
     } finally {
       formLoading.value = false
     }
+
+    dialogVisible.value = true
   }
 
   /**
@@ -220,6 +227,7 @@ export function useRoleForm(onSuccess?: () => void) {
     formData,
     permissions,
     rules,
+    preloadPermissions,
     openCreate,
     openEdit,
     submitForm,

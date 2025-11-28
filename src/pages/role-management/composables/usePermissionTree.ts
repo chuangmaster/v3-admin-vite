@@ -3,7 +3,7 @@
  * @module @/pages/role-management/composables/usePermissionTree
  */
 
-import type { PermissionDto, PermissionTreeNode } from "../types"
+import type { Permission, PermissionTreeNode } from "../types"
 
 /**
  * 模組分組配置
@@ -24,7 +24,8 @@ export function usePermissionTree() {
    * @param permissions 權限陣列
    * @returns 樹狀結構
    */
-  const buildPermissionTree = (permissions: PermissionDto[]): PermissionTreeNode[] => {
+  const buildPermissionTree = (permissions: Permission[]): PermissionTreeNode[] => {
+    debugger
     // 1. 按模組分組
     const grouped = permissions.reduce(
       (acc, perm) => {
@@ -35,7 +36,7 @@ export function usePermissionTree() {
         acc[module].push(perm)
         return acc
       },
-      {} as Record<string, PermissionDto[]>
+      {} as Record<string, Permission[]>
     )
 
     // 2. 建立模組節點

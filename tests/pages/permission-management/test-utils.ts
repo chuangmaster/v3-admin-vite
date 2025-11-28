@@ -12,7 +12,7 @@ export function createMockPermission(overrides?: Partial<Permission>): Permissio
   return {
     id: "550e8400-e29b-41d4-a716-446655440001",
     name: "新增權限",
-    permissionCode: "permission:create",
+    permissionCode: "permission.create",
     description: "允許建立新的權限",
     permissionType: "function",
     isSystem: false,
@@ -60,16 +60,28 @@ export function createMockPagedResult<T>(
   const pageSize = overrides?.pageSize || 20
   const totalPages = Math.ceil(totalCount / pageSize)
 
-  return {
+  // Build a data payload that contains the items (some backends nest items inside data)
+  const dataPayload: any = {
     items,
     pageNumber: 1,
     pageSize,
     totalCount,
     totalPages,
     hasPreviousPage: false,
-    hasNextPage: totalPages > 1,
-    ...overrides
+    hasNextPage: totalPages > 1
   }
+
+  return {
+    // top-level pagination fields (some implementations expect these)
+    pageNumber: 1,
+    pageSize,
+    totalCount,
+    // payload placed into `data` to match ApiResponse<T>
+    data: dataPayload as any,
+    timestamp: new Date().toISOString(),
+    traceId: `trace-${Math.random().toString(36).substring(7)}`,
+    ...overrides
+  } as PagedApiResponse<T>
 }
 
 /**

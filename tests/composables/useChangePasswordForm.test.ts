@@ -67,12 +67,20 @@ describe("useChangePasswordForm composable", () => {
   })
 
   it("should reset form data", () => {
-    const { formData, resetForm } = useChangePasswordForm()
-
+    const { formData, resetForm, formRef } = useChangePasswordForm()
     formData.oldPassword = "oldpass123"
     formData.newPassword = "newpass123"
     formData.confirmPassword = "newpass123"
     formData.userId = "user123"
+
+    // provide a mock formRef that clears fields when resetFields is called
+    formRef.value = {
+      resetFields: () => {
+        formData.oldPassword = ""
+        formData.newPassword = ""
+        formData.confirmPassword = ""
+      }
+    } as any
 
     resetForm()
 

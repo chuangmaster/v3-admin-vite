@@ -17,7 +17,7 @@ import { request } from "@/http/axios"
  */
 export async function getPermissions(
   query: PermissionQuery
-): Promise<PagedApiResponse<Permission>> {
+): Promise<PagedApiResponse<Permission[]>> {
   return request({
     url: "/permission",
     method: "GET",

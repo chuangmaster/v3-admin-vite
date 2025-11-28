@@ -10,9 +10,9 @@ import type {
   AssignRolePermissionsRequest,
   CreateRoleRequest,
   DeleteRoleRequest,
-  PermissionDto,
-  RoleDetailDto,
-  RoleDto,
+  Permission,
+  Role,
+  RoleDetail,
   UpdateRoleRequest
 } from "../types"
 
@@ -27,7 +27,7 @@ import { request } from "@/http/axios"
 export async function getRoles(
   pageNumber = 1,
   pageSize = 10
-): Promise<PagedApiResponse<RoleDto>> {
+): Promise<PagedApiResponse<Role[]>> {
   return request({
     url: "/role",
     method: "GET",
@@ -40,7 +40,7 @@ export async function getRoles(
  * @param id 角色 ID
  * @returns 角色資料
  */
-export async function getRole(id: string): Promise<ApiResponse<RoleDto>> {
+export async function getRole(id: string): Promise<ApiResponse<Role>> {
   return request({
     url: `/role/${id}`,
     method: "GET"
@@ -52,7 +52,7 @@ export async function getRole(id: string): Promise<ApiResponse<RoleDto>> {
  * @param id 角色 ID
  * @returns 角色詳細資訊
  */
-export async function getRoleDetail(id: string): Promise<ApiResponse<RoleDetailDto>> {
+export async function getRoleDetail(id: string): Promise<ApiResponse<RoleDetail>> {
   return request({
     url: `/role/${id}/permissions`,
     method: "GET"
@@ -64,7 +64,7 @@ export async function getRoleDetail(id: string): Promise<ApiResponse<RoleDetailD
  * @param data 新增角色請求
  * @returns 建立的角色資料
  */
-export async function createRole(data: CreateRoleRequest): Promise<ApiResponse<RoleDto>> {
+export async function createRole(data: CreateRoleRequest): Promise<ApiResponse<Role>> {
   return request({
     url: "/role",
     method: "POST",
@@ -81,7 +81,7 @@ export async function createRole(data: CreateRoleRequest): Promise<ApiResponse<R
 export async function updateRole(
   id: string,
   data: UpdateRoleRequest
-): Promise<ApiResponse<RoleDto>> {
+): Promise<ApiResponse<Role>> {
   return request({
     url: `/role/${id}`,
     method: "PUT",
@@ -144,7 +144,7 @@ export async function removePermission(
  * @returns 權限清單
  */
 export async function getPermissions(): Promise<
-  ApiResponse<{ items: PermissionDto[] }>
+  ApiResponse<Permission[]>
 > {
   return request({
     url: "/permission",

@@ -2,7 +2,7 @@
  * 可包含 API 回傳的頂層欄位（某些後端直接把分頁資料放在回傳頂層）
  * 作為基底型別獨立存在，供不同回傳結構使用。
  */
-export interface ApiPagedResponse<T = any> {
+export interface ApiResponse<T = any> {
   /** 是否成功 */
   success?: boolean
   /** 業務代碼（字串或數字） */
@@ -13,17 +13,16 @@ export interface ApiPagedResponse<T = any> {
   timestamp?: string
   /** 追蹤 ID */
   traceId?: string
-  // 允許包含任意其它頂層欄位（例如 items, pageNumber 等）
-  [key: string]: any
+  /** 資料列表 */
+  data: T
 }
 
 /**
- * 命名為 `PagedApiResponse` 的分頁回應型別，繼承 `ApiPagedResponse`。
+ * 命名為 `PagedApiResponse` 的分頁回應型別，繼承 `ApiResponse`。
  * 代表 API 回傳同時包含頂層欄位與分頁資料的情況。
  */
-export interface PagedApiResponse<T> extends ApiPagedResponse<T> {
-  /** 資料列表 */
-  items: T[]
+export interface PagedApiResponse<T> extends ApiResponse<T> {
+
   /** 當前頁碼 */
   pageNumber: number
   /** 每頁筆數 */

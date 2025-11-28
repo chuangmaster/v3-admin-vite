@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { RoleDto } from "../types"
+import type { Role } from "../types"
 import dayjs from "dayjs"
 
 interface Props {
   /** 角色資料 */
-  data: RoleDto[]
+  data: Role[]
   /** 是否載入中 */
   loading: boolean
 }
 
 interface Emits {
-  (e: "edit", role: RoleDto): void
-  (e: "delete", role: RoleDto): void
+  (e: "edit", role: Role): void
+  (e: "delete", role: Role): void
 }
 
 defineProps<Props>()
