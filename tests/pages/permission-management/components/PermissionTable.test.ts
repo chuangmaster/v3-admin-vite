@@ -6,13 +6,19 @@ import type { Permission } from "@/pages/permission-management/types"
 import { mount } from "@vue/test-utils"
 import { describe, expect, it, vi } from "vitest"
 
-// Mock Element Plus 元件
+// Mock Element Plus 元件（擴充以避免覆寫全域 mock 導致匯出缺失）
 vi.mock("element-plus", () => ({
   ElTable: { name: "ElTable" },
   ElTableColumn: { name: "ElTableColumn" },
   ElButton: { name: "ElButton" },
   ElTag: { name: "ElTag" },
-  ElEmpty: { name: "ElEmpty" }
+  ElEmpty: { name: "ElEmpty" },
+  ElLoadingDirective: { mounted: () => {}, unmounted: () => {} },
+  vLoading: { mounted: () => {}, unmounted: () => {} },
+  ElLoading: { name: "ElLoading" },
+  ElScrollbar: { name: "ElScrollbar" },
+  ElInput: { name: "ElInput" },
+  ElMessage: { error: vi.fn(), success: vi.fn(), warning: vi.fn() }
 }))
 
 describe("permission table component", () => {

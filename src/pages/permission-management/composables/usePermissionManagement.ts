@@ -49,8 +49,8 @@ export function usePermissionManagement() {
       }
       const response = await permissionApi.getPermissions(query)
       if (response.success && response.data) {
-        permissions.value = response.data.items
-        pagination.value.total = response.data.totalCount
+        permissions.value = response.data
+        pagination.value.total = response.totalCount
       } else {
         ElMessage.error(response.message || "載入失敗")
       }

@@ -65,16 +65,19 @@ describe("usePermissionForm", () => {
 
     // 填入表單資料
     formData.value.name = "新增權限"
-    formData.value.permissionCode = "permission:create"
+    formData.value.permissionCode = "permission.create"
     formData.value.description = "允許建立新的權限"
+    formData.value.permissionType = "function"
 
     await handleSubmit()
 
-    expect(mockCreatePermission).toHaveBeenCalledWith({
-      name: "新增權限",
-      code: "permission:create",
-      description: "允許建立新的權限"
-    })
+    expect(mockCreatePermission).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "新增權限",
+        permissionCode: "permission.create",
+        description: "允許建立新的權限"
+      })
+    )
     expect(mockEmit).toHaveBeenCalledWith("success")
   })
 
@@ -93,8 +96,9 @@ describe("usePermissionForm", () => {
     })
 
     formData.value.name = "新增權限"
-    formData.value.permissionCode = "permission:read"
+    formData.value.permissionCode = "permission.read"
     formData.value.description = "允許查看權限"
+    formData.value.permissionType = "function"
 
     await handleSubmit()
 
@@ -113,7 +117,7 @@ describe("usePermissionForm", () => {
 
     const mockPermission = createMockPermission({
       name: "編輯權限",
-      permissionCode: "permission:edit",
+      permissionCode: "permission.edit",
       description: "允許編輯權限"
     })
 
@@ -121,7 +125,7 @@ describe("usePermissionForm", () => {
 
     expect(isEditMode.value).toBe(true)
     expect(formData.value.name).toBe("編輯權限")
-    expect(formData.value.permissionCode).toBe("permission:edit")
+    expect(formData.value.permissionCode).toBe("permission.edit")
     expect(formData.value.description).toBe("允許編輯權限")
   })
 
@@ -137,7 +141,7 @@ describe("usePermissionForm", () => {
 
     const mockPermission = createMockPermission({
       name: "舊名稱",
-      permissionCode: "permission:old"
+      permissionCode: "permission.old"
     })
 
     mockUpdatePermission.mockResolvedValue({
@@ -218,7 +222,7 @@ describe("usePermissionForm", () => {
     const mockEmit = vi.fn()
     const { formData, handleSubmit } = usePermissionForm(mockEmit as any)
 
-    formData.value.permissionCode = "permission:create"
+    formData.value.permissionCode = "permission.create"
     // 不填 name
 
     await handleSubmit()

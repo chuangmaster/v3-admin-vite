@@ -17,6 +17,8 @@ export default antfu(
     // 忽略文件
     ignores: [
       "specs/**/*.md",
+      ".github/prompts/**/*.md",
+      ".specify/**/*",
       "dist",
       "node_modules"
     ]

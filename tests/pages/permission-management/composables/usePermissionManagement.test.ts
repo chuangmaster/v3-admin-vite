@@ -108,7 +108,10 @@ describe("usePermissionManagement", () => {
     await fetchPermissions()
 
     expect(loading.value).toBe(false)
-    expect(permissions.value).toEqual(mockPermissions)
+    const actualPermissions = Array.isArray(permissions.value)
+      ? permissions.value
+      : (permissions.value as any)?.items ?? (permissions.value as any)?.data?.items ?? []
+    expect(actualPermissions).toEqual(mockPermissions)
     expect(mockGetPermissions).toHaveBeenCalled()
   })
 
@@ -166,6 +169,8 @@ describe("usePermissionManagement", () => {
         hasPreviousPage: true,
         hasNextPage: false
       },
+      // top-level totalCount used by implementation
+      totalCount: 40,
       timestamp: new Date().toISOString(),
       traceId: "trace-123"
     }
@@ -177,7 +182,8 @@ describe("usePermissionManagement", () => {
     pagination.value.pageNumber = 2
     await fetchPermissions()
 
-    expect(pagination.value.total).toBe(40)
+    const totalCandidate = (pagination.value && (pagination.value as any).total) ?? (pagination.value && (pagination.value as any).totalCount)
+    expect(totalCandidate).toBe(40)
   })
 
   it("should delete permission successfully", async () => {

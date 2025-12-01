@@ -64,7 +64,7 @@ describe("useExportExcel", () => {
     exportPermissions([mockPermission])
 
     expect(document.createElement).toHaveBeenCalledWith("a")
-    expect(ElMessage.success).toHaveBeenCalledWith("匯出成功")
+    expect(URL.createObjectURL).toHaveBeenCalled()
   })
 
   it("should export multiple permissions", async () => {
@@ -81,7 +81,7 @@ describe("useExportExcel", () => {
     const { exportPermissions } = useExportExcel()
     exportPermissions(permissions)
 
-    expect(ElMessage.success).toHaveBeenCalledWith("匯出成功")
+    expect(URL.createObjectURL).toHaveBeenCalled()
   })
 
   it("should include UTF-8 BOM for Excel", async () => {
@@ -91,19 +91,24 @@ describe("useExportExcel", () => {
 
     const mockPermission = createMockPermission()
 
-    // Mock Blob 以捕獲 CSV 內容
-    let blobContent = ""
+    // Mock Blob 以捕獲二進位輸出
+    let _blobContent = ""
+    let blobIsArrayBuffer = false
     vi.stubGlobal("Blob", class {
       constructor(parts: any[]) {
-        blobContent = parts[0]
+        const part = Array.isArray(parts) ? parts[0] : parts[0]
+        blobIsArrayBuffer = !!(
+          part && (part instanceof ArrayBuffer || Object.prototype.toString.call(part) === "[object ArrayBuffer]")
+        )
+        _blobContent = Array.isArray(parts) ? parts.join("") : String(parts[0])
       }
     } as any)
 
     const { exportPermissions } = useExportExcel()
     exportPermissions([mockPermission])
 
-    // 驗證 BOM 存在
-    expect(blobContent).toContain("\uFEFF")
+    // 驗證為二進位輸出（xlsx 會回傳 ArrayBuffer）
+    expect(blobIsArrayBuffer).toBe(true)
   })
 
   it("should set download filename", async () => {
@@ -152,8 +157,8 @@ describe("useExportExcel", () => {
     const { exportPermissions } = useExportExcel()
     exportPermissions([mockPermission])
 
-    // 應該成功格式化日期
-    expect(ElMessage.success).toHaveBeenCalledWith("匯出成功")
+    // 應該成功產生下載 URL
+    expect(URL.createObjectURL).toHaveBeenCalled()
   })
 
   it("should include system permission flag in export", async () => {
@@ -167,6 +172,6 @@ describe("useExportExcel", () => {
     const { exportPermissions } = useExportExcel()
     exportPermissions([systemPermission, customPermission])
 
-    expect(ElMessage.success).toHaveBeenCalledWith("匯出成功")
+    expect(URL.createObjectURL).toHaveBeenCalled()
   })
 })
