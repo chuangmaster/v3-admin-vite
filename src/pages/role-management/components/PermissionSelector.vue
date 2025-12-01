@@ -8,7 +8,7 @@
 
 import type { PermissionTreeNode } from "../types"
 
-import { ref } from "vue"
+import { ref, watch } from "vue"
 
 interface Props {
   /** 已選中的權限 ID */
@@ -32,6 +32,15 @@ const treeRef = ref()
 const filterText = ref("")
 
 /**
+ * 監聽 modelValue 的變更，更新樹的選中狀態
+ */
+watch(() => props.modelValue, (newVal: string[]) => {
+  if (treeRef.value) {
+    treeRef.value.setCheckedKeys(newVal || [])
+  }
+}, { deep: true })
+
+/**
  * 樹狀過濾方法
  */
 function filterNode(value: string, data: any) {
@@ -40,9 +49,9 @@ function filterNode(value: string, data: any) {
 }
 
 /**
- * 監聽過濾文字的變更
+ * 處理過濾文字的變更
  */
-function watch() {
+function handleFilterInput() {
   if (treeRef.value) {
     treeRef.value.filter(filterText.value)
   }
@@ -73,7 +82,7 @@ defineExpose({ treeRef })
         v-model="filterText"
         placeholder="搜尋權限..."
         clearable
-        @input="watch"
+        @input="handleFilterInput"
       />
     </div>
 
@@ -83,7 +92,6 @@ defineExpose({ treeRef })
         :data="props.permissions || []"
         show-checkbox
         node-key="id"
-        :default-checked-keys="props.modelValue"
         :props="{ children: 'children', label: 'label' }"
         :filter-node-method="filterNode"
         :disabled="props.disabled"

@@ -6,57 +6,42 @@
 import type { Permission, PermissionTreeNode } from "../types"
 
 /**
- * 模組分組配置
- */
-const MODULE_GROUPS: Record<string, { label: string, order: number }> = {
-  user: { label: "使用者管理", order: 1 },
-  role: { label: "角色管理", order: 2 },
-  permission: { label: "權限管理", order: 3 }
-}
-
-/**
  * 權限樹狀結構轉換邏輯
- * 將扁平化的權限列表轉換為樹狀結構
+ * 將扁平化的權限列表轉換為樹狀結構，基於 API 返回的數據進行分類
  */
 export function usePermissionTree() {
   /**
    * 構建權限樹狀結構
-   * @param permissions 權限陣列
+   * 根據權限代碼的格式 (resource.action)，動態提取資源名並進行分組
+   * @param permissions 權限陣列（來自 API）
    * @returns 樹狀結構
    */
   const buildPermissionTree = (permissions: Permission[]): PermissionTreeNode[] => {
-    debugger
-    // 1. 按模組分組
+    // 1. 按資源進行分組
     const grouped = permissions.reduce(
       (acc, perm) => {
-        const [module] = perm.permissionCode.split(".")
-        if (!acc[module]) {
-          acc[module] = []
+        const [resource] = perm.permissionCode.split(".")
+        if (!acc[resource]) {
+          acc[resource] = []
         }
-        acc[module].push(perm)
+        acc[resource].push(perm)
         return acc
       },
       {} as Record<string, Permission[]>
     )
 
-    // 2. 建立模組節點
-    const moduleNodes = Object.entries(grouped)
-      .map(([module, perms]) => ({
-        id: `${module}-group`,
-        label: MODULE_GROUPS[module]?.label || module,
-        permissionCode: module,
-        isGroup: true,
-        children: perms.map(p => ({
-          id: p.id,
-          label: `${p.name} (${p.permissionCode})`,
-          permissionCode: p.permissionCode
-        }))
+    // 2. 建立資源節點（按照在 API 數據中出現的順序）
+    const resourceNodes = Object.entries(grouped).map(([resource, perms]) => ({
+      id: `${resource}-group`,
+      label: resource,
+      permissionCode: resource,
+      isGroup: true,
+      children: perms.map(p => ({
+        id: p.id,
+        label: `${p.name} (${p.permissionCode})`,
+        permissionCode: p.permissionCode
       }))
-      .sort((a, b) => {
-        const orderA = MODULE_GROUPS[a.permissionCode]?.order ?? 999
-        const orderB = MODULE_GROUPS[b.permissionCode]?.order ?? 999
-        return orderA - orderB
-      })
+    }))
 
     // 3. 建立頂層節點
     return [
@@ -65,7 +50,7 @@ export function usePermissionTree() {
         label: "存取控制 (Access Control)",
         permissionCode: "access_control",
         isGroup: true,
-        children: moduleNodes
+        children: resourceNodes
       }
     ]
   }
