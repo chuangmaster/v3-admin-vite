@@ -54,7 +54,12 @@ async function handleBatchDelete(): Promise<void> {
   permissionTableRef.value?.clearSelection()
 }
 
-function handlePaginationChange(): void {
+function handlePageChange(): void {
+  fetchPermissions()
+}
+
+function handleSizeChange(): void {
+  pagination.value.pageNumber = 1
   fetchPermissions()
 }
 
@@ -86,16 +91,7 @@ function handleDialogClose(): void {
   permissionFormRef.value?.resetForm()
 }
 
-function checkPermission(): void {
-  // 檢查是否有查看權限
-  const hasReadPermission = !!PERMISSION_PERMISSIONS.READ
-  if (!hasReadPermission) {
-    ElMessage.error("無權限訪問此頁面")
-  }
-}
-
 onMounted(() => {
-  checkPermission()
   fetchPermissions()
 })
 </script>
@@ -118,7 +114,12 @@ onMounted(() => {
       </el-input>
 
       <div class="toolbar-buttons">
-        <el-button type="primary" :icon="Plus" @click="handleCreate">
+        <el-button
+          type="primary"
+          :icon="Plus"
+          @click="handleCreate"
+          v-permission="[PERMISSION_PERMISSIONS.CREATE]"
+        >
           新增權限
         </el-button>
         <el-button
@@ -126,6 +127,7 @@ onMounted(() => {
           type="danger"
           :icon="Delete"
           @click="handleBatchDelete"
+          v-permission="[PERMISSION_PERMISSIONS.DELETE]"
         >
           批次刪除 ({{ selectedPermissions.length }})
         </el-button>
@@ -161,7 +163,8 @@ onMounted(() => {
           :page-sizes="[10, 20, 50, 100]"
           :total="pagination.total"
           layout="total, sizes, prev, pager, next, jumper"
-          @change="handlePaginationChange"
+          @current-change="handlePageChange"
+          @size-change="handleSizeChange"
         />
       </div>
     </el-card>

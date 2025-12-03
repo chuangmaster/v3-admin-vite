@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Download, Plus, Search } from "@element-plus/icons-vue"
+import { Download, Plus } from "@element-plus/icons-vue"
 import { computed, onMounted, ref } from "vue"
 import RoleForm from "./components/RoleForm.vue"
 import RoleTable from "./components/RoleTable.vue"
@@ -10,9 +10,7 @@ import { useRoleManagement } from "./composables/useRoleManagement"
 const {
   roles,
   loading,
-  total,
-  currentPage,
-  pageSize,
+  pagination,
   loadRoles,
   handleDeleteRole,
   handlePageChange,
@@ -24,12 +22,11 @@ const roleForm = useRoleForm(() => {
 })
 
 const roleFormRef = ref()
-const searchKeyword = ref("")
 const { exportRoles } = useExportExcel()
 
 const rolesList = computed(() => roles.value)
 const isLoading = computed(() => loading.value)
-const totalCount = computed(() => total.value)
+const totalCount = computed(() => pagination.value.total)
 
 onMounted(async () => {
   try {
@@ -59,30 +56,12 @@ function handleSubmitForm() {
 function handleExport() {
   exportRoles(roles.value)
 }
-
-function handleSearchClear() {
-  searchKeyword.value = ""
-  loadRoles()
-}
 </script>
 
 <template>
   <div class="role-management-page">
     <!-- 工具列 -->
     <div class="toolbar">
-      <el-input
-        v-model="searchKeyword"
-        placeholder="搜尋角色名稱或描述..."
-        clearable
-        style="width: 250px"
-        @keyup.enter="loadRoles"
-        @clear="handleSearchClear"
-      >
-        <template #prefix>
-          <el-icon><Search /></el-icon>
-        </template>
-      </el-input>
-
       <div class="toolbar-buttons">
         <el-button
           type="primary"
@@ -117,8 +96,8 @@ function handleSearchClear() {
       <!-- 分頁 -->
       <div class="pagination-container">
         <el-pagination
-          v-model:current-page="currentPage"
-          v-model:page-size="pageSize"
+          v-model:current-page="pagination.pageNumber"
+          v-model:page-size="pagination.pageSize"
           :page-sizes="[10, 20, 50, 100]"
           :total="totalCount"
           layout="total, sizes, prev, pager, next, jumper"

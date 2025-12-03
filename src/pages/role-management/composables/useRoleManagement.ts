@@ -11,15 +11,17 @@ import { ref } from "vue"
 import { deleteRole, getRoles } from "../apis/role"
 
 /**
- * 角色管理核心邏輯
+ * 角色管理核心邏輯組合式函式
  * 負責角色列表載入、刪除、分頁等操作
  */
 export function useRoleManagement() {
   const roles = ref<Role[]>([])
   const loading = ref(false)
-  const total = ref(0)
-  const currentPage = ref(1)
-  const pageSize = ref(10)
+  const pagination = ref({
+    pageNumber: 1,
+    pageSize: 10,
+    total: 0
+  })
 
   /**
    * 載入角色列表
@@ -27,10 +29,10 @@ export function useRoleManagement() {
   const loadRoles = async () => {
     loading.value = true
     try {
-      const response = await getRoles(currentPage.value, pageSize.value)
+      const response = await getRoles(pagination.value.pageNumber, pagination.value.pageSize)
       if (response.success) {
         roles.value = response.data
-        total.value = response.totalCount
+        pagination.value.total = response.totalCount
       } else {
         ElMessage.error("載入角色列表失敗")
       }
@@ -75,7 +77,7 @@ export function useRoleManagement() {
    * @param page 新頁碼
    */
   const handlePageChange = async (page: number) => {
-    currentPage.value = page
+    pagination.value.pageNumber = page
     await loadRoles()
   }
 
@@ -84,17 +86,15 @@ export function useRoleManagement() {
    * @param size 新每頁筆數
    */
   const handleSizeChange = async (size: number) => {
-    pageSize.value = size
-    currentPage.value = 1
+    pagination.value.pageSize = size
+    pagination.value.pageNumber = 1
     await loadRoles()
   }
 
   return {
     roles,
     loading,
-    total,
-    currentPage,
-    pageSize,
+    pagination,
     loadRoles,
     handleDeleteRole,
     refresh,
