@@ -8,7 +8,7 @@ import UserTable from "./components/UserTable.vue"
 import { useExportExcel } from "./composables/useExportExcel"
 import { useUserManagement } from "./composables/useUserManagement"
 
-const { users, loading, pagination, searchKeyword, fetchUsers, handleDelete }
+const { users, loading, pagination, searchKeyword, fetchUsers, handleDelete, resetSearch }
   = useUserManagement()
 const { exportUsers } = useExportExcel()
 
@@ -46,9 +46,7 @@ function handlePageChange(): void {
 }
 
 function handleSearchClear(): void {
-  searchKeyword.value = ""
-  pagination.value.pageNumber = 1
-  fetchUsers()
+  resetSearch()
 }
 
 onMounted(() => {
@@ -65,7 +63,6 @@ onMounted(() => {
         placeholder="請輸入用戶名或顯示名稱"
         clearable
         style="width: 250px"
-        @keyup.enter="fetchUsers"
         @clear="handleSearchClear"
       >
         <template #prefix>

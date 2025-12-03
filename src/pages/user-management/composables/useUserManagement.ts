@@ -10,7 +10,8 @@ import {
   API_CODE_LAST_ACCOUNT_CANNOT_DELETE
 } from "@@/constants/api-code"
 import { ElMessage, ElMessageBox } from "element-plus"
-import { ref } from "vue"
+import { debounce } from "lodash-es"
+import { ref, watch } from "vue"
 import * as accountApi from "@/pages/user-management/apis/user"
 
 /**
@@ -111,6 +112,18 @@ export function useUserManagement() {
     pagination.value.pageNumber = 1
     fetchUsers()
   }
+
+  /**
+   * 當搜尋關鍵字變更時，重置分頁並重新載入
+   */
+  const debouncedSearch = debounce(() => {
+    fetchUsers()
+  }, 500)
+
+  watch(searchKeyword, () => {
+    pagination.value.pageNumber = 1
+    debouncedSearch()
+  })
 
   return {
     users,

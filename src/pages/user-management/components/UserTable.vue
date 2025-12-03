@@ -10,14 +10,13 @@ interface Props {
   loading: boolean
 }
 
-const props = defineProps<Props>()
+interface Emits {
+  (e: "edit", user: User): void
+  (e: "delete", user: User): void
+}
 
-const emit = defineEmits<{
-  /** 編輯用戶事件 */
-  edit: [user: User]
-  /** 刪除用戶事件 */
-  delete: [user: User]
-}>()
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
 
 /** 狀態選項 */
 const statusOptions = [
@@ -42,6 +41,24 @@ function getStatusType(status: string): "success" | "warning" | "info" | "danger
 function getStatusLabel(status: string): string {
   return statusOptions.find(opt => opt.value === status)?.label || status
 }
+
+/**
+ * 處理編輯按鈕點擊
+ */
+function handleEdit(user: User): void {
+  emit("edit", user)
+}
+
+/**
+ * 處理刪除按鈕點擊
+ */
+function handleDelete(user: User): void {
+  emit("delete", user)
+}
+
+defineExpose({
+  // 可根據需要暴露方法給父層
+})
 </script>
 
 <template>
@@ -72,7 +89,7 @@ function getStatusLabel(status: string): string {
           type="primary"
           size="small"
           link
-          @click="emit('edit', row)"
+          @click="handleEdit(row)"
         >
           編輯
         </el-button>
@@ -81,7 +98,7 @@ function getStatusLabel(status: string): string {
           type="danger"
           size="small"
           link
-          @click="emit('delete', row)"
+          @click="handleDelete(row)"
         >
           刪除
         </el-button>
