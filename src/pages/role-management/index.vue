@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from "vue"
-
+import { Download, Plus, Search } from "@element-plus/icons-vue"
+import { computed, onMounted, ref } from "vue"
 import RoleForm from "./components/RoleForm.vue"
 import RoleTable from "./components/RoleTable.vue"
 import { useExportExcel } from "./composables/useExportExcel"
@@ -23,37 +23,20 @@ const roleForm = useRoleForm(() => {
   loadRoles()
 })
 
-// 創建模板引用來訪問 RoleForm 組件
 const roleFormRef = ref()
-
-// 監聽對話框狀態變化，當對話框打開時同步 formRef
-watch(() => roleForm.dialogVisible.value, async (visible) => {
-  if (visible) {
-    // 等待 DOM 更新
-    await nextTick()
-    if (roleFormRef.value?.formRef) {
-      roleForm.formRef.value = roleFormRef.value.formRef
-    }
-  }
-})
-
+const searchKeyword = ref("")
 const { exportRoles } = useExportExcel()
 
-// 建立計算屬性確保類型正確
 const rolesList = computed(() => roles.value)
 const isLoading = computed(() => loading.value)
 const totalCount = computed(() => total.value)
 
-// 頁面掛載時加載角色列表
 onMounted(async () => {
-  // 先預載全部權限，讓新增對話框可以立即顯示
   try {
     await roleForm.preloadPermissions()
   } catch (e) {
-    // 預載失敗不影響頁面其他功能
     console.warn("preloadPermissions failed:", e)
   }
-
   loadRoles()
 })
 
@@ -76,34 +59,54 @@ function handleSubmitForm() {
 function handleExport() {
   exportRoles(roles.value)
 }
+
+function handleSearchClear() {
+  searchKeyword.value = ""
+  loadRoles()
+}
 </script>
 
 <template>
   <div class="role-management-page">
-    <el-card class="box-card">
-      <!-- 工具列 -->
+    <!-- 工具列 -->
+    <div class="toolbar">
+      <el-input
+        v-model="searchKeyword"
+        placeholder="搜尋角色名稱或描述..."
+        clearable
+        style="width: 250px"
+        @keyup.enter="loadRoles"
+        @clear="handleSearchClear"
+      >
+        <template #prefix>
+          <el-icon><Search /></el-icon>
+        </template>
+      </el-input>
+
+      <div class="toolbar-buttons">
+        <el-button
+          type="primary"
+          :icon="Plus"
+          @click="handleAdd"
+          v-permission="['role.create']"
+        >
+          新增角色
+        </el-button>
+        <el-button
+          :icon="Download"
+          @click="handleExport"
+        >
+          匯出報表
+        </el-button>
+      </div>
+    </div>
+
+    <!-- 表格卡片 -->
+    <el-card class="table-card">
       <template #header>
-        <div class="card-header">
-          <span class="title">角色列表</span>
-          <div class="toolbar-buttons">
-            <el-button
-              type="primary"
-              @click="handleAdd"
-              v-permission="['role.create']"
-            >
-              新增角色
-            </el-button>
-            <el-button
-              type="default"
-              @click="handleExport"
-            >
-              匯出報表
-            </el-button>
-          </div>
-        </div>
+        <span class="card-title">角色列表</span>
       </template>
 
-      <!-- 角色表格 -->
       <RoleTable
         :data="rolesList"
         :loading="isLoading"
@@ -112,16 +115,17 @@ function handleExport() {
       />
 
       <!-- 分頁 -->
-      <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
-        :page-sizes="[10, 20, 50, 100]"
-        :total="totalCount"
-        layout="total, sizes, prev, pager, next, jumper"
-        @current-change="handlePageChange"
-        @size-change="handleSizeChange"
-        class="pagination-container"
-      />
+      <div class="pagination-container">
+        <el-pagination
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="totalCount"
+          layout="total, sizes, prev, pager, next, jumper"
+          @current-change="handlePageChange"
+          @size-change="handleSizeChange"
+        />
+      </div>
     </el-card>
 
     <!-- 角色表單對話框 -->
@@ -141,34 +145,45 @@ function handleExport() {
 
 <style scoped lang="scss">
 .role-management-page {
-  padding: 12px;
+  padding: 20px;
 
-  .box-card {
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 16px;
+
+    .toolbar-buttons {
+      display: flex;
+      gap: 8px;
+    }
+  }
+
+  .table-card {
     :deep(.el-card__header) {
       padding: 16px 20px;
-      border-bottom: 1px solid #ebeef5;
+      border-bottom: 1px solid var(--el-border-color-light);
+      background-color: var(--el-fill-color-blank);
     }
 
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    :deep(.el-card__body) {
+      padding: 0;
+    }
 
-      .title {
-        font-size: 16px;
-        font-weight: 500;
-      }
-
-      .toolbar-buttons {
-        display: flex;
-        gap: 12px;
-      }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--el-text-color-primary);
     }
   }
 
   .pagination-container {
-    margin-top: 16px;
-    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 20px;
+    border-top: 1px solid var(--el-border-color-lighter);
+    background-color: var(--el-fill-color-blank);
   }
 }
 </style>

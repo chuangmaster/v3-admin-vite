@@ -76,7 +76,6 @@ defineExpose({
     v-loading="loading"
     :data="permissions"
     stripe
-    style="width: 100%"
     @selection-change="handleSelectionChange"
   >
     <!-- 選擇列 -->

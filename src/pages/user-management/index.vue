@@ -1,70 +1,53 @@
 <script setup lang="ts">
 import type { User } from "./types"
 import { USER_PERMISSIONS } from "@@/constants/permissions"
+import { Download, Plus, Search } from "@element-plus/icons-vue"
 import { onMounted, ref } from "vue"
 import UserForm from "./components/UserForm.vue"
 import UserTable from "./components/UserTable.vue"
 import { useExportExcel } from "./composables/useExportExcel"
 import { useUserManagement } from "./composables/useUserManagement"
 
-const { users, loading, pagination, searchKeyword, fetchUsers, handleDelete, resetSearch }
+const { users, loading, pagination, searchKeyword, fetchUsers, handleDelete }
   = useUserManagement()
 const { exportUsers } = useExportExcel()
 
-/** 對話框可見性 */
 const dialogVisible = ref(false)
-
-/** 對話框標題 */
 const dialogTitle = ref("新增用戶")
-
-/** UserForm 元件 ref */
 const userFormRef = ref<InstanceType<typeof UserForm>>()
 
-/**
- * 處理新增用戶按鈕點擊
- */
 function handleCreate(): void {
   dialogTitle.value = "新增用戶"
   userFormRef.value?.resetForm()
   dialogVisible.value = true
 }
 
-/**
- * 處理編輯用戶
- * @param user - 待編輯的用戶
- */
 function handleEdit(user: User): void {
   dialogTitle.value = "編輯用戶"
   userFormRef.value?.setupEdit(user)
   dialogVisible.value = true
 }
 
-/**
- * 處理表單提交成功
- */
 function handleFormSuccess(): void {
   dialogVisible.value = false
   fetchUsers()
 }
 
-/**
- * 處理表單取消
- */
 function handleFormCancel(): void {
   dialogVisible.value = false
 }
 
-/**
- * 處理匯出報表
- */
 function handleExport(): void {
   exportUsers(users.value)
 }
 
-/**
- * 處理分頁變更
- */
 function handlePageChange(): void {
+  fetchUsers()
+}
+
+function handleSearchClear(): void {
+  searchKeyword.value = ""
+  pagination.value.pageNumber = 1
   fetchUsers()
 }
 
@@ -74,44 +57,50 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="user-management p-5">
-    <!-- 搜尋列 -->
-    <el-card class="mb-4">
-      <el-row :gutter="16">
-        <el-col :span="8">
-          <el-input
-            v-model="searchKeyword"
-            placeholder="請輸入用戶名或顯示名稱"
-            clearable
-            @clear="resetSearch"
-          >
-            <template #append>
-              <el-button icon="Search" @click="fetchUsers" />
-            </template>
-          </el-input>
-        </el-col>
-        <el-col :span="16" class="flex justify-end gap-2">
-          <el-button
-            v-permission="[USER_PERMISSIONS.CREATE]"
-            type="primary"
-            icon="Plus"
-            @click="handleCreate"
-          >
-            新增用戶
-          </el-button>
-          <el-button icon="Download" @click="handleExport">
-            匯出報表
-          </el-button>
-        </el-col>
-      </el-row>
-    </el-card>
+  <div class="user-management-page">
+    <!-- 工具列 -->
+    <div class="toolbar">
+      <el-input
+        v-model="searchKeyword"
+        placeholder="請輸入用戶名或顯示名稱"
+        clearable
+        style="width: 250px"
+        @keyup.enter="fetchUsers"
+        @clear="handleSearchClear"
+      >
+        <template #prefix>
+          <el-icon><Search /></el-icon>
+        </template>
+      </el-input>
 
-    <!-- 用戶表格 -->
-    <el-card>
+      <div class="toolbar-buttons">
+        <el-button
+          v-permission="[USER_PERMISSIONS.CREATE]"
+          type="primary"
+          :icon="Plus"
+          @click="handleCreate"
+        >
+          新增用戶
+        </el-button>
+        <el-button
+          :icon="Download"
+          @click="handleExport"
+        >
+          匯出報表
+        </el-button>
+      </div>
+    </div>
+
+    <!-- 表格卡片 -->
+    <el-card class="table-card">
+      <template #header>
+        <span class="card-title">用戶列表</span>
+      </template>
+
       <UserTable :data="users" :loading="loading" @edit="handleEdit" @delete="handleDelete" />
 
       <!-- 分頁 -->
-      <div class="mt-4 flex justify-end">
+      <div class="pagination-container">
         <el-pagination
           v-model:current-page="pagination.pageNumber"
           v-model:page-size="pagination.pageSize"
@@ -145,7 +134,46 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
-.user-management {
-  background: var(--el-bg-color);
+.user-management-page {
+  padding: 20px;
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 16px;
+
+    .toolbar-buttons {
+      display: flex;
+      gap: 8px;
+    }
+  }
+
+  .table-card {
+    :deep(.el-card__header) {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--el-border-color-light);
+      background-color: var(--el-fill-color-blank);
+    }
+
+    :deep(.el-card__body) {
+      padding: 0;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--el-text-color-primary);
+    }
+  }
+
+  .pagination-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 20px;
+    border-top: 1px solid var(--el-border-color-lighter);
+    background-color: var(--el-fill-color-blank);
+  }
 }
 </style>

@@ -37,7 +37,6 @@ export function useRoleForm(onSuccess?: () => void) {
    * 預載所有權限清單，供 index 頁面在進入時呼叫
    */
   const preloadPermissions = async () => {
-    debugger
     if (permissions.value.length > 0) return
     formLoading.value = true
     try {

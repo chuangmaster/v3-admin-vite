@@ -2,7 +2,7 @@
 import type { Permission } from "./types"
 import { PERMISSION_PERMISSIONS } from "@@/constants/permissions"
 import { Delete, Download, Plus, RefreshRight, Search } from "@element-plus/icons-vue"
-import { ElIcon, ElMessage } from "element-plus"
+import { ElMessage } from "element-plus"
 import { nextTick, onMounted, ref } from "vue"
 import PermissionForm from "./components/PermissionForm.vue"
 import PermissionTable from "./components/PermissionTable.vue"
@@ -22,24 +22,12 @@ const {
 
 const { exportPermissions } = useExportExcel()
 
-/** 對話框可見性 */
 const dialogVisible = ref(false)
-
-/** 對話框標題 */
 const dialogTitle = ref("新增權限")
-
-/** PermissionTable 元件 ref */
 const permissionTableRef = ref<InstanceType<typeof PermissionTable>>()
-
-/** PermissionForm 元件 ref */
 const permissionFormRef = ref<InstanceType<typeof PermissionForm>>()
-
-/** 已選擇的權限列表 */
 const selectedPermissions = ref<Permission[]>([])
 
-/**
- * 處理新增權限按鈕點擊
- */
 function handleCreate(): void {
   dialogTitle.value = "新增權限"
   permissionFormRef.value?.resetForm()
@@ -57,83 +45,47 @@ function handleEdit(permission: Permission): void {
   })
 }
 
-/**
- * 處理刪除權限
- */
 async function handleDelete(permission: Permission): Promise<void> {
   await handleDeletePermission(permission)
 }
 
-/**
- * 處理批次刪除權限
- */
 async function handleBatchDelete(): Promise<void> {
   await handleBatchDeletePermissions(selectedPermissions.value)
   permissionTableRef.value?.clearSelection()
 }
 
-/**
- * 處理分頁變更
- */
 function handlePaginationChange(): void {
   fetchPermissions()
 }
 
-/**
- * 處理搜尋重置
- */
 function handleReset(): void {
   resetSearch()
+  fetchPermissions()
 }
 
-/**
- * 處理搜尋清空
- */
 function handleSearchClear(): void {
   pagination.value.pageNumber = 1
   fetchPermissions()
 }
 
-/**
- * 處理匯出 Excel
- */
 function handleExport(): void {
   exportPermissions(permissions.value)
   ElMessage.success("匯出成功")
 }
 
-/**
- * 處理表單選擇變更
- */
 function handleSelectionChange(selected: Permission[]): void {
   selectedPermissions.value = selected
 }
 
-/**
- * 處理表單成功提交
- */
 function handleFormSuccess(): void {
   dialogVisible.value = false
   fetchPermissions()
 }
 
-/**
- * 處理表單更新列表請求
- */
-function handleFormRefresh(): void {
-  fetchPermissions()
-}
-
-/**
- * 處理對話框關閉
- */
 function handleDialogClose(): void {
   permissionFormRef.value?.resetForm()
 }
 
-/**
- * 檢查權限
- */
 function checkPermission(): void {
   // 檢查是否有查看權限
   const hasReadPermission = !!PERMISSION_PERMISSIONS.READ
@@ -149,57 +101,49 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="permission-management">
-    <!-- 頁面標題 -->
-    <div class="page-header">
-      <h1>權限管理</h1>
-    </div>
-
+  <div class="permission-management-page">
     <!-- 工具列 -->
     <div class="toolbar">
-      <!-- 搜尋輸入 -->
-      <div class="search-box">
-        <el-input
-          v-model="searchKeyword"
-          placeholder="搜尋權限名稱或代碼..."
-          clearable
-          style="width: 250px"
-          @keyup.enter="fetchPermissions"
-          @clear="handleSearchClear"
-        >
-          <template #prefix>
-            <ElIcon><Search /></ElIcon>
-          </template>
-        </el-input>
-      </div>
+      <el-input
+        v-model="searchKeyword"
+        placeholder="搜尋權限名稱或代碼..."
+        clearable
+        style="width: 250px"
+        @keyup.enter="fetchPermissions"
+        @clear="handleSearchClear"
+      >
+        <template #prefix>
+          <el-icon><Search /></el-icon>
+        </template>
+      </el-input>
 
-      <!-- 操作按鈕 -->
-      <div class="action-buttons">
-        <el-button type="primary" @click="handleCreate">
-          <ElIcon><Plus /></ElIcon>
+      <div class="toolbar-buttons">
+        <el-button type="primary" :icon="Plus" @click="handleCreate">
           新增權限
         </el-button>
         <el-button
           v-if="selectedPermissions.length > 0"
           type="danger"
+          :icon="Delete"
           @click="handleBatchDelete"
         >
-          <ElIcon><Delete /></ElIcon>
           批次刪除 ({{ selectedPermissions.length }})
         </el-button>
-        <el-button @click="handleExport">
-          <ElIcon><Download /></ElIcon>
-          匯出 Excel
+        <el-button :icon="Download" @click="handleExport">
+          匯出報表
         </el-button>
-        <el-button @click="handleReset">
-          <ElIcon><RefreshRight /></ElIcon>
+        <el-button :icon="RefreshRight" @click="handleReset">
           重置
         </el-button>
       </div>
     </div>
 
-    <!-- 權限表格 -->
-    <div class="table-container">
+    <!-- 表格卡片 -->
+    <el-card class="table-card">
+      <template #header>
+        <span class="card-title">權限列表</span>
+      </template>
+
       <PermissionTable
         ref="permissionTableRef"
         :permissions="permissions"
@@ -208,51 +152,39 @@ onMounted(() => {
         @delete="handleDelete"
         @selection-change="handleSelectionChange"
       />
-    </div>
 
-    <!-- 分頁 -->
-    <div class="pagination-container">
-      <el-pagination
-        v-model:current-page="pagination.pageNumber"
-        v-model:page-size="pagination.pageSize"
-        :page-sizes="[10, 20, 50, 100]"
-        :total="pagination.total"
-        layout="total, sizes, prev, pager, next, jumper"
-        @change="handlePaginationChange"
-      />
-    </div>
+      <!-- 分頁 -->
+      <div class="pagination-container">
+        <el-pagination
+          v-model:current-page="pagination.pageNumber"
+          v-model:page-size="pagination.pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="pagination.total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @change="handlePaginationChange"
+        />
+      </div>
+    </el-card>
 
     <!-- 新增/編輯對話框 -->
     <el-dialog
       v-model="dialogVisible"
       :title="dialogTitle"
-      width="500px"
+      width="600px"
       @close="handleDialogClose"
     >
       <PermissionForm
         ref="permissionFormRef"
         @success="handleFormSuccess"
         @close="dialogVisible = false"
-        @refresh="handleFormRefresh"
       />
     </el-dialog>
   </div>
 </template>
 
 <style scoped lang="scss">
-.permission-management {
+.permission-management-page {
   padding: 20px;
-
-  .page-header {
-    margin-bottom: 20px;
-
-    h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 600;
-      color: var(--el-text-color-primary);
-    }
-  }
 
   .toolbar {
     display: flex;
@@ -261,45 +193,52 @@ onMounted(() => {
     margin-bottom: 20px;
     gap: 16px;
 
-    .search-box {
-      flex: 1;
-      max-width: 300px;
-    }
-
-    .action-buttons {
+    .toolbar-buttons {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
     }
   }
 
-  .table-container {
-    margin-bottom: 16px;
-    background: var(--el-bg-color);
-    border-radius: 4px;
-    padding: 0;
+  .table-card {
+    :deep(.el-card__header) {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--el-border-color-light);
+      background-color: var(--el-fill-color-blank);
+    }
+
+    :deep(.el-card__body) {
+      padding: 0;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--el-text-color-primary);
+    }
   }
 
   .pagination-container {
     display: flex;
     justify-content: flex-end;
-    align-items: center;
+    padding: 16px 20px;
+    border-top: 1px solid var(--el-border-color-lighter);
+    background-color: var(--el-fill-color-blank);
   }
-}
 
-@media (max-width: 768px) {
-  .permission-management {
+  @media (max-width: 768px) {
     padding: 12px;
 
     .toolbar {
       flex-direction: column;
       align-items: stretch;
+      gap: 12px;
 
-      .search-box {
-        max-width: 100%;
+      input {
+        width: 100% !important;
       }
 
-      .action-buttons {
+      .toolbar-buttons {
         justify-content: flex-start;
       }
     }

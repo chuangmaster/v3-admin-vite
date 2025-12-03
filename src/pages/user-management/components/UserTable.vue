@@ -45,9 +45,9 @@ function getStatusLabel(status: string): string {
 </script>
 
 <template>
-  <el-table :data="props.data" v-loading="props.loading" border stripe>
-    <el-table-column prop="username" label="用戶名" width="150" />
-    <el-table-column prop="displayName" label="顯示名稱" width="150" />
+  <el-table :data="props.data" v-loading="props.loading" stripe>
+    <el-table-column prop="username" label="用戶名" width="150" show-overflow-tooltip />
+    <el-table-column prop="displayName" label="顯示名稱" width="150" show-overflow-tooltip />
     <el-table-column prop="status" label="狀態" width="100">
       <template #default="{ row }">
         <el-tag :type="getStatusType(row.status)">
