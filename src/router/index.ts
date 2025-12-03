@@ -195,70 +195,48 @@ export const constantRoutes: RouteRecordRaw[] = [
  */
 export const dynamicRoutes: RouteRecordRaw[] = [
   {
-    path: "/user-management",
+    path: "/identity",
     component: Layouts,
-    name: "UserManagement",
+    redirect: "/identity/user",
+    name: "IdentityAndPermission",
     meta: {
-      title: { zhCN: "用户管理", zhTW: "用戶管理", en: "User Management" },
-      titleKey: "userManagement",
+      title: { zhCN: "身分與权限管理", zhTW: "身分與權限管理", en: "Identity & Permissions" },
+      titleKey: "identityAndPermission",
       elIcon: "User",
-      permissions: ["account.read"]
+      alwaysShow: true
     },
     children: [
       {
-        path: "",
+        path: "user",
         component: () => import("@/pages/user-management/index.vue"),
         name: "UserManagementPage",
         meta: {
           title: { zhCN: "用户管理", zhTW: "用戶管理", en: "User Management" },
           titleKey: "userManagement",
-          keepAlive: true
+          keepAlive: true,
+          permissions: ["account.read"]
         }
-      }
-    ]
-  },
-  {
-    path: "/permission-management",
-    component: Layouts,
-    name: "PermissionManagement",
-    meta: {
-      title: { zhCN: "权限管理", zhTW: "權限管理", en: "Permission Management" },
-      titleKey: "permissionManagement",
-      elIcon: "Key",
-      permissions: ["permission.read"]
-    },
-    children: [
+      },
       {
-        path: "",
+        path: "permission",
         component: () => import("@/pages/permission-management/index.vue"),
         name: "PermissionManagementPage",
         meta: {
           title: { zhCN: "权限管理", zhTW: "權限管理", en: "Permission Management" },
           titleKey: "permissionManagement",
-          keepAlive: true
+          keepAlive: true,
+          permissions: ["permission.read"]
         }
-      }
-    ]
-  },
-  {
-    path: "/role-management",
-    component: Layouts,
-    name: "RoleManagement",
-    meta: {
-      title: { zhCN: "角色管理", zhTW: "角色管理", en: "Role Management" },
-      titleKey: "roleManagement",
-      elIcon: "CircleCloseFilled",
-      permissions: ["role.read"]
-    },
-    children: [
+      },
       {
-        path: "",
+        path: "role",
         component: () => import("@/pages/role-management/index.vue"),
         name: "RoleManagementPage",
         meta: {
           title: { zhCN: "角色管理", zhTW: "角色管理", en: "Role Management" },
           titleKey: "roleManagement",
-          keepAlive: true
+          keepAlive: true,
+          permissions: ["role.read"]
         }
       }
     ]
