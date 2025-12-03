@@ -88,7 +88,7 @@ defineExpose({
     <el-table-column prop="name" label="權限名稱" min-width="150" show-overflow-tooltip />
 
     <!-- 代碼列 -->
-    <el-table-column prop="code" label="權限代碼" min-width="150" show-overflow-tooltip />
+    <el-table-column prop="permissionCode" label="權限代碼" min-width="150" show-overflow-tooltip />
 
     <!-- 描述列 -->
     <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
