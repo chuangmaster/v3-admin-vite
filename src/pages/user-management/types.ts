@@ -1,8 +1,3 @@
-/**
- * 用戶管理模組型別定義
- * @module @/pages/user-management/types
- */
-
 /** 用戶實體 */
 export interface User {
   /** 用戶唯一識別碼（UUID） */
