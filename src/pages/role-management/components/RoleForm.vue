@@ -110,15 +110,11 @@ function handlePermissionsChange(val: string[]) {
       <div class="section-title">
         權限設定
       </div>
-      <el-collapse>
-        <el-collapse-item title="選擇權限" name="permissions">
-          <PermissionSelector
-            :model-value="props.formData?.selectedPermissionIds || []"
-            :permissions="props.permissions"
-            @update:model-value="handlePermissionsChange"
-          />
-        </el-collapse-item>
-      </el-collapse>
+      <PermissionSelector
+        :model-value="props.formData?.selectedPermissionIds || []"
+        :permissions="props.permissions"
+        @update:model-value="handlePermissionsChange"
+      />
       <div class="section-footer">
         <el-button @click="handleClose">
           取消
