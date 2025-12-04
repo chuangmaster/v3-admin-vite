@@ -2,7 +2,7 @@
 import type { User } from "./types"
 import { USER_PERMISSIONS } from "@@/constants/permissions"
 import { Download, Plus, Search } from "@element-plus/icons-vue"
-import { onMounted, ref } from "vue"
+import { nextTick, onMounted, ref } from "vue"
 import UserForm from "./components/UserForm.vue"
 import UserTable from "./components/UserTable.vue"
 import { useExportExcel } from "./composables/useExportExcel"
@@ -18,14 +18,18 @@ const userFormRef = ref<InstanceType<typeof UserForm>>()
 
 function handleCreate(): void {
   dialogTitle.value = "新增用戶"
-  userFormRef.value?.resetForm()
   dialogVisible.value = true
+  nextTick(() => {
+    userFormRef.value?.resetForm()
+  })
 }
 
 function handleEdit(user: User): void {
   dialogTitle.value = "編輯用戶"
-  userFormRef.value?.setupEdit(user)
   dialogVisible.value = true
+  nextTick(() => {
+    userFormRef.value?.setupEdit(user)
+  })
 }
 
 function handleFormSuccess(): void {
