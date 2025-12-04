@@ -105,6 +105,7 @@ defineExpose({ treeRef })
         :props="{ children: 'children', label: 'label' }"
         :filter-node-method="filterNode"
         :disabled="props.disabled"
+        :default-expand-all="true"
         @check="handleCheck"
       />
     </div>
