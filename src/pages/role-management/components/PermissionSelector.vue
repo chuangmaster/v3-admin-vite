@@ -8,7 +8,7 @@
 
 import type { PermissionTreeNode } from "../types"
 
-import { ref, watch } from "vue"
+import { nextTick, ref, watch } from "vue"
 
 interface Props {
   /** 已選中的權限 ID */
@@ -34,11 +34,23 @@ const filterText = ref("")
 /**
  * 監聽 modelValue 的變更，更新樹的選中狀態
  */
-watch(() => props.modelValue, (newVal: string[]) => {
-  if (treeRef.value) {
-    treeRef.value.setCheckedKeys(newVal || [])
-  }
-}, { deep: true })
+watch(
+  () => props.modelValue,
+  async (newVal: string[]) => {
+    console.log("[PermissionSelector] modelValue changed:", newVal)
+    // 等待 DOM 更新
+    await nextTick()
+    if (treeRef.value?.setCheckedKeys) {
+      console.log("[PermissionSelector] setting checked keys:", newVal)
+      // 第二個參數 false 表示不觸發父子節點聯動檢查，避免循環觸發
+      treeRef.value.setCheckedKeys(newVal || [], false)
+      console.log("[PermissionSelector] checked keys set successfully")
+    } else {
+      console.warn("[PermissionSelector] treeRef.value is not ready")
+    }
+  },
+  { deep: true, immediate: true }
+)
 
 /**
  * 樹狀過濾方法
@@ -62,12 +74,10 @@ function handleFilterInput() {
  */
 function handleCheck() {
   if (treeRef.value) {
-    // 獲取所有選中的節點 ID
-    const checkedNodes = treeRef.value.getCheckedNodes()
-    // 只取葉子節點（非分組節點）
-    const permissionIds = checkedNodes
-      .filter((node: any) => !node.isGroup)
-      .map((node: any) => node.id)
+    // 只獲取選中的葉子節點（true 參數表示只取葉子節點）
+    const checkedNodes = treeRef.value.getCheckedNodes(true)
+    // 提取葉子節點的 ID
+    const permissionIds = checkedNodes.map((node: any) => node.id)
     emit("update:modelValue", permissionIds)
   }
 }

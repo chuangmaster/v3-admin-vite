@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Download, Plus } from "@element-plus/icons-vue"
-import { computed, onMounted, ref } from "vue"
+import { computed, onMounted, ref, watch } from "vue"
 import RoleForm from "./components/RoleForm.vue"
 import RoleTable from "./components/RoleTable.vue"
 import { useExportExcel } from "./composables/useExportExcel"
@@ -22,6 +22,13 @@ const roleForm = useRoleForm(() => {
 })
 
 const roleFormRef = ref()
+
+// 當 roleFormRef 建立後，傳遞給 useRoleForm
+watch(() => roleFormRef.value?.formRef, (newVal) => {
+  if (newVal) {
+    roleForm.setFormRef(newVal)
+  }
+}, { immediate: true })
 const { exportRoles } = useExportExcel()
 
 const rolesList = computed(() => roles.value)
@@ -49,8 +56,12 @@ function handleDelete(role: any) {
   handleDeleteRole(role)
 }
 
-function handleSubmitForm() {
-  roleForm.submitForm()
+function handleSubmitRole() {
+  roleForm.submitRole()
+}
+
+function handleSubmitPermission() {
+  roleForm.submitPermission()
 }
 
 function handleExport() {
@@ -117,7 +128,9 @@ function handleExport() {
       :rules="roleForm.rules"
       :permissions="roleForm.permissions.value"
       @update:model-value="(value) => { roleForm.dialogVisible.value = value }"
-      @submit="handleSubmitForm"
+      @update:form-data="(value) => { roleForm.formData.value = value }"
+      @submit-role="handleSubmitRole"
+      @submit-permission="handleSubmitPermission"
     />
   </div>
 </template>
