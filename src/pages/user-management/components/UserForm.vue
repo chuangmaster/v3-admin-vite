@@ -6,6 +6,7 @@ import { ref } from "vue"
 
 import { useChangePasswordForm } from "../composables/useChangePasswordForm"
 import { useUserForm } from "../composables/useUserForm"
+import { useUserRoles } from "../composables/useUserRoles"
 
 const emit = defineEmits<{
   /** 表單提交成功事件 */
@@ -25,6 +26,10 @@ const { formRef, formData, formLoading, isEditMode, rules, submitForm, resetForm
 const { formRef: passwordFormRef, formData: passwordData, formLoading: passwordLoading, rules: passwordRules, submitForm: submitPasswordForm, resetForm: resetPasswordForm, setUserId }
   = useChangePasswordForm()
 
+// ============ 角色表單 ============
+const { formLoading: roleFormLoading, formData: roleFormData, availableRoles, fetchRoles, fetchUserRoles, submitForm: submitRoleForm, resetForm: resetRoleForm, setUserId: setRoleUserId }
+  = useUserRoles()
+
 /**
  * 處理表單提交
  */
@@ -41,6 +46,11 @@ async function handleSubmit(): Promise<void> {
       emit("success")
       resetPasswordForm()
     }
+  } else if (activeTab.value === "roles") {
+    const success = await submitRoleForm()
+    if (success) {
+      emit("success")
+    }
   }
 }
 
@@ -50,6 +60,7 @@ async function handleSubmit(): Promise<void> {
 function handleCancel(): void {
   resetForm()
   resetPasswordForm()
+  resetRoleForm()
   emit("cancel")
 }
 
@@ -57,10 +68,14 @@ function handleCancel(): void {
  * 設置編輯模式（公開方法供父元件呼叫）
  * @param user - 待編輯的用戶
  */
-function setupEdit(user: User): void {
+async function setupEdit(user: User): Promise<void> {
   activeTab.value = "info"
   setEditMode(user)
   setUserId(user.id)
+  setRoleUserId(user.id)
+  // 預先載入可用角色列表和使用者的角色
+  await fetchRoles()
+  await fetchUserRoles()
 }
 
 // 暴露方法供父元件呼叫
@@ -147,7 +162,37 @@ defineExpose({
         </el-form-item>
       </el-form>
     </el-tab-pane>
+
+    <!-- 角色分配分頁（僅在編輯模式下顯示，需要 users:assign-roles 權限） -->
+    <el-tab-pane v-if="isEditMode" v-permission="['role.assign']" label="角色分配" name="roles">
+      <div class="role-assignment">
+        <el-form label-width="120px" :disabled="roleFormLoading">
+          <el-form-item label="角色">
+            <el-select
+              v-model="roleFormData.selectedRoleIds"
+              multiple
+              filterable
+              clearable
+              placeholder="請選擇要分配的角色"
+              :loading="roleFormLoading"
+              style="width: 100%"
+            >
+              <el-option
+                v-for="role in availableRoles"
+                :key="role.id"
+                :label="role.roleName"
+                :value="role.id"
+              />
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-tab-pane>
   </el-tabs>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.role-assignment {
+  padding: 20px 0;
+}
+</style>
