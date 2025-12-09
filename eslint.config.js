@@ -20,7 +20,8 @@ export default antfu(
       ".github/prompts/**/*.md",
       ".specify/**/*",
       "dist",
-      "node_modules"
+      "node_modules",
+      "**/*.md"
     ]
   },
   {

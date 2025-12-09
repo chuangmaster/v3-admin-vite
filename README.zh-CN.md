@@ -1,232 +1,470 @@
 <div align="center">
   <img alt="logo" width="120" height="120" src="./src/common/assets/images/layouts/logo.png">
-  <h1>V3 Admin Vite</h1>
+  <h1>V3 Admin Vite - 快速後台搭建方案</h1>
 </div>
-
-[![github release](https://img.shields.io/github/v/release/un-pany/v3-admin-vite?style=flat)](https://github.com/un-pany/v3-admin-vite/releases)
-[![github stars](https://img.shields.io/github/stars/un-pany/v3-admin-vite?style=flat)](https://github.com/un-pany/v3-admin-vite/stargazers)
-[![gitee stars](https://gitee.com/un-pany/v3-admin-vite/badge/star.svg)](https://gitee.com/un-pany/v3-admin-vite/stargazers)
 
 <b><a href="./README.md">English</a> | 中文</b>
 
-## 简介 <a href="https://mp.weixin.qq.com/s/ccuzm4ZlHvN-1XBBN2lduQ"><img src="https://img.shields.io/badge/AI-VibeCoding-black"></a>
+## 簡介
 
-V3 Admin Vite 是一个精心制作的后台管理系统模板，基于 Vue3、Vite、TypeScript、Element Plus 等主流技术，并且具备良好的 AI Vibe Coding 体验！
+本專案基於 [V3 Admin Vite](https://github.com/un-pany/v3-admin-vite) 進行深度客製化調整，專注於提供**開箱即用的前後端後台管理系統解決方案**。透過整合完整的業務模組與標準化的 API 契約，實現快速搭配後端專案、快速上線的目標。
 
-## 通知
+### 核心特色
+
+✨ **業務模組完整**：內建用戶管理、角色管理、權限管理等核心後台功能
+🔗 **後端契約對接**：嚴格遵循 OpenAPI 規格，與後端 API 無縫整合
+🚀 **快速搭建**：清晰的目錄結構與規範化開發流程，降低學習成本
+📦 **開箱即用**：完整的 CRUD 範例、權限控制、Excel 匯出等常用功能
+🎨 **企業級品質**：基於 Vue 3 + TypeScript + Element Plus 的現代化技術棧
 
 > [!IMPORTANT]
-> 欢迎体验全新的 5.0 版本，它是一次匠心之作！如果对你有帮助，欢迎点个 Star 支持一下。
+> 本專案適合需要快速搭建企業級後台管理系統的團隊使用，特別是與配套後端專案配合使用時效果最佳。
 
-> [!WARNING]
-> 4.x 版本如果没有严重的 BUG 将不再维护！[点击切换到 4.x 分支](https://github.com/un-pany/v3-admin-vite/tree/4.x)
+## 後端專案
+
+> [!IMPORTANT]
+> **配套後端專案**：[V3.Admin.Backend](https://github.com/chuangmaster/V3.Admin.Backend)
+>
+> 本前端專案專為與配套後端無縫協作而設計。後端專案提供：
+>
+> - 遵循 OpenAPI 規格的 RESTful APIs
+> - JWT 身份驗證與授權機制
+> - 用戶、角色、權限管理端點
+> - 完整的 API 文件與契約
 
 > [!TIP]
-> 正式推出付费服务，如果不想自己动手，但想移除 TS 或其他模块？试试懒人套餐！[点击看看](https://github.com/un-pany/v3-admin-vite/issues/225)
+> 為獲得最佳開發體驗，建議同時克隆並運行前後端專案。前端已預先配置為連接後端位址 `http://localhost:5176`。
 
-> [!NOTE]
-> 如果你有移动端 H5 需求，试试新的开源模板 [MobVue](https://github.com/un-pany/mobvue)。
+## 快速開始
 
-## 使用
+### 環境要求
 
-<details>
-<summary>推荐环境</summary>
+- **Node.js**: 20.19+ 或 22.12+
+- **pnpm**: 10+
+- **IDE**: Visual Studio Code (推薦安裝 `.vscode/extensions.json` 中的推薦插件)
 
-<br>
-
-- 新版 `Visual Studio Code` 或者 AI IDE `Cursor` 与 `Trae`
-- 安装 `.vscode/extensions.json` 文件中推荐的插件
-- `node` 20.19+ 或 22.12+
-- `pnpm` 10+
-
-</details>
-
-<details>
-<summary>本地开发</summary>
-
-<br>
+### 本地開發
 
 ```bash
-# 克隆项目
-git clone https://github.com/un-pany/v3-admin-vite.git
+# 1. 克隆專案
+git clone <your-repository-url>
 
-# 进入项目目录
+# 2. 進入專案目錄
 cd v3-admin-vite
 
-# 安装依赖
+# 3. 安裝依賴
 pnpm i
 
-# 启动服务
+# 4. 配置環境變數（可選）
+# 編輯 .env.development 設定後端 API 位址
+# VITE_BASE_URL = http://localhost:5176
+
+# 5. 啟動開發伺服器
 pnpm dev
 ```
 
-</details>
+啟動成功後瀏覽器會自動開啟 `http://localhost:3333`
 
-<details>
-<summary>打包构建</summary>
+### 後端對接
 
-<br>
+本專案預設配置為對接後端 API 位於 `http://localhost:5176`，所有 API 請求都遵循 OpenAPI 規格文件定義：
+
+1. **設定 API Base URL**：在 `.env.development` 中調整 `VITE_BASE_URL`
+2. **API 代理配置**：開發環境已配置 `/api` 路徑的反向代理，見 `vite.config.ts`
+3. **API 契約文件**：參考 `specs/` 目錄下各模組的 API 契約文件
+
+**後端啟動順序**：
+
+1. 先啟動後端專案（預設 5176 埠）
+2. 再啟動前端專案（預設 3333 埠）
+
+### 打包建置
 
 ```bash
-# 打包构建预发布环境
+# 打包預發布環境
 pnpm build:staging
 
-# 打包构建生产环境
+# 打包生產環境
 pnpm build
 ```
 
-</details>
-
-<details>
-<summary>本地预览</summary>
-
-<br>
+### 本地預覽
 
 ```bash
-# 先执行打包构建命令生成 dist 目录后再执行以下预览命令
+# 先執行打包命令生成 dist 目錄，再執行預覽
 pnpm preview
 ```
 
-</details>
-
-<details>
-<summary>代码检查</summary>
-
-<br>
+### 程式碼檢查與測試
 
 ```bash
-# 代码校验与格式化
+# 程式碼校驗與格式化
 pnpm lint
 
-# 单元测试
+# 單元測試
 pnpm test
 ```
 
-</details>
+## 專案特色
 
-<details>
-<summary>代码提交规范</summary>
+### 📦 內建業務模組
 
-<br>
+本專案已整合完整的後台管理核心功能：
 
-`feat` 新功能
+#### 1. 用戶管理模組
 
-`fix` 修复错误
+- ✅ 用戶列表查詢（分頁、搜尋、篩選）
+- ✅ 新增用戶（密碼強度驗證、角色指派）
+- ✅ 編輯用戶資訊
+- ✅ 刪除用戶（軟刪除機制）
+- ✅ 匯出 Excel 報表
+- ✅ 完整的權限控制（路由級 + 按鈕級）
+- ✅ 密碼變更功能
 
-`perf` 性能优化
+#### 2. 角色管理模組
 
-`refactor` 重构代码
+- ✅ 角色列表查詢
+- ✅ 新增/編輯/刪除角色
+- ✅ 角色權限指派
+- ✅ 並發更新衝突處理
+- ✅ 角色使用狀態檢查
 
-`docs` 文档和注释
+#### 3. 權限管理模組
 
-`types` 类型相关
+- ✅ 權限列表查詢
+- ✅ 新增/編輯/刪除權限
+- ✅ 權限代碼格式驗證
+- ✅ 權限使用狀態檢查
+- ✅ 層級權限結構
 
-`test` 单测相关
+### 🔗 標準化 API 整合
 
-`ci` 持续集成、工作流
+- **OpenAPI 規格遵循**：所有 API 呼叫嚴格遵循後端 OpenAPI 規格文件
+- **統一回應格式**：`ApiResponse<T>` 標準化回應結構（success, code, message, data, timestamp, traceId）
+- **完整錯誤處理**：涵蓋驗證錯誤、授權錯誤、並發衝突等業務邏輯錯誤碼
+- **JWT 認證**：自動攜帶 Bearer Token，統一攔截處理未授權情況
+- **API 契約文件**：每個模組都有詳細的 API 契約文件（`specs/*/contracts/api-contracts.md`）
 
-`revert` 撤销更改
+### 🎯 開發規範化
 
-`chore` 琐事（更新依赖、修改配置等）
+- **清晰的目錄結構**：按業務模組劃分，公私資源分離
+- **型別安全**：完整的 TypeScript 型別定義
+- **組合式函式**：可重用的業務邏輯封裝
+- **單元測試**：核心功能都有對應的測試案例
+- **開發文件**：每個模組都有完整的 spec、quickstart、tasks 等文件
 
-</details>
+## 專案結構
 
-## 链接
+```
+v3-admin-vite
+├─ specs/                    # 功能規格文件
+│  ├─ 001-user-management/   # 用戶管理模組規格
+│  ├─ 002-permission-management/  # 權限管理模組規格
+│  └─ 003-role-management/   # 角色管理模組規格
+├─ src/
+│  ├─ common/                # 通用目錄（@@別名）
+│  │  ├─ apis/               # 通用 API（用戶資訊等）
+│  │  ├─ components/         # 通用元件
+│  │  ├─ composables/        # 通用組合式函式
+│  │  ├─ constants/          # 通用常數（API 錯誤碼等）
+│  │  └─ utils/              # 通用工具函式
+│  ├─ pages/                 # 業務頁面
+│  │  ├─ user-management/    # 用戶管理模組
+│  │  │  ├─ apis/            # 模組私有 API
+│  │  │  ├─ components/      # 模組私有元件
+│  │  │  ├─ composables/     # 模組私有組合式函式
+│  │  │  ├─ types/           # 模組型別定義
+│  │  │  └─ index.vue        # 模組頁面
+│  │  ├─ role-management/    # 角色管理模組
+│  │  ├─ permission-management/  # 權限管理模組
+│  │  ├─ dashboard/          # 儀表板
+│  │  └─ login/              # 登入頁面
+│  ├─ http/                  # 網路請求配置
+│  ├─ router/                # 路由配置
+│  ├─ pinia/                 # 狀態管理
+│  ├─ layouts/               # 版型配置
+│  └─ plugins/               # 插件配置
+├─ tests/                    # 單元測試
+├─ types/                    # 全域型別定義
+└─ ...配置檔案
+```
 
-**在线预览**：[github-pages](https://un-pany.github.io/v3-admin-vite)
+### 核心目錄說明
 
-**中文文档**：[链接](https://juejin.cn/post/7445151895121543209)
+- **`specs/`**：每個功能模組的完整規格文件，包含需求分析、API 契約、開發任務等
+- **`src/common/`**：跨模組共用的資源，透過 `@@` 別名引用
+- **`src/pages/[module]/`**：按業務模組劃分，每個模組自包含 API、元件、邏輯
+- **`src/http/axios.ts`**：統一的 HTTP 客戶端，處理認證、錯誤攔截、回應格式化
 
-**零基础教程**：[链接](https://juejin.cn/column/7207659644487139387)
+## 技術棧
 
-**移动端 H5**：[mobvue](https://github.com/un-pany/mobvue)
+**核心框架**
 
-**Electron 桌面版**：[v3-electron-vite](https://github.com/un-pany/v3-electron-vite)
+- Vue 3.5+ (Composition API + `<script setup>`)
+- TypeScript 5.9+
+- Vite 6.3+
 
-**国内仓库**：[gitee](https://gitee.com/un-pany/v3-admin-vite)
+**UI 與樣式**
 
-**可有可无的群**：[查看进群方式](https://github.com/un-pany/v3-admin-vite/issues/191)
+- Element Plus 2.11+ (企業級元件庫)
+- UnoCSS (原子化 CSS)
+- Scss (CSS 預處理器)
 
-**捐赠**：[请作者喝咖啡](https://github.com/un-pany/v3-admin-vite/issues/69)
+**狀態與路由**
 
-**发行版 & 更新日志**：[releases](https://github.com/un-pany/v3-admin-vite/releases)
+- Vue Router 4.5+
+- Pinia 3.0+ (狀態管理)
 
-## 特性
+**開發工具**
 
-**结构精简**：没有复杂的封装，没有复杂的类型体操，刚好够用
+- ESLint 9+ (程式碼檢查與格式化)
+- Vitest (單元測試)
+- pnpm (套件管理)
 
-**详细的注释**：各个配置项都写有尽可能详细的注释
+**其他套件**
 
-**最新的依赖**：及时更新所有三方依赖至最新版
+- Axios (HTTP 請求)
+- VXE Table (高效能表格)
+- XLSX (Excel 匯出)
+- dayjs (日期處理)
 
-**有一点规范**：代码风格统一、命名风格统一、注释风格统一
+## 核心功能
 
-## 内置功能
+### 🔐 權限控制系統
 
-**用户管理**：登录、登出演示
+- **路由級權限**：基於角色的動態路由，無權限自動導向 403
+- **按鈕級權限**：自訂指令與權限函式，細粒度控制操作按鈕顯示
+- **路由守衛**：全域守衛自動驗證 JWT Token 與權限
 
-**权限管理**：页面级权限（动态路由）、按钮级权限（权限指令、权限函数）、路由守卫
+### 🎨 版型與主題
 
-**多环境**：开发环境（development）、预发布环境（staging）、生产环境（production）
+- **三種版型模式**：左側、頂部、混合版型可切換
+- **三種主題模式**：普通、深色、深藍主題
+- **響應式設計**：完整支援移動端瀏覽
 
-**多主题**：普通、黑暗、深蓝, 三种主题模式
+### 📊 表格與資料
 
-**多布局**：左侧、顶部、混合, 三种布局模式
+- **高效能表格**：使用 VXE Table 處理大量資料
+- **分頁控制**：標準化分頁元件與邏輯封裝
+- **Excel 匯出**：一鍵匯出查詢結果為 Excel 檔案
+- **搜尋與篩選**：完整的查詢條件組合
 
-**首页**：根据不同用户显示不同的 Dashboard 页面
+### 🛡️ 錯誤處理
 
-**错误页**：403、404
+- **統一錯誤攔截**：Axios 攔截器處理所有 HTTP 與業務錯誤
+- **錯誤碼對應**：後端錯誤碼自動對應多語系錯誤訊息
+- **友善錯誤提示**：ElMessage 顯示清晰的錯誤訊息
+- **錯誤頁面**：403、404 等錯誤頁面
 
-**兼容移动端**：布局兼容移动端页面分辨率
+### 🌐 國際化
 
-**其他**：SVG 雪碧图、动态侧边栏、动态面包屑、标签页快捷导航、内容区放大与全屏、组合式函数
+- **多語系支援**：中英文切換（vue-i18n）
+- **動態語系載入**：按需載入語系檔案
 
-## 技术栈
+### 🧪 測試與品質
 
-**Vue3**：采用 Vue3 + script setup 最新的 Vue3 组合式 API
+- **單元測試**：核心業務邏輯與元件測試
+- **程式碼檢查**：ESLint 自動格式化與錯誤檢測
+- **Git Hooks**：Husky + lint-staged 提交前自動檢查
 
-**Element Plus**：Element UI 的 Vue3 版本
+## 開發指南
 
-**Pinia**：传说中的 Vuex5
+### 新增業務模組
 
-**Vite**：真的很快
+本專案採用**模組化開發**，每個業務模組自包含所有資源。參考現有模組（如 `user-management`）：
 
-**Vue Router**：路由路由
+1. **建立模組目錄**：`src/pages/[module-name]/`
+2. **定義 API 與型別**：
+   - `apis/[module].ts` - API 函式
+   - `types/index.ts` - 型別定義
+3. **建立組合式函式**：`composables/use[Module].ts` - 業務邏輯
+4. **建立元件**：`components/` - 表格、表單等
+5. **建立頁面**：`index.vue` - 頁面入口
+6. **配置路由**：在 `src/router/` 新增路由定義
 
-**TypeScript**：JavaScript 语言的超集
+### API 呼叫規範
 
-**pnpm**：更快速的，节省磁盘空间的包管理工具
+所有 API 呼叫必須使用 `@/http/axios` 的 `request` 函式：
 
-**Scss**：和 Element Plus 保持一致
+```typescript
+import type { ApiResponse } from "types/api"
+import { request } from "@/http/axios"
 
-**CSS 变量**：主要控制项目的布局和颜色
+export async function getUserList(params: UserQuery): Promise<ApiResponse<UserListResponse>> {
+  return request({
+    url: "/api/accounts",
+    method: "GET",
+    params
+  })
+}
+```
 
-**ESLint**：代码校验与格式化
+### 權限控制使用
 
-**Axios**：发送网络请求（已封装好）
+**路由權限**：在路由 meta 中定義
 
-**UnoCSS**：具有高性能且极具灵活性的即时原子化 CSS 引擎
+```typescript
+{
+  path: "/user-management",
+  meta: {
+    title: "用戶管理",
+    permissions: ["user:view"]  // 需要的權限代碼
+  }
+}
+```
 
-## 项目预览图
+**按鈕權限**：使用 `v-permission` 指令
 
-![preview](./src/common/assets/images/docs/preview.png)
+```text
+<el-button v-permission="['user:create']">新增用戶</el-button>
+```
 
-## 贡献者
+### 組合式函式開發
 
-在此感谢所有的贡献者！
+將可重用的業務邏輯抽取為組合式函式：
 
-<a href="https://github.com/un-pany/v3-admin-vite/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=un-pany/v3-admin-vite">
-</a>
+```typescript
+// composables/useUserManagement.ts
+export function useUserManagement() {
+  const tableData = ref<User[]>([])
+  const loading = ref(false)
 
-## 公众号
+  async function fetchUsers() {
+    loading.value = true
+    try {
+      const res = await getUserList(queryParams)
+      tableData.value = res.data.items
+    } finally {
+      loading.value = false
+    }
+  }
 
-新的尝试，欢迎关注
+  return { tableData, loading, fetchUsers }
+}
+```
 
-<a href="https://mp.weixin.qq.com/s/artNHKubYNRBlsrxD7eXXA">
-  <img src="https://github.com/user-attachments/assets/529bac73-f9e3-4311-94d0-3db57216b771">
-</a>
+## Git 提交規範
 
-## License
+本專案使用 Conventional Commits 規範：
 
-[MIT](./LICENSE) License © 2022-PRESENT [pany](https://github.com/pany-ang)
+- `feat`: 新增功能
+- `fix`: 修復錯誤
+- `perf`: 效能優化
+- `refactor`: 程式碼重構
+- `docs`: 文件與註解
+- `types`: 型別相關變更
+- `test`: 測試相關
+- `ci`: CI/CD 相關
+- `revert`: 撤銷變更
+- `chore`: 雜項（更新依賴、修改配置等）
+
+**範例**：
+
+```bash
+git commit -m "feat: 新增用戶批次刪除功能"
+git commit -m "fix: 修復角色權限指派並發衝突問題"
+```
+
+## 常見問題
+
+### 如何配置後端 API 位址？
+
+編輯對應環境的 `.env` 檔案：
+
+- 開發環境：`.env.development`
+- 預發環境：`.env.staging`
+- 生產環境：`.env.production`
+
+修改 `VITE_BASE_URL` 變數：
+
+```bash
+VITE_BASE_URL = http://your-backend-api-url
+```
+
+### 如何新增新的權限？
+
+1. 在後端新增權限定義
+2. 在前端 `src/router/` 中對應路由的 `meta.permissions` 新增權限代碼
+3. 在按鈕上使用 `v-permission` 指令控制顯示
+
+### API 回應格式是什麼？
+
+所有 API 遵循統一的回應格式：
+
+```typescript
+{
+  success: boolean // 是否成功
+  code: string // 業務狀態碼（如 "SUCCESS", "VALIDATION_ERROR"）
+  message: string // 訊息說明
+  data: T | null // 實際資料
+  timestamp: string // 時間戳記
+  traceId: string // 追蹤 ID
+}
+```
+
+### 如何處理並發更新衝突？
+
+本專案已實作樂觀鎖機制（RowVersion），當發生並發衝突時：
+
+1. 後端回傳 `CONCURRENT_UPDATE_CONFLICT` 錯誤碼
+2. 前端攔截器自動顯示錯誤訊息
+3. 提示使用者重新載入最新資料後再操作
+
+### 如何匯出 Excel？
+
+使用已封裝的 `useExportExcel` 組合式函式：
+
+```typescript
+import { useExportExcel } from "@@/composables/useExportExcel"
+
+const { exportExcel } = useExportExcel()
+
+// 匯出當前表格資料
+exportExcel({
+  data: tableData.value,
+  filename: "用戶列表",
+  headers: ["用戶名稱", "角色", "狀態"]
+})
+```
+
+## 專案架構設計
+
+### 為什麼使用模組化結構？
+
+- **業務內聚**：同一模組的程式碼集中管理，降低認知負擔
+- **減少衝突**：多人協作時減少檔案衝突機率
+- **清晰邊界**：公共資源（`common/`）與私有資源（`pages/[module]/`）明確分離
+- **易於維護**：修改或移除模組時不影響其他功能
+
+### 為什麼採用組合式函式？
+
+- **邏輯重用**：跨元件共享業務邏輯
+- **可測試性**：純函式易於單元測試
+- **型別安全**：完整的 TypeScript 支援
+- **關注點分離**：元件專注於 UI，邏輯抽取到 composables
+
+### 為什麼嚴格遵循 OpenAPI 規格？
+
+- **契約優先**：前後端基於契約並行開發，減少溝通成本
+- **型別安全**：自動生成型別定義，減少執行時錯誤
+- **文件即程式碼**：API 文件始終保持最新
+- **可測試性**：基於契約的 Mock 與測試
+
+## 相關連結
+
+- **原始專案**：[V3 Admin Vite](https://github.com/un-pany/v3-admin-vite) by [@un-pany](https://github.com/un-pany)
+- **Vue 3 官方文件**：[https://vuejs.org/](https://vuejs.org/)
+- **Element Plus 官方文件**：[https://element-plus.org/](https://element-plus.org/)
+- **Vite 官方文件**：[https://vitejs.dev/](https://vitejs.dev/)
+
+## 致謝
+
+本專案基於 [V3 Admin Vite](https://github.com/un-pany/v3-admin-vite) 進行客製化開發，感謝原作者 [@pany](https://github.com/pany-ang) 及所有貢獻者的辛勤付出！
+
+## 授權
+
+[MIT](./LICENSE) License
+
+---
+
+**專案目標**：提供開箱即用的企業級前後端後台管理系統解決方案，讓開發團隊專注於業務邏輯而非基礎架構搭建。

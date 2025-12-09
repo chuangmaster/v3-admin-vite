@@ -1,31 +1,36 @@
 <div align="center">
   <img alt="logo" width="120" height="120" src="./src/common/assets/images/layouts/logo.png">
-  <h1>V3 Admin Vite</h1>
+  <h1>V3 Admin Vite - Rapid Admin System Setup</h1>
 </div>
-
-[![github release](https://img.shields.io/github/v/release/un-pany/v3-admin-vite?style=flat)](https://github.com/un-pany/v3-admin-vite/releases)
-[![github stars](https://img.shields.io/github/stars/un-pany/v3-admin-vite?style=flat)](https://github.com/un-pany/v3-admin-vite/stargazers)
-[![gitee stars](https://gitee.com/un-pany/v3-admin-vite/badge/star.svg)](https://gitee.com/un-pany/v3-admin-vite/stargazers)
 
 <b>English | <a href="./README.zh-CN.md">中文</a></b>
 
-## Introduction <a href="https://mp.weixin.qq.com/s/ccuzm4ZlHvN-1XBBN2lduQ"><img src="https://img.shields.io/badge/AI-VibeCoding-black"></a>
+## Introduction
 
-V3 Admin Vite is a well-crafted backend management system template, built with popular technologies such as Vue3, Vite, TypeScript, and Element Plus, and offers a great AI Vibe Coding experience!
+This project is a customized version based on [V3 Admin Vite](https://github.com/un-pany/v3-admin-vite), focusing on providing a **ready-to-use frontend-backend admin system solution**. By integrating complete business modules with standardized API contracts, it enables rapid backend integration and quick deployment.
 
-## Notifications
+### Key Features
+
+✨ **Complete Business Modules**: Built-in user management, role management, permission management, and other core admin features
+🔗 **Backend Contract Integration**: Strictly follows OpenAPI specifications for seamless backend API integration
+🚀 **Quick Setup**: Clear directory structure and standardized development workflow with low learning curve
+📦 **Ready to Use**: Complete CRUD examples, permission control, Excel export, and other common features
+🎨 **Enterprise Quality**: Modern tech stack based on Vue 3 + TypeScript + Element Plus
+
+## Backend Project
 
 > [!IMPORTANT]
-> Welcome to experience the brand-new version 5.0, a masterpiece crafted with great care! If it helps you, feel free to give a Star to show your support.
-
-> [!WARNING]
-> Version 4.x will no longer be maintained unless there are critical bugs! [Click to switch to the 4.x branch](https://github.com/un-pany/v3-admin-vite/tree/4.x)
+> **Companion Backend Project**: [V3.Admin.Backend](https://github.com/chuangmaster/V3.Admin.Backend)
+>
+> This frontend project is designed to work seamlessly with the companion backend. The backend project provides:
+>
+> - RESTful APIs following OpenAPI specification
+> - JWT authentication and authorization
+> - User, Role, and Permission management endpoints
+> - Complete API documentation and contracts
 
 > [!TIP]
-> Paid services are officially launched! If you don’t want to do it yourself but want to remove TS or other modules, try the lazy package! [Click to check it out](https://github.com/un-pany/v3-admin-vite/issues/225)
-
-> [!NOTE]
-> If you have mobile web app requirements, give the new open-source template [MobVue](https://github.com/un-pany/mobvue) a try.
+> For the best development experience, clone and run both frontend and backend projects together. The frontend is pre-configured to connect to the backend at `http://localhost:5176`.
 
 ## Usage
 
@@ -131,50 +136,60 @@ pnpm test
 
 </details>
 
+## Project Features
+
+### 📦 Built-in Business Modules
+
+This project has integrated complete core admin management features:
+
+#### 1. User Management Module
+
+- ✅ User list query (pagination, search, filter)
+- ✅ Add user (password strength validation, role assignment)
+- ✅ Edit user information
+- ✅ Delete user (soft delete mechanism)
+- ✅ Export Excel report
+- ✅ Complete permission control (route-level + button-level)
+- ✅ Password change functionality
+
+#### 2. Role Management Module
+
+- ✅ Role list query
+- ✅ Create/edit/delete roles
+- ✅ Role permission assignment
+- ✅ Concurrent update conflict handling
+- ✅ Role usage status check
+
+#### 3. Permission Management Module
+
+- ✅ Permission list query
+- ✅ Create/edit/delete permissions
+- ✅ Permission code format validation
+- ✅ Permission usage status check
+- ✅ Hierarchical permission structure
+
+### 🔗 Standardized API Integration
+
+- **OpenAPI Specification Compliance**: All API calls strictly follow backend OpenAPI specification
+- **Unified Response Format**: `ApiResponse<T>` standardized response structure (success, code, message, data, timestamp, traceId)
+- **Complete Error Handling**: Covers validation errors, authorization errors, concurrent conflicts, and other business logic error codes
+- **JWT Authentication**: Automatically carries Bearer Token, unified handling of unauthorized situations
+- **API Contract Documents**: Detailed API contract documents for each module
+
+### 🎯 Development Standardization
+
+- **Clear Directory Structure**: Organized by business modules, separation of public and private resources
+- **Type Safety**: Complete TypeScript type definitions
+- **Composables**: Reusable business logic encapsulation
+- **Unit Tests**: Corresponding test cases for core functionalities
+- **Development Documentation**: Complete spec, quickstart, tasks for each module
+
 ## Links
 
-**Online Preview**: [github-pages](https://un-pany.github.io/v3-admin-vite)
-
-**Chinese Documentation**: [link](https://juejin.cn/post/7445151895121543209)
-
-**Zero to Hero Tutorial**: [link](https://juejin.cn/column/7207659644487139387)
-
-**Mobile Web App**: [mobvue](https://github.com/un-pany/mobvue)
-
-**Electron Desktop Version**: [v3-electron-vite](https://github.com/un-pany/v3-electron-vite)
-
-**Chinese Repository**: [gitee](https://gitee.com/un-pany/v3-admin-vite)
-
-**Optional Group**: [check how to join](https://github.com/un-pany/v3-admin-vite/issues/191)
-
-**Donations**: [buy a coffee for the author](https://github.com/un-pany/v3-admin-vite/issues/69)
-
-**Releases & Changelog**: [releases](https://github.com/un-pany/v3-admin-vite/releases)
-
-## Features
-
-**Simplified structure**: No complex encapsulation, no complicated type gymnastics, just enough to meet the needs
-
-**Detailed comments**: Every configuration item comes with as detailed comments as possible
-
-**Latest dependencies**: Keeps all third-party dependencies up to date
-
-**Consistency**: Unified code style, naming conventions, and comment style
-
-## Built-in Features
-
-**User Management**: Login, logout demonstration
-
-**User Administration**: Complete CRUD system for user management with Excel export
-
-- View user list with pagination and search
-- Add new users with password complexity validation
-- Edit existing user information
-- Delete users with confirmation and error handling
-- Export user data to Excel files
-- Role-based access control for all operations
-
-**Permission Management**: Page-level permissions (dynamic routing), button-level permissions (permission directives, permission functions), route guards
+- **Original Project**: [V3 Admin Vite](https://github.com/un-pany/v3-admin-vite) by [@un-pany](https://github.com/un-pany)
+- **Vue 3 Documentation**: [https://vuejs.org/](https://vuejs.org/)
+- **Element Plus Documentation**: [https://element-plus.org/](https://element-plus.org/)
+- **Vite Documentation**: [https://vitejs.dev/](https://vitejs.dev/)
 
 **Multiple Environments**: Development, staging, and production environments
 
@@ -216,26 +231,14 @@ pnpm test
 
 **UnoCSS**: A high-performance, flexible atomic CSS engine
 
-## Project Preview Image
+## Acknowledgements
 
-![preview](./src/common/assets/images/docs/preview.png)
-
-## Contributors
-
-A big thank you to all the contributors!
-
-<a href="https://github.com/un-pany/v3-admin-vite/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=un-pany/v3-admin-vite">
-</a>
-
-## ‌WeChat Official Account‌
-
-New attempts, welcome to follow
-
-<a href="https://mp.weixin.qq.com/s/artNHKubYNRBlsrxD7eXXA">
-  <img src="https://github.com/user-attachments/assets/529bac73-f9e3-4311-94d0-3db57216b771">
-</a>
+This project is based on [V3 Admin Vite](https://github.com/un-pany/v3-admin-vite) for customization. Thanks to original author [@pany](https://github.com/pany-ang) and all contributors for their hard work!
 
 ## License
 
-[MIT](./LICENSE) License © 2022-PRESENT [pany](https://github.com/pany-ang)
+[MIT](./LICENSE) License
+
+---
+
+**Project Goal**: Provide a ready-to-use enterprise-level frontend-backend admin system solution, allowing development teams to focus on business logic rather than infrastructure setup.
