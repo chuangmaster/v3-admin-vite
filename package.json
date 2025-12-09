@@ -62,6 +62,6 @@
     "vue-tsc": "3.0.7"
   },
   "lint-staged": {
-    "*": "eslint --fix"
+    "*.{js,ts,vue,jsx,tsx,css,scss,json}": "eslint --fix"
   }
 }
