@@ -88,7 +88,9 @@ function createRequest(instance: AxiosInstance) {
     // 預設配置
     const defaultConfig: AxiosRequestConfig = {
       // 介面位址
-      baseURL: import.meta.env.VITE_BASE_URL,
+      // 在 build 時應由 Vite 注入 `import.meta.env.VITE_BASE_URL`
+      // 若未設定則警告並使用相對 /api/v1 作為 fallback（可視情況調整）
+      baseURL: import.meta.env.VITE_BASE_URL || "/api/v1",
       // 請求標頭
       headers: {
         // 攜帶 Token
@@ -101,6 +103,13 @@ function createRequest(instance: AxiosInstance) {
       timeout: 5000,
       // 跨域請求時是否攜帶 Cookies
       withCredentials: false
+    }
+    if (!import.meta.env.VITE_BASE_URL) {
+      // 在 runtime 記錄警告，協助追蹤部署時是否有在 build 階段注入 env
+      // 注意：在瀏覽器 console 直接執行 `import.meta` 會拋錯，這裡僅在編譯後的程式碼中使用
+
+      console.log(defaultConfig.baseURL)
+      console.warn("[config] VITE_BASE_URL 未在 build 時注入，已使用 fallback: /api/v1。請於部署前在 CI/服務平台設定 VITE_BASE_URL 並重新 build。")
     }
     // 將預設配置 defaultConfig 和傳入的自訂配置 config 進行合併成為 mergeConfig
     const mergeConfig = merge(defaultConfig, config)
