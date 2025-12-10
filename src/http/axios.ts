@@ -99,8 +99,8 @@ function createRequest(instance: AxiosInstance) {
       },
       // 請求主體
       data: {},
-      // 請求逾時
-      timeout: 5000,
+      // 請求逾時（單位 ms）：預設 5s 會導致 client 在 upstream 尚未回應時中止，改為 60s
+      timeout: 60000,
       // 跨域請求時是否攜帶 Cookies
       withCredentials: false
     }
