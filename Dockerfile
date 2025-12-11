@@ -26,4 +26,5 @@ ENV BACKEND_URL=https://your-backend-url.railway.app
 EXPOSE 80
 
 # 使用 envsubst 替換 nginx 配置中的環境變數，然後啟動 nginx
-CMD ["/bin/sh", "-c", "envsubst '${BACKEND_URL}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+# 並輸出配置內容以便調試
+CMD ["/bin/sh", "-c", "echo '=== Environment Variables ===' && echo \"BACKEND_URL: $BACKEND_URL\" && envsubst '${BACKEND_URL}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && echo '=== Generated Nginx Config ===' && cat /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
