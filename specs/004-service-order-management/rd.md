@@ -134,7 +134,7 @@
 
 | 權限代號                | 說明項          |
 | ------------------- | ------------ |
-| inboundOrder.read        | 查詢寄賣單 |
-| inboundOrder.create | 建立寄賣單       |    
-| inboundOrder.delete | 刪除寄賣單       |      
-| inboundOrder.update | 修改寄賣單       |   
+| serviceOrder.read        | 查詢寄賣單 |
+| serviceOrder.create | 建立寄賣單       |    
+| serviceOrder.delete | 刪除寄賣單       |      
+| serviceOrder.update | 修改寄賣單       |   

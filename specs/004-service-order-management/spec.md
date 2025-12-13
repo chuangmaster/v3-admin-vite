@@ -167,7 +167,7 @@
 #### 權限管理
 
 - **FR-039**: 系統必須根據使用者權限控制服務單的建立、查詢、修改、刪除功能
-- **FR-040**: 系統必須支援以下權限：`inboundOrder.read`（查詢與匯出寄賣單）、`inboundOrder.create`（建立寄賣單）、`inboundOrder.delete`（刪除寄賣單）、`inboundOrder.update`（修改寄賣單）
+- **FR-040**: 系統必須支援以下權限：`serviceOrder.read`（查詢與匯出寄賣單）、`serviceOrder.create`（建立寄賣單）、`serviceOrder.delete`（刪除寄賣單）、`serviceOrder.update`（修改寄賣單）
 - **FR-041**: 系統必須支援收購單相關權限（假設與寄賣單權限結構相同但獨立管理）
 
 ### Key Entities
