@@ -24,9 +24,9 @@ description: "Task list for Service Order Management feature implementation"
 
 **Purpose**: 建立專案基礎結構與套件安裝
 
-- [ ] T001 安裝新增套件(signature_pad 與 xlsx)至 package.json
-- [ ] T002 新增服務單權限常數至 src/common/constants/permissions.ts
-- [ ] T003 新增服務單路由至 src/router/index.ts
+- [x] T001 安裝新增套件(signature_pad 與 xlsx)至 package.json
+- [x] T002 新增服務單權限常數至 src/common/constants/permissions.ts
+- [x] T003 新增服務單路由至 src/router/index.ts
 
 ---
 
@@ -36,12 +36,12 @@ description: "Task list for Service Order Management feature implementation"
 
 **⚠️ CRITICAL**: 此階段未完成前,任何用戶故事都無法開始
 
-- [ ] T004 定義 TypeScript 型別於 src/pages/service-order-management/types.ts
-- [ ] T005 [P] 建立 API 服務層於 src/pages/service-order-management/apis/service-order.ts (註:服務單編號由後端自動生成,前端無需處理編號生成邏輯)
-- [ ] T006 [P] 建立客戶 API 服務層於 src/pages/service-order-management/apis/customer.ts
-- [ ] T007 [P] 建立附件 API 服務層於 src/pages/service-order-management/apis/attachment.ts
-- [ ] T008 [P] 建立簽名 API 服務層於 src/pages/service-order-management/apis/signature.ts
-- [ ] T009 [P] 建立 OCR API 服務層於 src/pages/service-order-management/apis/ocr.ts
+- [x] T004 定義 TypeScript 型別於 src/pages/service-order-management/types.ts
+- [x] T005 [P] 建立 API 服務層於 src/pages/service-order-management/apis/service-order.ts (註:服務單編號由後端自動生成,前端無需處理編號生成邏輯)
+- [x] T006 [P] 建立客戶 API 服務層於 src/pages/service-order-management/apis/customer.ts
+- [x] T007 [P] 建立附件 API 服務層於 src/pages/service-order-management/apis/attachment.ts
+- [x] T008 [P] 建立簽名 API 服務層於 src/pages/service-order-management/apis/signature.ts
+- [x] T009 [P] 建立 OCR API 服務層於 src/pages/service-order-management/apis/ocr.ts
 
 **Checkpoint**: 基礎建設完成 - 用戶故事實作可並行開始
 
@@ -57,21 +57,21 @@ description: "Task list for Service Order Management feature implementation"
 
 #### Core Components (可並行)
 
-- [ ] T010 [P] [US1] 建立客戶搜尋元件於 src/pages/service-order-management/components/CustomerSearch.vue
-- [ ] T011 [P] [US1] 建立客戶表單元件於 src/pages/service-order-management/components/CustomerForm.vue
-- [ ] T012 [P] [US1] 建立身分證上傳元件(OCR 整合)於 src/pages/service-order-management/components/IDCardUpload.vue
-- [ ] T013 [P] [US1] 建立觸控簽名板元件於 src/pages/service-order-management/components/SignaturePad.vue
+- [x] T010 [P] [US1] 建立客戶搜尋元件於 src/pages/service-order-management/components/CustomerSearch.vue
+- [x] T011 [P] [US1] 建立客戶表單元件於 src/pages/service-order-management/components/CustomerForm.vue
+- [x] T012 [P] [US1] 建立身分證上傳元件(OCR 整合)於 src/pages/service-order-management/components/IDCardUpload.vue
+- [x] T013 [P] [US1] 建立觸控簽名板元件於 src/pages/service-order-management/components/SignaturePad.vue
 
 #### Composables (依賴 Components)
 
-- [ ] T014 [US1] 建立客戶搜尋組合式函式於 src/pages/service-order-management/composables/useCustomerSearch.ts
-- [ ] T015 [US1] 建立簽名處理組合式函式於 src/pages/service-order-management/composables/useSignature.ts
-- [ ] T016 [US1] 建立服務單表單組合式函式於 src/pages/service-order-management/composables/useServiceOrderForm.ts
+- [x] T014 [US1] 建立客戶搜尋組合式函式於 src/pages/service-order-management/composables/useCustomerSearch.ts
+- [x] T015 [US1] 建立簽名處理組合式函式於 src/pages/service-order-management/composables/useSignature.ts
+- [x] T016 [US1] 建立服務單表單組合式函式於 src/pages/service-order-management/composables/useServiceOrderForm.ts
 
 #### Main Components (依賴 Core Components 與 Composables)
 
-- [ ] T017 [US1] 建立服務單表單元件於 src/pages/service-order-management/components/ServiceOrderForm.vue
-- [ ] T018 [US1] 建立服務單建立頁面於 src/pages/service-order-management/create.vue
+- [x] T017 [US1] 建立服務單表單元件於 src/pages/service-order-management/components/ServiceOrderForm.vue
+- [x] T018 [US1] 建立服務單建立頁面於 src/pages/service-order-management/create.vue
 
 #### Tests for User Story 1 (可並行)
 
