@@ -1,5 +1,9 @@
 import { vi } from "vitest"
 import { h } from "vue"
+import { setActivePinia, createPinia } from "pinia"
+
+// 在測試環境啟動一個全域的 Pinia 實例，避免呼叫 getActivePinia() 時找不到
+setActivePinia(createPinia())
 
 // Mock element-plus 常見匯出（元件與指令）
 vi.mock("element-plus", () => {
