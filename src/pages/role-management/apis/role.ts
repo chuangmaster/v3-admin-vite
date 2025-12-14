@@ -6,7 +6,6 @@
 
 import type { PagedApiResponse } from "types/api-paged-response"
 import type {
-  ApiResponse,
   AssignRolePermissionsRequest,
   CreateRoleRequest,
   DeleteRoleRequest,

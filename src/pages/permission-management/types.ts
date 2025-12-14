@@ -89,22 +89,6 @@ export interface PermissionRole {
   createdAt: string
 }
 
-/** API 標準回應格式 */
-export interface ApiResponse<T> {
-  /** 是否成功 */
-  success: boolean
-  /** 業務代碼 */
-  code: string
-  /** 訊息 */
-  message: string
-  /** 資料 */
-  data: T | null
-  /** 時間戳 */
-  timestamp: string
-  /** 追蹤 ID */
-  traceId: string
-}
-
 /** 驗證權限代碼格式（格式：module:action 或 module:submodule:action，最多三層） */
 export function validatePermissionCode(code: string): boolean {
   const pattern = /^\w+:\w+(:\w+)?$/

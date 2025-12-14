@@ -4,8 +4,6 @@
  * @module @/pages/user-management/composables/useUserRoles
  */
 
-import type { ApiResponse } from "../types"
-
 import type { Role, UserRole } from "@/pages/role-management/types"
 import { ElMessage } from "element-plus"
 import { computed, reactive, ref } from "vue"
