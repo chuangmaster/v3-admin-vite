@@ -92,10 +92,12 @@ interface PagedResponse<T> {
 | POST | `/service-orders/{id}/attachments` | 上傳附件 | `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create` |
 | GET | `/service-orders/{id}/attachments` | 取得附件列表 | `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read` |
 | GET | `/attachments/{id}/download` | 下載附件 | `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read` |
+| POST | `/attachments/{id}/view-log` | 記錄附件查看日誌 | `serviceOrder.attachment.viewSensitive` |
 
 ### 簽名相關
 | 方法 | 端點 | 說明 | 權限 |
 |------|------|------|------|
+| POST | `/service-orders/{id}/signatures/merge-preview` | 合併簽名與預覽文件 | `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create` |
 | POST | `/service-orders/{id}/signatures/offline` | 儲存線下簽名 | `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create` |
 | POST | `/service-orders/{id}/signatures/online` | 發送線上簽名邀請 | `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create` |
 | POST | `/service-orders/{id}/signatures/resend` | 重新發送簽名邀請 | `serviceOrder.consignment.update` 或 `serviceOrder.buyback.update` |
@@ -1036,7 +1038,124 @@ interface ResendSignatureRequest {
 
 ---
 
-### 16. 取得簽名記錄
+### 16. 合併簽名與預覽文件
+
+**端點**: `POST /service-orders/{id}/signatures/merge-preview`
+
+**權限**: `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create`
+
+**說明**: 將客戶的觸控簽名（Base64）與 PDF 合約文件合併，產生預覽文件供店員與客戶確認。此 API 僅產生預覽，不會正式儲存簽名記錄。確認無誤後，前端應呼叫 `POST /service-orders/{id}/signatures/offline` 正式儲存簽名。
+
+**路徑參數**:
+- `id` (UUID): 服務單 ID
+
+**請求 Body**:
+```typescript
+interface MergeSignaturePreviewRequest {
+  /** 簽名文件類型 */
+  documentType: "BUYBACK_CONTRACT" | "TRADE_APPLICATION" | "CONSIGNMENT_CONTRACT"
+  /** 簽名資料（Base64 PNG） */
+  signatureBase64: string
+}
+```
+
+**請求範例**:
+```json
+{
+  "documentType": "CONSIGNMENT_CONTRACT",
+  "signatureBase64": "iVBORw0KGgoAAAANSUhEUgAA..."
+}
+```
+
+**成功回應** (200):
+```json
+{
+  "success": true,
+  "code": "SUCCESS",
+  "message": "預覽文件產生成功",
+  "data": {
+    "previewUrl": "https://storage.example.com/previews/contract_preview_12345.pdf",
+    "expiresAt": "2025-12-14T12:30:00Z"
+  },
+  "timestamp": "2025-12-14T10:30:00Z",
+  "traceId": "abc123xyz"
+}
+```
+
+**錯誤回應** (400):
+```json
+{
+  "success": false,
+  "code": "SIGNATURE_MERGE_FAILED",
+  "message": "簽名合併失敗，請確認簽名資料格式正確",
+  "data": null,
+  "timestamp": "2025-12-14T10:30:00Z",
+  "traceId": "abc123xyz"
+}
+```
+
+**前端整合流程**:
+1. 客戶在簽名板上簽名完成
+2. 前端匯出 Base64 簽名資料
+3. 呼叫 `POST /service-orders/{id}/signatures/merge-preview` 取得預覽 URL
+4. 顯示預覽 PDF 供店員與客戶確認
+5. 確認無誤後呼叫 `POST /service-orders/{id}/signatures/offline` 正式儲存
+
+---
+
+### 17. 記錄附件查看日誌
+
+**端點**: `POST /attachments/{id}/view-log`
+
+**權限**: `serviceOrder.attachment.viewSensitive`
+
+**說明**: 記錄敏感附件（如身分證明文件）的查看歷史，用於個資稽核。每次使用者查看或下載身分證明文件時，前端必須呼叫此 API 記錄日誌。
+
+**路徑參數**:
+- `id` (UUID): 附件 ID
+
+**請求 Body**:
+```typescript
+interface LogAttachmentViewRequest {
+  /** 操作類型 */
+  action: "VIEW" | "DOWNLOAD"
+}
+```
+
+**請求範例**:
+```json
+{
+  "action": "VIEW"
+}
+```
+
+**成功回應** (201):
+```json
+{
+  "success": true,
+  "code": "SUCCESS",
+  "message": "查看記錄已儲存",
+  "data": {
+    "logId": "aa0e8400-e29b-41d4-a716-446655440005",
+    "attachmentId": "880e8400-e29b-41d4-a716-446655440003",
+    "userId": "user123",
+    "userName": "張三",
+    "action": "VIEW",
+    "viewedAt": "2025-12-14T10:30:00Z"
+  },
+  "timestamp": "2025-12-14T10:30:00Z",
+  "traceId": "abc123xyz"
+}
+```
+
+**前端整合流程**:
+1. 使用者點擊「查看」或「下載」身分證明文件
+2. 前端先呼叫 `POST /attachments/{id}/view-log` 記錄日誌
+3. 日誌記錄成功後才顯示圖片或觸發下載
+
+---
+
+### 18. 取得簽名記錄
 
 **端點**: `GET /service-orders/{id}/signatures`
 
@@ -1245,7 +1364,7 @@ async function fetchServiceOrders(params: ServiceOrderListParams) {
 
 本 API 契約定義了服務單管理模組的所有前後端互動介面：
 
-✅ **17 個 API 端點**：涵蓋服務單、客戶、附件、簽名、OCR 功能  
+✅ **19 個 API 端點**：涵蓋服務單、客戶、附件、簽名、OCR 功能（包含簽名合併預覽與附件查看日誌）  
 ✅ **統一回應格式**：遵循 `ApiResponse<T>` 規範  
 ✅ **完整錯誤處理**：定義所有業務錯誤代碼  
 ✅ **權限控制**：明確定義各端點所需權限  

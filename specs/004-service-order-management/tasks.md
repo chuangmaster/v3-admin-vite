@@ -92,6 +92,8 @@
 - [ ] T029 [US1] 實作收購單線上簽名流程 (提交表單後呼叫 sendOnlineSignature API，透過 Dropbox Sign API 寄送合約至客戶 Email，處理發送失敗顯示錯誤訊息，服務單狀態設為已終止，提示重新建單)
 - [ ] T030 [US1] 實作身分證明文件強制驗證 (提交前檢查是否已上傳 fileType=ID_CARD 的附件，若未上傳則阻止提交並顯示錯誤訊息「身分證明文件為必要附件，請上傳或拍攝身分證照片」，焦點移至上傳區域)
 - [ ] T031 [US1] 實作 AI 辨識自動搜尋客戶邏輯 (辨識成功後自動以身分證字號呼叫 searchCustomers API，若找到客戶自動選擇並填入表單，若找不到填入新增客戶表單，比對姓名一致性顯示警告，若已選客戶但身分證字號不符則顯示錯誤阻止繼續)
+- [ ] T031-1 [P] [US1] 撰寫外籍人士身分證格式驗證測試 `tests/pages/service-order-management/composables/useForeignIdValidation.test.ts` (測試 YYYYMMDD+AA 格式驗證、出生日期合理性檢查、格式錯誤提示)
+- [ ] T031-2 [US1] 實作外籍人士身分證格式驗證邏輯 `src/pages/service-order-management/composables/useForeignIdValidation.ts` (驗證 10 位格式、出生日期範圍、英文字母大寫)
 
 **Checkpoint**: 使用者故事 1 (建立收購單) 應完全功能且可獨立測試
 
@@ -197,6 +199,7 @@
 - [ ] T068 執行 quickstart.md 驗證流程 (依照 quickstart.md 測試指南執行完整功能測試)
 - [ ] T069 [P] 更新專案文件 README.md (新增服務單管理模組說明、路由資訊、權限說明)
 - [ ] T070 [P] 建立使用者指南文件 `docs/service-order-management-user-guide.md` (包含功能介紹、操作流程、常見問題)
+- [ ] T071 撰寫 AI 辨識後客戶搜尋整合測試 `tests/pages/service-order-management/integration/ai-customer-search.test.ts` (使用 mock OCR 結果驗證辨識成功後自動搜尋客戶、自動選擇客戶、自動填入表單的完整流程，驗證 90% 成功率目標)
 
 ---
 
@@ -293,16 +296,16 @@ Task: "建立觸控簽名板元件 src/pages/service-order-management/components
 
 ## Summary (總結)
 
-**總任務數**: 70 個任務
+**總任務數**: 73 個任務
 
 **任務分佈**:
 - Phase 1 (Setup): 5 個任務
 - Phase 2 (Foundational): 7 個任務 (關鍵阻塞階段)
-- Phase 3 (User Story 1 - 建立收購單): 19 個任務 (包含 4 個測試)
+- Phase 3 (User Story 1 - 建立收購單): 21 個任務 (包含 4 個測試 + 2 個外籍人士驗證任務)
 - Phase 4 (User Story 2 - 建立寄賣單): 7 個任務
 - Phase 5 (User Story 3 - 客戶搜尋與選擇): 5 個任務 (包含 2 個測試)
 - Phase 6 (User Story 4 - 服務單查詢與管理): 14 個任務 (包含 3 個測試)
-- Phase 7 (Polish): 13 個任務 (包含 5 個元件測試)
+- Phase 7 (Polish): 14 個任務 (包含 5 個元件測試 + 1 個整合測試)
 
 **並行機會**:
 - Setup 階段: 4 個任務可並行 (T002-T005)
@@ -321,7 +324,7 @@ Task: "建立觸控簽名板元件 src/pages/service-order-management/components
 
 **建議 MVP 範圍**: User Story 1 + User Story 2 (建立收購單與寄賣單)
 
-**格式驗證**: 所有 70 個任務均遵循 checklist 格式 (checkbox + ID + 標籤 + 檔案路徑)
+**格式驗證**: 所有 73 個任務均遵循 checklist 格式 (checkbox + ID + 標籤 + 檔案路徑)
 
 ---
 

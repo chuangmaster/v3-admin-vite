@@ -9,6 +9,8 @@
 
 服務單管理模組為精品收購與寄賣業務的核心功能，提供店員建立、查詢、修改收購單與寄賣單的完整流程。主要功能包含：AI 辨識身分證自動填入客戶資料、客戶搜尋與選擇、商品項目管理、線上/線下簽名、附件管理、服務單狀態追蹤、Excel 匯出與草稿自動儲存。系統支援權限控制，確保敏感資料（如身分證明文件）的安全存取。
 
+**服務單編號規則**: 類型前綴（收購單 BS、寄賣單 CS）+ 日期（YYYYMMDD）+ 流水號（3 位數），例如：BS20251214001、CS20251214002。
+
 ## Technical Context
 
 **Language/Version**: TypeScript 5.x, Vue 3.5+  
@@ -18,7 +20,7 @@
 **Target Platform**: 現代瀏覽器 (Chrome, Edge, Safari), 支援觸控螢幕與桌面  
 **Project Type**: Web application (single-page application, SPA)  
 **Performance Goals**: 列表查詢 < 2 秒 (50,000 筆資料), 客戶搜尋 < 1 秒 (10,000 筆), 建單流程 < 3 分鐘 (不含簽名), Excel 匯出 < 5 秒 (1,000 筆)  
-**Constraints**: AI 辨識準確率 ≥ 85%, 線上簽名寄送成功率 ≥ 95%, 支援 50 位店員同時使用, 草稿自動儲存間隔 30 秒, 身分證明文件加密儲存  
+**Constraints**: AI 辨識準確率 ≥ 85% (使用 Azure Computer Vision OCR 為主、Google Gemini Vision API 為備援), 線上簽名寄送成功率 ≥ 95%, 支援 50 位店員同時使用, 草稿自動儲存間隔 30 秒, 身分證明文件加密儲存  
 **Scale/Scope**: 預估 50+ 位店員使用, 服務單資料量 100,000+ 筆/年, 客戶資料量 20,000+ 筆, 支援 1-4 件商品項目/服務單
 
 ## Constitution Check
