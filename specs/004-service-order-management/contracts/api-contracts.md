@@ -267,6 +267,13 @@ interface ServiceOrderListParams {
 
 **權限**: `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create`
 
+**重要**: 在呼叫此 API 前，前端必須確保已透過 `POST /service-orders/{id}/attachments` 上傳身分證明文件。後端會驗證該服務單是否存在類型為 `ID_CARD` 的附件，若未上傳則返回驗證錯誤。
+
+**建議流程**:
+1. 呼叫 `POST /service-orders` 建立服務單（取得服務單 ID）
+2. 立即呼叫 `POST /service-orders/{id}/attachments` 上傳身分證明文件
+3. 完成其他附件上傳與簽名流程
+
 **請求 Body**:
 ```typescript
 interface ProductItem {
@@ -385,6 +392,18 @@ interface CreateServiceOrderRequest {
   "success": false,
   "code": "VALIDATION_ERROR",
   "message": "寄賣結束日期必須晚於起始日期",
+  "data": null,
+  "timestamp": "2025-12-14T10:30:00Z",
+  "traceId": "abc123xyz"
+}
+```
+
+**錯誤回應** (400 - 未上傳身分證明):
+```json
+{
+  "success": false,
+  "code": "MISSING_ID_CARD_ATTACHMENT",
+  "message": "身分證明文件為必要附件，請上傳或拍攝身分證照片",
   "data": null,
   "timestamp": "2025-12-14T10:30:00Z",
   "traceId": "abc123xyz"
@@ -615,12 +634,22 @@ interface UpdateStatusRequest {
 
 **權限**: `customer.read`
 
+**說明**: 搜尋客戶資料,支援多種關鍵字搜尋。搜尋邏輯優先順序:身分證字號(精確比對) > 電話(精確比對) > 姓名(模糊搜尋) > Email(模糊搜尋)。若關鍵字符合身分證字號格式(1英文+9數字),則僅以身分證字號搜尋。
+
 **查詢參數**:
 ```typescript
 interface CustomerSearchParams {
-  /** 搜尋關鍵字（姓名、電話、Email、身分證字號） */
+  /** 搜尋關鍵字(姓名、電話、Email、身分證字號) */
   keyword: string
 }
+```
+
+**請求範例**:
+```
+GET /customers/search?keyword=A123456789  // 身分證字號搜尋(精確比對)
+GET /customers/search?keyword=0912345678  // 電話搜尋(精確比對)
+GET /customers/search?keyword=王小明      // 姓名搜尋(模糊比對)
+GET /customers/search?keyword=wang        // Email 搜尋(模糊比對)
 ```
 
 **成功回應** (200):
@@ -638,6 +667,18 @@ interface CustomerSearchParams {
       "idCardNumber": "A123456789"
     }
   ],
+  "timestamp": "2025-12-14T10:30:00Z",
+  "traceId": "abc123xyz"
+}
+```
+
+**成功回應** (200 - 無結果):
+```json
+{
+  "success": true,
+  "code": "SUCCESS",
+  "message": "查詢成功",
+  "data": [],
   "timestamp": "2025-12-14T10:30:00Z",
   "traceId": "abc123xyz"
 }
@@ -715,18 +756,25 @@ interface CreateCustomerRequest {
 
 **權限**: `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create`
 
+**說明**: 上傳服務單相關附件。**身分證明文件（fileType = ID_CARD）為必要附件**，每筆服務單至少需要一個身分證明附件。建議在建立服務單後立即上傳身分證明文件。
+
 **路徑參數**:
 - `id` (UUID): 服務單 ID
 
 **請求 Body** (multipart/form-data):
 ```typescript
 interface UploadAttachmentRequest {
-  /** 檔案 */
+  /** 檔案（支援上傳或拍照） */
   file: File
   /** 檔案類型 */
   fileType: "ID_CARD" | "CONTRACT" | "OTHER"
 }
 ```
+
+**檔案限制**:
+- 身分證明文件僅接受圖片格式：image/jpeg, image/png
+- 檔案大小限制：最大 10MB
+- 每筆服務單必須至少有一個 fileType = "ID_CARD" 的附件
 
 **成功回應** (201):
 ```json
@@ -749,12 +797,24 @@ interface UploadAttachmentRequest {
 }
 ```
 
-**錯誤回應** (400):
+**錯誤回應** (400 - 檔案大小超過限制):
 ```json
 {
   "success": false,
-  "code": "VALIDATION_ERROR",
-  "message": "檔案大小超過 10MB 限制",
+  "code": "FILE_SIZE_EXCEEDED",
+  "message": "檔案大小超過 10MB 限制，請壓縮後重新上傳",
+  "data": null,
+  "timestamp": "2025-12-14T10:30:00Z",
+  "traceId": "abc123xyz"
+}
+```
+
+**錯誤回應** (400 - 檔案格式不支援):
+```json
+{
+  "success": false,
+  "code": "UNSUPPORTED_FILE_FORMAT",
+  "message": "僅支援 JPG 或 PNG 格式的圖片檔案",
   "data": null,
   "timestamp": "2025-12-14T10:30:00Z",
   "traceId": "abc123xyz"
@@ -995,6 +1055,8 @@ interface ResendSignatureRequest {
 
 **權限**: `customer.create`
 
+**說明**: 使用 AI OCR 技術辨識身分證圖片,提取姓名與身分證字號。前端應在辨識成功後,自動使用身分證字號呼叫客戶搜尋 API (`GET /customers/search?keyword={idCardNumber}`),實現自動搜尋既有客戶的功能。
+
 **請求 Body** (multipart/form-data):
 ```typescript
 interface OCRIDCardRequest {
@@ -1019,17 +1081,38 @@ interface OCRIDCardRequest {
 }
 ```
 
-**錯誤回應** (400):
+**錯誤回應** (400 - 辨識失敗):
 ```json
 {
   "success": false,
-  "code": "VALIDATION_ERROR",
-  "message": "圖片辨識失敗，請重新拍攝或手動輸入",
+  "code": "OCR_RECOGNITION_FAILED",
+  "message": "辨識失敗，請重新拍攝或手動輸入客戶資料",
   "data": null,
   "timestamp": "2025-12-14T10:30:00Z",
   "traceId": "abc123xyz"
 }
 ```
+
+**錯誤回應** (400 - 身分證字號格式錯誤):
+```json
+{
+  "success": false,
+  "code": "INVALID_ID_CARD_FORMAT",
+  "message": "辨識的身分證字號格式不正確，請確認照片清晰度或手動輸入",
+  "data": {
+    "recognizedText": "A12345678X"
+  },
+  "timestamp": "2025-12-14T10:30:00Z",
+  "traceId": "abc123xyz"
+}
+```
+
+**前端整合流程**:
+1. 用戶上傳/拍攝身分證照片
+2. 點擊 ⭐ 星星符號觸發 OCR 辨識
+3. 呼叫 `POST /ocr/id-card` 取得辨識結果
+4. 若辨識成功,自動呼叫 `GET /customers/search?keyword={idCardNumber}` 搜尋客戶
+5. 若找到客戶,自動選擇並填入表單;若找不到,填入新增客戶表單
 
 ---
 
