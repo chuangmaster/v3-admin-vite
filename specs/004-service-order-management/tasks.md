@@ -1,365 +1,345 @@
----
-
-description: "Task list for Service Order Management feature implementation"
----
-
 # Tasks: 服務單管理
 
-**Input**: Design documents from `/specs/004-service-order-management/`
-**Prerequisites**: plan.md ✅, spec.md ✅, research.md ✅, data-model.md ✅, contracts/api-contracts.md ✅
+**Input**: Design documents from `/specs/004-service-order-management/`  
+**Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/api-contracts.md, quickstart.md  
+**Branch**: `004-service-order-management`  
+**Date**: 2025-12-15
 
-**Tests**: 本專案包含測試任務(已規劃單元測試與元件測試)
+**Tests**: 測試任務僅在規格明確要求時生成。本功能包含測試需求（參考 quickstart.md 測試指南）。
 
-**Organization**: 任務依用戶故事分組，確保每個故事可獨立實作與測試
+**Organization**: 任務按使用者故事組織，使每個故事能夠獨立實作與測試。
 
-## Format: `[ID] [P?] [Story] Description`
+---
 
-- **[P]**: 可並行執行(不同檔案、無依賴關係)
-- **[Story]**: 任務所屬用戶故事(如 US1, US2, US3)
-- 包含完整檔案路徑
+## Format: `- [ ] [ID] [P?] [Story?] Description`
+
+- **Checkbox**: 所有任務必須以 `- [ ]` 開頭
+- **[ID]**: 任務序號 (T001, T002, T003...)，按執行順序排列
+- **[P]**: 可並行執行（不同檔案、無依賴關係）
+- **[Story]**: 使用者故事標籤 (US1, US2, US3, US4)，僅用於使用者故事階段任務
+- **Description**: 清楚的動作描述，包含確切的檔案路徑
+
+**範例**:
+- ✅ `- [ ] T001 Create project structure per implementation plan`
+- ✅ `- [ ] T012 [P] [US1] Create User model in src/models/user.py`
+- ✅ `- [ ] T014 [US1] Implement UserService in src/services/user_service.py`
 
 ---
 
 ## Phase 1: Setup (專案初始化)
 
-**Purpose**: 建立專案基礎結構與套件安裝
+**Purpose**: 建立專案基礎結構與設定
 
-- [x] T001 安裝新增套件(signature_pad 與 xlsx)至 package.json
-- [x] T002 新增服務單權限常數至 src/common/constants/permissions.ts
-- [x] T003 新增服務單路由至 src/router/index.ts
+- [ ] T001 建立服務單管理模組目錄結構 `src/pages/service-order-management/` 及子目錄 (apis/, components/, composables/, images/)
+- [ ] T002 [P] 安裝必要套件 signature_pad 與 xlsx (`pnpm add signature_pad xlsx`)
+- [ ] T003 [P] 定義型別檔案 `src/pages/service-order-management/types.ts` (ServiceOrder, ProductItem, Customer, Attachment, SignatureRecord, CreateServiceOrderRequest 等)
+- [ ] T004 [P] 新增服務單權限常數至 `src/common/constants/permissions.ts` (SERVICE_ORDER_PERMISSIONS: CONSIGNMENT_*, BUYBACK_*, ATTACHMENT_VIEW_SENSITIVE)
+- [ ] T005 建立測試目錄結構 `tests/pages/service-order-management/` 及子目錄 (composables/, components/)
 
 ---
 
-## Phase 2: Foundational (基礎建設 - 阻塞性前置任務)
+## Phase 2: Foundational (基礎建設 - 阻塞前置條件)
 
-**Purpose**: 核心基礎設施,必須在任何用戶故事實作前完成
+**Purpose**: 核心基礎設施，所有使用者故事開始前必須完成
 
-**⚠️ CRITICAL**: 此階段未完成前,任何用戶故事都無法開始
+**⚠️ CRITICAL**: 此階段完成前，任何使用者故事工作都不能開始
 
-- [x] T004 定義 TypeScript 型別於 src/pages/service-order-management/types.ts
-- [x] T005 [P] 建立 API 服務層於 src/pages/service-order-management/apis/service-order.ts (註:服務單編號由後端自動生成,前端無需處理編號生成邏輯)
-- [x] T006 [P] 建立客戶 API 服務層於 src/pages/service-order-management/apis/customer.ts
-- [x] T007 [P] 建立附件 API 服務層於 src/pages/service-order-management/apis/attachment.ts
-- [x] T008 [P] 建立簽名 API 服務層於 src/pages/service-order-management/apis/signature.ts
-- [x] T009 [P] 建立 OCR API 服務層於 src/pages/service-order-management/apis/ocr.ts
+- [ ] T006 建立服務單 API 服務層 `src/pages/service-order-management/apis/service-order.ts` (包含所有 API 函式: getServiceOrderList, getServiceOrder, createServiceOrder, updateServiceOrder, deleteServiceOrder, updateServiceOrderStatus, getModificationHistory)
+- [ ] T007 [P] 建立客戶 API 服務層 `src/pages/service-order-management/apis/customer.ts` (searchCustomers, createCustomer, getCustomer)
+- [ ] T008 [P] 建立附件 API 服務層 `src/pages/service-order-management/apis/attachment.ts` (uploadAttachment, getAttachmentList, downloadAttachment)
+- [ ] T009 [P] 建立簽名 API 服務層 `src/pages/service-order-management/apis/signature.ts` (saveOfflineSignature, sendOnlineSignature, resendSignature, getSignatureRecords)
+- [ ] T010 [P] 建立 OCR API 服務層 `src/pages/service-order-management/apis/ocr.ts` (recognizeIDCard)
+- [ ] T011 新增路由設定至 `src/router/index.ts` (服務單列表路由 /service-order-management, 服務單建立路由 /service-order-management/create, 服務單詳細路由 /service-order-management/:id)
+- [ ] T012 建立 Pinia store `src/pinia/stores/service-order.ts` (管理服務單狀態、分頁狀態、查詢條件)
 
-**Checkpoint**: 基礎建設完成 - 用戶故事實作可並行開始
+**Checkpoint**: 基礎設施就緒 - 使用者故事實作現在可以並行開始
 
 ---
 
 ## Phase 3: User Story 1 - 建立收購單 (Priority: P1) 🎯 MVP
 
-**Goal**: 店員可快速建立收購單以記錄客戶的精品收購交易,包含客戶資訊、商品詳情與收購金額,並確保收購合約完整簽署
+**Goal**: 店員能快速建立收購單，包含客戶資訊、商品詳情、身分證明上傳與 AI 辨識、線上/線下簽名功能
 
-**Independent Test**: 可透過建立一筆完整的收購單(包含客戶選擇、商品資訊填寫、身分證明上傳、線下簽名)並驗證資料儲存與合約產生來獨立測試
+**Independent Test**: 建立一筆完整的收購單（包含客戶選擇、1-4 件商品資訊填寫、身分證明上傳與 AI 辨識、線下觸控簽名），驗證資料儲存、合約產生與簽名記錄
 
-### Implementation for User Story 1
+### 測試 - User Story 1 (TDD: 先寫測試，確保失敗)
 
-#### Core Components (可並行)
+- [ ] T013 [P] [US1] 建立 useServiceOrderForm 組合式函式測試 `tests/pages/service-order-management/composables/useServiceOrderForm.test.ts` (測試表單驗證、提交、重置邏輯)
+- [ ] T014 [P] [US1] 建立 useCustomerSearch 組合式函式測試 `tests/pages/service-order-management/composables/useCustomerSearch.test.ts` (測試搜尋關鍵字、debounce、結果列表)
+- [ ] T015 [P] [US1] 建立 useIdCardRecognition 組合式函式測試 `tests/pages/service-order-management/composables/useIdCardRecognition.test.ts` (測試 OCR 呼叫、重試機制、客戶資料比對)
+- [ ] T016 [P] [US1] 建立 useSignature 組合式函式測試 `tests/pages/service-order-management/composables/useSignature.test.ts` (測試簽名板初始化、清除、Base64 匯出)
 
-- [x] T010 [P] [US1] 建立客戶搜尋元件於 src/pages/service-order-management/components/CustomerSearch.vue
-- [x] T011 [P] [US1] 建立客戶表單元件於 src/pages/service-order-management/components/CustomerForm.vue
-- [x] T012 [P] [US1] 建立身分證上傳元件(OCR 整合)於 src/pages/service-order-management/components/IDCardUpload.vue
-- [x] T013 [P] [US1] 建立觸控簽名板元件於 src/pages/service-order-management/components/SignaturePad.vue
+### 元件實作 - User Story 1
 
-#### Composables (依賴 Components)
+- [ ] T017 [P] [US1] 建立客戶搜尋元件 `src/pages/service-order-management/components/CustomerSearch.vue` (搜尋輸入框、結果列表、選擇客戶、新增客戶按鈕)
+- [ ] T018 [P] [US1] 建立客戶表單元件 `src/pages/service-order-management/components/CustomerForm.vue` (姓名、電話、Email、身分證字號輸入欄位與驗證，支援台灣與外籍人士格式)
+- [ ] T019 [P] [US1] 建立身分證上傳元件 `src/pages/service-order-management/components/IdCardUploader.vue` (檔案上傳、拍照功能、預覽、AI 辨識按鈕 ⭐、呼叫後端 OCR API、錯誤處理、重試機制最多 3 次)
+- [ ] T020 [P] [US1] 建立商品項目表單元件 `src/pages/service-order-management/components/ProductItemForm.vue` (品牌名稱、款式、內碼輸入，支援 1-4 件商品，動態新增/刪除項目)
+- [ ] T021 [P] [US1] 建立觸控簽名板元件 `src/pages/service-order-management/components/SignaturePad.vue` (使用 signature_pad，支援滑鼠/觸控筆/手指簽名，清除、確認按鈕，匯出 Base64 PNG)
 
-- [x] T014 [US1] 建立客戶搜尋組合式函式於 src/pages/service-order-management/composables/useCustomerSearch.ts
-- [x] T015 [US1] 建立簽名處理組合式函式於 src/pages/service-order-management/composables/useSignature.ts
-- [x] T016 [US1] 建立服務單表單組合式函式於 src/pages/service-order-management/composables/useServiceOrderForm.ts
+### 組合式函式實作 - User Story 1
 
-#### Main Components (依賴 Core Components 與 Composables)
+- [ ] T022 [US1] 實作 useCustomerSearch 組合式函式 `src/pages/service-order-management/composables/useCustomerSearch.ts` (搜尋關鍵字 ref、debounce 500ms、呼叫 searchCustomers API、loading 狀態、結果列表)
+- [ ] T023 [US1] 實作 useIdCardRecognition 組合式函式 `src/pages/service-order-management/composables/useIdCardRecognition.ts` (檔案上傳、呼叫 recognizeIDCard API、辨識結果處理、重試計數器、錯誤提示、自動客戶搜尋、資料比對邏輯)
+- [ ] T024 [US1] 實作 useSignature 組合式函式 `src/pages/service-order-management/composables/useSignature.ts` (初始化 SignaturePad、清除簽名、取得 Base64 資料、驗證簽名非空)
+- [ ] T025 [US1] 實作 useServiceOrderForm 組合式函式 `src/pages/service-order-management/composables/useServiceOrderForm.ts` (表單資料 ref、驗證規則、提交邏輯、草稿自動儲存、重置表單、身分證明文件驗證)
 
-- [x] T017 [US1] 建立服務單表單元件於 src/pages/service-order-management/components/ServiceOrderForm.vue
-- [x] T018 [US1] 建立服務單建立頁面於 src/pages/service-order-management/create.vue
+### 主要元件與頁面實作 - User Story 1
 
-#### Tests for User Story 1 (可並行)
+- [ ] T026 [US1] 建立服務單表單元件 `src/pages/service-order-management/components/ServiceOrderForm.vue` (整合 CustomerSearch、CustomerForm、ProductItemForm、IdCardUploader、SignaturePad，收購單表單邏輯，驗證必填欄位，支援新增/編輯模式)
+- [ ] T027 [US1] 建立服務單建立頁面 `src/pages/service-order-management/create.vue` (路由參數接收服務單類型 buyback，顯示 ServiceOrderForm，處理提交成功/失敗，導航邏輯)
+- [ ] T028 [US1] 實作收購單線下簽名流程 (提交表單後產生收購合約與一時貿易申請書，顯示 SignaturePad，每次簽名即時儲存，呼叫 saveOfflineSignature API，Base64 傳送後端，後端合併 PDF 與簽名，前端顯示預覽確認)
+- [ ] T029 [US1] 實作收購單線上簽名流程 (提交表單後呼叫 sendOnlineSignature API，透過 Dropbox Sign API 寄送合約至客戶 Email，處理發送失敗顯示錯誤訊息，服務單狀態設為已終止，提示重新建單)
+- [ ] T030 [US1] 實作身分證明文件強制驗證 (提交前檢查是否已上傳 fileType=ID_CARD 的附件，若未上傳則阻止提交並顯示錯誤訊息「身分證明文件為必要附件，請上傳或拍攝身分證照片」，焦點移至上傳區域)
+- [ ] T031 [US1] 實作 AI 辨識自動搜尋客戶邏輯 (辨識成功後自動以身分證字號呼叫 searchCustomers API，若找到客戶自動選擇並填入表單，若找不到填入新增客戶表單，比對姓名一致性顯示警告，若已選客戶但身分證字號不符則顯示錯誤阻止繼續)
 
-- [ ] T019 [P] [US1] 撰寫 CustomerSearch 元件測試於 tests/pages/service-order-management/components/CustomerSearch.test.ts
-- [ ] T020 [P] [US1] 撰寫 CustomerForm 元件測試於 tests/pages/service-order-management/components/CustomerForm.test.ts
-- [ ] T021 [P] [US1] 撰寫 SignaturePad 元件測試於 tests/pages/service-order-management/components/SignaturePad.test.ts
-- [ ] T022 [P] [US1] 撰寫 ServiceOrderForm 元件測試於 tests/pages/service-order-management/components/ServiceOrderForm.test.ts
-- [ ] T023 [P] [US1] 撰寫 useCustomerSearch 組合式函式測試於 tests/pages/service-order-management/composables/useCustomerSearch.test.ts
-- [ ] T024 [P] [US1] 撰寫 useServiceOrderForm 組合式函式測試於 tests/pages/service-order-management/composables/useServiceOrderForm.test.ts
-
-**Checkpoint**: 用戶故事 1 應完全可用且可獨立測試
+**Checkpoint**: 使用者故事 1 (建立收購單) 應完全功能且可獨立測試
 
 ---
 
 ## Phase 4: User Story 2 - 建立寄賣單 (Priority: P1) 🎯 MVP
 
-**Goal**: 店員可快速建立寄賣單以記錄客戶的精品寄賣交易,包含客戶資訊、商品詳情、寄賣金額、寄賣期間與續約設定,並確保寄賣合約完整簽署
+**Goal**: 店員能快速建立寄賣單，包含客戶資訊、商品詳情、配件、寄賣日期、瑕疵、續約設定、身分證明上傳與 AI 辨識、線上/線下簽名功能
 
-**Independent Test**: 可透過建立一筆完整的寄賣單(包含客戶選擇、商品資訊、配件、寄賣日期、瑕疵說明、續約設定、身分證明上傳、線下簽名)並驗證資料儲存與合約產生來獨立測試
+**Independent Test**: 建立一筆完整的寄賣單（包含客戶選擇、1-4 件商品資訊、商品配件、寄賣日期區間、瑕疵說明、續約設定、身分證明上傳與 AI 辨識、線下觸控簽名），驗證資料儲存、合約產生與簽名記錄
 
-### Implementation for User Story 2
+### 元件實作 - User Story 2
 
-#### Components (可並行,依賴 US1 元件)
+- [ ] T032 [P] [US2] 建立商品配件選擇器元件 `src/pages/service-order-management/components/AccessoriesSelector.vue` (多選項目: 盒子、防塵袋、購證、提袋、肩帶、羊毛氈、枕頭、保卡、鎖頭/鑰匙、緞帶/花、品牌小卡、保證書、無)
+- [ ] T033 [P] [US2] 建立商品瑕疵選擇器元件 `src/pages/service-order-management/components/DefectsSelector.vue` (多選項目: 五金生鏽/刮痕/掉、皮質磨損/刮痕/壓痕、內裡髒污、四角磨損)
+- [ ] T034 [US2] 擴充 ProductItemForm 元件 `src/pages/service-order-management/components/ProductItemForm.vue` (整合 AccessoriesSelector 與 DefectsSelector，根據服務單類型條件顯示)
 
-- [ ] T025 [P] [US2] 建立商品配件選擇器元件於 src/pages/service-order-management/components/AccessoriesSelector.vue
-- [ ] T026 [P] [US2] 建立商品瑕疵選擇器元件於 src/pages/service-order-management/components/DefectsSelector.vue
+### 主要元件與頁面實作 - User Story 2
 
-#### Enhancement (擴展 US1 元件支援寄賣單)
+- [ ] T035 [US2] 擴充 ServiceOrderForm 元件 `src/pages/service-order-management/components/ServiceOrderForm.vue` (新增寄賣單專屬欄位: 寄賣日期選擇器、續約設定單選、驗證寄賣日期起訖邏輯、預設結束日期為起始日期後 90 天)
+- [ ] T036 [US2] 更新服務單建立頁面 `src/pages/service-order-management/create.vue` (支援路由參數 consignment，根據類型切換表單模式，寄賣單驗證邏輯)
+- [ ] T037 [US2] 實作寄賣單線下簽名流程 (提交表單後產生寄賣合約書，顯示 SignaturePad，簽名即時儲存，呼叫 saveOfflineSignature API，Base64 傳送後端，後端合併 PDF 與簽名，前端顯示預覽確認)
+- [ ] T038 [US2] 實作寄賣單線上簽名流程 (提交表單後呼叫 sendOnlineSignature API，透過 Dropbox Sign API 寄送寄賣合約至客戶 Email，處理發送失敗顯示錯誤訊息，服務單狀態設為已終止，提示重新建單)
 
-- [ ] T027 [US2] 擴展 ServiceOrderForm 元件支援寄賣單欄位(配件、日期、瑕疵、續約)於 src/pages/service-order-management/components/ServiceOrderForm.vue
-- [ ] T028 [US2] 擴展 useServiceOrderForm 組合式函式支援寄賣單邏輯於 src/pages/service-order-management/composables/useServiceOrderForm.ts
-
-#### Tests for User Story 2 (可並行)
-
-- [ ] T029 [P] [US2] 撰寫 AccessoriesSelector 元件測試於 tests/pages/service-order-management/components/AccessoriesSelector.test.ts
-- [ ] T030 [P] [US2] 撰寫 DefectsSelector 元件測試於 tests/pages/service-order-management/components/DefectsSelector.test.ts
-
-**Checkpoint**: 用戶故事 1 與 2 均應獨立運作
+**Checkpoint**: 使用者故事 1 與 2 (建立收購單與寄賣單) 都應可獨立運作
 
 ---
 
 ## Phase 5: User Story 3 - 客戶搜尋與選擇 (Priority: P2)
 
-**Goal**: 店員可快速搜尋並選擇既有客戶資料,或在找不到客戶時新增客戶資料,以提升服務單建立效率
+**Goal**: 店員能快速搜尋既有客戶或新增客戶資料，支援多種搜尋條件 (姓名、電話、Email、身分證字號)，並自動填入服務單表單
 
-**Independent Test**: 可透過搜尋既有客戶(姓名、電話、Email、身分證字號)、選擇客戶並驗證資料自動填入,或搜尋不到時新增客戶來獨立測試
+**Independent Test**: 手動搜尋既有客戶 (使用姓名、電話、Email、身分證字號)、選擇客戶並驗證資料自動填入，或搜尋不到時新增客戶
 
-**Note**: 此功能核心元件已在 US1 實作(CustomerSearch、CustomerForm),本階段主要為優化與增強
+### 測試 - User Story 3
 
-### Implementation for User Story 3
+- [ ] T039 [P] [US3] 建立 CustomerSearch 元件測試 `tests/pages/service-order-management/components/CustomerSearch.test.ts` (測試搜尋輸入、結果列表顯示、客戶選擇事件、新增客戶事件)
+- [ ] T040 [P] [US3] 建立 CustomerForm 元件測試 `tests/pages/service-order-management/components/CustomerForm.test.ts` (測試欄位驗證、格式驗證、提交事件、台灣與外籍人士格式支援)
 
-#### Enhancement (優化搜尋功能)
+### 組合式函式實作 - User Story 3
 
-- [ ] T031 [US3] 優化 CustomerSearch 元件支援多條件搜尋(姓名、電話、Email、身分證字號)於 src/pages/service-order-management/components/CustomerSearch.vue
-- [ ] T032 [US3] 優化 useCustomerSearch 組合式函式支援進階搜尋邏輯於 src/pages/service-order-management/composables/useCustomerSearch.ts
+- [ ] T041 [US3] 完善 useCustomerSearch 組合式函式 `src/pages/service-order-management/composables/useCustomerSearch.ts` (實作搜尋優先級邏輯: 身分證字號精確比對 > 電話精確比對 > 姓名模糊搜尋 > Email 模糊搜尋，若關鍵字符合身分證格式則僅以身分證搜尋)
 
-#### Tests for User Story 3 (可並行)
+### 元件實作 - User Story 3
 
-- [ ] T033 [P] [US3] 撰寫客戶搜尋進階功能測試於 tests/pages/service-order-management/composables/useCustomerSearch.test.ts
-- [ ] T033-1 [P] [US3] 撰寫獨立新增客戶流程整合測試於 tests/pages/service-order-management/components/CustomerForm.test.ts
+- [ ] T042 [US3] 完善 CustomerSearch 元件 `src/pages/service-order-management/components/CustomerSearch.vue` (顯示搜尋結果客戶基本資訊 (姓名、電話、Email、身分證字號)，點擊選擇客戶發出 select 事件，無結果時顯示「新增客戶」按鈕發出 create 事件)
+- [ ] T043 [US3] 完善 CustomerForm 元件 `src/pages/service-order-management/components/CustomerForm.vue` (實作新增客戶邏輯，呼叫 createCustomer API，成功後發出 success 事件並自動選擇該客戶，提供身分證字號說明文字與格式驗證)
 
-**Checkpoint**: 所有客戶管理功能應完全可用
+**Checkpoint**: 使用者故事 1, 2, 3 都應可獨立運作
 
 ---
 
 ## Phase 6: User Story 4 - 服務單查詢與管理 (Priority: P2)
 
-**Goal**: 店員可查詢、瀏覽、修改已建立的收購單與寄賣單,並管理服務單狀態與附件
+**Goal**: 店員能查詢、瀏覽、修改已建立的收購單與寄賣單，管理服務單狀態與附件，匯出 Excel 報表
 
-**Independent Test**: 可透過搜尋服務單(依類型、客戶名稱、日期範圍等條件)、查看詳細資訊、修改服務單、更新狀態、下載附件來獨立測試
+**Independent Test**: 搜尋服務單 (依類型、客戶名稱、日期範圍等條件)、查看詳細資訊、修改服務單、更新狀態、下載附件、匯出 Excel
 
-### Implementation for User Story 4
+### 測試 - User Story 4
 
-#### Core Components (可並行)
+- [ ] T044 [P] [US4] 建立 useServiceOrderManagement 組合式函式測試 `tests/pages/service-order-management/composables/useServiceOrderManagement.test.ts` (測試查詢邏輯、分頁、篩選、刪除、狀態更新)
+- [ ] T045 [P] [US4] 建立 useExportExcel 組合式函式測試 `tests/pages/service-order-management/composables/useExportExcel.test.ts` (測試 Excel 匯出邏輯、檔案命名、欄位對應)
+- [ ] T046 [P] [US4] 建立 useDraftAutosave 組合式函式測試 `tests/pages/service-order-management/composables/useDraftAutosave.test.ts` (測試 localStorage 儲存、恢復、清除邏輯、30 秒間隔)
 
-- [ ] T034 [P] [US4] 建立服務單列表元件於 src/pages/service-order-management/components/ServiceOrderTable.vue
-- [ ] T035 [P] [US4] 建立服務單篩選元件於 src/pages/service-order-management/components/ServiceOrderFilter.vue
-- [ ] T036 [P] [US4] 建立狀態更新元件於 src/pages/service-order-management/components/StatusUpdateDialog.vue
-- [ ] T037 [P] [US4] 建立修改歷史元件於 src/pages/service-order-management/components/ModificationHistory.vue
+### 元件實作 - User Story 4
 
-#### Composables (依賴 Components)
+- [ ] T047 [P] [US4] 建立服務單表格元件 `src/pages/service-order-management/components/ServiceOrderTable.vue` (顯示服務單列表: 編號、客戶名稱、商品資訊、金額、狀態、建立日期，支援排序、分頁、編輯/刪除/查看按鈕，權限控制)
+- [ ] T048 [P] [US4] 建立附件查看元件 `src/pages/service-order-management/components/AttachmentViewer.vue` (顯示附件列表，提供下載/預覽功能，身分證明文件權限控制顯示「已上傳」或完整圖片，查看記錄日誌)
 
-- [ ] T038 [US4] 建立服務單列表管理組合式函式於 src/pages/service-order-management/composables/useServiceOrderManagement.ts
-- [ ] T039 [US4] 建立 Excel 匯出組合式函式於 src/pages/service-order-management/composables/useExportExcel.ts
+### 組合式函式實作 - User Story 4
 
-#### Main Pages (依賴 Components 與 Composables)
+- [ ] T049 [US4] 實作 useServiceOrderManagement 組合式函式 `src/pages/service-order-management/composables/useServiceOrderManagement.ts` (查詢參數 ref、呼叫 getServiceOrderList API、分頁邏輯、篩選邏輯、刪除邏輯、狀態更新邏輯、loading 狀態)
+- [ ] T050 [US4] 實作 useExportExcel 組合式函式 `src/pages/service-order-management/composables/useExportExcel.ts` (使用 xlsx 套件，匯出當前畫面資料，檔案命名格式「服務單報表_YYYYMMDD_HHMMSS.xlsx」，包含欄位: 服務單編號、客戶名稱、品牌名稱、款式、內碼、商品數量、金額、狀態、建立日期，單次最多 10,000 筆限制)
+- [ ] T051 [US4] 實作 useDraftAutosave 組合式函式 `src/pages/service-order-management/composables/useDraftAutosave.ts` (使用 localStorage，每 30 秒或欄位失焦時自動儲存，key 格式「serviceOrder_draft_{type}」，包含時間戳記，頁面開啟時檢測並提示恢復，提交成功或放棄時清除，7 天自動過期)
 
-- [ ] T040 [US4] 建立服務單列表查詢主頁面於 src/pages/service-order-management/index.vue
-- [ ] T041 [US4] 建立服務單詳細頁面於 src/pages/service-order-management/detail.vue
+### 頁面實作 - User Story 4
 
-#### Tests for User Story 4 (可並行)
+- [ ] T052 [US4] 建立服務單列表查詢頁面 `src/pages/service-order-management/index.vue` (整合 ServiceOrderTable，篩選條件表單 (服務單類型、客戶名稱、日期範圍、狀態)，分頁元件，Excel 匯出按鈕，新增收購單/寄賣單按鈕，權限控制)
+- [ ] T053 [US4] 建立服務單詳細頁面 `src/pages/service-order-management/detail.vue` (顯示完整服務單資訊，整合 AttachmentViewer，修改歷史顯示，編輯按鈕 (依權限)，狀態更新下拉選單，線上簽名複製連結/重新寄送按鈕)
+- [ ] T054 [US4] 實作服務單狀態轉換驗證 (前端驗證狀態轉換規則: 待處理→已完成/已終止, 已完成→待處理, 已終止為終態不可逆，無效轉換時顯示錯誤提示)
+- [ ] T055 [US4] 實作服務單修改邏輯 (呼叫 updateServiceOrder API，樂觀鎖版本號驗證，並發衝突時顯示「資料已被其他使用者修改，請重新載入」，成功後更新 UI)
+- [ ] T056 [US4] 實作修改歷史追蹤功能 (呼叫 getModificationHistory API，顯示變更欄位、變更前後值、修改時間、修改者，格式化顯示邏輯)
+- [ ] T057 [US4] 實作 Excel 匯出功能整合 (點擊「匯出 Excel」按鈕，檢查當前畫面資料量，若無資料提示「目前無資料可匯出」，若超過 10,000 筆提示「資料量過大，建議縮小篩選範圍」，呼叫 useExportExcel 執行匯出)
 
-- [ ] T042 [P] [US4] 撰寫 ServiceOrderTable 元件測試於 tests/pages/service-order-management/components/ServiceOrderTable.test.ts
-- [ ] T043 [P] [US4] 撰寫 ServiceOrderFilter 元件測試於 tests/pages/service-order-management/components/ServiceOrderFilter.test.ts
-- [ ] T044 [P] [US4] 撰寫 useServiceOrderManagement 組合式函式測試於 tests/pages/service-order-management/composables/useServiceOrderManagement.test.ts
-- [ ] T045 [P] [US4] 撰寫 useExportExcel 組合式函式測試於 tests/pages/service-order-management/composables/useExportExcel.test.ts
-
-**Checkpoint**: 所有用戶故事應獨立運作
-
----
-
-## Phase 7: Polish & Cross-Cutting Concerns
-
-**Purpose**: 跨用戶故事的改進與優化
-
-- [ ] T046 [P] 新增草稿儲存功能至 ServiceOrderForm(LocalStorage,表單變更後 2 秒自動儲存)於 src/pages/service-order-management/components/ServiceOrderForm.vue
-- [ ] T046-1 [P] 撰寫草稿儲存功能測試於 tests/pages/service-order-management/components/ServiceOrderForm.test.ts
-- [ ] T047 [P] 優化錯誤處理與使用者提示訊息
-- [ ] T048 [P] 優化載入狀態與骨架屏
-- [ ] T049 [P] 新增國際化支援(i18n)
-- [ ] T050 程式碼審查與重構
-- [ ] T051 效能優化(大量資料處理、分頁優化)
-- [ ] T052 安全性加固(權限檢查、資料驗證)
-- [ ] T053 執行 quickstart.md 驗證流程
+**Checkpoint**: 所有使用者故事應完全功能且可獨立運作
 
 ---
 
-## Dependencies & Execution Order
+## Phase 7: Polish & Cross-Cutting Concerns (優化與跨切面關注)
 
-### Phase Dependencies
+**Purpose**: 影響多個使用者故事的改進
+
+- [ ] T058 [P] 撰寫 IdCardUploader 元件測試 `tests/pages/service-order-management/components/IdCardUploader.test.ts` (測試檔案上傳、拍照、預覽、OCR 呼叫、重試機制)
+- [ ] T059 [P] 撰寫 SignaturePad 元件測試 `tests/pages/service-order-management/components/SignaturePad.test.ts` (測試簽名板初始化、清除、匯出、驗證)
+- [ ] T060 [P] 撰寫 ProductItemForm 元件測試 `tests/pages/service-order-management/components/ProductItemForm.test.ts` (測試動態新增/刪除商品項目、配件選擇、瑕疵選擇)
+- [ ] T061 [P] 撰寫 ServiceOrderForm 元件測試 `tests/pages/service-order-management/components/ServiceOrderForm.test.ts` (測試表單驗證、提交、收購單/寄賣單模式切換)
+- [ ] T062 [P] 撰寫 ServiceOrderTable 元件測試 `tests/pages/service-order-management/components/ServiceOrderTable.test.ts` (測試列表顯示、排序、分頁、權限按鈕)
+- [ ] T063 [P] 新增國際化支援至 `src/i18n/locales/zh-tw.ts` (所有服務單管理相關的文字翻譯鍵)
+- [ ] T064 程式碼重構與最佳化 (移除重複程式碼、提取共用邏輯、改善可讀性)
+- [ ] T065 效能優化 (大量資料處理、虛擬滾動評估、API 請求快取、debounce 調校)
+- [ ] T066 安全性強化 (敏感資料加密傳輸、XSS 防護、CSRF 防護、權限驗證)
+- [ ] T067 錯誤處理改進 (統一錯誤訊息格式、使用者友善錯誤提示、錯誤邊界元件)
+- [ ] T068 執行 quickstart.md 驗證流程 (依照 quickstart.md 測試指南執行完整功能測試)
+- [ ] T069 [P] 更新專案文件 README.md (新增服務單管理模組說明、路由資訊、權限說明)
+- [ ] T070 [P] 建立使用者指南文件 `docs/service-order-management-user-guide.md` (包含功能介紹、操作流程、常見問題)
+
+---
+
+## Dependencies & Execution Order (依賴關係與執行順序)
+
+### 階段依賴
 
 - **Setup (Phase 1)**: 無依賴 - 可立即開始
-- **Foundational (Phase 2)**: 依賴 Setup 完成 - **阻塞所有用戶故事**
+- **Foundational (Phase 2)**: 依賴 Setup 完成 - 阻塞所有使用者故事
 - **User Stories (Phase 3-6)**: 全部依賴 Foundational 階段完成
-  - 用戶故事可並行進行(如有足夠人力)
-  - 或按優先順序依序進行(P1 → P2)
-- **Polish (Phase 7)**: 依賴所有預期用戶故事完成
+  - 使用者故事可以並行進行 (若有人力配置)
+  - 或按優先級順序執行 (P1 → P2)
+- **Polish (Phase 7)**: 依賴所有期望的使用者故事完成
 
-### User Story Dependencies
+### 使用者故事依賴
 
-- **User Story 1 (P1) - 建立收購單**: Foundational 完成後即可開始 - 無其他故事依賴
-- **User Story 2 (P1) - 建立寄賣單**: 依賴 US1 核心元件(CustomerSearch, CustomerForm, IDCardUpload, SignaturePad),但擴展獨立實作
-- **User Story 3 (P2) - 客戶搜尋**: 依賴 US1 客戶元件,主要為功能優化
-- **User Story 4 (P2) - 查詢管理**: 依賴 US1 與 US2 的資料模型,但查詢功能獨立實作
+- **User Story 1 (P1 - 建立收購單)**: Foundational 完成後可開始 - 無其他故事依賴
+- **User Story 2 (P1 - 建立寄賣單)**: Foundational 完成後可開始 - 與 US1 共用部分元件 (CustomerSearch, CustomerForm, IdCardUploader, SignaturePad) 但可獨立測試
+- **User Story 3 (P2 - 客戶搜尋與選擇)**: Foundational 完成後可開始 - 優化 US1/US2 的客戶選擇流程但可獨立測試
+- **User Story 4 (P2 - 服務單查詢與管理)**: Foundational 完成後可開始 - 依賴 US1/US2 建立的資料進行查詢但可獨立測試
 
-### Within Each User Story
+### 每個使用者故事內
 
-- 核心元件(Components) → 組合式函式(Composables) → 主頁面(Pages)
-- 測試可與實作並行(標記 [P] 的任務)
-- 故事完成後再移至下一優先順序
+- 測試 (若包含) 必須先寫並確保失敗後才實作
+- 元件實作可並行 (標記 [P])
+- 組合式函式實作可並行 (標記 [P])
+- 主要元件與頁面實作在元件與組合式函式完成後進行
+- 故事完成後才移至下一優先級
 
-### Parallel Opportunities
+### 並行機會
 
-- Setup 階段所有標記 [P] 的任務可並行
-- Foundational 階段所有標記 [P] 的任務可並行
-- Foundational 完成後,US1 與 US2 可部分並行(US2 依賴 US1 元件)
-- 每個故事內標記 [P] 的元件可並行開發
-- 每個故事內標記 [P] 的測試可並行執行
-- 不同團隊成員可同時處理不同用戶故事
+- 所有 Setup 任務標記 [P] 可並行執行
+- 所有 Foundational 任務標記 [P] 可並行執行 (在 Phase 2 內)
+- Foundational 階段完成後，所有使用者故事可並行開始 (若團隊人力允許)
+- 每個使用者故事內標記 [P] 的測試可並行執行
+- 每個使用者故事內標記 [P] 的元件可並行執行
+- 每個使用者故事內標記 [P] 的組合式函式可並行執行
+- 不同使用者故事可由不同團隊成員並行處理
 
 ---
 
-## Parallel Example: User Story 1
+## Parallel Example: User Story 1 (建立收購單)
 
 ```bash
-# US1 核心元件可並行開發:
-Task T010: "建立客戶搜尋元件 CustomerSearch.vue"
-Task T011: "建立客戶表單元件 CustomerForm.vue"
-Task T012: "建立身分證上傳元件 IDCardUpload.vue"
-Task T013: "建立觸控簽名板元件 SignaturePad.vue"
+# 同時啟動 User Story 1 的所有測試:
+Task: "建立 useServiceOrderForm 組合式函式測試 tests/pages/service-order-management/composables/useServiceOrderForm.test.ts"
+Task: "建立 useCustomerSearch 組合式函式測試 tests/pages/service-order-management/composables/useCustomerSearch.test.ts"
+Task: "建立 useIdCardRecognition 組合式函式測試 tests/pages/service-order-management/composables/useIdCardRecognition.test.ts"
+Task: "建立 useSignature 組合式函式測試 tests/pages/service-order-management/composables/useSignature.test.ts"
 
-# US1 測試可並行執行:
-Task T019: "CustomerSearch 元件測試"
-Task T020: "CustomerForm 元件測試"
-Task T021: "SignaturePad 元件測試"
-Task T022: "ServiceOrderForm 元件測試"
-Task T023: "useCustomerSearch 測試"
-Task T024: "useServiceOrderForm 測試"
+# 同時啟動 User Story 1 的所有元件:
+Task: "建立客戶搜尋元件 src/pages/service-order-management/components/CustomerSearch.vue"
+Task: "建立客戶表單元件 src/pages/service-order-management/components/CustomerForm.vue"
+Task: "建立身分證上傳元件 src/pages/service-order-management/components/IdCardUploader.vue"
+Task: "建立商品項目表單元件 src/pages/service-order-management/components/ProductItemForm.vue"
+Task: "建立觸控簽名板元件 src/pages/service-order-management/components/SignaturePad.vue"
 ```
 
 ---
 
-## Parallel Example: User Story 4
+## Implementation Strategy (實作策略)
 
-```bash
-# US4 核心元件可並行開發:
-Task T034: "建立服務單列表元件 ServiceOrderTable.vue"
-Task T035: "建立服務單篩選元件 ServiceOrderFilter.vue"
-Task T036: "建立狀態更新元件 StatusUpdateDialog.vue"
-Task T037: "建立修改歷史元件 ModificationHistory.vue"
-
-# US4 測試可並行執行:
-Task T042: "ServiceOrderTable 元件測試"
-Task T043: "ServiceOrderFilter 元件測試"
-Task T044: "useServiceOrderManagement 測試"
-Task T045: "useExportExcel 測試"
-```
-
----
-
-## Implementation Strategy
-
-### MVP First (僅 User Story 1 與 2 - 核心建單功能)
+### MVP First (僅 User Story 1 + 2)
 
 1. 完成 Phase 1: Setup
-2. 完成 Phase 2: Foundational (**CRITICAL** - 阻塞所有故事)
-3. 完成 Phase 3: User Story 1 - 建立收購單
-4. 完成 Phase 4: User Story 2 - 建立寄賣單
-5. **STOP and VALIDATE**: 獨立測試 US1 與 US2
-6. 準備部署/展示
+2. 完成 Phase 2: Foundational (關鍵 - 阻塞所有故事)
+3. 完成 Phase 3: User Story 1 (建立收購單)
+4. 完成 Phase 4: User Story 2 (建立寄賣單)
+5. **停止並驗證**: 獨立測試 User Story 1 與 2
+6. 若就緒則部署/展示
 
-### Incremental Delivery (漸進式交付)
+### 漸進式交付
 
 1. 完成 Setup + Foundational → 基礎就緒
-2. 新增 User Story 1 → 獨立測試 → 部署/展示 (MVP - 收購單!)
-3. 新增 User Story 2 → 獨立測試 → 部署/展示 (MVP - 寄賣單!)
-4. 新增 User Story 3 → 獨立測試 → 部署/展示 (優化客戶搜尋)
-5. 新增 User Story 4 → 獨立測試 → 部署/展示 (完整查詢管理)
-6. 每個故事增加價值而不破壞先前故事
+2. 新增 User Story 1 → 獨立測試 → 部署/展示 (MVP 第一階段!)
+3. 新增 User Story 2 → 獨立測試 → 部署/展示 (MVP 完整!)
+4. 新增 User Story 3 → 獨立測試 → 部署/展示 (優化!)
+5. 新增 User Story 4 → 獨立測試 → 部署/展示 (完整功能!)
+6. 每個故事都增加價值而不破壞先前的故事
 
-### Parallel Team Strategy (並行團隊策略)
+### 並行團隊策略
 
 若有多位開發者:
 
-1. 團隊共同完成 Setup + Foundational
+1. 團隊一起完成 Setup + Foundational
 2. Foundational 完成後:
-   - Developer A: User Story 1 (收購單)
-   - Developer B: User Story 2 核心元件 (配件選擇器、瑕疵選擇器)
-   - Developer C: User Story 4 核心元件 (列表、篩選)
+   - 開發者 A: User Story 1 (建立收購單)
+   - 開發者 B: User Story 2 (建立寄賣單)
+   - 開發者 C: User Story 3 (客戶搜尋與選擇)
+   - 開發者 D: User Story 4 (服務單查詢與管理)
 3. 故事獨立完成並整合
 
 ---
 
-## Task Summary
+## Summary (總結)
 
-### 總任務數: 55
+**總任務數**: 70 個任務
 
-- **Phase 1 (Setup)**: 3 任務
-- **Phase 2 (Foundational)**: 6 任務
-- **Phase 3 (US1 - 建立收購單)**: 15 任務 (9 實作 + 6 測試)
-- **Phase 4 (US2 - 建立寄賣單)**: 6 任務 (4 實作 + 2 測試)
-- **Phase 5 (US3 - 客戶搜尋)**: 4 任務 (2 實作 + 2 測試)
-- **Phase 6 (US4 - 查詢管理)**: 12 任務 (8 實作 + 4 測試)
-- **Phase 7 (Polish)**: 9 任務
+**任務分佈**:
+- Phase 1 (Setup): 5 個任務
+- Phase 2 (Foundational): 7 個任務 (關鍵阻塞階段)
+- Phase 3 (User Story 1 - 建立收購單): 19 個任務 (包含 4 個測試)
+- Phase 4 (User Story 2 - 建立寄賣單): 7 個任務
+- Phase 5 (User Story 3 - 客戶搜尋與選擇): 5 個任務 (包含 2 個測試)
+- Phase 6 (User Story 4 - 服務單查詢與管理): 14 個任務 (包含 3 個測試)
+- Phase 7 (Polish): 13 個任務 (包含 5 個元件測試)
 
-### 並行機會: 26 任務標記為 [P]
+**並行機會**:
+- Setup 階段: 4 個任務可並行 (T002-T005)
+- Foundational 階段: 5 個任務可並行 (T007-T010)
+- User Story 1: 9 個任務可並行 (4 個測試 + 5 個元件)
+- User Story 2: 3 個任務可並行 (3 個元件)
+- User Story 3: 2 個任務可並行 (2 個測試)
+- User Story 4: 5 個任務可並行 (3 個測試 + 2 個元件)
+- Polish 階段: 8 個任務可並行 (5 個元件測試 + 3 個文件)
 
-- Setup: 0
-- Foundational: 5
-- US1: 10 (4 元件 + 6 測試)
-- US2: 2 (2 測試)
-- US3: 2 (2 測試)
-- US4: 6 (4 元件 + 2 測試)
-- Polish: 4
+**獨立測試標準**:
+- User Story 1: 建立完整收購單並驗證資料儲存、合約產生、簽名記錄
+- User Story 2: 建立完整寄賣單並驗證資料儲存、合約產生、簽名記錄
+- User Story 3: 搜尋客戶、選擇客戶、新增客戶並驗證資料填入
+- User Story 4: 查詢服務單、修改服務單、更新狀態、匯出 Excel
 
-### 獨立測試標準
+**建議 MVP 範圍**: User Story 1 + User Story 2 (建立收購單與寄賣單)
 
-- **US1**: 可建立完整收購單(客戶選擇、商品填寫、身分證上傳、簽名)
-- **US2**: 可建立完整寄賣單(包含配件、日期、瑕疵、續約設定)
-- **US3**: 可搜尋客戶並自動填入資料或新增客戶
-- **US4**: 可查詢、查看、修改、匯出服務單
-
-### 建議 MVP 範圍
-
-**僅 User Story 1 與 2** (P1 優先級):
-- Phase 1 (Setup): 3 任務
-- Phase 2 (Foundational): 6 任務
-- Phase 3 (US1): 15 任務
-- Phase 4 (US2): 6 任務
-- **Total MVP**: 30 任務
-
-**預估時程**: 8-10 天 (1 位開發者全職)
+**格式驗證**: 所有 70 個任務均遵循 checklist 格式 (checkbox + ID + 標籤 + 檔案路徑)
 
 ---
 
-## Format Validation ✅
+## Notes (注意事項)
 
-所有任務遵循嚴格的檢查清單格式:
-- ✅ 所有任務以 `- [ ]` 開頭(Markdown checkbox)
-- ✅ 所有任務包含 Task ID (T001-T053)
-- ✅ 並行任務標記 [P]
-- ✅ 用戶故事階段任務標記 [Story] (US1, US2, US3, US4)
-- ✅ 所有任務包含清楚的檔案路徑
-- ✅ Setup 與 Foundational 階段無 [Story] 標記
-- ✅ Polish 階段無 [Story] 標記
-
----
-
-## Notes
-
-- [P] 任務 = 不同檔案、無依賴關係,可並行執行
-- [Story] 標記將任務映射至特定用戶故事,便於追蹤
-- 每個用戶故事應可獨立完成與測試
-- 在每個檢查點停下來驗證故事獨立性
-- 避免: 模糊任務、相同檔案衝突、破壞獨立性的跨故事依賴
-- 提交: 每完成任務或邏輯群組後提交
-- 測試優先: 標記 [P] 的測試可與實作並行或先行編寫
-
----
-
-**開發快樂! 🚀**
+- **[P] 任務**: 不同檔案、無依賴關係，可並行執行
+- **[Story] 標籤**: 將任務對應至特定使用者故事以便追蹤
+- 每個使用者故事應可獨立完成並測試
+- 實作前先驗證測試失敗
+- 每個任務或邏輯群組完成後提交
+- 在任何檢查點停止以獨立驗證故事
+- 避免: 模糊任務、同檔案衝突、破壞獨立性的跨故事依賴
+- OCR 辨識由後端處理 (Azure Vision + Google Gemini)，前端僅負責上傳與顯示結果
+- 身分證明文件為必要附件，每筆服務單建立時必須驗證
+- 線上簽名使用 Dropbox Sign API，發送失敗則服務單狀態設為已終止
+- 服務單支援 1-4 件商品項目，每件商品獨立記錄
+- 客戶資料以快照方式儲存於服務單，修改僅影響該服務單不影響客戶主檔
+- 草稿自動儲存使用 localStorage，每 30 秒或欄位失焦時觸發
+- Excel 匯出單次最多 10,000 筆，超過提示縮小範圍
+- 所有 API 呼叫需處理錯誤並顯示使用者友善訊息
+- 權限控制在 UI 層隱藏無權限按鈕，後端進行二次驗證
