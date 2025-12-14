@@ -634,7 +634,11 @@ interface UpdateStatusRequest {
 
 **權限**: `customer.read`
 
-**說明**: 搜尋客戶資料,支援多種關鍵字搜尋。搜尋邏輯優先順序:身分證字號(精確比對) > 電話(精確比對) > 姓名(模糊搜尋) > Email(模糊搜尋)。若關鍵字符合身分證字號格式(1英文+9數字),則僅以身分證字號搜尋。
+**說明**: 搜尋客戶資料,支援多種關鍵字搜尋。搜尋邏輯優先順序:身分證字號(精確比對) > 電話(精確比對) > 姓名(模糊搜尋) > Email(模糊搜尋)。若關鍵字符合身分證字號格式,則僅以身分證字號搜尋。
+
+**支援的身分證字號格式**:
+1. 台灣國民：1 英文字母 + 9 數字（例如：A123456789）
+2. 外籍人士（無統一證號）：西元出生年月日 8 位數 + 英文姓名第一個字前兩個字母大寫（例如：19900115JO，總長度 10 位）
 
 **查詢參數**:
 ```typescript
@@ -646,8 +650,9 @@ interface CustomerSearchParams {
 
 **請求範例**:
 ```
-GET /customers/search?keyword=A123456789  // 身分證字號搜尋(精確比對)
-GET /customers/search?keyword=0912345678  // 電話搜尋(精確比對)
+GET /customers/search?keyword=A123456789   // 台灣身分證字號搜尋(精確比對)
+GET /customers/search?keyword=19900115JO   // 外籍人士身分證字號搜尋(精確比對)
+GET /customers/search?keyword=0912345678   // 電話搜尋(精確比對)
 GET /customers/search?keyword=王小明      // 姓名搜尋(模糊比對)
 GET /customers/search?keyword=wang        // Email 搜尋(模糊比對)
 ```
@@ -701,18 +706,32 @@ interface CreateCustomerRequest {
   phone: string
   /** Email（可選） */
   email?: string
-  /** 身分證字號 */
+  /** 身分證字號（支援台灣身分證與外籍人士格式） */
   idCardNumber: string
 }
 ```
 
-**請求範例**:
+**身分證字號格式**:
+1. 台灣國民：1 英文字母 + 9 數字（例如：A123456789）
+2. 外籍人士（無統一證號）：西元出生年月日 8 位數 + 英文姓名第一個字前兩個字母大寫（例如：19900115JO，總長度 10 位）
+
+**請求範例（台灣國民）**:
 ```json
 {
   "name": "王小明",
   "phone": "0912345678",
   "email": "wang@example.com",
   "idCardNumber": "A123456789"
+}
+```
+
+**請求範例（外籍人士）**:
+```json
+{
+  "name": "John Doe",
+  "phone": "0987654321",
+  "email": "john@example.com",
+  "idCardNumber": "19900115JO"
 }
 ```
 
@@ -1080,6 +1099,27 @@ interface OCRIDCardRequest {
   "traceId": "abc123xyz"
 }
 ```
+
+**成功回應範例（外籍人士）**:
+```json
+{
+  "success": true,
+  "code": "SUCCESS",
+  "message": "辨識成功",
+  "data": {
+    "name": "John Doe",
+    "idCardNumber": "19900115JO",
+    "confidence": 0.89
+  },
+  "timestamp": "2025-12-14T10:30:00Z",
+  "traceId": "abc123xyz"
+}
+```
+
+**說明**:
+- 對於台灣身分證，辨識結果為標準格式（1 英文字母 + 9 數字）
+- 對於外籍人士居留證，若無統一證號欄項，辨識結果為西元出生年月日 8 位數 + 英文姓名前兩字母大寫（總長度 10 位）
+- confidence 為辨識信心度（0-1），建議低於 0.8 時提示用戶確認
 
 **錯誤回應** (400 - 辨識失敗):
 ```json
