@@ -10,6 +10,7 @@
 
 ```mermaid
 erDiagram
+    ServiceOrder ||--o{ ProductItem : contains
     ServiceOrder ||--o{ Attachment : has
     ServiceOrder ||--o{ SignatureRecord : has
     ServiceOrder ||--o{ ModificationHistory : has
@@ -21,22 +22,27 @@ erDiagram
         string orderType
         string orderSource
         string customerId FK
-        string brandName
-        string style
-        string internalCode
-        int quantity
-        decimal amount
+        decimal totalAmount
         string status
-        string accessories
         date consignmentStartDate
         date consignmentEndDate
-        string defects
         string renewalOption
         timestamp createdAt
         string createdBy
         timestamp updatedAt
         string updatedBy
         int version
+    }
+    
+    ProductItem {
+        string id PK
+        string serviceOrderId FK
+        string brandName
+        string style
+        string internalCode
+        int sequence
+        string accessories
+        string defects
     }
     
     Customer {
@@ -99,22 +105,48 @@ erDiagram
 | `orderType` | Enum | ✅ | 服務單類型 | `CONSIGNMENT`（寄賣）或 `BUYBACK`（收購） | FR-001, FR-010 |
 | `orderSource` | Enum | ✅ | 服務單來源 | `ONLINE`（線上）或 `OFFLINE`（線下） | FR-001, FR-010 |
 | `customerId` | UUID | ✅ | 客戶 ID（外鍵） | 必須為有效的客戶 ID | FR-002, FR-011 |
-| `brandName` | String | ✅ | 品牌名稱 | 長度 1-100 字元 | FR-001, FR-010 |
-| `style` | String | ✅ | 款式 | 長度 1-100 字元 | FR-001, FR-010 |
-| `internalCode` | String | ❌ | 內碼 | 長度 0-50 字元 | FR-001, FR-010 |
-| `quantity` | Integer | ✅ | 商品數量 | 正整數，範圍 1-9999 | FR-002, FR-011 |
-| `amount` | Decimal | ✅ | 金額 | 正數，最多兩位小數 | FR-002, FR-011 |
+| `totalAmount` | Decimal | ✅ | 總金額 | 正數，最多兩位小數 | FR-002, FR-011 |
 | `status` | Enum | ✅ | 服務單狀態 | `PENDING`、`COMPLETED`、`TERMINATED` | FR-032 |
-| `accessories` | JSON | ❌ | 商品配件（僅寄賣單） | 陣列，可選值見下方說明 | FR-013 |
 | `consignmentStartDate` | Date | ❌ | 寄賣起始日期（僅寄賣單） | ISO 8601 格式 | FR-012 |
 | `consignmentEndDate` | Date | ❌ | 寄賣結束日期（僅寄賣單） | ISO 8601 格式，須晚於起始日期 | FR-012 |
-| `defects` | JSON | ❌ | 商品瑕疵處（僅寄賣單） | 陣列，可選值見下方說明 | FR-014 |
 | `renewalOption` | Enum | ❌ | 續約設定（僅寄賣單） | `AUTO_RETRIEVE`、`AUTO_DISCOUNT_10`、`DISCUSS_LATER` | FR-015 |
 | `createdAt` | Timestamp | ✅ | 建立時間 | ISO 8601 格式（UTC） | FR-009, FR-020 |
 | `createdBy` | String | ✅ | 建立者（使用者 ID） | - | FR-009, FR-020 |
 | `updatedAt` | Timestamp | ❌ | 最後更新時間 | ISO 8601 格式（UTC） | FR-009, FR-020 |
 | `updatedBy` | String | ❌ | 最後更新者（使用者 ID） | - | FR-009, FR-020 |
 | `version` | Integer | ✅ | 版本號（樂觀鎖） | 初始值 0，每次更新 +1 | 並發控制 |
+
+**續約設定選項**（`renewalOption`）:
+- `AUTO_RETRIEVE`: 到期自動取回
+- `AUTO_DISCOUNT_10`: 第三個月起自動調降 10%
+- `DISCUSS_LATER`: 屆時討論
+
+**狀態轉換規則**（FR-032）:
+```typescript
+PENDING → COMPLETED ✅
+PENDING → TERMINATED ✅
+COMPLETED → PENDING ✅
+TERMINATED → (任何狀態) ❌ // 終態不可逆
+```
+
+---
+
+### 2. ProductItem（商品項目）
+
+**用途**: 代表服務單中的單一商品項目
+
+**屬性**:
+
+| 欄位名稱 | 型別 | 必填 | 說明 | 驗證規則 | 來源需求 |
+|---------|------|------|------|---------|---------|
+| `id` | UUID | ✅ | 唯一識別碼 | UUID v4 格式 | 系統自動生成 |
+| `serviceOrderId` | UUID | ✅ | 服務單 ID（外鍵） | 必須為有效的服務單 ID | 關聯服務單 |
+| `brandName` | String | ✅ | 品牌名稱 | 長度 1-100 字元 | FR-001, FR-010 |
+| `style` | String | ✅ | 款式 | 長度 1-100 字元 | FR-001, FR-010 |
+| `internalCode` | String | ❌ | 內碼 | 長度 0-50 字元 | FR-001, FR-010 |
+| `sequence` | Integer | ✅ | 商品序號（顯示順序） | 範圍 1-4 | FR-042 |
+| `accessories` | JSON | ❌ | 商品配件（僅寄賣單） | 陣列，可選值見下方說明 | FR-013 |
+| `defects` | JSON | ❌ | 商品瑕疵處（僅寄賣單） | 陣列，可選值見下方說明 | FR-014 |
 
 **商品配件選項**（`accessories`）:
 ```json
@@ -145,7 +177,14 @@ erDiagram
 ]
 ```
 
-**續約設定選項**（`renewalOption`）:
+**約束條件**:
+- 每個服務單必須包含 1-4 個商品項目（FR-042）
+- `sequence` 必須唯一且連續（1, 2, 3, 4）
+- 收購單的商品項目不包含 `accessories` 與 `defects` 欄位
+
+---
+
+### 3. Customer（客戶）
 - `AUTO_RETRIEVE`: 到期自動取回
 - `AUTO_DISCOUNT_10`: 第三個月起自動調降 10%
 - `DISCUSS_LATER`: 屆時討論
@@ -160,7 +199,7 @@ TERMINATED → (任何狀態) ❌ // 終態不可逆
 
 ---
 
-### 2. Customer（客戶）
+### 3. Customer（客戶）
 
 **用途**: 記錄客戶基本資訊
 
@@ -187,7 +226,7 @@ TERMINATED → (任何狀態) ❌ // 終態不可逆
 
 ---
 
-### 3. Attachment（附件）
+### 4. Attachment（附件）
 
 **用途**: 儲存服務單相關文件（身分證明、合約文件等）
 
@@ -216,7 +255,7 @@ TERMINATED → (任何狀態) ❌ // 終態不可逆
 
 ---
 
-### 4. SignatureRecord（簽名記錄）
+### 5. SignatureRecord（簽名記錄）
 
 **用途**: 記錄線下或線上簽名的完整資訊
 
@@ -249,7 +288,7 @@ TERMINATED → (任何狀態) ❌ // 終態不可逆
 
 ---
 
-### 5. ModificationHistory（修改歷史）
+### 6. ModificationHistory（修改歷史）
 
 **用途**: 追蹤服務單的所有變更，提供稽核與回溯能力
 
@@ -285,13 +324,15 @@ TERMINATED → (任何狀態) ❌ // 終態不可逆
 #### 服務單表單
 1. **必填欄位**：
    - 客戶資料（選擇或新增）
-   - 品牌名稱、款式、商品數量、金額
+   - 至少一個商品項目
+   - 每個商品項目的品牌名稱與款式
+   - 總金額
    - 身分證明文件上傳
    - 寄賣單額外必填：寄賣日期、續約設定
 
 2. **格式驗證**：
-   - 金額：正數，最多兩位小數
-   - 商品數量：正整數，1-9999
+   - 總金額：正數，最多兩位小數
+   - 商品項目數量：1-4 件
    - 寄賣日期：起始日期 < 結束日期
 
 3. **檔案驗證**：
@@ -332,6 +373,12 @@ ALTER TABLE service_orders
 ADD CONSTRAINT fk_customer 
 FOREIGN KEY (customer_id) REFERENCES customers(id);
 
+-- ProductItem → ServiceOrder
+ALTER TABLE product_items 
+ADD CONSTRAINT fk_service_order 
+FOREIGN KEY (service_order_id) REFERENCES service_orders(id) 
+ON DELETE CASCADE;
+
 -- Attachment → ServiceOrder
 ALTER TABLE attachments 
 ADD CONSTRAINT fk_service_order 
@@ -359,6 +406,10 @@ CREATE INDEX idx_customer_id ON service_orders(customer_id);
 CREATE INDEX idx_status ON service_orders(status);
 CREATE INDEX idx_created_at ON service_orders(created_at);
 CREATE INDEX idx_order_type ON service_orders(order_type);
+
+-- 商品項目查詢索引
+CREATE INDEX idx_product_item_order_id ON product_items(service_order_id);
+CREATE INDEX idx_product_item_sequence ON product_items(service_order_id, sequence);
 
 -- 客戶搜尋索引
 CREATE INDEX idx_customer_name ON customers(name);
@@ -402,6 +453,26 @@ export enum RenewalOption {
   DISCUSS_LATER = "discuss_later"        // 屆時討論
 }
 
+/** 商品項目實體 */
+export interface ProductItem {
+  /** 唯一識別碼（UUID） */
+  id: string
+  /** 服務單 ID */
+  serviceOrderId: string
+  /** 品牌名稱 */
+  brandName: string
+  /** 款式 */
+  style: string
+  /** 內碼 */
+  internalCode?: string
+  /** 商品序號（顯示順序，1-4） */
+  sequence: number
+  /** 商品配件（僅寄賣單） */
+  accessories?: string[]
+  /** 商品瑕疵處（僅寄賣單） */
+  defects?: string[]
+}
+
 /** 服務單實體 */
 export interface ServiceOrder {
   /** 唯一識別碼（UUID） */
@@ -414,26 +485,16 @@ export interface ServiceOrder {
   orderSource: ServiceOrderSource
   /** 客戶 ID */
   customerId: string
-  /** 品牌名稱 */
-  brandName: string
-  /** 款式 */
-  style: string
-  /** 內碼 */
-  internalCode?: string
-  /** 商品數量 */
-  quantity: number
-  /** 金額 */
-  amount: number
+  /** 商品項目列表（1-4 件） */
+  productItems: ProductItem[]
+  /** 總金額 */
+  totalAmount: number
   /** 服務單狀態 */
   status: ServiceOrderStatus
-  /** 商品配件（僅寄賣單） */
-  accessories?: string[]
   /** 寄賣起始日期（僅寄賣單，ISO 8601） */
   consignmentStartDate?: string
   /** 寄賣結束日期（僅寄賣單，ISO 8601） */
   consignmentEndDate?: string
-  /** 商品瑕疵處（僅寄賣單） */
-  defects?: string[]
   /** 續約設定（僅寄賣單） */
   renewalOption?: RenewalOption
   /** 建立時間（ISO 8601, UTC） */
@@ -531,8 +592,14 @@ export interface ModificationHistory {
 
 本資料模型涵蓋服務單管理的所有核心實體與關聯關係：
 
-✅ **5 個核心實體**：ServiceOrder、Customer、Attachment、SignatureRecord、ModificationHistory  
+✅ **6 個核心實體**：ServiceOrder、ProductItem、Customer、Attachment、SignatureRecord、ModificationHistory  
 ✅ **完整屬性定義**：包含型別、必填性、驗證規則、來源需求  
 ✅ **清楚的關聯關係**：外鍵約束與索引建議  
-✅ **業務規則實作**：狀態轉換、並發控制、資料驗證  
+✅ **業務規則實作**：狀態轉換、並發控制、資料驗證、多商品項目管理（1-4 件）  
 ✅ **TypeScript 型別定義**：可直接用於前端開發
+
+**重要變更說明**：
+- 服務單支援多商品項目（1-4 件），每個商品項目包含品牌、款式、內碼
+- 寄賣單的每個商品項目可獨立記錄配件與瑕疵
+- 服務單層級包含總金額、寄賣日期與續約設定
+- 商品項目透過 sequence 欄位維持顯示順序

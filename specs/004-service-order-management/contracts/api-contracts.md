@@ -214,17 +214,28 @@ interface ServiceOrderListParams {
       "email": "wang@example.com",
       "idCardNumber": "A123456789"
     },
-    "brandName": "CHANEL",
-    "style": "Classic Flap",
-    "internalCode": "ABC123",
-    "quantity": 1,
-    "amount": 50000.00,
-    "status": "pending",
-    "accessories": ["box", "dustBag", "card"],
+    "productItems": [
+      {
+        "sequence": 1,
+        "brandName": "CHANEL",
+        "style": "Classic Flap",
+        "internalCode": "ABC123",
+        "accessories": ["box", "dustBag", "card"],
+        "defects": ["cornerWear"]
+      },
+      {
+        "sequence": 2,
+        "brandName": "LV",
+        "style": "Neverfull MM",
+        "accessories": ["dustBag"],
+        "defects": []
+      }
+    ],
+    "totalAmount": 50000.00,
     "consignmentStartDate": "2025-12-14",
     "consignmentEndDate": "2026-03-14",
-    "defects": ["cornerWear"],
     "renewalOption": "auto_retrieve",
+    "status": "pending",
     "createdAt": "2025-12-14T02:30:00Z",
     "createdBy": "user123",
     "updatedAt": null,
@@ -258,6 +269,21 @@ interface ServiceOrderListParams {
 
 **請求 Body**:
 ```typescript
+interface ProductItem {
+  /** 品牌名稱 */
+  brandName: string
+  /** 款式 */
+  style: string
+  /** 內碼（可選） */
+  internalCode?: string
+  /** 商品序號(1-4) */
+  sequence: number
+  /** 商品配件（僅寄賣單） */
+  accessories?: string[]
+  /** 商品瑕疵處（僅寄賣單） */
+  defects?: string[]
+}
+
 interface CreateServiceOrderRequest {
   /** 服務單類型 */
   orderType: "consignment" | "buyback"
@@ -265,24 +291,14 @@ interface CreateServiceOrderRequest {
   orderSource: "online" | "offline"
   /** 客戶 ID */
   customerId: string
-  /** 品牌名稱 */
-  brandName: string
-  /** 款式 */
-  style: string
-  /** 內碼（可選） */
-  internalCode?: string
-  /** 商品數量 */
-  quantity: number
-  /** 金額 */
-  amount: number
-  /** 商品配件（僅寄賣單） */
-  accessories?: string[]
+  /** 商品項目列表(1-4件) */
+  productItems: ProductItem[]
+  /** 總金額 */
+  totalAmount: number
   /** 寄賣起始日期（僅寄賣單，ISO 8601） */
   consignmentStartDate?: string
   /** 寄賣結束日期（僅寄賣單，ISO 8601） */
   consignmentEndDate?: string
-  /** 商品瑕疵處（僅寄賣單） */
-  defects?: string[]
   /** 續約設定（僅寄賣單） */
   renewalOption?: "auto_retrieve" | "auto_discount_10" | "discuss_later"
 }
@@ -294,15 +310,26 @@ interface CreateServiceOrderRequest {
   "orderType": "consignment",
   "orderSource": "offline",
   "customerId": "660e8400-e29b-41d4-a716-446655440001",
-  "brandName": "CHANEL",
-  "style": "Classic Flap",
-  "internalCode": "ABC123",
-  "quantity": 1,
-  "amount": 50000.00,
-  "accessories": ["box", "dustBag", "card"],
+  "productItems": [
+    {
+      "sequence": 1,
+      "brandName": "CHANEL",
+      "style": "Classic Flap",
+      "internalCode": "ABC123",
+      "accessories": ["box", "dustBag", "card"],
+      "defects": ["cornerWear"]
+    },
+    {
+      "sequence": 2,
+      "brandName": "LV",
+      "style": "Neverfull MM",
+      "accessories": ["dustBag"],
+      "defects": []
+    }
+  ],
+  "totalAmount": 50000.00,
   "consignmentStartDate": "2025-12-14",
   "consignmentEndDate": "2026-03-14",
-  "defects": ["cornerWear"],
   "renewalOption": "auto_retrieve"
 }
 ```
@@ -319,17 +346,28 @@ interface CreateServiceOrderRequest {
     "orderType": "consignment",
     "orderSource": "offline",
     "customerId": "660e8400-e29b-41d4-a716-446655440001",
-    "brandName": "CHANEL",
-    "style": "Classic Flap",
-    "internalCode": "ABC123",
-    "quantity": 1,
-    "amount": 50000.00,
-    "status": "pending",
-    "accessories": ["box", "dustBag", "card"],
+    "productItems": [
+      {
+        "sequence": 1,
+        "brandName": "CHANEL",
+        "style": "Classic Flap",
+        "internalCode": "ABC123",
+        "accessories": ["box", "dustBag", "card"],
+        "defects": ["cornerWear"]
+      },
+      {
+        "sequence": 2,
+        "brandName": "LV",
+        "style": "Neverfull MM",
+        "accessories": ["dustBag"],
+        "defects": []
+      }
+    ],
+    "totalAmount": 50000.00,
     "consignmentStartDate": "2025-12-14",
     "consignmentEndDate": "2026-03-14",
-    "defects": ["cornerWear"],
     "renewalOption": "auto_retrieve",
+    "status": "pending",
     "createdAt": "2025-12-14T02:30:00Z",
     "createdBy": "user123",
     "updatedAt": null,
@@ -367,24 +405,14 @@ interface CreateServiceOrderRequest {
 **請求 Body**:
 ```typescript
 interface UpdateServiceOrderRequest {
-  /** 品牌名稱 */
-  brandName: string
-  /** 款式 */
-  style: string
-  /** 內碼（可選） */
-  internalCode?: string
-  /** 商品數量 */
-  quantity: number
-  /** 金額 */
-  amount: number
-  /** 商品配件（僅寄賣單） */
-  accessories?: string[]
+  /** 商品項目列表(1-4件) */
+  productItems: ProductItem[]
+  /** 總金額 */
+  totalAmount: number
   /** 寄賣起始日期（僅寄賣單，ISO 8601） */
   consignmentStartDate?: string
   /** 寄賣結束日期（僅寄賣單，ISO 8601） */
   consignmentEndDate?: string
-  /** 商品瑕疵處（僅寄賣單） */
-  defects?: string[]
   /** 續約設定（僅寄賣單） */
   renewalOption?: "auto_retrieve" | "auto_discount_10" | "discuss_later"
   /** 版本號（樂觀鎖） */
@@ -395,15 +423,26 @@ interface UpdateServiceOrderRequest {
 **請求範例**:
 ```json
 {
-  "brandName": "CHANEL",
-  "style": "Classic Flap",
-  "internalCode": "ABC123",
-  "quantity": 1,
-  "amount": 55000.00,
-  "accessories": ["box", "dustBag", "card"],
+  "productItems": [
+    {
+      "sequence": 1,
+      "brandName": "CHANEL",
+      "style": "Classic Flap",
+      "internalCode": "ABC123",
+      "accessories": ["box", "dustBag", "card"],
+      "defects": ["cornerWear"]
+    },
+    {
+      "sequence": 2,
+      "brandName": "LV",
+      "style": "Neverfull MM",
+      "accessories": ["dustBag"],
+      "defects": []
+    }
+  ],
+  "totalAmount": 55000.00,
   "consignmentStartDate": "2025-12-14",
   "consignmentEndDate": "2026-03-14",
-  "defects": ["cornerWear"],
   "renewalOption": "auto_retrieve",
   "version": 0
 }
@@ -418,7 +457,7 @@ interface UpdateServiceOrderRequest {
   "data": {
     "id": "550e8400-e29b-41d4-a716-446655440000",
     "orderNumber": "CS20251214001",
-    "amount": 55000.00,
+    "totalAmount": 55000.00,
     "updatedAt": "2025-12-14T03:00:00Z",
     "updatedBy": "user123",
     "version": 1
@@ -555,7 +594,7 @@ interface UpdateStatusRequest {
     {
       "id": "770e8400-e29b-41d4-a716-446655440002",
       "serviceOrderId": "550e8400-e29b-41d4-a716-446655440000",
-      "fieldName": "amount",
+      "fieldName": "totalAmount",
       "oldValue": "50000.00",
       "newValue": "55000.00",
       "modifiedAt": "2025-12-14T03:00:00Z",
