@@ -1,4 +1,4 @@
-import type { PagedApiResponse } from "types/api-paged-response"
+import type { PagedApiResponse } from "types/api"
 import type {
   CreatePermissionDto,
   Permission,

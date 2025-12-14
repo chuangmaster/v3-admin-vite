@@ -1,4 +1,4 @@
-import type { PagedApiResponse } from "types/api-paged-response"
+import type { PagedApiResponse } from "types/api"
 import type { Permission, PermissionUsage } from "@/pages/permission-management/types"
 import { vi } from "vitest"
 

@@ -1,6 +1,7 @@
 /** 模拟接口响应数据 */
-const SELECT_RESPONSE_DATA = {
-  code: 0,
+const SELECT_RESPONSE_DATA: ApiResponse<Array<{ label: string, value: number, disabled?: boolean }>> = {
+  success: true,
+  code: "0",
   data: [
     {
       label: "苹果",
@@ -16,7 +17,9 @@ const SELECT_RESPONSE_DATA = {
       disabled: true
     }
   ],
-  message: "获取 Select 数据成功"
+  message: "获取 Select 数据成功",
+  timestamp: new Date().toISOString(),
+  traceId: "demo-trace-id"
 }
 
 const ERROR_MESSAGE = "接口发生错误"
