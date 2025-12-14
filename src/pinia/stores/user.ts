@@ -27,11 +27,11 @@ export const useUserStore = defineStore("user", () => {
   // 获取用户详情
   const getInfo = async () => {
     const { data } = await getCurrentUserApi()
-    username.value = data.username
+    username.value = data?.username || ""
     // 验证返回的 roles 是否为一个非空数组（保留用於向後兼容）
-    roles.value = data.roles ?? []
+    roles.value = data?.roles ?? []
     // 验证返回的 permissions 是否为一个非空数组，否则塞入一个没有任何作用的默认权限，防止路由守卫逻辑进入无限循环
-    permissions.value = data.permissions?.length > 0 ? data.permissions : routerConfig.defaultPermissions
+    permissions.value = (data?.permissions?.length ?? 0) > 0 ? data!.permissions : routerConfig.defaultPermissions
   }
 
   // 模拟角色变化

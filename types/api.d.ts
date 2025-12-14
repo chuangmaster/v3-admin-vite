@@ -2,7 +2,7 @@
  * API 統一回應介面
  * 所有 API 回應都應遵循此格式
  */
-interface ApiResponse<T = any> {
+export interface ApiResponse<T = any> {
   /** 操作是否成功 */
   success: boolean
   /** 業務邏輯代碼 */
@@ -21,11 +21,29 @@ interface ApiResponse<T = any> {
  * 分頁 API 回應介面
  * 繼承 ApiResponse，額外包含分頁資訊
  */
-interface PagedApiResponse<T> extends ApiResponse<T> {
+export interface PagedApiResponse<T> extends ApiResponse<T> {
   /** 當前頁碼 */
   pageNumber: number
   /** 每頁筆數 */
   pageSize: number
   /** 總筆數 */
   totalCount: number
+}
+
+// 保留全域型別宣告以向後兼容
+declare global {
+  interface ApiResponse<T = any> {
+    success: boolean
+    code: string
+    message: string
+    data: T | null
+    timestamp: string
+    traceId: string
+  }
+
+  interface PagedApiResponse<T> extends ApiResponse<T> {
+    pageNumber: number
+    pageSize: number
+    totalCount: number
+  }
 }
