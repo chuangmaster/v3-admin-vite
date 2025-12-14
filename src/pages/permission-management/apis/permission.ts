@@ -1,6 +1,5 @@
 import type { PagedApiResponse } from "types/api-paged-response"
 import type {
-  ApiResponse,
   CreatePermissionDto,
   Permission,
   PermissionQuery,

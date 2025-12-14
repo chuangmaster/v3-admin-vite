@@ -3,8 +3,6 @@
  * @module @/pages/user-management/apis/user-roles
  */
 
-import type { ApiResponse } from "../types"
-
 import type { AssignUserRoleRequest, UserRole } from "@/pages/role-management/types"
 
 import { request } from "@/http/axios"

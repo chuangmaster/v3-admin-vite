@@ -7,6 +7,6 @@ export interface LoginRequestData {
   code: string
 }
 
-export type CaptchaResponseData = ApiResponseData<string>
+export type CaptchaResponseData = ApiResponse<string>
 
-export type LoginResponseData = ApiResponseData<{ token: string }>
+export type LoginResponseData = ApiResponse<{ token: string }>
