@@ -37,7 +37,7 @@ description: "Task list for Service Order Management feature implementation"
 **⚠️ CRITICAL**: 此階段未完成前,任何用戶故事都無法開始
 
 - [ ] T004 定義 TypeScript 型別於 src/pages/service-order-management/types.ts
-- [ ] T005 [P] 建立 API 服務層於 src/pages/service-order-management/apis/service-order.ts
+- [ ] T005 [P] 建立 API 服務層於 src/pages/service-order-management/apis/service-order.ts (註:服務單編號由後端自動生成,前端無需處理編號生成邏輯)
 - [ ] T006 [P] 建立客戶 API 服務層於 src/pages/service-order-management/apis/customer.ts
 - [ ] T007 [P] 建立附件 API 服務層於 src/pages/service-order-management/apis/attachment.ts
 - [ ] T008 [P] 建立簽名 API 服務層於 src/pages/service-order-management/apis/signature.ts
@@ -131,6 +131,7 @@ description: "Task list for Service Order Management feature implementation"
 #### Tests for User Story 3 (可並行)
 
 - [ ] T033 [P] [US3] 撰寫客戶搜尋進階功能測試於 tests/pages/service-order-management/composables/useCustomerSearch.test.ts
+- [ ] T033-1 [P] [US3] 撰寫獨立新增客戶流程整合測試於 tests/pages/service-order-management/components/CustomerForm.test.ts
 
 **Checkpoint**: 所有客戶管理功能應完全可用
 
@@ -176,7 +177,8 @@ description: "Task list for Service Order Management feature implementation"
 
 **Purpose**: 跨用戶故事的改進與優化
 
-- [ ] T046 [P] 新增草稿儲存功能至 ServiceOrderForm(LocalStorage)於 src/pages/service-order-management/components/ServiceOrderForm.vue
+- [ ] T046 [P] 新增草稿儲存功能至 ServiceOrderForm(LocalStorage,表單變更後 2 秒自動儲存)於 src/pages/service-order-management/components/ServiceOrderForm.vue
+- [ ] T046-1 [P] 撰寫草稿儲存功能測試於 tests/pages/service-order-management/components/ServiceOrderForm.test.ts
 - [ ] T047 [P] 優化錯誤處理與使用者提示訊息
 - [ ] T048 [P] 優化載入狀態與骨架屏
 - [ ] T049 [P] 新增國際化支援(i18n)
@@ -295,25 +297,25 @@ Task T045: "useExportExcel 測試"
 
 ## Task Summary
 
-### 總任務數: 53
+### 總任務數: 55
 
 - **Phase 1 (Setup)**: 3 任務
 - **Phase 2 (Foundational)**: 6 任務
 - **Phase 3 (US1 - 建立收購單)**: 15 任務 (9 實作 + 6 測試)
 - **Phase 4 (US2 - 建立寄賣單)**: 6 任務 (4 實作 + 2 測試)
-- **Phase 5 (US3 - 客戶搜尋)**: 3 任務 (2 實作 + 1 測試)
+- **Phase 5 (US3 - 客戶搜尋)**: 4 任務 (2 實作 + 2 測試)
 - **Phase 6 (US4 - 查詢管理)**: 12 任務 (8 實作 + 4 測試)
-- **Phase 7 (Polish)**: 8 任務
+- **Phase 7 (Polish)**: 9 任務
 
-### 並行機會: 24 任務標記為 [P]
+### 並行機會: 26 任務標記為 [P]
 
 - Setup: 0
 - Foundational: 5
 - US1: 10 (4 元件 + 6 測試)
 - US2: 2 (2 測試)
-- US3: 1 (1 測試)
+- US3: 2 (2 測試)
 - US4: 6 (4 元件 + 2 測試)
-- Polish: 3
+- Polish: 4
 
 ### 獨立測試標準
 
