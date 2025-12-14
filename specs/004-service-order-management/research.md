@@ -27,34 +27,40 @@
 ### 2. 身分證自動辨識技術
 
 #### 決策
-採用第三方 OCR 服務（如 Google Cloud Vision API、Azure Computer Vision 或開源的 Tesseract.js）進行身分證文字辨識。
+採用**後端處理方案**：身分證圖片上傳後，交由後端透過 **Azure Computer Vision + Google Gemini** 處理 OCR 辨識，前端不需要額外處理辨識邏輯。
 
 #### 理由
 - **準確率需求**：目標達到 85% 以上準確率（規格 SC-002）
-- **成本考量**：優先選擇具有免費額度的雲端服務或開源方案
-- **實作簡易性**：避免自建 OCR 模型，降低複雜度
-- **隱私考量**：需確保身分證圖片不會永久儲存於第三方服務
+- **前端簡化**：前端僅負責檔案上傳，無需整合 OCR 套件，降低前端複雜度與打包體積
+- **後端專業處理**：Azure Computer Vision 與 Google Gemini 準確率更高，適合生產環境
+- **隱私與安全**：後端可統一管理身分證圖片的儲存與存取權限
 
-#### 技術選項比較
+#### 前端職責
+1. **檔案上傳**：使用 Element Plus el-upload 元件上傳身分證圖片
+2. **觸發辨識**：點擊「自動辨識」按鈕（⚡️）後，呼叫後端 OCR API
+3. **顯示結果**：接收後端回傳的辨識結果（姓名、身分證字號），自動填入表單
+4. **錯誤處理**：若辨識失敗，提示「辨識失敗，請重新拍攝或手動輸入」
 
-| 方案 | 優點 | 缺點 | 推薦度 |
-|------|------|------|--------|
-| **Google Cloud Vision API** | 準確率高、支援繁體中文、API 簡單 | 需付費（超過免費額度）、依賴外部服務 | ⭐⭐⭐⭐ |
-| **Azure Computer Vision** | 準確率高、整合 Azure 生態系 | 需付費、需 Azure 帳號 | ⭐⭐⭐ |
-| **Tesseract.js** | 開源免費、可離線執行、隱私性佳 | 準確率較低、需訓練資料 | ⭐⭐⭐⭐⭐ |
-| **自建 OCR 模型** | 客製化程度高 | 開發成本極高、維護困難 | ⭐ |
+#### API 整合（參考 contracts/api-contracts.md）
+- **端點**: `POST /ocr/id-card`
+- **請求**: multipart/form-data（檔案上傳）
+- **回應**:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "name": "王小明",
+      "idCardNumber": "A123456789",
+      "confidence": 0.92
+    }
+  }
+  ```
 
-#### 最終選擇
-**Tesseract.js** + **預處理優化**
-
-**實作策略**：
-1. 前端上傳圖片前進行預處理（灰階化、對比增強、去噪）
-2. 使用 Tesseract.js 進行文字辨識
-3. 使用正則表達式解析辨識結果（姓名、身分證字號等）
-4. 若準確率不足，提供手動修正與訓練資料回饋機制
-
-**替代方案**：
-- 若 Tesseract.js 準確率無法達標，備案為整合 Google Cloud Vision API（需評估成本）
+#### 替代方案（已拒絕）
+- **方案 A**：前端使用 Tesseract.js 進行 OCR
+  - **拒絕原因**：準確率較低（需訓練資料），增加前端複雜度與打包體積
+- **方案 B**：前端直接呼叫第三方 OCR API（如 Google Cloud Vision）
+  - **拒絕原因**：暴露 API Key 於前端不安全，且無法統一管理身分證圖片
 
 ---
 
@@ -304,7 +310,7 @@ export const SERVICE_ORDER_PERMISSIONS = {
 
 | 風險 | 影響 | 機率 | 緩解策略 |
 |------|------|------|----------|
-| OCR 準確率不足 | 使用者體驗差，需大量手動修正 | 中 | 提供手動修正功能、優化圖片預處理、備案使用雲端 OCR |
+| 後端 OCR API 準確率不足或延遲 | 使用者體驗差，需大量手動修正 | 中 | 提供手動修正功能、前端先實作手動輸入，後端 API 完成後再整合 |
 | Dropbox Sign API 不穩定 | 線上簽名功能失效 | 低 | 提供線下簽名替代方案、實作重試機制 |
 | 大量資料查詢效能問題 | 查詢速度慢於 2 秒 | 中 | 後端索引優化、前端分頁、限制查詢範圍 |
 | 觸控簽名在特定裝置失效 | 線下簽名功能無法使用 | 低 | 裝置相容性測試、提供降級方案（鍵盤輸入） |
@@ -320,7 +326,8 @@ export const SERVICE_ORDER_PERMISSIONS = {
 - `.specify/memory/plan-instruction.md` - 開發規範
 
 ### 外部技術文件
-- [Tesseract.js 官方文件](https://tesseract.projectnaptha.com/)
+- [Azure Computer Vision 官方文件](https://learn.microsoft.com/azure/ai-services/computer-vision/)
+- [Google Gemini API 文件](https://ai.google.dev/)
 - [Dropbox Sign API](https://developers.hellosign.com/)
 - [signature_pad](https://github.com/szimek/signature_pad)
 - [SheetJS (xlsx)](https://docs.sheetjs.com/)
@@ -333,7 +340,7 @@ export const SERVICE_ORDER_PERMISSIONS = {
 所有技術不明確項目已完成研究，主要決策如下：
 
 1. ✅ **後端 API 契約**：Phase 1 定義 OpenAPI 規格
-2. ✅ **OCR 技術**：Tesseract.js（備案：Google Cloud Vision）
+2. ✅ **OCR 技術**：後端處理（Azure Vision + Google Gemini），前端僅負責上傳
 3. ✅ **線上簽名**：Dropbox Sign API
 4. ✅ **觸控簽名**：signature_pad
 5. ✅ **Excel 匯出**：SheetJS（參考既有實作）

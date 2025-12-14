@@ -65,7 +65,6 @@
 | HTTP 客戶端 | Axios | 最新穩定版 |
 | 工具函式 | Lodash-es | 最新穩定版 |
 | 測試框架 | Vitest | 最新穩定版 |
-| OCR | Tesseract.js | 最新穩定版 |
 | 簽名板 | signature_pad | 最新穩定版 |
 | Excel 匯出 | SheetJS (xlsx) | 最新穩定版 |
 
@@ -86,14 +85,13 @@ src/pages/service-order-management/
 │   ├── ServiceOrderTable.vue         # 服務單列表元件
 │   ├── CustomerSearch.vue            # 客戶搜尋元件
 │   ├── CustomerForm.vue              # 客戶表單元件
-│   ├── IDCardUpload.vue              # 身分證明上傳與辨識元件
+│   ├── IDCardUpload.vue              # 身分證明上傳元件（呼叫後端 OCR API）
 │   ├── SignaturePad.vue              # 觸控簽名板元件
 │   └── AccessoriesSelector.vue       # 商品配件選擇器元件
 └── composables/
     ├── useServiceOrderManagement.ts  # 服務單列表管理
     ├── useServiceOrderForm.ts        # 服務單表單邏輯
     ├── useCustomerSearch.ts          # 客戶搜尋邏輯
-    ├── useIDCardOCR.ts               # 身分證辨識邏輯
     ├── useSignature.ts               # 簽名處理邏輯
     └── useExportExcel.ts             # Excel 匯出邏輯
 ```
@@ -108,8 +106,8 @@ src/pages/service-order-management/
 # 安裝依賴
 pnpm install
 
-# 安裝新增套件（OCR、簽名板、Excel）
-pnpm add tesseract.js signature_pad xlsx
+# 安裝新增套件（簽名板、Excel）
+pnpm add signature_pad xlsx
 
 # 啟動開發伺服器
 pnpm dev
@@ -125,7 +123,7 @@ pnpm dev
 #### Phase 2: 核心元件（第 3-5 天）
 4. ✅ 客戶搜尋元件（`CustomerSearch.vue` + `useCustomerSearch.ts`）
 5. ✅ 客戶表單元件（`CustomerForm.vue`）
-6. ✅ 身分證上傳與辨識（`IDCardUpload.vue` + `useIDCardOCR.ts`）
+6. ✅ 身分證上傳元件（`IDCardUpload.vue`，OCR 由後端處理）
 7. ✅ 簽名板元件（`SignaturePad.vue` + `useSignature.ts`）
 8. ✅ 商品配件選擇器（`AccessoriesSelector.vue`）
 
@@ -208,11 +206,11 @@ export function useCustomerSearch() {
 
 ---
 
-### 2. IDCardUpload.vue - 身分證上傳與辨識元件
+### 2. IDCardUpload.vue - 身分證上傳元件
 
 **職責**:
 - 支援檔案上傳與相機拍照
-- 整合 Tesseract.js 進行 OCR 辨識
+- 呼叫後端 OCR API 進行身分證辨識（Azure Vision + Google Gemini）
 - 顯示辨識結果並自動填入表單
 - 比對客戶資料一致性
 
@@ -222,6 +220,7 @@ export function useCustomerSearch() {
   <IDCardUpload 
     :customer="selectedCustomer"
     @recognized="handleIDCardRecognized" 
+    @upload-success="handleUploadSuccess"
   />
 </template>
 
@@ -230,41 +229,51 @@ function handleIDCardRecognized(data: { name: string; idCardNumber: string }) {
   console.log("辨識結果:", data)
   // 自動填入表單
 }
+
+function handleUploadSuccess(fileUrl: string) {
+  console.log("檔案上傳成功:", fileUrl)
+}
 </script>
 ```
 
-**組合式函式**: `useIDCardOCR.ts`
-```typescript
-import Tesseract from "tesseract.js"
+**實作重點**:
+1. **檔案上傳**（使用 Element Plus el-upload）
+2. **觸發 OCR API**：
+   ```typescript
+   async function recognizeIDCard(file: File) {
+     const formData = new FormData()
+     formData.append('file', file)
+     
+     const response = await request({
+       url: '/ocr/id-card',
+       method: 'POST',
+       data: formData,
+       headers: { 'Content-Type': 'multipart/form-data' }
+     })
+     
+     if (response.success && response.data) {
+       emit('recognized', {
+         name: response.data.name,
+         idCardNumber: response.data.idCardNumber
+       })
+     } else {
+       ElMessage.error('辨識失敗，請重新拍攝或手動輸入')
+     }
+   }
+   ```
+3. **客戶資料比對**（若已選擇客戶）：
+   ```typescript
+   if (selectedCustomer.value) {
+     const isMatched = 
+       recognizedData.idCardNumber === selectedCustomer.value.idCardNumber
+     
+     if (!isMatched) {
+       ElMessage.warning('身分證資料與選擇的客戶不一致，請確認')
+     }
+   }
+   ```
 
-export function useIDCardOCR() {
-  const loading = ref(false)
-  const result = ref<{ name: string; idCardNumber: string } | null>(null)
-  
-  async function recognize(file: File) {
-    loading.value = true
-    try {
-      const { data } = await Tesseract.recognize(file, "chi_tra+eng")
-      const text = data.text
-      
-      // 解析姓名與身分證字號（正則表達式）
-      const nameMatch = text.match(/姓名[:：]?\s*([^\n]+)/)
-      const idMatch = text.match(/[A-Z]\d{9}/)
-      
-      result.value = {
-        name: nameMatch?.[1]?.trim() || "",
-        idCardNumber: idMatch?.[0] || ""
-      }
-    } catch (error) {
-      ElMessage.error("辨識失敗，請重新拍攝或手動輸入")
-    } finally {
-      loading.value = false
-    }
-  }
-  
-  return { loading, result, recognize }
-}
-```
+**相關 API**: `POST /ocr/id-card`（參考 contracts/api-contracts.md）
 
 ---
 
@@ -328,7 +337,7 @@ export function useSignature(canvasRef: Ref<HTMLCanvasElement | null>) {
 ### 4. ServiceOrderForm.vue - 服務單表單元件
 
 **職責**:
-- 整合客戶搜尋、身分證上傳、簽名板
+- 整合客戶搜尋、身分證上傳（OCR 由後端處理）、簽名板
 - 表單驗證與提交
 - 支援新增與編輯模式
 
@@ -519,7 +528,13 @@ describe("CustomerSearch.vue", () => {
 
 ### Q1: 如何測試 OCR 功能？
 
-**A**: 準備測試用身分證圖片（確保清晰、角度正確），在開發環境測試辨識準確率。若準確率不足，調整圖片預處理參數。
+**A**: OCR 功能由後端處理（Azure Vision + Google Gemini），前端僅需測試：
+1. 檔案上傳功能是否正常
+2. 呼叫 `/ocr/id-card` API 是否成功
+3. 接收辨識結果後是否正確填入表單
+4. 辨識失敗時是否顯示錯誤訊息
+
+可使用 Mock API 模擬後端回應進行前端測試。
 
 ### Q2: 線上簽名整合需要後端支援嗎？
 
@@ -554,7 +569,9 @@ describe("CustomerSearch.vue", () => {
 ### 外部資源
 - [Vue 3 官方文件](https://vuejs.org/)
 - [Element Plus 官方文件](https://element-plus.org/)
-- [Tesseract.js 官方文件](https://tesseract.projectnaptha.com/)
+- [Azure Computer Vision 文件](https://learn.microsoft.com/azure/ai-services/computer-vision/)
+- [Google Gemini API 文件](https://ai.google.dev/)
+- [Dropbox Sign API](https://developers.hellosign.com/)
 - [signature_pad GitHub](https://github.com/szimek/signature_pad)
 - [SheetJS 官方文件](https://docs.sheetjs.com/)
 
