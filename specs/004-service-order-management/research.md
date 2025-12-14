@@ -276,21 +276,21 @@ function canTransitionTo(
 ```typescript
 export const SERVICE_ORDER_PERMISSIONS = {
   // 寄賣單權限
-  INBOUND_ORDER_READ: "inboundOrder.read",
-  INBOUND_ORDER_CREATE: "inboundOrder.create",
-  INBOUND_ORDER_UPDATE: "inboundOrder.update",
-  INBOUND_ORDER_DELETE: "inboundOrder.delete",
+  CONSIGNMENT_READ: "serviceOrder.consignment.read",
+  CONSIGNMENT_CREATE: "serviceOrder.consignment.create",
+  CONSIGNMENT_UPDATE: "serviceOrder.consignment.update",
+  CONSIGNMENT_DELETE: "serviceOrder.consignment.delete",
   // 收購單權限
-  BUYBACK_ORDER_READ: "buybackOrder.read",
-  BUYBACK_ORDER_CREATE: "buybackOrder.create",
-  BUYBACK_ORDER_UPDATE: "buybackOrder.update",
-  BUYBACK_ORDER_DELETE: "buybackOrder.delete"
+  BUYBACK_READ: "serviceOrder.buyback.read",
+  BUYBACK_CREATE: "serviceOrder.buyback.create",
+  BUYBACK_UPDATE: "serviceOrder.buyback.update",
+  BUYBACK_DELETE: "serviceOrder.buyback.delete"
 } as const
 ```
 2. **使用 v-permission 指令**：
 ```vue
 <el-button
-  v-permission="[SERVICE_ORDER_PERMISSIONS.INBOUND_ORDER_CREATE]"
+  v-permission="[SERVICE_ORDER_PERMISSIONS.CONSIGNMENT_CREATE]"
   type="primary"
   @click="handleCreate"
 >

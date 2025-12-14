@@ -71,13 +71,13 @@ interface PagedResponse<T> {
 ### 服務單相關
 | 方法 | 端點 | 說明 | 權限 |
 |------|------|------|------|
-| GET | `/service-orders` | 查詢服務單列表 | `serviceOrder.read` 或 `buybackOrder.read` |
-| GET | `/service-orders/{id}` | 查詢單一服務單 | `serviceOrder.read` 或 `buybackOrder.read` |
-| POST | `/service-orders` | 建立服務單 | `serviceOrder.create` 或 `buybackOrder.create` |
-| PUT | `/service-orders/{id}` | 更新服務單 | `serviceOrder.update` 或 `buybackOrder.update` |
-| PATCH | `/service-orders/{id}/status` | 更新服務單狀態 | `serviceOrder.update` 或 `buybackOrder.update` |
-| DELETE | `/service-orders/{id}` | 刪除服務單 | `serviceOrder.delete` 或 `buybackOrder.delete` |
-| GET | `/service-orders/{id}/history` | 查詢修改歷史 | `serviceOrder.read` 或 `buybackOrder.read` |
+| GET | `/service-orders` | 查詢服務單列表 | `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read` |
+| GET | `/service-orders/{id}` | 查詢單一服務單 | `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read` |
+| POST | `/service-orders` | 建立服務單 | `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create` |
+| PUT | `/service-orders/{id}` | 更新服務單 | `serviceOrder.consignment.update` 或 `serviceOrder.buyback.update` |
+| PATCH | `/service-orders/{id}/status` | 更新服務單狀態 | `serviceOrder.consignment.update` 或 `serviceOrder.buyback.update` |
+| DELETE | `/service-orders/{id}` | 刪除服務單 | `serviceOrder.consignment.delete` 或 `serviceOrder.buyback.delete` |
+| GET | `/service-orders/{id}/history` | 查詢修改歷史 | `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read` |
 
 ### 客戶相關
 | 方法 | 端點 | 說明 | 權限 |
@@ -89,17 +89,17 @@ interface PagedResponse<T> {
 ### 附件相關
 | 方法 | 端點 | 說明 | 權限 |
 |------|------|------|------|
-| POST | `/service-orders/{id}/attachments` | 上傳附件 | `serviceOrder.create` 或 `buybackOrder.create` |
-| GET | `/service-orders/{id}/attachments` | 取得附件列表 | `serviceOrder.read` 或 `buybackOrder.read` |
-| GET | `/attachments/{id}/download` | 下載附件 | `serviceOrder.read` 或 `buybackOrder.read` |
+| POST | `/service-orders/{id}/attachments` | 上傳附件 | `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create` |
+| GET | `/service-orders/{id}/attachments` | 取得附件列表 | `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read` |
+| GET | `/attachments/{id}/download` | 下載附件 | `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read` |
 
 ### 簽名相關
 | 方法 | 端點 | 說明 | 權限 |
 |------|------|------|------|
-| POST | `/service-orders/{id}/signatures/offline` | 儲存線下簽名 | `serviceOrder.create` 或 `buybackOrder.create` |
-| POST | `/service-orders/{id}/signatures/online` | 發送線上簽名邀請 | `serviceOrder.create` 或 `buybackOrder.create` |
-| POST | `/service-orders/{id}/signatures/resend` | 重新發送簽名邀請 | `serviceOrder.update` 或 `buybackOrder.update` |
-| GET | `/service-orders/{id}/signatures` | 取得簽名記錄 | `serviceOrder.read` 或 `buybackOrder.read` |
+| POST | `/service-orders/{id}/signatures/offline` | 儲存線下簽名 | `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create` |
+| POST | `/service-orders/{id}/signatures/online` | 發送線上簽名邀請 | `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create` |
+| POST | `/service-orders/{id}/signatures/resend` | 重新發送簽名邀請 | `serviceOrder.consignment.update` 或 `serviceOrder.buyback.update` |
+| GET | `/service-orders/{id}/signatures` | 取得簽名記錄 | `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read` |
 
 ### OCR 相關
 | 方法 | 端點 | 說明 | 權限 |
@@ -114,7 +114,7 @@ interface PagedResponse<T> {
 
 **端點**: `GET /service-orders`
 
-**權限**: `serviceOrder.read` 或 `buybackOrder.read`
+**權限**: `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read`
 
 **查詢參數**:
 ```typescript
@@ -190,7 +190,7 @@ interface ServiceOrderListParams {
 
 **端點**: `GET /service-orders/{id}`
 
-**權限**: `serviceOrder.read` 或 `buybackOrder.read`
+**權限**: `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read`
 
 **路徑參數**:
 - `id` (UUID): 服務單 ID
@@ -254,7 +254,7 @@ interface ServiceOrderListParams {
 
 **端點**: `POST /service-orders`
 
-**權限**: `serviceOrder.create` 或 `buybackOrder.create`
+**權限**: `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create`
 
 **請求 Body**:
 ```typescript
@@ -359,7 +359,7 @@ interface CreateServiceOrderRequest {
 
 **端點**: `PUT /service-orders/{id}`
 
-**權限**: `serviceOrder.update` 或 `buybackOrder.update`
+**權限**: `serviceOrder.consignment.update` 或 `serviceOrder.buyback.update`
 
 **路徑參數**:
 - `id` (UUID): 服務單 ID
@@ -446,7 +446,7 @@ interface UpdateServiceOrderRequest {
 
 **端點**: `PATCH /service-orders/{id}/status`
 
-**權限**: `serviceOrder.update` 或 `buybackOrder.update`
+**權限**: `serviceOrder.consignment.update` 或 `serviceOrder.buyback.update`
 
 **路徑參數**:
 - `id` (UUID): 服務單 ID
@@ -505,7 +505,7 @@ interface UpdateStatusRequest {
 
 **端點**: `DELETE /service-orders/{id}`
 
-**權限**: `serviceOrder.delete` 或 `buybackOrder.delete`
+**權限**: `serviceOrder.consignment.delete` 或 `serviceOrder.buyback.delete`
 
 **路徑參數**:
 - `id` (UUID): 服務單 ID
@@ -540,7 +540,7 @@ interface UpdateStatusRequest {
 
 **端點**: `GET /service-orders/{id}/history`
 
-**權限**: `serviceOrder.read` 或 `buybackOrder.read`
+**權限**: `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read`
 
 **路徑參數**:
 - `id` (UUID): 服務單 ID
@@ -674,7 +674,7 @@ interface CreateCustomerRequest {
 
 **端點**: `POST /service-orders/{id}/attachments`
 
-**權限**: `serviceOrder.create` 或 `buybackOrder.create`
+**權限**: `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create`
 
 **路徑參數**:
 - `id` (UUID): 服務單 ID
@@ -728,7 +728,7 @@ interface UploadAttachmentRequest {
 
 **端點**: `GET /service-orders/{id}/attachments`
 
-**權限**: `serviceOrder.read` 或 `buybackOrder.read`
+**權限**: `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read`
 
 **路徑參數**:
 - `id` (UUID): 服務單 ID
@@ -762,7 +762,7 @@ interface UploadAttachmentRequest {
 
 **端點**: `GET /attachments/{id}/download`
 
-**權限**: `serviceOrder.read` 或 `buybackOrder.read`
+**權限**: `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read`
 
 **路徑參數**:
 - `id` (UUID): 附件 ID
@@ -781,7 +781,7 @@ Content-Length: 2048576
 
 **端點**: `POST /service-orders/{id}/signatures/offline`
 
-**權限**: `serviceOrder.create` 或 `buybackOrder.create`
+**權限**: `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create`
 
 **路徑參數**:
 - `id` (UUID): 服務單 ID
@@ -832,7 +832,7 @@ interface SaveOfflineSignatureRequest {
 
 **端點**: `POST /service-orders/{id}/signatures/online`
 
-**權限**: `serviceOrder.create` 或 `buybackOrder.create`
+**權限**: `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create`
 
 **路徑參數**:
 - `id` (UUID): 服務單 ID
@@ -884,7 +884,7 @@ interface SendOnlineSignatureRequest {
 
 **端點**: `POST /service-orders/{id}/signatures/resend`
 
-**權限**: `serviceOrder.update` 或 `buybackOrder.update`
+**權限**: `serviceOrder.consignment.update` 或 `serviceOrder.buyback.update`
 
 **路徑參數**:
 - `id` (UUID): 服務單 ID
@@ -922,7 +922,7 @@ interface ResendSignatureRequest {
 
 **端點**: `GET /service-orders/{id}/signatures`
 
-**權限**: `serviceOrder.read` 或 `buybackOrder.read`
+**權限**: `serviceOrder.consignment.read` 或 `serviceOrder.buyback.read`
 
 **路徑參數**:
 - `id` (UUID): 服務單 ID
@@ -1026,16 +1026,16 @@ interface OCRIDCardRequest {
 ## 權限定義
 
 ### 寄賣單權限
-- `serviceOrder.read`: 查詢與匯出寄賣單
-- `serviceOrder.create`: 建立寄賣單
-- `serviceOrder.update`: 修改寄賣單
-- `serviceOrder.delete`: 刪除寄賣單
+- `serviceOrder.consignment.read`: 查詢與匯出寄賣單
+- `serviceOrder.consignment.create`: 建立寄賣單
+- `serviceOrder.consignment.update`: 修改寄賣單
+- `serviceOrder.consignment.delete`: 刪除寄賣單
 
 ### 收購單權限
-- `buybackOrder.read`: 查詢與匯出收購單
-- `buybackOrder.create`: 建立收購單
-- `buybackOrder.update`: 修改收購單
-- `buybackOrder.delete`: 刪除收購單
+- `serviceOrder.buyback.read`: 查詢與匯出收購單
+- `serviceOrder.buyback.create`: 建立收購單
+- `serviceOrder.buyback.update`: 修改收購單
+- `serviceOrder.buyback.delete`: 刪除收購單
 
 ### 客戶權限
 - `customer.read`: 查詢客戶資料
