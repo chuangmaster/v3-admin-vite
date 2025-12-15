@@ -44,13 +44,13 @@
 
 **⚠️ CRITICAL**: 此階段完成前，任何使用者故事工作都不能開始
 
-- [ ] T006 建立服務單 API 服務層 `src/pages/service-order-management/apis/service-order.ts` (包含所有 API 函式: getServiceOrderList, getServiceOrder, createServiceOrder, updateServiceOrder, deleteServiceOrder, updateServiceOrderStatus, getModificationHistory)
-- [ ] T007 [P] 建立客戶 API 服務層 `src/pages/service-order-management/apis/customer.ts` (searchCustomers, createCustomer, getCustomer)
-- [ ] T008 [P] 建立附件 API 服務層 `src/pages/service-order-management/apis/attachment.ts` (uploadAttachment, getAttachmentList, downloadAttachment)
-- [ ] T009 [P] 建立簽名 API 服務層 `src/pages/service-order-management/apis/signature.ts` (saveOfflineSignature, sendOnlineSignature, resendSignature, getSignatureRecords)
-- [ ] T010 [P] 建立 OCR API 服務層 `src/pages/service-order-management/apis/ocr.ts` (recognizeIDCard)
-- [ ] T011 新增路由設定至 `src/router/index.ts` (服務單列表路由 /service-order-management, 服務單建立路由 /service-order-management/create, 服務單詳細路由 /service-order-management/:id)
-- [ ] T012 建立 Pinia store `src/pinia/stores/service-order.ts` (管理服務單狀態、分頁狀態、查詢條件)
+- [X] T006 建立服務單 API 服務層 `src/pages/service-order-management/apis/service-order.ts` (包含所有 API 函式: getServiceOrderList, getServiceOrder, createServiceOrder, updateServiceOrder, deleteServiceOrder, updateServiceOrderStatus, getModificationHistory)
+- [X] T007 [P] 建立客戶 API 服務層 `src/pages/service-order-management/apis/customer.ts` (searchCustomers, createCustomer, getCustomer)
+- [X] T008 [P] 建立附件 API 服務層 `src/pages/service-order-management/apis/attachment.ts` (uploadAttachment, getAttachmentList, downloadAttachment)
+- [X] T009 [P] 建立簽名 API 服務層 `src/pages/service-order-management/apis/signature.ts` (saveOfflineSignature, sendOnlineSignature, resendSignature, getSignatureRecords)
+- [X] T010 [P] 建立 OCR API 服務層 `src/pages/service-order-management/apis/ocr.ts` (recognizeIDCard)
+- [X] T011 新增路由設定至 `src/router/index.ts` (服務單列表路由 /service-order-management, 服務單建立路由 /service-order-management/create, 服務單詳細路由 /service-order-management/:id)
+- [X] T012 建立 Pinia store `src/pinia/stores/service-order.ts` (管理服務單狀態、分頁狀態、查詢條件)
 
 **Checkpoint**: 基礎設施就緒 - 使用者故事實作現在可以並行開始
 

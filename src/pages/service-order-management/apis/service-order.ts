@@ -3,10 +3,10 @@
  * @module @/pages/service-order-management/apis/service-order
  */
 
+import type { PagedApiResponse } from "types/api"
 import type {
   CreateServiceOrderRequest,
   ModificationHistory,
-  PagedResponse,
   ServiceOrder,
   ServiceOrderListItem,
   ServiceOrderListParams,
@@ -22,7 +22,7 @@ import { request } from "@/http/axios"
  */
 export async function getServiceOrderList(
   params: ServiceOrderListParams
-): Promise<ApiResponse<PagedResponse<ServiceOrderListItem>>> {
+): Promise<PagedApiResponse<ServiceOrderListItem[]>> {
   return request({ url: "/service-orders", method: "GET", params })
 }
 

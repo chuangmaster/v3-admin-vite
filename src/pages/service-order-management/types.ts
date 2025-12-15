@@ -18,16 +18,24 @@ export enum ServiceOrderSource {
 
 /** 服務單狀態 */
 export enum ServiceOrderStatus {
-  /** 待處理 */
+  /** 草稿 */
+  DRAFT = "draft",
+  /** 待確認 */
   PENDING = "pending",
+  /** 已確認 */
+  CONFIRMED = "confirmed",
+  /** 處理中 */
+  IN_PROGRESS = "in_progress",
   /** 已完成 */
   COMPLETED = "completed",
-  /** 已終止 */
-  TERMINATED = "terminated"
+  /** 已取消 */
+  CANCELLED = "cancelled"
 }
 
 /** 續約設定 */
 export enum RenewalOption {
+  /** 無續約 */
+  NONE = "none",
   /** 到期自動取回 */
   AUTO_RETRIEVE = "auto_retrieve",
   /** 第三個月起自動調降 10% */
@@ -64,6 +72,26 @@ export enum AttachmentType {
   OTHER = "OTHER"
 }
 
+/** 商品類別（收購單專用） */
+export enum ProductCategory {
+  /** 黃金首飾 */
+  GOLD_JEWELRY = "黃金首飾",
+  /** 鉑金首飾 */
+  PLATINUM_JEWELRY = "鉑金首飾",
+  /** K金首飾 */
+  K_GOLD_JEWELRY = "K金首飾",
+  /** 鑽石 */
+  DIAMOND = "鑽石",
+  /** 寶石 */
+  GEMSTONE = "寶石",
+  /** 名錶 */
+  LUXURY_WATCH = "名錶",
+  /** 名牌包 */
+  LUXURY_BAG = "名牌包",
+  /** 其他精品 */
+  OTHER = "其他精品"
+}
+
 /** 商品配件選項 */
 export const ACCESSORY_OPTIONS = [
   { label: "盒子", value: "box" },
@@ -89,20 +117,40 @@ export const DEFECT_OPTIONS = [
   { label: "四角磨損", value: "cornerWear" }
 ] as const
 
-/** 商品項目實體 */
+/** 商品項目實體（包含收購單和寄賣單的所有欄位） */
 export interface ProductItem {
   /** 唯一識別碼（UUID） */
   id?: string
   /** 服務單 ID */
   serviceOrderId?: string
-  /** 品牌名稱 */
-  brandName: string
-  /** 款式 */
-  style: string
-  /** 內碼 */
+
+  // 收購單專用欄位
+  /** 商品類別（收購單） */
+  category?: ProductCategory
+  /** 商品名稱（收購單） */
+  name?: string
+  /** 重量 (g) - 金屬類商品（收購單） */
+  weight?: number
+  /** 純度 - 金屬類商品（收購單） */
+  purity?: string
+  /** 單價（收購單） */
+  unitPrice?: number
+  /** 數量（收購單） */
+  quantity?: number
+  /** 小計（收購單） */
+  totalPrice?: number
+  /** 備註說明（收購單） */
+  description?: string
+
+  // 寄賣單專用欄位
+  /** 品牌名稱（寄賣單） */
+  brandName?: string
+  /** 款式（寄賣單） */
+  style?: string
+  /** 內碼（寄賣單） */
   internalCode?: string
-  /** 商品序號（顯示順序，1-4） */
-  sequence: number
+  /** 商品序號（顯示順序，1-4）（寄賣單） */
+  sequence?: number
   /** 商品配件（僅寄賣單） */
   accessories?: string[]
   /** 商品瑕疵處（僅寄賣單） */
@@ -155,8 +203,12 @@ export interface SignatureRecord {
   serviceOrderId: string
   /** 簽名文件類型 */
   documentType: DocumentType
+  /** 簽名類型（用於顯示） */
+  signatureType?: string
   /** 簽名資料（Base64 PNG，僅線下簽名） */
   signatureData?: string
+  /** 簽名 URL（用於顯示簽名圖片） */
+  signatureUrl?: string
   /** 簽名方式 */
   signatureMethod: SignatureMethod
   /** Dropbox Sign 請求 ID（僅線上簽名） */
@@ -201,6 +253,14 @@ export interface ServiceOrder {
   customerId: string
   /** 客戶資訊（查詢詳細時回傳） */
   customer?: Customer
+  /** 客戶姓名（查詢詳細時回傳） */
+  customerName?: string
+  /** 客戶電話（查詢詳細時回傳） */
+  customerPhone?: string
+  /** 客戶 Email（查詢詳細時回傳） */
+  customerEmail?: string
+  /** 客戶身分證字號（查詢詳細時回傳） */
+  customerIdCard?: string
   /** 商品項目列表（1-4 件） */
   productItems: ProductItem[]
   /** 總金額 */
@@ -213,6 +273,10 @@ export interface ServiceOrder {
   consignmentEndDate?: string
   /** 續約設定（僅寄賣單） */
   renewalOption?: RenewalOption
+  /** 簽名記錄列表（查詢詳細時回傳） */
+  signatureRecords?: SignatureRecord[]
+  /** 備註說明 */
+  notes?: string
   /** 建立時間（ISO 8601, UTC） */
   createdAt: string
   /** 建立者（使用者 ID） */
@@ -264,7 +328,7 @@ export interface CreateServiceOrderRequest {
   /** 服務單類型 */
   orderType: ServiceOrderType
   /** 服務單來源 */
-  orderSource: ServiceOrderSource
+  orderSource?: ServiceOrderSource
   /** 客戶 ID */
   customerId: string
   /** 商品項目列表(1-4件) */
@@ -277,6 +341,12 @@ export interface CreateServiceOrderRequest {
   consignmentEndDate?: string
   /** 續約設定（僅寄賣單） */
   renewalOption?: RenewalOption
+  /** 續約月數（僅寄賣單） */
+  renewalMonths?: number
+  /** 利率（僅寄賣單） */
+  interestRate?: number
+  /** 備註說明 */
+  notes?: string
 }
 
 /** 更新服務單請求 */
@@ -313,26 +383,16 @@ export interface ServiceOrderListParams {
   orderType?: ServiceOrderType
   /** 客戶名稱（模糊搜尋，可選） */
   customerName?: string
+  /** 單號（模糊搜尋，可選） */
+  orderNumber?: string
+  /** 日期範圍（可選，用於前端篩選） */
+  createdDateRange?: [string, string]
   /** 起始日期（ISO 8601，可選） */
   startDate?: string
   /** 結束日期（ISO 8601，可選） */
   endDate?: string
   /** 服務單狀態（可選） */
   status?: ServiceOrderStatus
-}
-
-/** 分頁回應格式 */
-export interface PagedResponse<T> {
-  /** 資料項目列表 */
-  items: T[]
-  /** 當前頁碼（從 1 開始） */
-  pageNumber: number
-  /** 每頁筆數 */
-  pageSize: number
-  /** 總筆數 */
-  totalRecords: number
-  /** 總頁數 */
-  totalPages: number
 }
 
 /** 客戶搜尋參數 */
