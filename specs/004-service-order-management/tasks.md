@@ -30,11 +30,11 @@
 
 **Purpose**: 建立專案基礎結構與設定
 
-- [ ] T001 建立服務單管理模組目錄結構 `src/pages/service-order-management/` 及子目錄 (apis/, components/, composables/, images/)
-- [ ] T002 [P] 安裝必要套件 signature_pad 與 xlsx (`pnpm add signature_pad xlsx`)
-- [ ] T003 [P] 定義型別檔案 `src/pages/service-order-management/types.ts` (ServiceOrder, ProductItem, Customer, Attachment, SignatureRecord, CreateServiceOrderRequest 等)
-- [ ] T004 [P] 新增服務單權限常數至 `src/common/constants/permissions.ts` (SERVICE_ORDER_PERMISSIONS: CONSIGNMENT_*, BUYBACK_*, ATTACHMENT_VIEW_SENSITIVE)
-- [ ] T005 建立測試目錄結構 `tests/pages/service-order-management/` 及子目錄 (composables/, components/)
+- [X] T001 建立服務單管理模組目錄結構 `src/pages/service-order-management/` 及子目錄 (apis/, components/, composables/, images/)
+- [X] T002 [P] 安裝必要套件 signature_pad 與 xlsx (`pnpm add signature_pad xlsx`)
+- [X] T003 [P] 定義型別檔案 `src/pages/service-order-management/types.ts` (ServiceOrder, ProductItem, Customer, Attachment, SignatureRecord, CreateServiceOrderRequest 等)
+- [X] T004 [P] 新增服務單權限常數至 `src/common/constants/permissions.ts` (SERVICE_ORDER_PERMISSIONS: CONSIGNMENT_*, BUYBACK_*, ATTACHMENT_VIEW_SENSITIVE)
+- [X] T005 建立測試目錄結構 `tests/pages/service-order-management/` 及子目錄 (composables/, components/)
 
 ---
 
