@@ -58,7 +58,7 @@ function handleLogin() {
     }
     loading.value = true
     loginApi(loginFormData).then(({ data }) => {
-      userStore.setToken(data.token)
+      userStore.setToken(data?.token || "")
       const redirectPath = route.query.redirect ? decodeURIComponent(route.query.redirect as string) : "/"
       router.push(redirectPath)
     }).catch(() => {

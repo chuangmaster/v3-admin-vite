@@ -74,22 +74,6 @@ export interface UserListResponse {
   totalPages: number
 }
 
-/** API 統一回應格式 */
-export interface ApiResponse<T = any> {
-  /** 操作是否成功 */
-  success: boolean
-  /** 業務邏輯代碼 */
-  code: string
-  /** 繁體中文訊息 */
-  message: string
-  /** 回應資料（可為 null） */
-  data: T | null
-  /** 回應時間戳記（ISO 8601, UTC） */
-  timestamp: string
-  /** 分散式追蹤 ID */
-  traceId: string
-}
-
 /** Excel 匯出資料結構 */
 export interface UserExportData {
   /** 用戶名 */

@@ -4,9 +4,8 @@
  * @module @/pages/role-managements/role
  */
 
-import type { PagedApiResponse } from "types/api-paged-response"
+import type { PagedApiResponse } from "types/api"
 import type {
-  ApiResponse,
   AssignRolePermissionsRequest,
   CreateRoleRequest,
   DeleteRoleRequest,

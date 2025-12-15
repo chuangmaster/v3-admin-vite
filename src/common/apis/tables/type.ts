@@ -25,7 +25,7 @@ export interface TableData {
   username: string
 }
 
-export type TableResponseData = ApiResponseData<{
+export type TableResponseData = ApiResponse<{
   list: TableData[]
   total: number
 }>

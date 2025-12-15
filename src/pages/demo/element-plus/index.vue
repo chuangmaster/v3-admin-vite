@@ -97,8 +97,8 @@ function getTableData() {
     username: searchData.username,
     phone: searchData.phone
   }).then(({ data }) => {
-    paginationData.total = data.total
-    tableData.value = data.list
+    paginationData.total = data?.total || 0
+    tableData.value = data?.list || []
   }).catch(() => {
     tableData.value = []
   }).finally(() => {
