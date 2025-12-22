@@ -14,7 +14,7 @@ import SignaturePad from "./components/SignaturePad.vue"
 import { useIdCardRecognition } from "./composables/useIdCardRecognition"
 import { useServiceOrderForm } from "./composables/useServiceOrderForm"
 import { useSignature } from "./composables/useSignature"
-import { AttachmentType, ServiceOrderType } from "./types"
+import { AttachmentType, ServiceOrderSource, ServiceOrderType } from "./types"
 
 defineOptions({
   name: "ServiceOrderCreate"
@@ -243,24 +243,73 @@ function handleCancel() {
       <template #header>
         <div class="card-header">
           <span class="title">建立服務訂單</span>
-          <el-tag v-if="formData.orderType === ServiceOrderType.BUYBACK" type="success">
-            收購單
-          </el-tag>
-          <el-tag v-else type="warning">
-            寄賣單
-          </el-tag>
         </div>
       </template>
 
-      <el-steps :active="selectedCustomer ? 1 : 0" finish-status="success" class="steps">
+      <el-steps :active="productItems.length > 0 ? 3 : selectedCustomer ? 2 : formData.orderType && formData.orderSource ? 1 : 0" finish-status="success" class="steps">
+        <el-step title="服務單設定" />
         <el-step title="選擇客戶" />
         <el-step title="新增商品" />
         <el-step title="上傳附件" />
         <el-step title="簽名確認" />
       </el-steps>
 
-      <!-- 步驟 1: 選擇客戶 -->
+      <!-- 服務單類型與來源選擇 -->
       <el-card shadow="never" class="section-card">
+        <template #header>
+          <div class="section-title">
+            <el-icon><Document /></el-icon>
+            <span>服務單設定</span>
+          </div>
+        </template>
+
+        <el-form label-width="100px">
+          <el-form-item label="服務單類型" required>
+            <el-select v-model="formData.orderType" placeholder="請選擇服務單類型">
+              <el-option
+                label="收購單"
+                :value="ServiceOrderType.BUYBACK"
+              >
+                <el-tag type="success" size="small">
+                  收購單
+                </el-tag>
+              </el-option>
+              <el-option
+                label="寄賣單"
+                :value="ServiceOrderType.CONSIGNMENT"
+              >
+                <el-tag type="warning" size="small">
+                  寄賣單
+                </el-tag>
+              </el-option>
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="服務單來源" required>
+            <el-select v-model="formData.orderSource" placeholder="請選擇服務單來源">
+              <el-option
+                label="線下"
+                :value="ServiceOrderSource.OFFLINE"
+              >
+                <el-tag type="info" size="small">
+                  線下
+                </el-tag>
+              </el-option>
+              <el-option
+                label="線上"
+                :value="ServiceOrderSource.ONLINE"
+              >
+                <el-tag type="primary" size="small">
+                  線上
+                </el-tag>
+              </el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </el-card>
+
+      <!-- 步驟 1: 選擇客戶 -->
+      <el-card v-if="formData.orderType && formData.orderSource" shadow="never" class="section-card">
         <template #header>
           <div class="section-title">
             <el-icon><User /></el-icon>
@@ -320,29 +369,54 @@ function handleCancel() {
           stripe
         >
           <el-table-column type="index" label="#" width="50" />
-          <el-table-column prop="category" label="類別" width="120" />
-          <el-table-column prop="name" label="商品名稱" />
-          <el-table-column prop="weight" label="重量 (g)" width="100">
+          <el-table-column prop="brandName" label="品牌名稱" min-width="120">
             <template #default="{ row }">
-              {{ row.weight || '-' }}
+              {{ row.brandName || '-' }}
             </template>
           </el-table-column>
-          <el-table-column prop="purity" label="純度" width="100">
+          <el-table-column prop="style" label="款式" min-width="120">
             <template #default="{ row }">
-              {{ row.purity || '-' }}
+              {{ row.style || '-' }}
             </template>
           </el-table-column>
-          <el-table-column prop="unitPrice" label="單價" width="120" align="right">
+          <el-table-column prop="internalCode" label="內碼" width="120">
             <template #default="{ row }">
-              NT$ {{ row.unitPrice?.toLocaleString() || 0 }}
+              {{ row.internalCode || '-' }}
             </template>
           </el-table-column>
-          <el-table-column prop="quantity" label="數量" width="80" align="center" />
-          <el-table-column prop="totalPrice" label="小計" width="120" align="right">
+          <el-table-column
+            v-if="formData.orderType === ServiceOrderType.CONSIGNMENT"
+            label="商品配件"
+            min-width="150"
+          >
             <template #default="{ row }">
-              <el-tag type="success">
-                NT$ {{ row.totalPrice?.toLocaleString() || 0 }}
+              <el-tag
+                v-for="accessory in row.accessories"
+                :key="accessory"
+                size="small"
+                style="margin: 2px;"
+              >
+                {{ accessory }}
               </el-tag>
+              <span v-if="!row.accessories || row.accessories.length === 0">-</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            v-if="formData.orderType === ServiceOrderType.CONSIGNMENT"
+            label="商品瑕疵處"
+            min-width="150"
+          >
+            <template #default="{ row }">
+              <el-tag
+                v-for="defect in row.defects"
+                :key="defect"
+                type="warning"
+                size="small"
+                style="margin: 2px;"
+              >
+                {{ defect }}
+              </el-tag>
+              <span v-if="!row.defects || row.defects.length === 0">-</span>
             </template>
           </el-table-column>
           <el-table-column label="操作" width="120" fixed="right">
@@ -525,7 +599,7 @@ function handleCancel() {
 
     :deep(.el-card__body) {
       overflow: visible;
-      min-height: 500px;
+      min-height: 200px;
     }
   }
 

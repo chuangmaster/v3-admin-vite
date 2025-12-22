@@ -185,21 +185,6 @@ TERMINATED → (任何狀態) ❌ // 終態不可逆
 ---
 
 ### 3. Customer（客戶）
-- `AUTO_RETRIEVE`: 到期自動取回
-- `AUTO_DISCOUNT_10`: 第三個月起自動調降 10%
-- `DISCUSS_LATER`: 屆時討論
-
-**狀態轉換規則**（FR-032）:
-```typescript
-PENDING → COMPLETED ✅
-PENDING → TERMINATED ✅
-COMPLETED → PENDING ✅
-TERMINATED → (任何狀態) ❌ // 終態不可逆
-```
-
----
-
-### 3. Customer（客戶）
 
 **用途**: 記錄客戶基本資訊
 

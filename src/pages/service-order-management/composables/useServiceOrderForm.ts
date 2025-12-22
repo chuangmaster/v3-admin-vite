@@ -3,7 +3,7 @@
  */
 import type { CreateServiceOrderRequest, Customer, ProductItem } from "../types"
 import { createServiceOrder } from "../apis/service-order"
-import { RenewalOption, ServiceOrderType } from "../types"
+import { RenewalOption, ServiceOrderSource, ServiceOrderType } from "../types"
 
 export function useServiceOrderForm() {
   const router = useRouter()
@@ -24,6 +24,7 @@ export function useServiceOrderForm() {
   /** 表單資料 */
   const formData = reactive<Partial<CreateServiceOrderRequest>>({
     orderType: ServiceOrderType.BUYBACK,
+    orderSource: ServiceOrderSource.OFFLINE,
     customerId: "",
     productItems: [],
     totalAmount: 0,
