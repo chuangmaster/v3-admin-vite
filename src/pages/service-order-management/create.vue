@@ -34,6 +34,7 @@ const {
   updateProductItem,
   removeProductItem,
   setSignature,
+  setIdCardUploaded,
   submitForm
 } = useServiceOrderForm()
 
@@ -78,17 +79,49 @@ function handleCustomerCreated(customer: Customer) {
  * OCR 辨識成功
  */
 function handleOCRRecognized(data: { name: string, idCardNumber: string }) {
-  // 填入客戶表單
+  // 檢查是否已選擇客戶
+  if (selectedCustomer.value) {
+    // 比對身分證字號是否一致
+    if (selectedCustomer.value.idCardNumber !== data.idCardNumber) {
+      ElMessageBox.alert(
+        `辨識的身分證字號「${data.idCardNumber}」與已選客戶「${selectedCustomer.value.name}(${selectedCustomer.value.idCardNumber})」不符，請重新選擇客戶`,
+        "身分證字號不符",
+        {
+          confirmButtonText: "確定",
+          type: "error",
+          callback: () => {
+            // 清除已選客戶
+            selectedCustomer.value = undefined
+            // 填入辨識資料
+            customerFormRef.value?.fillFromOCR(data)
+            // 自動搜尋客戶
+            searchCustomerByIdCard(data.idCardNumber)
+          }
+        }
+      )
+      return
+    } else {
+      // 身分證字號一致，比對姓名
+      if (selectedCustomer.value.name !== data.name) {
+        ElMessage.warning(`辨識姓名「${data.name}」與客戶資料「${selectedCustomer.value.name}」不一致，請確認`)
+      } else {
+        ElMessage.success("身分證辨識資料與客戶資料一致")
+      }
+      return
+    }
+  }
+
+  // 未選擇客戶，填入客戶表單
   customerFormRef.value?.fillFromOCR(data)
 
   // 自動使用身分證字號搜尋既有客戶
-  searchCustomerByIdCard(data.idCardNumber)
+  searchCustomerByIdCard(data.idCardNumber, data.name)
 }
 
 /**
  * 使用身分證字號搜尋客戶
  */
-async function searchCustomerByIdCard(idCardNumber: string) {
+async function searchCustomerByIdCard(idCardNumber: string, ocrName?: string) {
   try {
     // 這裡需要調用客戶搜尋 API
     const { searchCustomers } = await import("./apis/customer")
@@ -97,13 +130,20 @@ async function searchCustomerByIdCard(idCardNumber: string) {
     if (response.success && response.data && response.data.length > 0) {
       // 找到客戶，自動選擇第一個
       const customer = response.data[0]
+
+      // 比對姓名一致性
+      let nameWarning = ""
+      if (ocrName && customer.name !== ocrName) {
+        nameWarning = `\n注意：辨識姓名「${ocrName}」與客戶資料「${customer.name}」不一致，請確認`
+      }
+
       ElMessageBox.confirm(
-        `找到既有客戶「${customer.name}」，是否使用此客戶資料？`,
+        `找到既有客戶「${customer.name}」，是否使用此客戶資料？${nameWarning}`,
         "找到既有客戶",
         {
           confirmButtonText: "使用既有客戶",
           cancelButtonText: "新增為新客戶",
-          type: "info"
+          type: nameWarning ? "warning" : "info"
         }
       ).then(() => {
         // 使用既有客戶
@@ -441,7 +481,10 @@ function handleCancel() {
             :closable="false"
             style="margin-bottom: 16px;"
           />
-          <IdCardUploader @recognized="handleOCRRecognized" />
+          <IdCardUploader
+            @recognized="handleOCRRecognized"
+            @update:model-value="setIdCardUploaded"
+          />
           <el-divider>辨識後請至「手動輸入」頁籤確認資料</el-divider>
         </el-tab-pane>
         <el-tab-pane label="手動輸入">

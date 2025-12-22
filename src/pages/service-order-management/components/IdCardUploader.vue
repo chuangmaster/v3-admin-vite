@@ -9,7 +9,9 @@ import { recognizeIDCard } from "../apis/ocr"
 
 const emit = defineEmits<{
   /** 辨識成功 */
-  recognized: [data: { name: string, idCardNumber: string }]
+  "recognized": [data: { name: string, idCardNumber: string }]
+  /** 更新上傳狀態 */
+  "update:modelValue": [value: boolean]
 }>()
 
 const uploadRef = ref<UploadInstance>()
@@ -54,6 +56,9 @@ function handleChange(file: UploadFile) {
 
   // 重置重試計數
   retryCount.value = 0
+
+  // 通知父元件已上傳
+  emit("update:modelValue", true)
 }
 
 /**
@@ -68,6 +73,9 @@ function handleRemove() {
   if (previewUrl.value) {
     URL.revokeObjectURL(previewUrl.value)
   }
+
+  // 通知父元件已移除
+  emit("update:modelValue", false)
 }
 
 /**

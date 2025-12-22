@@ -18,6 +18,9 @@ export function useServiceOrderForm() {
   /** 簽名圖片 DataURL */
   const signatureDataUrl = ref<string>("")
 
+  /** 身分證明文件是否已上傳 */
+  const idCardUploaded = ref(false)
+
   /** 表單資料 */
   const formData = reactive<Partial<CreateServiceOrderRequest>>({
     orderType: ServiceOrderType.BUYBACK,
@@ -85,6 +88,13 @@ export function useServiceOrderForm() {
   }
 
   /**
+   * 設定身分證明文件上傳狀態
+   */
+  function setIdCardUploaded(uploaded: boolean) {
+    idCardUploaded.value = uploaded
+  }
+
+  /**
    * 驗證表單
    */
   function validateForm(): { valid: boolean, message?: string } {
@@ -94,6 +104,10 @@ export function useServiceOrderForm() {
 
     if (productItems.value.length === 0) {
       return { valid: false, message: "請至少新增一項商品" }
+    }
+
+    if (!idCardUploaded.value) {
+      return { valid: false, message: "身分證明文件為必要附件，請上傳或拍攝身分證照片" }
     }
 
     if (!signatureDataUrl.value) {
@@ -159,6 +173,7 @@ export function useServiceOrderForm() {
     selectedCustomer.value = undefined
     productItems.value = []
     signatureDataUrl.value = ""
+    idCardUploaded.value = false
     Object.assign(formData, {
       orderType: ServiceOrderType.BUYBACK,
       customerId: "",
@@ -176,6 +191,7 @@ export function useServiceOrderForm() {
     selectedCustomer,
     productItems,
     signatureDataUrl,
+    idCardUploaded,
     formData,
     totalAmount,
     setCustomer,
@@ -183,6 +199,7 @@ export function useServiceOrderForm() {
     updateProductItem,
     removeProductItem,
     setSignature,
+    setIdCardUploaded,
     validateForm,
     submitForm,
     resetForm

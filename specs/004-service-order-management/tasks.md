@@ -65,9 +65,9 @@
 ### 測試 - User Story 1 (TDD: 先寫測試，確保失敗)
 
 - [ ] T013 [P] [US1] 建立 useServiceOrderForm 組合式函式測試 `tests/pages/service-order-management/composables/useServiceOrderForm.test.ts` (測試表單驗證、提交、重置邏輯)
-- [ ] T014 [P] [US1] 建立 useCustomerSearch 組合式函式測試 `tests/pages/service-order-management/composables/useCustomerSearch.test.ts` (測試搜尋關鍵字、debounce、結果列表)
-- [ ] T015 [P] [US1] 建立 useIdCardRecognition 組合式函式測試 `tests/pages/service-order-management/composables/useIdCardRecognition.test.ts` (測試 OCR 呼叫、重試機制、客戶資料比對)
-- [ ] T016 [P] [US1] 建立 useSignature 組合式函式測試 `tests/pages/service-order-management/composables/useSignature.test.ts` (測試簽名板初始化、清除、Base64 匯出)
+- [X] T014 [P] [US1] 建立 useCustomerSearch 組合式函式測試 `tests/pages/service-order-management/composables/useCustomerSearch.test.ts` (測試搜尋關鍵字、debounce、結果列表)
+- [X] T015 [P] [US1] 建立 useIdCardRecognition 組合式函式測試 `tests/pages/service-order-management/composables/useIdCardRecognition.test.ts` (測試 OCR 呼叫、重試機制、客戶資料比對)
+- [X] T016 [P] [US1] 建立 useSignature 組合式函式測試 `tests/pages/service-order-management/composables/useSignature.test.ts` (測試簽名板初始化、清除、Base64 匯出)
 
 ### 元件實作 - User Story 1
 
@@ -86,12 +86,12 @@
 
 ### 主要元件與頁面實作 - User Story 1
 
-- [ ] T026 [US1] 建立服務單表單元件 `src/pages/service-order-management/components/ServiceOrderForm.vue` (整合 CustomerSearch、CustomerForm、ProductItemForm、IdCardUploader、SignaturePad，收購單表單邏輯，驗證必填欄位，支援新增/編輯模式)
+- [X] T026 [US1] 建立服務單表單元件 `src/pages/service-order-management/components/ServiceOrderForm.vue` (整合 CustomerSearch、CustomerForm、ProductItemForm、IdCardUploader、SignaturePad，收購單表單邏輯，驗證必填欄位，支援新增/編輯模式)
 - [X] T027 [US1] 建立服務單建立頁面 `src/pages/service-order-management/create.vue` (路由參數接收服務單類型 buyback，顯示 ServiceOrderForm，處理提交成功/失敗，導航邏輯)
 - [ ] T028 [US1] 實作收購單線下簽名流程 (提交表單後產生收購合約與一時貿易申請書，顯示 SignaturePad，每次簽名即時儲存，呼叫 saveOfflineSignature API，Base64 傳送後端，後端合併 PDF 與簽名，前端顯示預覽確認)
 - [ ] T029 [US1] 實作收購單線上簽名流程 (提交表單後呼叫 sendOnlineSignature API，透過 Dropbox Sign API 寄送合約至客戶 Email，處理發送失敗顯示錯誤訊息，服務單狀態設為已終止，提示重新建單)
-- [ ] T030 [US1] 實作身分證明文件強制驗證 (提交前檢查是否已上傳 fileType=ID_CARD 的附件，若未上傳則阻止提交並顯示錯誤訊息「身分證明文件為必要附件，請上傳或拍攝身分證照片」，焦點移至上傳區域)
-- [ ] T031 [US1] 實作 AI 辨識自動搜尋客戶邏輯 (辨識成功後自動以身分證字號呼叫 searchCustomers API，若找到客戶自動選擇並填入表單，若找不到填入新增客戶表單，比對姓名一致性顯示警告，若已選客戶但身分證字號不符則顯示錯誤阻止繼續)
+- [X] T030 [US1] 實作身分證明文件強制驗證 (提交前檢查是否已上傳 fileType=ID_CARD 的附件，若未上傳則阻止提交並顯示錯誤訊息「身分證明文件為必要附件，請上傳或拍攝身分證照片」，焦點移至上傳區域)
+- [X] T031 [US1] 實作 AI 辨識自動搜尋客戶邏輯 (辨識成功後自動以身分證字號呼叫 searchCustomers API，若找到客戶自動選擇並填入表單，若找不到填入新增客戶表單，比對姓名一致性顯示警告，若已選客戶但身分證字號不符則顯示錯誤阻止繼續)
 - [ ] T031-1 [P] [US1] 撰寫外籍人士身分證格式驗證測試 `tests/pages/service-order-management/composables/useForeignIdValidation.test.ts` (測試 YYYYMMDD+AA 格式驗證、出生日期合理性檢查、格式錯誤提示)
 - [ ] T031-2 [US1] 實作外籍人士身分證格式驗證邏輯 `src/pages/service-order-management/composables/useForeignIdValidation.ts` (驗證 10 位格式、出生日期範圍、英文字母大寫)
 
@@ -171,8 +171,8 @@
 
 ### 頁面實作 - User Story 4
 
-- [ ] T052 [US4] 建立服務單列表查詢頁面 `src/pages/service-order-management/index.vue` (整合 ServiceOrderTable，篩選條件表單 (服務單類型、客戶名稱、日期範圍、狀態)，分頁元件，Excel 匯出按鈕，新增收購單/寄賣單按鈕，權限控制)
-- [ ] T053 [US4] 建立服務單詳細頁面 `src/pages/service-order-management/detail.vue` (顯示完整服務單資訊，整合 AttachmentViewer，修改歷史顯示，編輯按鈕 (依權限)，狀態更新下拉選單，線上簽名複製連結/重新寄送按鈕)
+- [X] T052 [US4] 建立服務單列表查詢頁面 `src/pages/service-order-management/index.vue` (整合 ServiceOrderTable，篩選條件表單 (服務單類型、客戶名稱、日期範圍、狀態)，分頁元件，Excel 匯出按鈕，新增收購單/寄賣單按鈕，權限控制)
+- [X] T053 [US4] 建立服務單詳細頁面 `src/pages/service-order-management/detail.vue` (顯示完整服務單資訊，整合 AttachmentViewer，修改歷史顯示，編輯按鈕 (依權限)，狀態更新下拉選單，線上簽名複製連結/重新寄送按鈕)
 - [ ] T054 [US4] 實作服務單狀態轉換驗證 (前端驗證狀態轉換規則: 待處理→已完成/已終止, 已完成→待處理, 已終止為終態不可逆，無效轉換時顯示錯誤提示)
 - [ ] T055 [US4] 實作服務單修改邏輯 (呼叫 updateServiceOrder API，樂觀鎖版本號驗證，並發衝突時顯示「資料已被其他使用者修改，請重新載入」，成功後更新 UI)
 - [ ] T056 [US4] 實作修改歷史追蹤功能 (呼叫 getModificationHistory API，顯示變更欄位、變更前後值、修改時間、修改者，格式化顯示邏輯)
