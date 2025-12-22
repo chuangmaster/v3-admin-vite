@@ -71,18 +71,18 @@
 
 ### 元件實作 - User Story 1
 
-- [ ] T017 [P] [US1] 建立客戶搜尋元件 `src/pages/service-order-management/components/CustomerSearch.vue` (搜尋輸入框、結果列表、選擇客戶、新增客戶按鈕)
-- [ ] T018 [P] [US1] 建立客戶表單元件 `src/pages/service-order-management/components/CustomerForm.vue` (姓名、電話、Email、身分證字號輸入欄位與驗證，支援台灣與外籍人士格式)
-- [ ] T019 [P] [US1] 建立身分證上傳元件 `src/pages/service-order-management/components/IdCardUploader.vue` (檔案上傳、拍照功能、預覽、AI 辨識按鈕 ⭐、呼叫後端 OCR API、錯誤處理、重試機制最多 3 次)
-- [ ] T020 [P] [US1] 建立商品項目表單元件 `src/pages/service-order-management/components/ProductItemForm.vue` (品牌名稱、款式、內碼輸入，支援 1-4 件商品，動態新增/刪除項目)
-- [ ] T021 [P] [US1] 建立觸控簽名板元件 `src/pages/service-order-management/components/SignaturePad.vue` (使用 signature_pad，支援滑鼠/觸控筆/手指簽名，清除、確認按鈕，匯出 Base64 PNG)
+- [X] T017 [P] [US1] 建立客戶搜尋元件 `src/pages/service-order-management/components/CustomerSearch.vue` (搜尋輸入框、結果列表、選擇客戶、新增客戶按鈕)
+- [X] T018 [P] [US1] 建立客戶表單元件 `src/pages/service-order-management/components/CustomerForm.vue` (姓名、電話、Email、身分證字號輸入欄位與驗證，支援台灣與外籍人士格式)
+- [X] T019 [P] [US1] 建立身分證上傳元件 `src/pages/service-order-management/components/IdCardUploader.vue` (檔案上傳、拍照功能、預覽、AI 辨識按鈕 ⭐、呼叫後端 OCR API、錯誤處理、重試機制最多 3 次)
+- [X] T020 [P] [US1] 建立商品項目表單元件 `src/pages/service-order-management/components/ProductItemForm.vue` (品牌名稱、款式、內碼輸入，支援 1-4 件商品，動態新增/刪除項目)
+- [X] T021 [P] [US1] 建立觸控簽名板元件 `src/pages/service-order-management/components/SignaturePad.vue` (使用 signature_pad，支援滑鼠/觸控筆/手指簽名，清除、確認按鈕，匯出 Base64 PNG)
 
 ### 組合式函式實作 - User Story 1
 
-- [ ] T022 [US1] 實作 useCustomerSearch 組合式函式 `src/pages/service-order-management/composables/useCustomerSearch.ts` (搜尋關鍵字 ref、debounce 500ms、呼叫 searchCustomers API、loading 狀態、結果列表)
-- [ ] T023 [US1] 實作 useIdCardRecognition 組合式函式 `src/pages/service-order-management/composables/useIdCardRecognition.ts` (檔案上傳、呼叫 recognizeIDCard API、辨識結果處理、重試計數器、錯誤提示、自動客戶搜尋、資料比對邏輯)
-- [ ] T024 [US1] 實作 useSignature 組合式函式 `src/pages/service-order-management/composables/useSignature.ts` (初始化 SignaturePad、清除簽名、取得 Base64 資料、驗證簽名非空)
-- [ ] T025 [US1] 實作 useServiceOrderForm 組合式函式 `src/pages/service-order-management/composables/useServiceOrderForm.ts` (表單資料 ref、驗證規則、提交邏輯、草稿自動儲存、重置表單、身分證明文件驗證)
+- [X] T022 [US1] 實作 useCustomerSearch 組合式函式 `src/pages/service-order-management/composables/useCustomerSearch.ts` (搜尋關鍵字 ref、debounce 500ms、呼叫 searchCustomers API、loading 狀態、結果列表)
+- [X] T023 [US1] 實作 useIdCardRecognition 組合式函式 `src/pages/service-order-management/composables/useIdCardRecognition.ts` (檔案上傳、呼叫 recognizeIDCard API、辨識結果處理、重試計數器、錯誤提示、自動客戶搜尋、資料比對邏輯)
+- [X] T024 [US1] 實作 useSignature 組合式函式 `src/pages/service-order-management/composables/useSignature.ts` (初始化 SignaturePad、清除簽名、取得 Base64 資料、驗證簽名非空)
+- [X] T025 [US1] 實作 useServiceOrderForm 組合式函式 `src/pages/service-order-management/composables/useServiceOrderForm.ts` (表單資料 ref、驗證規則、提交邏輯、草稿自動儲存、重置表單、身分證明文件驗證)
 
 ### 主要元件與頁面實作 - User Story 1
 
