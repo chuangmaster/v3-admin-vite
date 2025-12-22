@@ -130,8 +130,8 @@
 
 ### 測試 - User Story 3
 
-- [ ] T039 [P] [US3] 建立 CustomerSearch 元件測試 `tests/pages/service-order-management/components/CustomerSearch.test.ts` (測試搜尋輸入、結果列表顯示、客戶選擇事件、新增客戶事件)
-- [ ] T040 [P] [US3] 建立 CustomerForm 元件測試 `tests/pages/service-order-management/components/CustomerForm.test.ts` (測試欄位驗證、格式驗證、提交事件、台灣與外籍人士格式支援)
+- [X] T039 [P] [US3] 建立 CustomerSearch 元件測試 `tests/pages/service-order-management/components/CustomerSearch.test.ts` (測試搜尋輸入、結果列表顯示、客戶選擇事件、新增客戶事件)
+- [X] T040 [P] [US3] 建立 CustomerForm 元件測試 `tests/pages/service-order-management/components/CustomerForm.test.ts` (測試欄位驗證、格式驗證、提交事件、台灣與外籍人士格式支援)
 
 ### 組合式函式實作 - User Story 3
 

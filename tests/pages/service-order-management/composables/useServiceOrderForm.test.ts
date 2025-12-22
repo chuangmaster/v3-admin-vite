@@ -159,7 +159,7 @@ describe("useServiceOrderForm", () => {
     })
 
     const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
-    const { setCustomer, addProductItem, submitForm } = useServiceOrderForm()
+    const { setCustomer, addProductItem, setSignature, submitForm } = useServiceOrderForm()
 
     // 設定客戶
     setCustomer({
@@ -177,6 +177,9 @@ describe("useServiceOrderForm", () => {
       quantity: 1,
       totalPrice: 6000
     })
+
+    // 設定簽名（必填）
+    setSignature("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA")
 
     await submitForm()
 
