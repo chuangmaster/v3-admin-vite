@@ -71,9 +71,10 @@ async function handleSubmit() {
       brandName: formData.brandName,
       style: formData.style,
       internalCode: formData.internalCode || undefined,
-      // 寄賣單才包含配件和瑕疵
+      // 配件欄位收購單和寄賣單都有
+      accessories: formData.accessories.length > 0 ? formData.accessories.map(String) : undefined,
+      // 瑡疵欄位只有寄賣單才有
       ...(isConsignment.value && {
-        accessories: formData.accessories.length > 0 ? formData.accessories.map(String) : undefined,
         defects: formData.defects.length > 0 ? formData.defects.map(String) : undefined
       })
     }
@@ -131,16 +132,17 @@ defineExpose({
       <el-input v-model="formData.internalCode" placeholder="請輸入內碼（選填）" maxlength="50" show-word-limit />
     </el-form-item>
 
-    <!-- 寄賣單額外欄位：配件、瑕疵處 -->
-    <template v-if="isConsignment">
-      <el-form-item label="配件" prop="accessories">
-        <el-checkbox-group v-model="formData.accessories">
-          <el-checkbox v-for="option in ACCESSORY_OPTIONS" :key="option.value" :value="option.value">
-            {{ option.label }}
-          </el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
+    <!-- 配件欄位：收購單和寄賣單都有 -->
+    <el-form-item label="配件" prop="accessories">
+      <el-checkbox-group v-model="formData.accessories">
+        <el-checkbox v-for="option in ACCESSORY_OPTIONS" :key="option.value" :value="option.value">
+          {{ option.label }}
+        </el-checkbox>
+      </el-checkbox-group>
+    </el-form-item>
 
+    <!-- 寄賣單額外欄位：瑕疵處 -->
+    <template v-if="isConsignment">
       <el-form-item label="瑕疵處" prop="defects">
         <el-checkbox-group v-model="formData.defects">
           <el-checkbox v-for="option in DEFECT_OPTIONS" :key="option.value" :value="option.value">

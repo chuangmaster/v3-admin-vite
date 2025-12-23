@@ -393,7 +393,6 @@ function getDefectLabel(value: string) {
             </template>
           </el-table-column>
           <el-table-column
-            v-if="formData.orderType === ServiceOrderType.CONSIGNMENT"
             label="商品配件"
             min-width="150"
           >
