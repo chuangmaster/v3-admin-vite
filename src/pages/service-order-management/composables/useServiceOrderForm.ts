@@ -18,8 +18,11 @@ export function useServiceOrderForm() {
   /** 簽名圖片 DataURL */
   const signatureDataUrl = ref<string>("")
 
-  /** 身分證明文件是否已上傳 */
-  const idCardUploaded = ref(false)
+  /** 身分證正面是否已上傳 */
+  const idCardFrontUploaded = ref(false)
+
+  /** 身分證反面是否已上傳 */
+  const idCardBackUploaded = ref(false)
 
   /** 表單資料 */
   const formData = reactive<Partial<CreateServiceOrderRequest>>({
@@ -83,8 +86,9 @@ export function useServiceOrderForm() {
   /**
    * 設定身分證明文件上傳狀態
    */
-  function setIdCardUploaded(uploaded: boolean) {
-    idCardUploaded.value = uploaded
+  function setIdCardUploaded(status: { front: boolean, back: boolean }) {
+    idCardFrontUploaded.value = status.front
+    idCardBackUploaded.value = status.back
   }
 
   /**
@@ -99,8 +103,19 @@ export function useServiceOrderForm() {
       return { valid: false, message: "請至少新增一項商品" }
     }
 
-    if (!idCardUploaded.value) {
-      return { valid: false, message: "身分證明文件為必要附件，請上傳或拍攝身分證照片" }
+    // 線下流程需要正反面都上傳
+    if (formData.orderSource === ServiceOrderSource.OFFLINE) {
+      if (!idCardFrontUploaded.value) {
+        return { valid: false, message: "請上傳身分證正面影本" }
+      }
+      if (!idCardBackUploaded.value) {
+        return { valid: false, message: "請上傳身分證反面影本" }
+      }
+    } else {
+      // 線上流程只需要正面
+      if (!idCardFrontUploaded.value) {
+        return { valid: false, message: "身分證明文件為必要附件，請上傳或拍攝身分證照片" }
+      }
     }
 
     if (!signatureDataUrl.value) {
@@ -162,7 +177,8 @@ export function useServiceOrderForm() {
     selectedCustomer.value = undefined
     productItems.value = []
     signatureDataUrl.value = ""
-    idCardUploaded.value = false
+    idCardFrontUploaded.value = false
+    idCardBackUploaded.value = false
     Object.assign(formData, {
       orderType: ServiceOrderType.BUYBACK,
       customerId: "",
@@ -180,7 +196,8 @@ export function useServiceOrderForm() {
     selectedCustomer,
     productItems,
     signatureDataUrl,
-    idCardUploaded,
+    idCardFrontUploaded,
+    idCardBackUploaded,
     formData,
     setCustomer,
     addProductItem,

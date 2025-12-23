@@ -5,6 +5,7 @@
  */
 import type { Customer } from "./types"
 import { Delete, Edit, EditPen, Goods, Plus, User } from "@element-plus/icons-vue"
+import { nextTick } from "vue"
 import CustomerForm from "./components/CustomerForm.vue"
 import CustomerSearch from "./components/CustomerSearch.vue"
 import IdCardUploader from "./components/IdCardUploader.vue"
@@ -27,6 +28,8 @@ const {
   selectedCustomer,
   productItems,
   formData,
+  idCardFrontUploaded,
+  idCardBackUploaded,
   setCustomer,
   addProductItem,
   updateProductItem,
@@ -43,12 +46,17 @@ const { saveSignature: _saveSignature } = useSignature()
 const customerFormRef = ref<InstanceType<typeof CustomerForm>>()
 const productItemFormRef = ref<InstanceType<typeof ProductItemForm>>()
 const signaturePadRef = ref<InstanceType<typeof SignaturePad>>()
+const dialogIdCardUploaderRef = ref<InstanceType<typeof IdCardUploader>>()
+const mainIdCardUploaderRef = ref<InstanceType<typeof IdCardUploader>>()
 
 // UI 狀態
 const showCustomerDialog = ref(false)
 const showProductDialog = ref(false)
 const editingProductIndex = ref<number>()
 const customerDialogTab = ref<string | number>("idcard")
+
+// 暫存對話框中上傳的身分證圖片
+const pendingIdCardFiles = ref<{ front: File | null, back: File | null }>({ front: null, back: null })
 
 /**
  * 選擇客戶
@@ -69,9 +77,30 @@ function handleCreateCustomer() {
  * 客戶新增成功
  */
 function handleCustomerCreated(customer: Customer) {
+  // 先保存對話框中上傳的身分證圖片
+  const uploadedFiles = dialogIdCardUploaderRef.value?.getUploadedFiles()
+  if (uploadedFiles) {
+    pendingIdCardFiles.value = {
+      front: uploadedFiles.front,
+      back: uploadedFiles.back
+    }
+  }
+
   setCustomer(customer)
   showCustomerDialog.value = false
   ElMessage.success("客戶新增成功")
+
+  // 將身分證圖片傳遞給客戶資訊區塊的上傳元件
+  nextTick(() => {
+    if (pendingIdCardFiles.value.front || pendingIdCardFiles.value.back) {
+      mainIdCardUploaderRef.value?.setFiles(pendingIdCardFiles.value)
+      // 更新上傳狀態
+      setIdCardUploaded({
+        front: !!pendingIdCardFiles.value.front || idCardFrontUploaded.value,
+        back: !!pendingIdCardFiles.value.back || idCardBackUploaded.value
+      })
+    }
+  })
 }
 
 /**
@@ -347,7 +376,24 @@ function getDefectLabel(value: string) {
               {{ selectedCustomer.idCardNumber }}
             </el-descriptions-item>
           </el-descriptions>
-          <el-button type="primary" link @click="selectedCustomer = undefined">
+
+          <!-- 身分證件上傳區 -->
+          <div class="id-card-section">
+            <div class="section-subtitle">
+              <span>身分證件</span>
+              <el-tag v-if="formData.orderSource === ServiceOrderSource.OFFLINE" type="danger" size="small">
+                正反面必填
+              </el-tag>
+            </div>
+            <IdCardUploader
+              ref="mainIdCardUploaderRef"
+              :require-both-sides="formData.orderSource === ServiceOrderSource.OFFLINE"
+              :show-recognize="false"
+              @update:model-value="setIdCardUploaded"
+            />
+          </div>
+
+          <el-button type="primary" link class="reselect-customer-btn" @click="selectedCustomer = undefined">
             重新選擇客戶
           </el-button>
         </div>
@@ -518,7 +564,16 @@ function getDefectLabel(value: string) {
             :closable="false"
             style="margin-bottom: 16px;"
           />
+          <el-alert
+            v-if="formData.orderSource === ServiceOrderSource.OFFLINE"
+            title="線下流程需要上傳身分證正反面影本"
+            type="warning"
+            :closable="false"
+            style="margin-bottom: 16px;"
+          />
           <IdCardUploader
+            ref="dialogIdCardUploaderRef"
+            :require-both-sides="formData.orderSource === ServiceOrderSource.OFFLINE"
             @recognized="handleOCRRecognized"
             @update:model-value="setIdCardUploaded"
           />
@@ -609,6 +664,29 @@ function getDefectLabel(value: string) {
   .customer-info {
     .el-button {
       margin-top: 12px;
+    }
+
+    // 確保「重新選擇客戶」按鈕可以被正常點擊，不會被其他元素覆蓋
+    .reselect-customer-btn {
+      position: relative;
+      z-index: 10;
+      margin-bottom: 16px;
+    }
+
+    .id-card-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--el-border-color-light);
+
+      .section-subtitle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 16px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--el-text-color-primary);
+      }
     }
   }
 

@@ -169,8 +169,8 @@ describe("useServiceOrderForm", () => {
       totalPrice: 6000
     })
 
-    // 設定身分證明文件已上傳（必填）
-    setIdCardUploaded(true)
+    // 設定身分證明文件已上傳（正反面都上傳，線下流程必填）
+    setIdCardUploaded({ front: true, back: true })
 
     // 設定簽名（必填）
     setSignature("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA")
