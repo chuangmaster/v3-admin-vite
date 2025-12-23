@@ -428,9 +428,11 @@ export interface OCRIDCardResponse {
   /** 姓名 */
   name: string
   /** 身分證字號 */
-  idCardNumber: string
+  idNumber: string
   /** 辨識信心度（0-1） */
   confidence: number
+  /** 是否為低信心度 */
+  isLowConfidence: boolean
 }
 
 /** 上傳附件請求（multipart/form-data） */

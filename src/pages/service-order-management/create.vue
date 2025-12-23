@@ -48,6 +48,7 @@ const signaturePadRef = ref<InstanceType<typeof SignaturePad>>()
 const showCustomerDialog = ref(false)
 const showProductDialog = ref(false)
 const editingProductIndex = ref<number>()
+const customerDialogTab = ref<string | number>("idcard")
 
 /**
  * 選擇客戶
@@ -90,10 +91,6 @@ function handleOCRRecognized(data: { name: string, idCardNumber: string }) {
           callback: () => {
             // 清除已選客戶
             selectedCustomer.value = undefined
-            // 填入辨識資料
-            customerFormRef.value?.fillFromOCR(data)
-            // 自動搜尋客戶
-            searchCustomerByIdCard(data.idCardNumber)
           }
         }
       )
@@ -514,8 +511,8 @@ function getDefectLabel(value: string) {
       class="customer-dialog"
       :close-on-click-modal="false"
     >
-      <el-tabs>
-        <el-tab-pane label="身分證辨識">
+      <el-tabs v-model="customerDialogTab">
+        <el-tab-pane label="身分證辨識" name="idcard">
           <el-alert
             title="上傳或拍攝身分證照片，系統將自動辨識並搜尋既有客戶"
             type="info"
@@ -528,7 +525,7 @@ function getDefectLabel(value: string) {
           />
           <el-divider>辨識後請至「手動輸入」頁籤確認資料</el-divider>
         </el-tab-pane>
-        <el-tab-pane label="手動輸入">
+        <el-tab-pane label="手動輸入" name="manual">
           <CustomerForm
             ref="customerFormRef"
             @success="handleCustomerCreated"

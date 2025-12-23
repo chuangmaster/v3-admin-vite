@@ -37,8 +37,9 @@ describe("useIdCardRecognition", () => {
     const mockFile = new File(["test"], "id-card.jpg", { type: "image/jpeg" })
     const mockResult: OCRIDCardResponse = {
       name: "王小明",
-      idCardNumber: "A123456789",
-      confidence: 0.95
+      idNumber: "A123456789",
+      confidence: 0.95,
+      isLowConfidence: false
     }
 
     vi.mocked(ocrApi.recognizeIDCard).mockResolvedValue({
@@ -78,8 +79,9 @@ describe("useIdCardRecognition", () => {
         message: "辨識成功",
         data: {
           name: "王小明",
-          idCardNumber: "A123456789",
-          confidence: 0.9
+          idNumber: "A123456789",
+          confidence: 0.9,
+          isLowConfidence: false
         },
         timestamp: "2025-01-01T00:00:00Z",
         traceId: "test-trace-id"
@@ -120,7 +122,7 @@ describe("useIdCardRecognition", () => {
     const { recognitionResult, clearResult } = useIdCardRecognition()
     recognitionResult.value = {
       name: "王小明",
-      idCardNumber: "A123456789"
+      idNumber: "A123456789"
     }
 
     // Act

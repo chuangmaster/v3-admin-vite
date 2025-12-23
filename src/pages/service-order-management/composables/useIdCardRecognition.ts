@@ -11,7 +11,7 @@ export function useIdCardRecognition() {
   /** 辨識結果 */
   const recognitionResult = ref<{
     name: string
-    idCardNumber: string
+    idNumber: string
   }>()
 
   /**

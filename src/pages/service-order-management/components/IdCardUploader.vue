@@ -115,7 +115,11 @@ async function handleRecognize() {
 
     if (response.success && response.data) {
       ElMessage.success("辨識成功")
-      emit("recognized", response.data)
+      // 後端回傳 idNumber，轉換為前端使用的 idCardNumber
+      emit("recognized", {
+        name: response.data.name,
+        idCardNumber: response.data.idNumber
+      })
       retryCount.value = 0
     } else {
       throw new Error(response.message || "辨識失敗")
