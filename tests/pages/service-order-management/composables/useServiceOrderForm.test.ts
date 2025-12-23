@@ -56,13 +56,15 @@ describe("useServiceOrderForm", () => {
       style: "金項鍊",
       internalCode: "TEST001",
       accessories: ["DUST_BAG", "CERTIFICATE"],
-      defects: []
+      defects: [],
+      amount: 50000
     }
 
     addProductItem(mockProduct)
 
     expect(productItems.value).toHaveLength(1)
     expect(productItems.value[0].style).toEqual(mockProduct.style)
+    expect(productItems.value[0].amount).toBe(50000)
   })
 
   it("should update product item correctly", async () => {
@@ -74,28 +76,31 @@ describe("useServiceOrderForm", () => {
       style: "金項鍊",
       internalCode: "TEST001",
       accessories: ["DUST_BAG"],
-      defects: []
+      defects: [],
+      amount: 50000
     }
 
     addProductItem(mockProduct)
 
     const updatedProduct = {
-      style: "金項鍊（已更新）",
-      internalCode: "TEST001-UPDATED"
+      style: "金項鍊(已更新)",
+      internalCode: "TEST001-UPDATED",
+      amount: 55000
     }
 
     updateProductItem(0, updatedProduct)
 
-    expect(productItems.value[0].style).toBe("金項鍊（已更新）")
+    expect(productItems.value[0].style).toBe("金項鍊(已更新)")
     expect(productItems.value[0].internalCode).toBe("TEST001-UPDATED")
+    expect(productItems.value[0].amount).toBe(55000)
   })
 
   it("should remove product item correctly", async () => {
     const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
     const { productItems, addProductItem, removeProductItem } = useServiceOrderForm()
 
-    addProductItem({ brandName: "CHANEL", style: "金項鍊", internalCode: "TEST001", accessories: [], defects: [] })
-    addProductItem({ brandName: "TIFFANY", style: "白金戒指", internalCode: "TEST002", accessories: [], defects: [] })
+    addProductItem({ brandName: "CHANEL", style: "金項鍊", internalCode: "TEST001", accessories: [], defects: [], amount: 50000 })
+    addProductItem({ brandName: "TIFFANY", style: "白金戒指", internalCode: "TEST002", accessories: [], defects: [], amount: 30000 })
 
     expect(productItems.value).toHaveLength(2)
 
@@ -103,6 +108,27 @@ describe("useServiceOrderForm", () => {
 
     expect(productItems.value).toHaveLength(1)
     expect(productItems.value[0].style).toBe("白金戒指")
+  })
+
+  it("should calculate total amount automatically", async () => {
+    const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
+    const { formData, addProductItem, updateProductItem, removeProductItem } = useServiceOrderForm()
+
+    // 添加第一個商品
+    addProductItem({ brandName: "CHANEL", style: "金項鍊", amount: 50000 })
+    expect(formData.totalAmount).toBe(50000)
+
+    // 添加第二個商品
+    addProductItem({ brandName: "TIFFANY", style: "白金戒指", amount: 30000 })
+    expect(formData.totalAmount).toBe(80000)
+
+    // 更新第一個商品金額
+    updateProductItem(0, { amount: 55000 })
+    expect(formData.totalAmount).toBe(85000)
+
+    // 刪除第一個商品
+    removeProductItem(0)
+    expect(formData.totalAmount).toBe(30000)
   })
 
   it("should allow manual total amount input", async () => {

@@ -55,9 +55,12 @@ export function useServiceOrderForm() {
       style: item.style!,
       internalCode: item.internalCode,
       accessories: item.accessories,
-      defects: item.defects
+      defects: item.defects,
+      amount: item.amount
     }
     productItems.value.push(newItem)
+    // 自動加總
+    updateTotalAmount()
   }
 
   /**
@@ -66,6 +69,8 @@ export function useServiceOrderForm() {
   function updateProductItem(index: number, item: Partial<ProductItem>) {
     if (productItems.value[index]) {
       Object.assign(productItems.value[index], item)
+      // 自動加總
+      updateTotalAmount()
     }
   }
 
@@ -74,6 +79,18 @@ export function useServiceOrderForm() {
    */
   function removeProductItem(index: number) {
     productItems.value.splice(index, 1)
+    // 自動加總
+    updateTotalAmount()
+  }
+
+  /**
+   * 自動計算並更新總金額
+   */
+  function updateTotalAmount() {
+    const total = productItems.value.reduce((sum, item) => {
+      return sum + (item.amount || 0)
+    }, 0)
+    formData.totalAmount = total
   }
 
   /**
@@ -146,7 +163,8 @@ export function useServiceOrderForm() {
           style: item.style,
           internalCode: item.internalCode,
           accessories: item.accessories,
-          defects: item.defects
+          defects: item.defects,
+          amount: item.amount
         }))
       }
 

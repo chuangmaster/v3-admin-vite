@@ -155,6 +155,8 @@ export interface ProductItem {
   accessories?: string[]
   /** 商品瑕疵處（僅寄賣單） */
   defects?: string[]
+  /** 金額（寄賣單為實拿金額，收購單為收購金額） */
+  amount?: number
 }
 
 /** 客戶實體 */

@@ -439,6 +439,15 @@ function getDefectLabel(value: string) {
             </template>
           </el-table-column>
           <el-table-column
+            :label="formData.orderType === ServiceOrderType.CONSIGNMENT ? '實拿金額' : '收購金額'"
+            width="120"
+            align="right"
+          >
+            <template #default="{ row }">
+              {{ row.amount ? row.amount.toLocaleString() : '-' }}
+            </template>
+          </el-table-column>
+          <el-table-column
             label="商品配件"
             min-width="150"
           >
@@ -504,15 +513,7 @@ function getDefectLabel(value: string) {
 
         <div v-if="productItems.length > 0" class="total-amount">
           <span>總金額：</span>
-          <el-input-number
-            v-model="formData.totalAmount"
-            :min="0"
-            :precision="0"
-            :step="1000"
-            :controls="false"
-            placeholder="請輸入總金額"
-            style="width: 200px;"
-          />
+          <span class="total-amount-value">{{ formData.totalAmount?.toLocaleString() || 0 }}</span>
           <span style="margin-left: 8px;">元</span>
         </div>
       </el-card>
@@ -703,6 +704,12 @@ function getDefectLabel(value: string) {
     span {
       font-size: 16px;
       font-weight: 500;
+    }
+
+    .total-amount-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--el-color-primary);
     }
   }
 

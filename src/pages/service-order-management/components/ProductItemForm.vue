@@ -37,12 +37,14 @@ const formData = reactive<{
   internalCode: string
   accessories: (string | number)[]
   defects: (string | number)[]
+  amount: number | undefined
 }>({
   brandName: "",
   style: "",
   internalCode: "",
   accessories: [],
-  defects: []
+  defects: [],
+  amount: undefined
 })
 
 /** 表單驗證規則 */
@@ -55,7 +57,11 @@ const rules: FormRules = {
     { required: true, message: "請輸入款式", trigger: "blur" },
     { min: 1, max: 100, message: "款式長度為 1-100 字元", trigger: "blur" }
   ],
-  internalCode: [{ max: 50, message: "內碼長度不超過 50 字元", trigger: "blur" }]
+  internalCode: [{ max: 50, message: "內碼長度不超過 50 字元", trigger: "blur" }],
+  amount: [
+    { required: true, message: "請輸入金額", trigger: "blur" },
+    { type: "number", min: 0, message: "金額必須大於等於 0", trigger: "blur" }
+  ]
 }
 
 /**
@@ -71,6 +77,7 @@ async function handleSubmit() {
       brandName: formData.brandName,
       style: formData.style,
       internalCode: formData.internalCode || undefined,
+      amount: formData.amount,
       // 配件欄位收購單和寄賣單都有
       accessories: formData.accessories.length > 0 ? formData.accessories.map(String) : undefined,
       // 瑡疵欄位只有寄賣單才有
@@ -107,6 +114,7 @@ watch(
       formData.internalCode = value.internalCode || ""
       formData.accessories = (value.accessories as (string | number)[]) || []
       formData.defects = (value.defects as (string | number)[]) || []
+      formData.amount = value.amount || 0
     }
   },
   { immediate: true }
@@ -130,6 +138,19 @@ defineExpose({
 
     <el-form-item label="內碼" prop="internalCode">
       <el-input v-model="formData.internalCode" placeholder="請輸入內碼（選填）" maxlength="50" show-word-limit />
+    </el-form-item>
+
+    <!-- 金額欄位：根據訂單類型顯示不同標籤 -->
+    <el-form-item :label="isConsignment ? '實拿金額' : '收購金額'" prop="amount">
+      <el-input-number
+        v-model="formData.amount"
+        :min="0"
+        :precision="0"
+        :step="1000"
+        :controls="false"
+        :placeholder="isConsignment ? '請輸入實拿金額' : '請輸入收購金額'"
+        style="width: 100%;"
+      />
     </el-form-item>
 
     <!-- 配件欄位：收購單和寄賣單都有 -->
