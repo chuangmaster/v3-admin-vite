@@ -79,6 +79,23 @@ function handleRemove() {
 }
 
 /**
+ * 將檔案轉換為 Base64
+ */
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = reader.result as string
+      // 移除 data:image/xxx;base64, 前綴
+      const base64 = result.split(",")[1]
+      resolve(base64)
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+/**
  * 執行 AI 辨識
  */
 async function handleRecognize() {
@@ -89,7 +106,12 @@ async function handleRecognize() {
 
   recognizing.value = true
   try {
-    const response = await recognizeIDCard(currentFile.value.raw)
+    // 將圖片轉換為 Base64
+    const base64 = await fileToBase64(currentFile.value.raw)
+    const contentType = currentFile.value.raw.type || "image/jpeg"
+    const fileName = currentFile.value.name
+
+    const response = await recognizeIDCard(base64, contentType, fileName)
 
     if (response.success && response.data) {
       ElMessage.success("辨識成功")

@@ -49,79 +49,70 @@ describe("useServiceOrderForm", () => {
 
   it("should add product item correctly", async () => {
     const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
-    const { ProductCategory } = await import("@/pages/service-order-management/types")
     const { productItems, addProductItem } = useServiceOrderForm()
 
     const mockProduct = {
-      category: ProductCategory.GOLD_JEWELRY,
-      name: "金項鍊",
-      weight: 50,
-      purity: "999",
-      unitPrice: 6000,
-      quantity: 1,
-      totalPrice: 6000,
-      description: "測試商品"
+      brandName: "CHANEL",
+      style: "金項鍊",
+      internalCode: "TEST001",
+      accessories: ["DUST_BAG", "CERTIFICATE"],
+      defects: []
     }
 
     addProductItem(mockProduct)
 
     expect(productItems.value).toHaveLength(1)
-    expect(productItems.value[0].name).toEqual(mockProduct.name)
+    expect(productItems.value[0].style).toEqual(mockProduct.style)
   })
 
   it("should update product item correctly", async () => {
     const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
-    const { ProductCategory } = await import("@/pages/service-order-management/types")
     const { productItems, addProductItem, updateProductItem } = useServiceOrderForm()
 
     const mockProduct = {
-      category: ProductCategory.GOLD_JEWELRY,
-      name: "金項鍊",
-      weight: 50,
-      purity: "999",
-      unitPrice: 6000,
-      quantity: 1,
-      totalPrice: 6000
+      brandName: "CHANEL",
+      style: "金項鍊",
+      internalCode: "TEST001",
+      accessories: ["DUST_BAG"],
+      defects: []
     }
 
     addProductItem(mockProduct)
 
     const updatedProduct = {
-      weight: 60,
-      totalPrice: 7200
+      style: "金項鍊（已更新）",
+      internalCode: "TEST001-UPDATED"
     }
 
     updateProductItem(0, updatedProduct)
 
-    expect(productItems.value[0].weight).toBe(60)
-    expect(productItems.value[0].totalPrice).toBe(7200)
+    expect(productItems.value[0].style).toBe("金項鍊（已更新）")
+    expect(productItems.value[0].internalCode).toBe("TEST001-UPDATED")
   })
 
   it("should remove product item correctly", async () => {
     const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
-    const { ProductCategory } = await import("@/pages/service-order-management/types")
     const { productItems, addProductItem, removeProductItem } = useServiceOrderForm()
 
-    addProductItem({ category: ProductCategory.GOLD_JEWELRY, name: "金項鍊", quantity: 1, totalPrice: 6000 })
-    addProductItem({ category: ProductCategory.PLATINUM_JEWELRY, name: "白金戒指", quantity: 1, totalPrice: 8000 })
+    addProductItem({ brandName: "CHANEL", style: "金項鍊", internalCode: "TEST001", accessories: [], defects: [] })
+    addProductItem({ brandName: "TIFFANY", style: "白金戒指", internalCode: "TEST002", accessories: [], defects: [] })
 
     expect(productItems.value).toHaveLength(2)
 
     removeProductItem(0)
 
     expect(productItems.value).toHaveLength(1)
-    expect(productItems.value[0].name).toBe("白金戒指")
+    expect(productItems.value[0].style).toBe("白金戒指")
   })
 
-  it("should calculate total amount correctly", async () => {
+  it("should allow manual total amount input", async () => {
     const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
-    const { ProductCategory } = await import("@/pages/service-order-management/types")
-    const { totalAmount, addProductItem } = useServiceOrderForm()
+    const { formData } = useServiceOrderForm()
 
-    addProductItem({ category: ProductCategory.GOLD_JEWELRY, name: "金項鍊", quantity: 1, totalPrice: 6000 })
-    addProductItem({ category: ProductCategory.PLATINUM_JEWELRY, name: "白金戒指", quantity: 1, totalPrice: 8000 })
+    // 手動設定總金額
+    formData.totalAmount = 15000
 
-    expect(totalAmount.value).toBe(14000)
+    expect(formData.totalAmount).toBe(15000)
   })
 
   it("should set signature correctly", async () => {

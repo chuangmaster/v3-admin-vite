@@ -4,8 +4,7 @@
  * 用於建立收購單或寄賣單
  */
 import type { Customer } from "./types"
-import { Delete, Edit, EditPen, Goods, Plus, Upload, User } from "@element-plus/icons-vue"
-import AttachmentUploader from "./components/AttachmentUploader.vue"
+import { Delete, Edit, EditPen, Goods, Plus, User } from "@element-plus/icons-vue"
 import CustomerForm from "./components/CustomerForm.vue"
 import CustomerSearch from "./components/CustomerSearch.vue"
 import IdCardUploader from "./components/IdCardUploader.vue"
@@ -14,7 +13,7 @@ import SignaturePad from "./components/SignaturePad.vue"
 import { useIdCardRecognition } from "./composables/useIdCardRecognition"
 import { useServiceOrderForm } from "./composables/useServiceOrderForm"
 import { useSignature } from "./composables/useSignature"
-import { AttachmentType, ServiceOrderSource, ServiceOrderType } from "./types"
+import { ACCESSORY_OPTIONS, DEFECT_OPTIONS, ServiceOrderSource, ServiceOrderType } from "./types"
 
 defineOptions({
   name: "ServiceOrderCreate"
@@ -28,7 +27,6 @@ const {
   selectedCustomer,
   productItems,
   formData,
-  totalAmount,
   setCustomer,
   addProductItem,
   updateProductItem,
@@ -235,6 +233,20 @@ function handleCancel() {
     router.push({ name: "ServiceOrderManagement" })
   })
 }
+
+/**
+ * 取得配件標籤
+ */
+function getAccessoryLabel(value: string) {
+  return ACCESSORY_OPTIONS.find(opt => opt.value === value)?.label || value
+}
+
+/**
+ * 取得瑕疵標籤
+ */
+function getDefectLabel(value: string) {
+  return DEFECT_OPTIONS.find(opt => opt.value === value)?.label || value
+}
 </script>
 
 <template>
@@ -246,11 +258,10 @@ function handleCancel() {
         </div>
       </template>
 
-      <el-steps :active="productItems.length > 0 ? 3 : selectedCustomer ? 2 : formData.orderType && formData.orderSource ? 1 : 0" finish-status="success" class="steps">
+      <el-steps :active="productItems.length > 0 ? 2 : selectedCustomer ? 1 : formData.orderType && formData.orderSource ? 0 : 0" finish-status="success" class="steps">
         <el-step title="服務單設定" />
         <el-step title="選擇客戶" />
         <el-step title="新增商品" />
-        <el-step title="上傳附件" />
         <el-step title="簽名確認" />
       </el-steps>
 
@@ -396,7 +407,7 @@ function handleCancel() {
                 size="small"
                 style="margin: 2px;"
               >
-                {{ accessory }}
+                {{ getAccessoryLabel(accessory) }}
               </el-tag>
               <span v-if="!row.accessories || row.accessories.length === 0">-</span>
             </template>
@@ -414,7 +425,7 @@ function handleCancel() {
                 size="small"
                 style="margin: 2px;"
               >
-                {{ defect }}
+                {{ getDefectLabel(defect) }}
               </el-tag>
               <span v-if="!row.defects || row.defects.length === 0">-</span>
             </template>
@@ -451,64 +462,20 @@ function handleCancel() {
 
         <div v-if="productItems.length > 0" class="total-amount">
           <span>總金額：</span>
-          <el-tag type="danger" size="large" effect="dark">
-            NT$ {{ totalAmount.toLocaleString() }}
-          </el-tag>
+          <el-input-number
+            v-model="formData.totalAmount"
+            :min="0"
+            :precision="0"
+            :step="1000"
+            :controls="false"
+            placeholder="請輸入總金額"
+            style="width: 200px;"
+          />
+          <span style="margin-left: 8px;">元</span>
         </div>
       </el-card>
 
-      <!-- 步驟 3: 上傳附件 -->
-      <el-card v-if="productItems.length > 0" shadow="never" class="section-card">
-        <template #header>
-          <div class="section-title">
-            <el-icon><Upload /></el-icon>
-            <span>上傳附件</span>
-            <el-text type="info" size="small" style="margin-left: 12px;">
-              請上傳身分證、合約等相關文件（可選）
-            </el-text>
-          </div>
-        </template>
-
-        <el-row :gutter="20">
-          <el-col :span="12">
-            <div class="attachment-section">
-              <div class="attachment-title">
-                身分證照片
-              </div>
-              <AttachmentUploader
-                :file-type="AttachmentType.ID_CARD"
-                :limit="2"
-              />
-            </div>
-          </el-col>
-          <el-col :span="12">
-            <div class="attachment-section">
-              <div class="attachment-title">
-                合約文件
-              </div>
-              <AttachmentUploader
-                :file-type="AttachmentType.CONTRACT"
-                :limit="5"
-              />
-            </div>
-          </el-col>
-        </el-row>
-        <el-row :gutter="20" style="margin-top: 20px;">
-          <el-col :span="24">
-            <div class="attachment-section">
-              <div class="attachment-title">
-                其他附件
-              </div>
-              <AttachmentUploader
-                :file-type="AttachmentType.OTHER"
-                :limit="10"
-              />
-            </div>
-          </el-col>
-        </el-row>
-      </el-card>
-
-      <!-- 步驟 4: 簽名確認 -->
+      <!-- 步驟 3: 簽名確認 -->
       <el-card v-if="productItems.length > 0" shadow="never" class="section-card">
         <template #header>
           <div class="section-title">

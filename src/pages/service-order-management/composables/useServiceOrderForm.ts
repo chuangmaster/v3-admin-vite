@@ -34,11 +34,6 @@ export function useServiceOrderForm() {
     notes: ""
   })
 
-  /** 總金額計算 */
-  const totalAmount = computed(() => {
-    return productItems.value.reduce((sum, item) => sum + (item.totalPrice || 0), 0)
-  })
-
   /**
    * 設定客戶
    */
@@ -53,14 +48,11 @@ export function useServiceOrderForm() {
   function addProductItem(item: Partial<ProductItem>) {
     const newItem: ProductItem = {
       id: `temp-${Date.now()}`,
-      category: item.category!,
-      name: item.name!,
-      weight: item.weight,
-      purity: item.purity,
-      unitPrice: item.unitPrice,
-      quantity: item.quantity || 1,
-      totalPrice: item.totalPrice || 0,
-      description: item.description
+      brandName: item.brandName!,
+      style: item.style!,
+      internalCode: item.internalCode,
+      accessories: item.accessories,
+      defects: item.defects
     }
     productItems.value.push(newItem)
   }
@@ -135,16 +127,12 @@ export function useServiceOrderForm() {
       const requestData: CreateServiceOrderRequest = {
         ...formData as CreateServiceOrderRequest,
         productItems: productItems.value.map(item => ({
-          category: item.category,
-          name: item.name,
-          weight: item.weight,
-          purity: item.purity,
-          unitPrice: item.unitPrice,
-          quantity: item.quantity,
-          totalPrice: item.totalPrice,
-          description: item.description
-        })),
-        totalAmount: totalAmount.value
+          brandName: item.brandName,
+          style: item.style,
+          internalCode: item.internalCode,
+          accessories: item.accessories,
+          defects: item.defects
+        }))
       }
 
       const response = await createServiceOrder(requestData)
@@ -194,7 +182,6 @@ export function useServiceOrderForm() {
     signatureDataUrl,
     idCardUploaded,
     formData,
-    totalAmount,
     setCustomer,
     addProductItem,
     updateProductItem,

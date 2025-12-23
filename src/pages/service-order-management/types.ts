@@ -413,10 +413,14 @@ export interface CreateCustomerRequest {
   idCardNumber: string
 }
 
-/** OCR 辨識身分證請求（multipart/form-data） */
-export interface OCRIDCardRequest {
-  /** 身分證圖片檔案 */
-  file: File
+/** OCR 辨識身分證請求（使用 Base64 編碼） */
+export interface OcrIdCardRequest {
+  /** 身分證圖片 Base64 字串（不含 data:image/xxx;base64, 前綴） */
+  imageBase64: string
+  /** 圖片 MIME 類型（例如：image/jpeg, image/png） */
+  contentType: string
+  /** 原始檔案名稱（可選） */
+  fileName?: string
 }
 
 /** OCR 辨識身分證回應 */
