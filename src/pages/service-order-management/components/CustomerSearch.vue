@@ -61,7 +61,7 @@ function handleCreate() {
               {{ customer.name }}
             </div>
             <div class="customer-details">
-              <span>{{ customer.phone }}</span>
+              <span>{{ customer.phoneNumber }}</span>
               <span v-if="customer.email" class="separator">|</span>
               <span v-if="customer.email">{{ customer.email }}</span>
               <span class="separator">|</span>

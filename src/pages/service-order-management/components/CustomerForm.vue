@@ -20,9 +20,9 @@ const loading = ref(false)
 /** 表單資料 */
 const formData = reactive<CreateCustomerRequest>({
   name: "",
-  phone: "",
+  phoneNumber: "",
   email: "",
-  idCardNumber: ""
+  idNumber: ""
 })
 
 /** 表單驗證規則 */
@@ -31,7 +31,7 @@ const rules: FormRules = {
     { required: true, message: "請輸入客戶姓名", trigger: "blur" },
     { min: 1, max: 50, message: "姓名長度為 1-50 字元", trigger: "blur" }
   ],
-  phone: [
+  phoneNumber: [
     { required: true, message: "請輸入電話號碼", trigger: "blur" },
     {
       pattern: /^(09\d{8}|0[2-8]-?\d{7,8})$/,
@@ -46,7 +46,7 @@ const rules: FormRules = {
       trigger: "blur"
     }
   ],
-  idCardNumber: [
+  idNumber: [
     { required: true, message: "請輸入身分證字號", trigger: "blur" },
     {
       validator: (_rule, value, callback) => {
@@ -114,9 +114,9 @@ function handleCancel() {
 function resetForm() {
   formRef.value?.resetFields()
   formData.name = ""
-  formData.phone = ""
+  formData.phoneNumber = ""
   formData.email = ""
-  formData.idCardNumber = ""
+  formData.idNumber = ""
 }
 
 /**
@@ -124,7 +124,7 @@ function resetForm() {
  */
 function fillFromOCR(data: { name: string, idCardNumber: string }) {
   formData.name = data.name
-  formData.idCardNumber = data.idCardNumber
+  formData.idNumber = data.idCardNumber
 }
 
 // 暴露方法供父元件使用
@@ -151,9 +151,9 @@ defineExpose({
       />
     </el-form-item>
 
-    <el-form-item label="電話號碼" prop="phone">
+    <el-form-item label="電話號碼" prop="phoneNumber">
       <el-input
-        v-model="formData.phone"
+        v-model="formData.phoneNumber"
         placeholder="請輸入手機號碼或市話（例如：0912345678）"
         maxlength="15"
       />
@@ -168,12 +168,12 @@ defineExpose({
       />
     </el-form-item>
 
-    <el-form-item label="身分證字號" prop="idCardNumber">
+    <el-form-item label="身分證字號" prop="idNumber">
       <el-input
-        v-model="formData.idCardNumber"
+        v-model="formData.idNumber"
         placeholder="請輸入身分證字號"
         maxlength="11"
-        @input="formData.idCardNumber = formData.idCardNumber.toUpperCase()"
+        @input="formData.idNumber = formData.idNumber.toUpperCase()"
       >
         <template #append>
           <el-tooltip

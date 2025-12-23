@@ -78,7 +78,7 @@ describe("customerForm.vue", () => {
       props: {
         formData: {
           name: "王小明",
-          phone: "0912345678",
+          phoneNumber: "0912345678",
           email: "wang@example.com",
           idCardNumber: "A123456789" // 正確的台灣身分證格式
         }
@@ -102,7 +102,7 @@ describe("customerForm.vue", () => {
       props: {
         formData: {
           name: "John Doe",
-          phone: "0912345678",
+          phoneNumber: "0912345678",
           email: "john@example.com",
           idCardNumber: "19900115JO" // 外籍人士身分證格式
         }
@@ -123,7 +123,7 @@ describe("customerForm.vue", () => {
     // Arrange
     const validFormData = {
       name: "王小明",
-      phone: "0912345678",
+      phoneNumber: "0912345678",
       email: "wang@example.com",
       idCardNumber: "A123456789"
     }

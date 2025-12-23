@@ -70,7 +70,7 @@ describe("customerSearch.vue", () => {
     const mockCustomer: Customer = {
       id: "1",
       name: "王小明",
-      phone: "0912345678",
+      phoneNumber: "0912345678",
       email: "wang@example.com",
       idCardNumber: "A123456789",
       createdAt: "2025-01-01T00:00:00Z"

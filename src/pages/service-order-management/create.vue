@@ -338,7 +338,7 @@ function getDefectLabel(value: string) {
               {{ selectedCustomer.name }}
             </el-descriptions-item>
             <el-descriptions-item label="電話號碼">
-              {{ selectedCustomer.phone }}
+              {{ selectedCustomer.phoneNumber }}
             </el-descriptions-item>
             <el-descriptions-item label="Email">
               {{ selectedCustomer.email || '未提供' }}

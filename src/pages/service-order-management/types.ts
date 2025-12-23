@@ -164,7 +164,7 @@ export interface Customer {
   /** 客戶姓名 */
   name: string
   /** 電話號碼 */
-  phone: string
+  phoneNumber: string
   /** Email */
   email?: string
   /** 身分證字號 */
@@ -405,12 +405,12 @@ export interface CustomerSearchParams {
 export interface CreateCustomerRequest {
   /** 客戶姓名 */
   name: string
-  /** 電話號碼 */
-  phone: string
+  /** 聯絡電話 */
+  phoneNumber: string
   /** Email（可選） */
   email?: string
   /** 身分證字號（支援台灣身分證與外籍人士格式） */
-  idCardNumber: string
+  idNumber: string
 }
 
 /** OCR 辨識身分證請求（使用 Base64 編碼） */

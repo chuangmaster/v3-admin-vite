@@ -35,7 +35,7 @@ describe("useServiceOrderForm", () => {
     const mockCustomer: Customer = {
       id: "customer-123",
       name: "王小明",
-      phone: "0912345678",
+      phoneNumber: "0912345678",
       email: "wang@example.com",
       idCardNumber: "A123456789",
       createdAt: "2025-12-14T10:00:00Z",
@@ -156,7 +156,7 @@ describe("useServiceOrderForm", () => {
     setCustomer({
       id: "customer-123",
       name: "王小明",
-      phone: "0912345678",
+      phoneNumber: "0912345678",
       idCardNumber: "A123456789"
     } as any)
 

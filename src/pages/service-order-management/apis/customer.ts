@@ -11,6 +11,34 @@ import type {
 import { request } from "@/http/axios"
 
 /**
+ * 後端回傳的客戶資料格式（與前端欄位名稱不同）
+ */
+interface CustomerResponseDTO {
+  id: string
+  name: string
+  phoneNumber: string
+  email?: string
+  idNumber: string
+  createdAt: string
+  updatedAt?: string
+}
+
+/**
+ * 轉換後端回傳的客戶資料為前端格式
+ */
+function transformCustomer(dto: CustomerResponseDTO): Customer {
+  return {
+    id: dto.id,
+    name: dto.name,
+    phoneNumber: dto.phoneNumber,
+    email: dto.email,
+    idCardNumber: dto.idNumber,
+    createdAt: dto.createdAt,
+    updatedAt: dto.updatedAt
+  }
+}
+
+/**
  * 搜尋客戶
  * @param params - 搜尋參數（關鍵字：姓名、電話、Email、身分證字號）
  * @returns 客戶列表
@@ -18,7 +46,23 @@ import { request } from "@/http/axios"
 export async function searchCustomers(
   params: CustomerSearchParams
 ): Promise<ApiResponse<Customer[]>> {
-  return request({ url: "/customers/search", method: "GET", params })
+  const response = await request<ApiResponse<CustomerResponseDTO[]>>({
+    url: "/customers/search",
+    method: "GET",
+    params
+  })
+
+  if (response.success && response.data) {
+    return {
+      ...response,
+      data: response.data.map(transformCustomer)
+    }
+  }
+
+  return {
+    ...response,
+    data: []
+  }
 }
 
 /**
@@ -29,7 +73,20 @@ export async function searchCustomers(
 export async function createCustomer(
   data: CreateCustomerRequest
 ): Promise<ApiResponse<Customer>> {
-  return request({ url: "/customers", method: "POST", data })
+  const response = await request<ApiResponse<CustomerResponseDTO>>({
+    url: "/customers",
+    method: "POST",
+    data
+  })
+
+  if (response.success && response.data) {
+    return {
+      ...response,
+      data: transformCustomer(response.data)
+    }
+  }
+
+  return response as unknown as ApiResponse<Customer>
 }
 
 /**
@@ -38,5 +95,17 @@ export async function createCustomer(
  * @returns 客戶資料
  */
 export async function getCustomer(id: string): Promise<ApiResponse<Customer>> {
-  return request({ url: `/customers/${id}`, method: "GET" })
+  const response = await request<ApiResponse<CustomerResponseDTO>>({
+    url: `/customers/${id}`,
+    method: "GET"
+  })
+
+  if (response.success && response.data) {
+    return {
+      ...response,
+      data: transformCustomer(response.data)
+    }
+  }
+
+  return response as unknown as ApiResponse<Customer>
 }
