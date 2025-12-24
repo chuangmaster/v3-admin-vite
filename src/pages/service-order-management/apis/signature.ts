@@ -4,6 +4,8 @@
  */
 
 import type {
+  GenerateContractPreviewRequest,
+  GenerateContractPreviewResponse,
   MergeSignaturePreviewRequest,
   MergeSignaturePreviewResponse,
   ResendSignatureRequest,
@@ -92,5 +94,20 @@ export async function getSignatureRecords(
   return request({
     url: `/service-orders/${serviceOrderId}/signatures`,
     method: "GET"
+  })
+}
+
+/**
+ * 生成合約預覽 PDF
+ * @param data - 生成合約預覽請求資料（客戶資訊、商品項目等）
+ * @returns 合約預覽 URL（收購單包含收購合約和一時貿易書，寄賣單包含寄賣合約書）
+ */
+export async function generateContractPreview(
+  data: GenerateContractPreviewRequest
+): Promise<ApiResponse<GenerateContractPreviewResponse>> {
+  return request({
+    url: "/contracts/preview",
+    method: "POST",
+    data
   })
 }

@@ -39,7 +39,7 @@ describe("useSignature", () => {
 
     // Act
     const { saveSignature, signatureRecord } = useSignature()
-    const result = await saveSignature("order-123", "data:image/png;base64,abc", "客戶")
+    const result = await saveSignature("order-123", "BUYBACK_CONTRACT" as any, "data:image/png;base64,abc", "客戶")
 
     // Assert
     expect(result).toBe(true)
@@ -60,7 +60,7 @@ describe("useSignature", () => {
 
     // Act
     const { saveSignature } = useSignature()
-    const result = await saveSignature("order-123", "data:image/png;base64,abc")
+    const result = await saveSignature("order-123", "BUYBACK_CONTRACT" as any, "data:image/png;base64,abc")
 
     // Assert
     expect(result).toBe(false)
@@ -108,7 +108,7 @@ describe("useSignature", () => {
 
     // Act
     const { saveSignature, loading } = useSignature()
-    const promise = saveSignature("order-123", "data:image/png;base64,abc")
+    const promise = saveSignature("order-123", "BUYBACK_CONTRACT" as any, "data:image/png;base64,abc")
 
     // Assert - loading 應該為 true
     expect(loading.value).toBe(true)

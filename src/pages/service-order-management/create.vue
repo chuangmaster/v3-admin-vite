@@ -4,7 +4,7 @@
  * 用於建立收購單或寄賣單
  */
 import type { Customer } from "./types"
-import { Delete, Edit, EditPen, Goods, Plus, User } from "@element-plus/icons-vue"
+import { Delete, Document, Edit, EditPen, Goods, Plus, User, View } from "@element-plus/icons-vue"
 import { nextTick } from "vue"
 import CustomerForm from "./components/CustomerForm.vue"
 import CustomerSearch from "./components/CustomerSearch.vue"
@@ -30,17 +30,28 @@ const {
   formData,
   idCardFrontUploaded,
   idCardBackUploaded,
+  contractPreviewGenerated,
   setCustomer,
   addProductItem,
   updateProductItem,
   removeProductItem,
   setSignature,
   setIdCardUploaded,
+  setContractPreviewGenerated,
+  prepareContractPreviewData,
+  validateFormBasic,
   submitForm
 } = useServiceOrderForm()
 
 const { recognitionResult: _recognitionResult } = useIdCardRecognition()
-const { saveSignature: _saveSignature } = useSignature()
+const {
+  loading: signatureLoading,
+  buybackContractPreviewUrl,
+  tradeApplicationPreviewUrl,
+  consignmentContractPreviewUrl,
+  generatePreview,
+  saveSignature: _saveSignature
+} = useSignature()
 
 // 元件 refs
 const customerFormRef = ref<InstanceType<typeof CustomerForm>>()
@@ -241,6 +252,39 @@ function handleSigned(dataUrl: string) {
 }
 
 /**
+ * 生成合約預覽
+ */
+async function handleGeneratePreview() {
+  // 先驗證基本資料
+  const validation = validateFormBasic()
+  if (!validation.valid) {
+    ElMessage.warning(validation.message)
+    return
+  }
+
+  const previewData = prepareContractPreviewData()
+  if (!previewData) {
+    ElMessage.error("無法準備合約預覽資料")
+    return
+  }
+
+  const result = await generatePreview(previewData)
+  if (result) {
+    setContractPreviewGenerated(true)
+    ElMessage.success("合約預覽生成成功，請客戶確認後進行簽章")
+  }
+}
+
+/**
+ * 開啟 PDF 預覽（新視窗）
+ */
+function openPreview(url: string) {
+  if (url) {
+    window.open(url, "_blank")
+  }
+}
+
+/**
  * 提交訂單
  */
 async function handleSubmit() {
@@ -284,10 +328,27 @@ function getDefectLabel(value: string) {
         </div>
       </template>
 
-      <el-steps :active="productItems.length > 0 ? 2 : selectedCustomer ? 1 : formData.orderType && formData.orderSource ? 0 : 0" finish-status="success" class="steps">
+      <el-steps
+        :active="
+          (formData.orderSource === ServiceOrderSource.OFFLINE && contractPreviewGenerated) || formData.orderSource === ServiceOrderSource.ONLINE
+            ? 4
+            : (formData.orderSource === ServiceOrderSource.OFFLINE && productItems.length > 0)
+              ? 3
+              : productItems.length > 0
+                ? 2
+                : selectedCustomer
+                  ? 1
+                  : formData.orderType && formData.orderSource
+                    ? 0
+                    : 0
+        "
+        finish-status="success"
+        class="steps"
+      >
         <el-step title="服務單設定" />
         <el-step title="選擇客戶" />
         <el-step title="新增商品" />
+        <el-step v-if="formData.orderSource === ServiceOrderSource.OFFLINE" title="合約預覽" />
         <el-step title="簽名確認" />
       </el-steps>
 
@@ -518,14 +579,119 @@ function getDefectLabel(value: string) {
         </div>
       </el-card>
 
-      <!-- 步驟 3: 簽名確認 -->
-      <el-card v-if="productItems.length > 0" shadow="never" class="section-card">
+      <!-- 步驟 3: 合約預覽（僅線下流程） -->
+      <el-card v-if="productItems.length > 0 && formData.orderSource === ServiceOrderSource.OFFLINE" shadow="never" class="section-card">
+        <template #header>
+          <div class="section-title">
+            <el-icon><Document /></el-icon>
+            <span>合約預覽</span>
+            <el-tag v-if="!contractPreviewGenerated" type="warning" size="small">
+              必須完成
+            </el-tag>
+            <el-tag v-else type="success" size="small">
+              已完成
+            </el-tag>
+          </div>
+        </template>
+
+        <el-alert
+          v-if="!contractPreviewGenerated"
+          title="請先生成合約預覽，供客戶確認後再進行簽章"
+          type="info"
+          :closable="false"
+          style="margin-bottom: 16px;"
+        />
+
+        <div v-if="!contractPreviewGenerated" style="text-align: center; padding: 20px;">
+          <el-button
+            type="primary"
+            :loading="signatureLoading"
+            size="large"
+            @click="handleGeneratePreview"
+          >
+            生成合約預覽
+          </el-button>
+        </div>
+
+        <div v-else class="contract-preview">
+          <el-alert
+            title="合約已生成，請讓客戶確認以下文件"
+            type="success"
+            :closable="false"
+            style="margin-bottom: 16px;"
+          />
+
+          <!-- 收購單：收購合約 + 一時貿易書 -->
+          <template v-if="formData.orderType === ServiceOrderType.BUYBACK">
+            <div class="preview-section">
+              <h4>收購合約</h4>
+              <el-button
+                type="primary"
+                link
+                :icon="View"
+                @click="openPreview(buybackContractPreviewUrl)"
+              >
+                開啟預覽
+              </el-button>
+              <iframe :src="buybackContractPreviewUrl" class="pdf-preview" />
+            </div>
+
+            <div class="preview-section">
+              <h4>一時貿易申請書（收購單需要）</h4>
+              <el-button
+                type="primary"
+                link
+                :icon="View"
+                @click="openPreview(tradeApplicationPreviewUrl)"
+              >
+                開啟預覽
+              </el-button>
+              <iframe :src="tradeApplicationPreviewUrl" class="pdf-preview" />
+            </div>
+          </template>
+
+          <!-- 寄賣單：寄賣合約書 -->
+          <template v-else>
+            <div class="preview-section">
+              <h4>寄賣合約書</h4>
+              <el-button
+                type="primary"
+                link
+                :icon="View"
+                @click="openPreview(consignmentContractPreviewUrl)"
+              >
+                開啟預覽
+              </el-button>
+              <iframe :src="consignmentContractPreviewUrl" class="pdf-preview" />
+            </div>
+          </template>
+
+          <el-button
+            type="warning"
+            style="margin-top: 16px;"
+            @click="() => { setContractPreviewGenerated(false) }"
+          >
+            重新生成
+          </el-button>
+        </div>
+      </el-card>
+
+      <!-- 步驟 4: 簽名確認 -->
+      <el-card v-if="productItems.length > 0 && (formData.orderSource === ServiceOrderSource.ONLINE || contractPreviewGenerated)" shadow="never" class="section-card">
         <template #header>
           <div class="section-title">
             <el-icon><EditPen /></el-icon>
             <span>客戶簽名</span>
           </div>
         </template>
+
+        <el-alert
+          v-if="formData.orderSource === ServiceOrderSource.OFFLINE"
+          title="請客戶確認合約內容無誤後，在下方簽名區簽名"
+          type="info"
+          :closable="false"
+          style="margin-bottom: 16px;"
+        />
 
         <SignaturePad
           ref="signaturePadRef"
@@ -726,6 +892,27 @@ function getDefectLabel(value: string) {
       font-size: 14px;
       font-weight: 500;
       color: var(--el-text-color-regular);
+    }
+  }
+
+  .contract-preview {
+    .preview-section {
+      margin-bottom: 24px;
+
+      h4 {
+        margin: 0 0 12px 0;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--el-text-color-primary);
+      }
+
+      .pdf-preview {
+        width: 100%;
+        height: 500px;
+        border: 1px solid var(--el-border-color);
+        border-radius: 4px;
+        margin-top: 8px;
+      }
     }
   }
 }

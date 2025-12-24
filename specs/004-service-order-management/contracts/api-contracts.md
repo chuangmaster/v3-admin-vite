@@ -97,6 +97,7 @@ interface PagedResponse<T> {
 ### 簽名相關
 | 方法 | 端點 | 說明 | 權限 |
 |------|------|------|------|
+| POST | `/contracts/preview` | 生成合約預覽 PDF | `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create` |
 | POST | `/service-orders/{id}/signatures/merge-preview` | 合併簽名與預覽文件 | `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create` |
 | POST | `/service-orders/{id}/signatures/offline` | 儲存線下簽名 | `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create` |
 | POST | `/service-orders/{id}/signatures/online` | 發送線上簽名邀請 | `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create` |
@@ -1184,6 +1185,143 @@ interface LogAttachmentViewRequest {
   "traceId": "abc123xyz"
 }
 ```
+
+---
+
+### 18. 生成合約預覽 PDF
+
+**端點**: `POST /contracts/preview`
+
+**權限**: `serviceOrder.consignment.create` 或 `serviceOrder.buyback.create`
+
+**說明**: 在提交服務單前,根據客戶資料和商品資料生成合約 PDF 預覽供客戶確認。收購單會生成收購合約和一時貿易申請書,寄賣單會生成寄賣合約書。此 API 用於線下流程,讓客戶在簽章前先瀏覽合約內容。
+
+**請求 Body**:
+```typescript
+interface GenerateContractPreviewRequest {
+  /** 服務單類型 */
+  orderType: "consignment" | "buyback"
+  /** 客戶資訊 */
+  customer: {
+    /** 客戶姓名 */
+    name: string
+    /** 電話號碼 */
+    phoneNumber: string
+    /** Email */
+    email?: string
+    /** 身分證字號 */
+    idCardNumber: string
+  }
+  /** 商品項目列表 */
+  productItems: ProductItem[]
+  /** 總金額 */
+  totalAmount: number
+  /** 寄賣起始日期（僅寄賣單，ISO 8601） */
+  consignmentStartDate?: string
+  /** 寄賣結束日期（僅寄賣單，ISO 8601） */
+  consignmentEndDate?: string
+}
+```
+
+**請求範例（收購單）**:
+```json
+{
+  "orderType": "buyback",
+  "customer": {
+    "name": "王小明",
+    "phoneNumber": "0912345678",
+    "email": "wang@example.com",
+    "idCardNumber": "A123456789"
+  },
+  "productItems": [
+    {
+      "brandName": "CHANEL",
+      "style": "Classic Flap",
+      "internalCode": "ABC123",
+      "amount": 50000
+    }
+  ],
+  "totalAmount": 50000
+}
+```
+
+**請求範例（寄賣單）**:
+```json
+{
+  "orderType": "consignment",
+  "customer": {
+    "name": "王小明",
+    "phoneNumber": "0912345678",
+    "email": "wang@example.com",
+    "idCardNumber": "A123456789"
+  },
+  "productItems": [
+    {
+      "brandName": "CHANEL",
+      "style": "Classic Flap",
+      "internalCode": "ABC123",
+      "accessories": ["box", "dustBag", "card"],
+      "defects": ["cornerWear"],
+      "amount": 50000
+    }
+  ],
+  "totalAmount": 50000,
+  "consignmentStartDate": "2025-12-14",
+  "consignmentEndDate": "2026-03-14"
+}
+```
+
+**成功回應（收購單）** (200):
+```json
+{
+  "success": true,
+  "code": "SUCCESS",
+  "message": "合約預覽生成成功",
+  "data": {
+    "buybackContractUrl": "https://storage.example.com/previews/buyback_contract_12345.pdf",
+    "tradeApplicationUrl": "https://storage.example.com/previews/trade_application_12345.pdf",
+    "expiresAt": "2025-12-14T12:30:00Z"
+  },
+  "timestamp": "2025-12-14T10:30:00Z",
+  "traceId": "abc123xyz"
+}
+```
+
+**成功回應（寄賣單）** (200):
+```json
+{
+  "success": true,
+  "code": "SUCCESS",
+  "message": "合約預覽生成成功",
+  "data": {
+    "consignmentContractUrl": "https://storage.example.com/previews/consignment_contract_12345.pdf",
+    "expiresAt": "2025-12-14T12:30:00Z"
+  },
+  "timestamp": "2025-12-14T10:30:00Z",
+  "traceId": "abc123xyz"
+}
+```
+
+**錯誤回應** (400):
+```json
+{
+  "success": false,
+  "code": "VALIDATION_ERROR",
+  "message": "客戶資料不完整",
+  "data": null,
+  "timestamp": "2025-12-14T10:30:00Z",
+  "traceId": "abc123xyz"
+}
+```
+
+**前端整合流程（線下流程）**:
+1. 客戶選擇完成、商品資料填寫完成、身分證上傳完成
+2. 前端呼叫 `POST /contracts/preview` 生成合約預覽 PDF
+3. 在 UI 中顯示預覽 PDF（使用 iframe 或開啟新視窗）
+4. 客戶確認合約內容無誤
+5. 客戶在簽名板上簽名
+6. 呼叫 `POST /service-orders` 建立服務單
+7. 呼叫 `POST /service-orders/{id}/signatures/offline` 儲存簽名記錄
 
 ---
 

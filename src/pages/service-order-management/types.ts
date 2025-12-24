@@ -487,6 +487,43 @@ export interface MergeSignaturePreviewResponse {
   expiresAt: string
 }
 
+/** 生成合約預覽請求 */
+export interface GenerateContractPreviewRequest {
+  /** 服務單類型 */
+  orderType: ServiceOrderType
+  /** 客戶資訊 */
+  customer: {
+    /** 客戶姓名 */
+    name: string
+    /** 電話號碼 */
+    phoneNumber: string
+    /** Email */
+    email?: string
+    /** 身分證字號 */
+    idCardNumber: string
+  }
+  /** 商品項目列表 */
+  productItems: ProductItem[]
+  /** 總金額 */
+  totalAmount: number
+  /** 寄賣起始日期（僅寄賣單） */
+  consignmentStartDate?: string
+  /** 寄賣結束日期（僅寄賣單） */
+  consignmentEndDate?: string
+}
+
+/** 生成合約預覽回應 */
+export interface GenerateContractPreviewResponse {
+  /** 收購合約預覽 URL（收購單） */
+  buybackContractUrl?: string
+  /** 一時貿易申請書預覽 URL（收購單） */
+  tradeApplicationUrl?: string
+  /** 寄賣合約書預覽 URL（寄賣單） */
+  consignmentContractUrl?: string
+  /** 過期時間（ISO 8601, UTC） */
+  expiresAt: string
+}
+
 /** 記錄附件查看日誌請求 */
 export interface LogAttachmentViewRequest {
   /** 操作類型 */
