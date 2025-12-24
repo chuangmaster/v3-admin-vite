@@ -5,6 +5,20 @@ import type { DocumentType, GenerateContractPreviewRequest, GenerateContractPrev
 import { generateContractPreview, mergeSignaturePreview, saveOfflineSignature } from "../apis/signature"
 import { ServiceOrderType } from "../types"
 
+/**
+ * 將 Base64 編碼的 PDF 轉換為可顯示的 Data URL
+ * @param base64 - Base64 編碼的 PDF 字串
+ * @returns 可用於 iframe src 的 Data URL
+ */
+function base64ToDataUrl(base64: string): string {
+  if (!base64) return ""
+  // 如果已經是 Data URL 格式，直接返回
+  if (base64.startsWith("data:")) {
+    return base64
+  }
+  return `data:application/pdf;base64,${base64}`
+}
+
 export function useSignature() {
   const loading = ref(false)
 
@@ -30,12 +44,15 @@ export function useSignature() {
       const response = await generateContractPreview(data)
 
       if (response.success && response.data) {
-        // 儲存預覽 URL
+        // 支援兩種格式：URL 格式（契約規格）或 Base64 格式（後端過渡版本）
+        const resData = response.data as GenerateContractPreviewResponse & { pdfBase64?: string }
+
         if (data.orderType === ServiceOrderType.BUYBACK) {
-          buybackContractPreviewUrl.value = response.data.buybackContractUrl || ""
-          tradeApplicationPreviewUrl.value = response.data.tradeApplicationUrl || ""
+          // 優先使用 URL，若無則使用 Base64 轉換
+          buybackContractPreviewUrl.value = resData.buybackContractUrl || base64ToDataUrl(resData.pdfBase64 || "")
+          tradeApplicationPreviewUrl.value = resData.tradeApplicationUrl || base64ToDataUrl(resData.pdfBase64 || "")
         } else {
-          consignmentContractPreviewUrl.value = response.data.consignmentContractUrl || ""
+          consignmentContractPreviewUrl.value = resData.consignmentContractUrl || base64ToDataUrl(resData.pdfBase64 || "")
         }
         return response.data
       } else {

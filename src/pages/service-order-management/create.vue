@@ -277,9 +277,31 @@ async function handleGeneratePreview() {
 
 /**
  * 開啟 PDF 預覽（新視窗）
+ * 支援 URL 和 Base64 Data URL 兩種格式
  */
 function openPreview(url: string) {
-  if (url) {
+  if (!url) return
+
+  // 如果是 Data URL (Base64 格式)，轉換為 Blob URL 以解決瀏覽器安全策略限制
+  if (url.startsWith("data:application/pdf;base64,")) {
+    try {
+      const base64 = url.replace("data:application/pdf;base64,", "")
+      const binaryString = atob(base64)
+      const bytes = new Uint8Array(binaryString.length)
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i)
+      }
+      const blob = new Blob([bytes], { type: "application/pdf" })
+      const blobUrl = URL.createObjectURL(blob)
+      window.open(blobUrl, "_blank")
+      // 延遲釋放 Blob URL，確保新視窗有足夠時間載入
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000)
+    } catch (error) {
+      console.error("PDF 預覽開啟失敗:", error)
+      ElMessage.error("PDF 預覽開啟失敗")
+    }
+  } else {
+    // 一般 URL 直接開啟
     window.open(url, "_blank")
   }
 }
