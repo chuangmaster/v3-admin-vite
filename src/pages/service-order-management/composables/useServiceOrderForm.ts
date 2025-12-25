@@ -1,7 +1,7 @@
 /**
  * 服務訂單表單業務邏輯
  */
-import type { CreateServiceOrderRequest, Customer, GenerateContractPreviewRequest, ProductItem } from "../types"
+import type { CreateServiceOrderRequest, Customer, ProductItem } from "../types"
 import { createServiceOrder } from "../apis/service-order"
 import { RenewalOption, ServiceOrderSource, ServiceOrderType } from "../types"
 
@@ -23,9 +23,6 @@ export function useServiceOrderForm() {
 
   /** 身分證反面是否已上傳 */
   const idCardBackUploaded = ref(false)
-
-  /** 是否已生成合約預覽 */
-  const contractPreviewGenerated = ref(false)
 
   /** 表單資料 */
   const formData = reactive<Partial<CreateServiceOrderRequest>>({
@@ -112,46 +109,9 @@ export function useServiceOrderForm() {
   }
 
   /**
-   * 設定合約預覽已生成狀態
+   * 驗證表單
    */
-  function setContractPreviewGenerated(value: boolean) {
-    contractPreviewGenerated.value = value
-  }
-
-  /**
-   * 準備生成合約預覽的資料
-   */
-  function prepareContractPreviewData(): GenerateContractPreviewRequest | null {
-    if (!selectedCustomer.value) {
-      return null
-    }
-
-    return {
-      orderType: formData.orderType!,
-      customer: {
-        name: selectedCustomer.value.name,
-        phoneNumber: selectedCustomer.value.phoneNumber,
-        email: selectedCustomer.value.email,
-        idCardNumber: selectedCustomer.value.idCardNumber
-      },
-      productItems: productItems.value.map(item => ({
-        brandName: item.brandName!,
-        style: item.style!,
-        internalCode: item.internalCode,
-        accessories: item.accessories,
-        defects: item.defects,
-        amount: item.amount
-      })),
-      totalAmount: formData.totalAmount!,
-      consignmentStartDate: formData.consignmentStartDate,
-      consignmentEndDate: formData.consignmentEndDate
-    }
-  }
-
-  /**
-   * 驗證表單（不包括簽名和合約預覽）
-   */
-  function validateFormBasic(): { valid: boolean, message?: string } {
+  function validateForm(): { valid: boolean, message?: string } {
     if (!formData.customerId) {
       return { valid: false, message: "請選擇或新增客戶" }
     }
@@ -160,41 +120,18 @@ export function useServiceOrderForm() {
       return { valid: false, message: "請至少新增一項商品" }
     }
 
-    // 線下流程需要正反面都上傳
-    if (formData.orderSource === ServiceOrderSource.OFFLINE) {
+    // 身分證明文件驗證（僅收購單需要）
+    if (formData.orderType === ServiceOrderType.BUYBACK) {
       if (!idCardFrontUploaded.value) {
-        return { valid: false, message: "請上傳身分證正面影本" }
+        return { valid: false, message: "收購單需要上傳身分證正面影本" }
       }
-      if (!idCardBackUploaded.value) {
-        return { valid: false, message: "請上傳身分證反面影本" }
-      }
-    } else {
-      // 線上流程只需要正面
-      if (!idCardFrontUploaded.value) {
-        return { valid: false, message: "身分證明文件為必要附件，請上傳或拍攝身分證照片" }
+
+      // 線下流程需要反面
+      if (formData.orderSource === ServiceOrderSource.OFFLINE && !idCardBackUploaded.value) {
+        return { valid: false, message: "收購單的線下流程需要上傳身分證反面影本" }
       }
     }
-
-    return { valid: true }
-  }
-
-  /**
-   * 驗證表單（完整驗證，包括簽名）
-   */
-  function validateForm(): { valid: boolean, message?: string } {
-    const basicValidation = validateFormBasic()
-    if (!basicValidation.valid) {
-      return basicValidation
-    }
-
-    // 線下流程需要先生成合約預覽
-    if (formData.orderSource === ServiceOrderSource.OFFLINE && !contractPreviewGenerated.value) {
-      return { valid: false, message: "請先生成合約預覽供客戶確認" }
-    }
-
-    if (!signatureDataUrl.value) {
-      return { valid: false, message: "請完成簽名" }
-    }
+    // 寄賣單不需要驗證身分證
 
     return { valid: true }
   }
@@ -254,7 +191,6 @@ export function useServiceOrderForm() {
     signatureDataUrl.value = ""
     idCardFrontUploaded.value = false
     idCardBackUploaded.value = false
-    contractPreviewGenerated.value = false
     Object.assign(formData, {
       orderType: ServiceOrderType.BUYBACK,
       customerId: "",
@@ -274,7 +210,6 @@ export function useServiceOrderForm() {
     signatureDataUrl,
     idCardFrontUploaded,
     idCardBackUploaded,
-    contractPreviewGenerated,
     formData,
     setCustomer,
     addProductItem,
@@ -282,9 +217,6 @@ export function useServiceOrderForm() {
     removeProductItem,
     setSignature,
     setIdCardUploaded,
-    setContractPreviewGenerated,
-    prepareContractPreviewData,
-    validateFormBasic,
     validateForm,
     submitForm,
     resetForm

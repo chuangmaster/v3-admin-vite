@@ -4,16 +4,14 @@
  * 用於建立收購單或寄賣單
  */
 import type { Customer } from "./types"
-import { Delete, Document, Edit, EditPen, Goods, Plus, User, View } from "@element-plus/icons-vue"
+import { Delete, Document, Edit, Goods, Plus, User } from "@element-plus/icons-vue"
 import { nextTick } from "vue"
 import CustomerForm from "./components/CustomerForm.vue"
 import CustomerSearch from "./components/CustomerSearch.vue"
 import IdCardUploader from "./components/IdCardUploader.vue"
 import ProductItemForm from "./components/ProductItemForm.vue"
-import SignaturePad from "./components/SignaturePad.vue"
 import { useIdCardRecognition } from "./composables/useIdCardRecognition"
 import { useServiceOrderForm } from "./composables/useServiceOrderForm"
-import { useSignature } from "./composables/useSignature"
 import { ACCESSORY_OPTIONS, DEFECT_OPTIONS, ServiceOrderSource, ServiceOrderType } from "./types"
 
 defineOptions({
@@ -30,33 +28,19 @@ const {
   formData,
   idCardFrontUploaded,
   idCardBackUploaded,
-  contractPreviewGenerated,
   setCustomer,
   addProductItem,
   updateProductItem,
   removeProductItem,
-  setSignature,
   setIdCardUploaded,
-  setContractPreviewGenerated,
-  prepareContractPreviewData,
-  validateFormBasic,
   submitForm
 } = useServiceOrderForm()
 
 const { recognitionResult: _recognitionResult } = useIdCardRecognition()
-const {
-  loading: signatureLoading,
-  buybackContractPreviewUrl,
-  tradeApplicationPreviewUrl,
-  consignmentContractPreviewUrl,
-  generatePreview,
-  saveSignature: _saveSignature
-} = useSignature()
 
 // 元件 refs
 const customerFormRef = ref<InstanceType<typeof CustomerForm>>()
 const productItemFormRef = ref<InstanceType<typeof ProductItemForm>>()
-const signaturePadRef = ref<InstanceType<typeof SignaturePad>>()
 const dialogIdCardUploaderRef = ref<InstanceType<typeof IdCardUploader>>()
 const mainIdCardUploaderRef = ref<InstanceType<typeof IdCardUploader>>()
 
@@ -245,68 +229,6 @@ function handleRemoveProduct(index: number) {
 }
 
 /**
- * 簽名完成
- */
-function handleSigned(dataUrl: string) {
-  setSignature(dataUrl)
-}
-
-/**
- * 生成合約預覽
- */
-async function handleGeneratePreview() {
-  // 先驗證基本資料
-  const validation = validateFormBasic()
-  if (!validation.valid) {
-    ElMessage.warning(validation.message)
-    return
-  }
-
-  const previewData = prepareContractPreviewData()
-  if (!previewData) {
-    ElMessage.error("無法準備合約預覽資料")
-    return
-  }
-
-  const result = await generatePreview(previewData)
-  if (result) {
-    setContractPreviewGenerated(true)
-    ElMessage.success("合約預覽生成成功，請客戶確認後進行簽章")
-  }
-}
-
-/**
- * 開啟 PDF 預覽（新視窗）
- * 支援 URL 和 Base64 Data URL 兩種格式
- */
-function openPreview(url: string) {
-  if (!url) return
-
-  // 如果是 Data URL (Base64 格式)，轉換為 Blob URL 以解決瀏覽器安全策略限制
-  if (url.startsWith("data:application/pdf;base64,")) {
-    try {
-      const base64 = url.replace("data:application/pdf;base64,", "")
-      const binaryString = atob(base64)
-      const bytes = new Uint8Array(binaryString.length)
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i)
-      }
-      const blob = new Blob([bytes], { type: "application/pdf" })
-      const blobUrl = URL.createObjectURL(blob)
-      window.open(blobUrl, "_blank")
-      // 延遲釋放 Blob URL，確保新視窗有足夠時間載入
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 10000)
-    } catch (error) {
-      console.error("PDF 預覽開啟失敗:", error)
-      ElMessage.error("PDF 預覽開啟失敗")
-    }
-  } else {
-    // 一般 URL 直接開啟
-    window.open(url, "_blank")
-  }
-}
-
-/**
  * 提交訂單
  */
 async function handleSubmit() {
@@ -352,17 +274,13 @@ function getDefectLabel(value: string) {
 
       <el-steps
         :active="
-          (formData.orderSource === ServiceOrderSource.OFFLINE && contractPreviewGenerated) || formData.orderSource === ServiceOrderSource.ONLINE
-            ? 4
-            : (formData.orderSource === ServiceOrderSource.OFFLINE && productItems.length > 0)
-              ? 3
-              : productItems.length > 0
-                ? 2
-                : selectedCustomer
-                  ? 1
-                  : formData.orderType && formData.orderSource
-                    ? 0
-                    : 0
+          productItems.length > 0
+            ? 2
+            : selectedCustomer
+              ? 1
+              : formData.orderType && formData.orderSource
+                ? 0
+                : 0
         "
         finish-status="success"
         class="steps"
@@ -370,8 +288,6 @@ function getDefectLabel(value: string) {
         <el-step title="服務單設定" />
         <el-step title="選擇客戶" />
         <el-step title="新增商品" />
-        <el-step v-if="formData.orderSource === ServiceOrderSource.OFFLINE" title="合約預覽" />
-        <el-step title="簽名確認" />
       </el-steps>
 
       <!-- 服務單類型與來源選擇 -->
@@ -460,12 +376,15 @@ function getDefectLabel(value: string) {
             </el-descriptions-item>
           </el-descriptions>
 
-          <!-- 身分證件上傳區 -->
-          <div class="id-card-section">
+          <!-- 身分證件上傳區（僅收購單需要） -->
+          <div v-if="formData.orderType === ServiceOrderType.BUYBACK" class="id-card-section">
             <div class="section-subtitle">
               <span>身分證件</span>
               <el-tag v-if="formData.orderSource === ServiceOrderSource.OFFLINE" type="danger" size="small">
                 正反面必填
+              </el-tag>
+              <el-tag v-else type="warning" size="small">
+                正面必填
               </el-tag>
             </div>
             <IdCardUploader
@@ -601,126 +520,6 @@ function getDefectLabel(value: string) {
         </div>
       </el-card>
 
-      <!-- 步驟 3: 合約預覽（僅線下流程） -->
-      <el-card v-if="productItems.length > 0 && formData.orderSource === ServiceOrderSource.OFFLINE" shadow="never" class="section-card">
-        <template #header>
-          <div class="section-title">
-            <el-icon><Document /></el-icon>
-            <span>合約預覽</span>
-            <el-tag v-if="!contractPreviewGenerated" type="warning" size="small">
-              必須完成
-            </el-tag>
-            <el-tag v-else type="success" size="small">
-              已完成
-            </el-tag>
-          </div>
-        </template>
-
-        <el-alert
-          v-if="!contractPreviewGenerated"
-          title="請先生成合約預覽，供客戶確認後再進行簽章"
-          type="info"
-          :closable="false"
-          style="margin-bottom: 16px;"
-        />
-
-        <div v-if="!contractPreviewGenerated" style="text-align: center; padding: 20px;">
-          <el-button
-            type="primary"
-            :loading="signatureLoading"
-            size="large"
-            @click="handleGeneratePreview"
-          >
-            生成合約預覽
-          </el-button>
-        </div>
-
-        <div v-else class="contract-preview">
-          <el-alert
-            title="合約已生成，請讓客戶確認以下文件"
-            type="success"
-            :closable="false"
-            style="margin-bottom: 16px;"
-          />
-
-          <!-- 收購單：收購合約 + 一時貿易書 -->
-          <template v-if="formData.orderType === ServiceOrderType.BUYBACK">
-            <div class="preview-section">
-              <h4>收購合約</h4>
-              <el-button
-                type="primary"
-                link
-                :icon="View"
-                @click="openPreview(buybackContractPreviewUrl)"
-              >
-                開啟預覽
-              </el-button>
-              <iframe :src="buybackContractPreviewUrl" class="pdf-preview" />
-            </div>
-
-            <div class="preview-section">
-              <h4>一時貿易申請書（收購單需要）</h4>
-              <el-button
-                type="primary"
-                link
-                :icon="View"
-                @click="openPreview(tradeApplicationPreviewUrl)"
-              >
-                開啟預覽
-              </el-button>
-              <iframe :src="tradeApplicationPreviewUrl" class="pdf-preview" />
-            </div>
-          </template>
-
-          <!-- 寄賣單：寄賣合約書 -->
-          <template v-else>
-            <div class="preview-section">
-              <h4>寄賣合約書</h4>
-              <el-button
-                type="primary"
-                link
-                :icon="View"
-                @click="openPreview(consignmentContractPreviewUrl)"
-              >
-                開啟預覽
-              </el-button>
-              <iframe :src="consignmentContractPreviewUrl" class="pdf-preview" />
-            </div>
-          </template>
-
-          <el-button
-            type="warning"
-            style="margin-top: 16px;"
-            @click="() => { setContractPreviewGenerated(false) }"
-          >
-            重新生成
-          </el-button>
-        </div>
-      </el-card>
-
-      <!-- 步驟 4: 簽名確認 -->
-      <el-card v-if="productItems.length > 0 && (formData.orderSource === ServiceOrderSource.ONLINE || contractPreviewGenerated)" shadow="never" class="section-card">
-        <template #header>
-          <div class="section-title">
-            <el-icon><EditPen /></el-icon>
-            <span>客戶簽名</span>
-          </div>
-        </template>
-
-        <el-alert
-          v-if="formData.orderSource === ServiceOrderSource.OFFLINE"
-          title="請客戶確認合約內容無誤後，在下方簽名區簽名"
-          type="info"
-          :closable="false"
-          style="margin-bottom: 16px;"
-        />
-
-        <SignaturePad
-          ref="signaturePadRef"
-          @signed="handleSigned"
-        />
-      </el-card>
-
       <!-- 操作按鈕 -->
       <div class="action-buttons">
         <el-button @click="handleCancel">
@@ -753,16 +552,9 @@ function getDefectLabel(value: string) {
             :closable="false"
             style="margin-bottom: 16px;"
           />
-          <el-alert
-            v-if="formData.orderSource === ServiceOrderSource.OFFLINE"
-            title="線下流程需要上傳身分證正反面影本"
-            type="warning"
-            :closable="false"
-            style="margin-bottom: 16px;"
-          />
           <IdCardUploader
             ref="dialogIdCardUploaderRef"
-            :require-both-sides="formData.orderSource === ServiceOrderSource.OFFLINE"
+            :require-both-sides="false"
             @recognized="handleOCRRecognized"
             @update:model-value="setIdCardUploaded"
           />
@@ -906,36 +698,6 @@ function getDefectLabel(value: string) {
     justify-content: center;
     gap: 12px;
     margin-top: 24px;
-  }
-
-  .attachment-section {
-    .attachment-title {
-      margin-bottom: 12px;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--el-text-color-regular);
-    }
-  }
-
-  .contract-preview {
-    .preview-section {
-      margin-bottom: 24px;
-
-      h4 {
-        margin: 0 0 12px 0;
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--el-text-color-primary);
-      }
-
-      .pdf-preview {
-        width: 100%;
-        height: 500px;
-        border: 1px solid var(--el-border-color);
-        border-radius: 4px;
-        margin-top: 8px;
-      }
-    }
   }
 }
 
