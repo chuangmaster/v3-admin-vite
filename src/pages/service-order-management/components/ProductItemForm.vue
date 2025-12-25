@@ -5,7 +5,7 @@
  */
 import type { FormInstance, FormRules } from "element-plus"
 import type { ProductItem } from "../types"
-import { ACCESSORY_OPTIONS, DEFECT_OPTIONS, ServiceOrderType } from "../types"
+import { ACCESSORY_OPTIONS, DEFECT_OPTIONS, GRADE_OPTIONS, ServiceOrderType } from "../types"
 
 interface Props {
   /** 商品項目資料（編輯模式） */
@@ -35,6 +35,7 @@ const formData = reactive<{
   brandName: string
   style: string
   internalCode: string
+  grade: string
   accessories: (string | number)[]
   defects: (string | number)[]
   amount: number | undefined
@@ -42,6 +43,7 @@ const formData = reactive<{
   brandName: "",
   style: "",
   internalCode: "",
+  grade: "",
   accessories: [],
   defects: [],
   amount: undefined
@@ -77,6 +79,7 @@ async function handleSubmit() {
       brandName: formData.brandName,
       style: formData.style,
       internalCode: formData.internalCode || undefined,
+      grade: formData.grade || undefined,
       amount: formData.amount,
       // 配件欄位收購單和寄賣單都有
       accessories: formData.accessories.length > 0 ? formData.accessories.map(String) : undefined,
@@ -112,6 +115,7 @@ watch(
       formData.brandName = value.brandName || ""
       formData.style = value.style || ""
       formData.internalCode = value.internalCode || ""
+      formData.grade = value.grade || ""
       formData.accessories = (value.accessories as (string | number)[]) || []
       formData.defects = (value.defects as (string | number)[]) || []
       formData.amount = value.amount || 0
@@ -138,6 +142,17 @@ defineExpose({
 
     <el-form-item label="內碼" prop="internalCode">
       <el-input v-model="formData.internalCode" placeholder="請輸入內碼（選填）" maxlength="50" show-word-limit />
+    </el-form-item>
+
+    <el-form-item label="商品等級" prop="grade">
+      <el-select v-model="formData.grade" placeholder="請選擇商品等級" clearable>
+        <el-option
+          v-for="option in GRADE_OPTIONS"
+          :key="option.value"
+          :label="option.label"
+          :value="option.value"
+        />
+      </el-select>
     </el-form-item>
 
     <!-- 金額欄位：根據訂單類型顯示不同標籤 -->

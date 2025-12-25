@@ -117,6 +117,14 @@ export const DEFECT_OPTIONS = [
   { label: "四角磨損", value: "cornerWear" }
 ] as const
 
+/** 商品等級選項 */
+export const GRADE_OPTIONS = [
+  { label: "A", value: "A" },
+  { label: "B", value: "B" },
+  { label: "C", value: "C" },
+  { label: "D", value: "D" }
+] as const
+
 /** 商品項目實體（包含收購單和寄賣單的所有欄位） */
 export interface ProductItem {
   /** 唯一識別碼（UUID） */
@@ -149,6 +157,8 @@ export interface ProductItem {
   style?: string
   /** 內碼（寄賣單） */
   internalCode?: string
+  /** 商品等級 */
+  grade?: string
   /** 商品序號（顯示順序，1-4）（寄賣單） */
   sequence?: number
   /** 商品配件（僅寄賣單） */

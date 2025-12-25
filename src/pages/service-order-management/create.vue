@@ -12,7 +12,7 @@ import IdCardUploader from "./components/IdCardUploader.vue"
 import ProductItemForm from "./components/ProductItemForm.vue"
 import { useIdCardRecognition } from "./composables/useIdCardRecognition"
 import { useServiceOrderForm } from "./composables/useServiceOrderForm"
-import { ACCESSORY_OPTIONS, DEFECT_OPTIONS, ServiceOrderSource, ServiceOrderType } from "./types"
+import { ACCESSORY_OPTIONS, DEFECT_OPTIONS, GRADE_OPTIONS, ServiceOrderSource, ServiceOrderType } from "./types"
 
 defineOptions({
   name: "ServiceOrderCreate"
@@ -261,6 +261,13 @@ function getAccessoryLabel(value: string) {
 function getDefectLabel(value: string) {
   return DEFECT_OPTIONS.find(opt => opt.value === value)?.label || value
 }
+
+/**
+ * 取得商品等級標籤
+ */
+function getGradeLabel(value: string) {
+  return GRADE_OPTIONS.find(opt => opt.value === value)?.label || value
+}
 </script>
 
 <template>
@@ -438,6 +445,14 @@ function getDefectLabel(value: string) {
           <el-table-column prop="internalCode" label="內碼" width="120">
             <template #default="{ row }">
               {{ row.internalCode || '-' }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="grade" label="商品等級" width="100">
+            <template #default="{ row }">
+              <el-tag v-if="row.grade" type="info" size="small">
+                {{ getGradeLabel(row.grade) }}
+              </el-tag>
+              <span v-else>-</span>
             </template>
           </el-table-column>
           <el-table-column
