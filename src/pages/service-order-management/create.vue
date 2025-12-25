@@ -591,13 +591,9 @@ function getDefectLabel(value: string) {
 <style scoped lang="scss">
 .app-container {
   padding: 20px;
-  min-height: calc(100vh - 100px);
 
   .main-card {
-    overflow: visible;
-
     :deep(.el-card__body) {
-      overflow: visible;
       min-height: 200px;
     }
   }
@@ -619,11 +615,6 @@ function getDefectLabel(value: string) {
 
   .section-card {
     margin-top: 20px;
-    overflow: visible;
-
-    :deep(.el-card__body) {
-      overflow: visible;
-    }
 
     .section-title {
       display: flex;
