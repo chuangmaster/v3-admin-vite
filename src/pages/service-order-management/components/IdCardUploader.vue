@@ -24,6 +24,10 @@ const emit = defineEmits<{
   "recognized": [data: { name: string, idCardNumber: string }]
   /** 更新上傳狀態（正面已上傳, 反面已上傳） */
   "update:modelValue": [value: { front: boolean, back: boolean }]
+  /** 正面圖片已上傳（傳遞 Base64 資料） */
+  "frontUploaded": [data: { base64: string, contentType: string, fileName: string }]
+  /** 反面圖片已上傳（傳遞 Base64 資料） */
+  "backUploaded": [data: { base64: string, contentType: string, fileName: string }]
 }>()
 
 const recognizing = ref(false)
@@ -65,7 +69,7 @@ function beforeUpload(file: UploadRawFile) {
 /**
  * 正面檔案變更處理
  */
-function handleFrontChange(file: UploadFile) {
+async function handleFrontChange(file: UploadFile) {
   frontFile.value = file
 
   // 生成預覽 URL
@@ -74,6 +78,19 @@ function handleFrontChange(file: UploadFile) {
       URL.revokeObjectURL(frontPreviewUrl.value)
     }
     frontPreviewUrl.value = URL.createObjectURL(file.raw)
+
+    // 轉換為 Base64 並通知父元件
+    try {
+      const base64 = await fileToBase64(file.raw)
+      emit("frontUploaded", {
+        base64,
+        contentType: file.raw.type || "image/jpeg",
+        fileName: file.name
+      })
+    } catch (error) {
+      ElMessage.error("圖片轉換失敗")
+      console.error(error)
+    }
   }
 
   // 重置重試計數
@@ -86,7 +103,7 @@ function handleFrontChange(file: UploadFile) {
 /**
  * 反面檔案變更處理
  */
-function handleBackChange(file: UploadFile) {
+async function handleBackChange(file: UploadFile) {
   backFile.value = file
 
   // 生成預覽 URL
@@ -95,6 +112,19 @@ function handleBackChange(file: UploadFile) {
       URL.revokeObjectURL(backPreviewUrl.value)
     }
     backPreviewUrl.value = URL.createObjectURL(file.raw)
+
+    // 轉換為 Base64 並通知父元件
+    try {
+      const base64 = await fileToBase64(file.raw)
+      emit("backUploaded", {
+        base64,
+        contentType: file.raw.type || "image/jpeg",
+        fileName: file.name
+      })
+    } catch (error) {
+      ElMessage.error("圖片轉換失敗")
+      console.error(error)
+    }
   }
 
   // 通知父元件上傳狀態

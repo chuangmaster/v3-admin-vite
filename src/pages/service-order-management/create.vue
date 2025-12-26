@@ -33,6 +33,8 @@ const {
   updateProductItem,
   removeProductItem,
   setIdCardUploaded,
+  setIdCardFrontImage,
+  setIdCardBackImage,
   submitForm
 } = useServiceOrderForm()
 
@@ -80,7 +82,6 @@ function handleCustomerCreated(customer: Customer) {
       back: uploadedFiles.back
     }
   }
-
   setCustomer(customer)
   showCustomerDialog.value = false
   ElMessage.success("客戶新增成功")
@@ -268,6 +269,20 @@ function getDefectLabel(value: string) {
 function getGradeLabel(value: string) {
   return GRADE_OPTIONS.find(opt => opt.value === value)?.label || value
 }
+
+/**
+ * 身分證正面圖片上傳
+ */
+function handleIdCardFrontUploaded(data: { base64: string, contentType: string, fileName: string }) {
+  setIdCardFrontImage(data.base64, data.contentType, data.fileName)
+}
+
+/**
+ * 身分證反面圖片上傳
+ */
+function handleIdCardBackUploaded(data: { base64: string, contentType: string, fileName: string }) {
+  setIdCardBackImage(data.base64, data.contentType, data.fileName)
+}
 </script>
 
 <template>
@@ -399,6 +414,8 @@ function getGradeLabel(value: string) {
               :require-both-sides="formData.orderSource === ServiceOrderSource.OFFLINE"
               :show-recognize="false"
               @update:model-value="setIdCardUploaded"
+              @front-uploaded="handleIdCardFrontUploaded"
+              @back-uploaded="handleIdCardBackUploaded"
             />
           </div>
 
@@ -572,6 +589,8 @@ function getGradeLabel(value: string) {
             :require-both-sides="false"
             @recognized="handleOCRRecognized"
             @update:model-value="setIdCardUploaded"
+            @front-uploaded="handleIdCardFrontUploaded"
+            @back-uploaded="handleIdCardBackUploaded"
           />
           <el-divider>辨識後請至「手動輸入」頁籤確認資料</el-divider>
         </el-tab-pane>
@@ -594,7 +613,7 @@ function getGradeLabel(value: string) {
     >
       <ProductItemForm
         ref="productItemFormRef"
-        :order-type="formData.orderType"
+        :order-type="formData.orderType as ServiceOrderType"
         :model-value="editingProductIndex !== undefined ? productItems[editingProductIndex] : undefined"
         @submit="handleProductSubmit"
         @cancel="showProductDialog = false"

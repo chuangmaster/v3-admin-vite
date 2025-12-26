@@ -161,6 +161,8 @@ export interface ProductItem {
   grade?: string
   /** 商品序號（顯示順序，1-4）（寄賣單） */
   sequence?: number
+  /** 商品項目序號（API 使用） */
+  sequenceNumber?: number
   /** 商品配件（僅寄賣單） */
   accessories?: string[]
   /** 商品瑕疵處（僅寄賣單） */
@@ -335,18 +337,48 @@ export interface ServiceOrderListItem {
   version: number
 }
 
+/** API 商品項目（建立訂單用） */
+export interface CreateOrderProductItem {
+  /** 商品項目序號 */
+  sequenceNumber: number
+  /** 品牌名稱 */
+  brandName: string
+  /** 款式 */
+  styleName: string
+  /** 內碼 */
+  internalCode?: string
+}
+
 /** 建立服務單請求 */
 export interface CreateServiceOrderRequest {
   /** 服務單類型 */
-  orderType: ServiceOrderType
+  orderType: string
   /** 服務單來源 */
-  orderSource?: ServiceOrderSource
+  orderSource: string
   /** 客戶 ID */
-  customerId: string
+  customerId?: string
   /** 商品項目列表(1-4件) */
-  productItems: ProductItem[]
+  productItems: CreateOrderProductItem[]
   /** 總金額 */
   totalAmount: number
+  /** 身分證影本 Base64（單張圖片，舊格式） */
+  idCardImageBase64?: string
+  /** 身分證影本 Content Type */
+  idCardImageContentType?: string
+  /** 身分證影本檔案名稱 */
+  idCardImageFileName?: string
+  /** 身分證正面 Base64 */
+  idCardFrontImageBase64?: string
+  /** 身分證正面 Content Type */
+  idCardFrontImageContentType?: string
+  /** 身分證正面檔案名稱 */
+  idCardFrontImageFileName?: string
+  /** 身分證反面 Base64 */
+  idCardBackImageBase64?: string
+  /** 身分證反面 Content Type */
+  idCardBackImageContentType?: string
+  /** 身分證反面檔案名稱 */
+  idCardBackImageFileName?: string
   /** 寄賣起始日期（僅寄賣單，ISO 8601） */
   consignmentStartDate?: string
   /** 寄賣結束日期（僅寄賣單，ISO 8601） */

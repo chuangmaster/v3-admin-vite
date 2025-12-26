@@ -18,6 +18,20 @@ export function useServiceOrderForm() {
   /** 簽名圖片 DataURL */
   const signatureDataUrl = ref<string>("")
 
+  /** 身分證正面圖片資訊 */
+  const idCardFrontImage = ref<{
+    base64: string
+    contentType: string
+    fileName: string
+  }>()
+
+  /** 身分證反面圖片資訊 */
+  const idCardBackImage = ref<{
+    base64: string
+    contentType: string
+    fileName: string
+  }>()
+
   /** 身分證正面是否已上傳 */
   const idCardFrontUploaded = ref(false)
 
@@ -109,6 +123,22 @@ export function useServiceOrderForm() {
   }
 
   /**
+   * 設定身分證正面圖片
+   */
+  function setIdCardFrontImage(base64: string, contentType: string, fileName: string) {
+    idCardFrontImage.value = { base64, contentType, fileName }
+    idCardFrontUploaded.value = true
+  }
+
+  /**
+   * 設定身分證反面圖片
+   */
+  function setIdCardBackImage(base64: string, contentType: string, fileName: string) {
+    idCardBackImage.value = { base64, contentType, fileName }
+    idCardBackUploaded.value = true
+  }
+
+  /**
    * 驗證表單
    */
   function validateForm(): { valid: boolean, message?: string } {
@@ -151,15 +181,27 @@ export function useServiceOrderForm() {
     try {
       // 準備請求資料
       const requestData: CreateServiceOrderRequest = {
-        ...formData as CreateServiceOrderRequest,
-        productItems: productItems.value.map(item => ({
-          brandName: item.brandName,
-          style: item.style,
-          internalCode: item.internalCode,
-          accessories: item.accessories,
-          defects: item.defects,
-          amount: item.amount
-        }))
+        orderType: formData.orderType!,
+        orderSource: formData.orderSource!,
+        customerId: formData.customerId,
+        productItems: productItems.value.map((item, index) => ({
+          sequenceNumber: index,
+          brandName: item.brandName!,
+          styleName: item.style!,
+          internalCode: item.internalCode
+        })),
+        totalAmount: formData.totalAmount!,
+        // 身分證圖片（如果有上傳）
+        ...(idCardFrontImage.value && {
+          idCardFrontImageBase64: idCardFrontImage.value.base64,
+          idCardFrontImageContentType: idCardFrontImage.value.contentType,
+          idCardFrontImageFileName: idCardFrontImage.value.fileName
+        }),
+        ...(idCardBackImage.value && {
+          idCardBackImageBase64: idCardBackImage.value.base64,
+          idCardBackImageContentType: idCardBackImage.value.contentType,
+          idCardBackImageFileName: idCardBackImage.value.fileName
+        })
       }
 
       const response = await createServiceOrder(requestData)
@@ -189,10 +231,13 @@ export function useServiceOrderForm() {
     selectedCustomer.value = undefined
     productItems.value = []
     signatureDataUrl.value = ""
+    idCardFrontImage.value = undefined
+    idCardBackImage.value = undefined
     idCardFrontUploaded.value = false
     idCardBackUploaded.value = false
     Object.assign(formData, {
       orderType: ServiceOrderType.BUYBACK,
+      orderSource: ServiceOrderSource.OFFLINE,
       customerId: "",
       productItems: [],
       totalAmount: 0,
@@ -208,6 +253,8 @@ export function useServiceOrderForm() {
     selectedCustomer,
     productItems,
     signatureDataUrl,
+    idCardFrontImage,
+    idCardBackImage,
     idCardFrontUploaded,
     idCardBackUploaded,
     formData,
@@ -217,6 +264,8 @@ export function useServiceOrderForm() {
     removeProductItem,
     setSignature,
     setIdCardUploaded,
+    setIdCardFrontImage,
+    setIdCardBackImage,
     validateForm,
     submitForm,
     resetForm
