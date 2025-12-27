@@ -5,12 +5,12 @@
 
 import type { PagedApiResponse } from "types/api"
 import type {
-  CreateServiceOrderRequest,
+  CreateBuybackOrderRequest,
+  CreateConsignmentOrderRequest,
   ModificationHistory,
   ServiceOrder,
   ServiceOrderListItem,
   ServiceOrderListParams,
-  UpdateServiceOrderRequest,
   UpdateStatusRequest
 } from "../types"
 import { request } from "@/http/axios"
@@ -36,27 +36,25 @@ export async function getServiceOrder(id: string): Promise<ApiResponse<ServiceOr
 }
 
 /**
- * 建立服務單
- * @param data - 建立服務單請求資料
+ * 建立收購單 (US1 線下/線上)
+ * @param data - 建立收購單請求資料
  * @returns 建立的服務單資料
  */
-export async function createServiceOrder(
-  data: CreateServiceOrderRequest
+export async function createBuybackOrder(
+  data: CreateBuybackOrderRequest
 ): Promise<ApiResponse<ServiceOrder>> {
-  return request({ url: "/service-orders", method: "POST", data })
+  return request({ url: "/service-orders/buyback", method: "POST", data })
 }
 
 /**
- * 更新服務單
- * @param id - 服務單 ID（UUID）
- * @param data - 更新服務單請求資料（包含樂觀鎖版本號）
- * @returns 更新後的服務單資料
+ * 建立寄賣單 (US2 線下/線上)
+ * @param data - 建立寄賣單請求資料
+ * @returns 建立的服務單資料
  */
-export async function updateServiceOrder(
-  id: string,
-  data: UpdateServiceOrderRequest
+export async function createConsignmentOrder(
+  data: CreateConsignmentOrderRequest
 ): Promise<ApiResponse<ServiceOrder>> {
-  return request({ url: `/service-orders/${id}`, method: "PUT", data })
+  return request({ url: "/service-orders/consignment", method: "POST", data })
 }
 
 /**
@@ -70,15 +68,6 @@ export async function updateServiceOrderStatus(
   data: UpdateStatusRequest
 ): Promise<ApiResponse<ServiceOrder>> {
   return request({ url: `/service-orders/${id}/status`, method: "PATCH", data })
-}
-
-/**
- * 刪除服務單
- * @param id - 服務單 ID（UUID）
- * @returns 刪除結果（data 為 null）
- */
-export async function deleteServiceOrder(id: string): Promise<ApiResponse<null>> {
-  return request({ url: `/service-orders/${id}`, method: "DELETE" })
 }
 
 /**

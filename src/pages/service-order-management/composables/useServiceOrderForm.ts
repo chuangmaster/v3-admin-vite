@@ -1,8 +1,13 @@
 /**
  * 服務訂單表單業務邏輯
  */
-import type { CreateServiceOrderRequest, Customer, ProductItem } from "../types"
-import { createServiceOrder } from "../apis/service-order"
+import type {
+  CreateBuybackOrderRequest,
+  CreateConsignmentOrderRequest,
+  Customer,
+  ProductItem
+} from "../types"
+import { createBuybackOrder, createConsignmentOrder } from "../apis/service-order"
 import { RenewalOption, ServiceOrderSource, ServiceOrderType } from "../types"
 
 export function useServiceOrderForm() {
@@ -39,15 +44,15 @@ export function useServiceOrderForm() {
   const idCardBackUploaded = ref(false)
 
   /** 表單資料 */
-  const formData = reactive<Partial<CreateServiceOrderRequest>>({
-    orderType: ServiceOrderType.BUYBACK,
-    orderSource: ServiceOrderSource.OFFLINE,
+  const formData = reactive({
+    orderType: ServiceOrderType.BUYBACK as string,
+    orderSource: ServiceOrderSource.OFFLINE as string,
     customerId: "",
-    productItems: [],
+    productItems: [] as ProductItem[],
     totalAmount: 0,
-    renewalOption: RenewalOption.NONE,
-    renewalMonths: 1,
-    interestRate: 0,
+    renewalOption: RenewalOption.NONE as string,
+    consignmentStartDate: undefined as string | undefined,
+    consignmentEndDate: undefined as string | undefined,
     notes: ""
   })
 
@@ -179,32 +184,57 @@ export function useServiceOrderForm() {
 
     loading.value = true
     try {
-      // 準備請求資料
-      const requestData: CreateServiceOrderRequest = {
-        orderType: formData.orderType!,
-        orderSource: formData.orderSource!,
-        customerId: formData.customerId,
-        productItems: productItems.value.map((item, index) => ({
-          sequenceNumber: index,
-          brandName: item.brandName!,
-          styleName: item.style!,
-          internalCode: item.internalCode
-        })),
-        totalAmount: formData.totalAmount!,
-        // 身分證圖片（如果有上傳）
-        ...(idCardFrontImage.value && {
-          idCardFrontImageBase64: idCardFrontImage.value.base64,
-          idCardFrontImageContentType: idCardFrontImage.value.contentType,
-          idCardFrontImageFileName: idCardFrontImage.value.fileName
-        }),
-        ...(idCardBackImage.value && {
-          idCardBackImageBase64: idCardBackImage.value.base64,
-          idCardBackImageContentType: idCardBackImage.value.contentType,
-          idCardBackImageFileName: idCardBackImage.value.fileName
-        })
-      }
+      let response
 
-      const response = await createServiceOrder(requestData)
+      if (formData.orderType === ServiceOrderType.BUYBACK) {
+        // 建立收購單
+        const requestData: CreateBuybackOrderRequest = {
+          orderType: formData.orderType!,
+          orderSource: formData.orderSource!,
+          customerId: formData.customerId!,
+          productItems: productItems.value.map((item, index) => ({
+            sequenceNumber: index + 1,
+            brandName: item.brandName!,
+            styleName: item.style,
+            internalCode: item.internalCode,
+            accessories: item.accessories
+          })),
+          totalAmount: formData.totalAmount!,
+          // 身分證圖片（如果有上傳）
+          ...(idCardFrontImage.value && {
+            idCardFrontImageBase64: idCardFrontImage.value.base64,
+            idCardFrontImageContentType: idCardFrontImage.value.contentType,
+            idCardFrontImageFileName: idCardFrontImage.value.fileName
+          }),
+          ...(idCardBackImage.value && {
+            idCardBackImageBase64: idCardBackImage.value.base64,
+            idCardBackImageContentType: idCardBackImage.value.contentType,
+            idCardBackImageFileName: idCardBackImage.value.fileName
+          })
+        }
+        response = await createBuybackOrder(requestData)
+      } else {
+        // 建立寄賣單
+        const requestData: CreateConsignmentOrderRequest = {
+          orderType: formData.orderType!,
+          orderSource: formData.orderSource!,
+          customerId: formData.customerId!,
+          productItems: productItems.value.map((item, index) => ({
+            sequenceNumber: index + 1,
+            brandName: item.brandName!,
+            styleName: item.style,
+            internalCode: item.internalCode,
+            accessories: item.accessories,
+            defects: item.defects
+          })),
+          totalAmount: formData.totalAmount!,
+          consignmentStartDate: formData.consignmentStartDate,
+          consignmentEndDate: formData.consignmentEndDate,
+          renewalOption: formData.renewalOption,
+          remarks: formData.notes
+        }
+        response = await createConsignmentOrder(requestData)
+      }
 
       if (response.success && response.data) {
         ElMessage.success("建立服務訂單成功")
@@ -242,8 +272,8 @@ export function useServiceOrderForm() {
       productItems: [],
       totalAmount: 0,
       renewalOption: RenewalOption.NONE,
-      renewalMonths: 1,
-      interestRate: 0,
+      consignmentStartDate: undefined,
+      consignmentEndDate: undefined,
       notes: ""
     })
   }

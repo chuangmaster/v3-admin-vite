@@ -349,7 +349,87 @@ export interface CreateOrderProductItem {
   internalCode?: string
 }
 
-/** 建立服務單請求 */
+/** 建立收購單商品項目請求 */
+export interface CreateBuybackProductItemRequest {
+  /** 商品序號 (1-4) */
+  sequenceNumber: number
+  /** 品牌名稱 */
+  brandName: string
+  /** 款式 */
+  styleName?: string
+  /** 內碼 */
+  internalCode?: string
+  /** 配件列表 */
+  accessories?: string[]
+}
+
+/** 建立寄賣單商品項目請求 */
+export interface CreateConsignmentProductItemRequest {
+  /** 商品序號 (1-4) */
+  sequenceNumber: number
+  /** 品牌名稱 */
+  brandName: string
+  /** 款式名稱 */
+  styleName?: string
+  /** 內碼 */
+  internalCode?: string
+  /** 配件列表 */
+  accessories?: string[]
+  /** 瑕疵列表 */
+  defects?: string[]
+}
+
+/** 建立收購單請求 (US1 線下/線上) */
+export interface CreateBuybackOrderRequest {
+  /** 服務單類型 (固定為 BUYBACK) */
+  orderType: string
+  /** 服務單來源 (OFFLINE/ONLINE) */
+  orderSource: string
+  /** 既有客戶 ID (必填) */
+  customerId: string
+  /** 商品項目清單 (1-4 件) */
+  productItems: CreateBuybackProductItemRequest[]
+  /** 總金額 */
+  totalAmount: number
+  /** 身分證正面圖片 Base64 (不含 data: 前綴) */
+  idCardFrontImageBase64?: string
+  /** 身分證正面圖片 MIME 類型 */
+  idCardFrontImageContentType?: string
+  /** 身分證正面圖片原始檔名 */
+  idCardFrontImageFileName?: string
+  /** 身分證反面圖片 Base64 (不含 data: 前綴) */
+  idCardBackImageBase64?: string
+  /** 身分證反面圖片 MIME 類型 */
+  idCardBackImageContentType?: string
+  /** 身分證反面圖片原始檔名 */
+  idCardBackImageFileName?: string
+}
+
+/** 建立寄賣單請求 (US2 線下/線上) */
+export interface CreateConsignmentOrderRequest {
+  /** 服務單類型 (固定為 CONSIGNMENT) */
+  orderType: string
+  /** 服務單來源 (OFFLINE/ONLINE) */
+  orderSource: string
+  /** 既有客戶 ID (必填) */
+  customerId: string
+  /** 服務日期 */
+  serviceDate?: string
+  /** 寄賣起始日期 */
+  consignmentStartDate?: string
+  /** 寄賣結束日期 (預設為起始日期 + 90 天) */
+  consignmentEndDate?: string
+  /** 續約選項 (AUTO_RETRIEVE/AUTO_DISCOUNT_10/DISCUSS) */
+  renewalOption?: string
+  /** 商品項目列表 (1-4 件) */
+  productItems: CreateConsignmentProductItemRequest[]
+  /** 總金額 */
+  totalAmount: number
+  /** 備註 */
+  remarks?: string
+}
+
+/** @deprecated 使用 CreateBuybackOrderRequest 或 CreateConsignmentOrderRequest */
 export interface CreateServiceOrderRequest {
   /** 服務單類型 */
   orderType: string
