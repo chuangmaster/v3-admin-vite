@@ -219,7 +219,7 @@ function getOrderTypeText(type: ServiceOrderType) {
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button
-              v-permission="['service-order:buyback:read', 'service-order:consignment:read']"
+              v-permission="['serviceOrder.buyback.read', 'serviceOrder.consignment.read']"
               type="primary"
               link
               size="small"
