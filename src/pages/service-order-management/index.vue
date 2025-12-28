@@ -67,16 +67,18 @@ function getStatusTag(status: ServiceOrderStatus) {
 /**
  * 訂單狀態文字
  */
-function getStatusText(status: ServiceOrderStatus) {
-  const map: Record<ServiceOrderStatus, string> = {
-    [ServiceOrderStatus.DRAFT]: "草稿",
-    [ServiceOrderStatus.PENDING]: "待確認",
-    [ServiceOrderStatus.CONFIRMED]: "已確認",
-    [ServiceOrderStatus.IN_PROGRESS]: "處理中",
-    [ServiceOrderStatus.COMPLETED]: "已完成",
-    [ServiceOrderStatus.CANCELLED]: "已取消"
+function getStatusText(status: ServiceOrderStatus | string) {
+  // 處理大小寫不一致的問題
+  const normalizedStatus = status.toString().toLowerCase().trim()
+
+  const map: Record<string, string> = {
+    pending: "待確認",
+    confirmed: "已確認",
+    in_progress: "處理中",
+    completed: "已完成",
+    cancelled: "已取消"
   }
-  return map[status] || status
+  return map[normalizedStatus] || status
 }
 
 /**
@@ -215,7 +217,7 @@ function getOrderTypeText(type: ServiceOrderType) {
             {{ formatDateTime(row.createdAt) }}
           </template>
         </el-table-column>
-        <el-table-column prop="createdBy" label="建立人" width="120" />
+        <el-table-column prop="createdByName" label="建立人" width="120" />
         <el-table-column label="操作" width="150" fixed="right">
           <template #default="{ row }">
             <el-button

@@ -18,11 +18,14 @@ interface Props {
   disabled?: boolean
   /** 最大檔案數量 */
   limit?: number
+  /** 唯讀模式（僅顯示已上傳檔案，不顯示上傳區域） */
+  readonly?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
-  limit: 10
+  limit: 10,
+  readonly: false
 })
 
 const emit = defineEmits<{
@@ -177,31 +180,62 @@ defineExpose({
 
 <template>
   <div v-loading="loading" class="attachment-uploader">
-    <el-upload
-      ref="uploadRef"
-      v-model:file-list="fileList"
-      :disabled="disabled || !serviceOrderId"
-      :limit="limit"
-      :http-request="handleUpload"
-      :before-upload="beforeUpload"
-      :on-preview="handlePreview"
-      :on-remove="handleRemove"
-      :on-exceed="handleExceed"
-      drag
-      multiple
-    >
-      <div class="upload-content">
-        <el-icon class="upload-icon">
-          <Document />
-        </el-icon>
-        <div class="upload-text">
-          將檔案拖曳至此處，或<em>點擊上傳</em>
+    <template v-if="readonly">
+      <!-- 唯讀模式：僅顯示檔案列表 -->
+      <el-upload
+        ref="uploadRef"
+        v-model:file-list="fileList"
+        :disabled="true"
+        :show-upload="false"
+        :on-preview="handlePreview"
+        list-type="text"
+      >
+        <template #file="{ file }">
+          <div class="readonly-file-item">
+            <el-icon class="file-icon">
+              <Document />
+            </el-icon>
+            <span class="file-name">{{ file.name }}</span>
+            <el-button
+              type="primary"
+              link
+              @click="handlePreview(file)"
+            >
+              下載
+            </el-button>
+          </div>
+        </template>
+      </el-upload>
+      <el-empty v-if="fileList.length === 0" description="無附件" :image-size="60" />
+    </template>
+    <template v-else>
+      <!-- 可編輯模式：顯示上傳區域 -->
+      <el-upload
+        ref="uploadRef"
+        v-model:file-list="fileList"
+        :disabled="disabled || !serviceOrderId"
+        :limit="limit"
+        :http-request="handleUpload"
+        :before-upload="beforeUpload"
+        :on-preview="handlePreview"
+        :on-remove="handleRemove"
+        :on-exceed="handleExceed"
+        drag
+        multiple
+      >
+        <div class="upload-content">
+          <el-icon class="upload-icon">
+            <Document />
+          </el-icon>
+          <div class="upload-text">
+            將檔案拖曳至此處，或<em>點擊上傳</em>
+          </div>
+          <div class="upload-tip">
+            支援 JPG、PNG、PDF 格式，單個檔案不超過 10MB
+          </div>
         </div>
-        <div class="upload-tip">
-          支援 JPG、PNG、PDF 格式，單個檔案不超過 10MB
-        </div>
-      </div>
-    </el-upload>
+      </el-upload>
+    </template>
   </div>
 </template>
 
@@ -231,6 +265,31 @@ defineExpose({
     .upload-tip {
       font-size: 12px;
       color: var(--el-text-color-secondary);
+    }
+  }
+
+  .readonly-file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--el-border-color);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    background-color: var(--el-fill-color-light);
+
+    .file-icon {
+      font-size: 20px;
+      color: var(--el-color-primary);
+    }
+
+    .file-name {
+      flex: 1;
+      font-size: 14px;
+      color: var(--el-text-color-regular);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 }

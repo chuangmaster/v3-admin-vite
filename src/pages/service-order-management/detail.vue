@@ -3,9 +3,9 @@ import { formatDateTime } from "@@/utils/datetime"
 /**
  * 服務訂單詳情頁面
  */
-import { ArrowLeft, CopyDocument, Goods, Refresh, Upload } from "@element-plus/icons-vue"
-import { ElMessage, ElMessageBox } from "element-plus"
-import { resendSignature } from "./apis/signature"
+import { ArrowLeft, Goods, Upload } from "@element-plus/icons-vue"
+import { ElMessage } from "element-plus"
+import { getAttachmentList } from "./apis/attachment"
 import AttachmentUploader from "./components/AttachmentUploader.vue"
 import { useServiceOrderDetail } from "./composables/useServiceOrderDetail"
 import { ACCESSORY_OPTIONS, AttachmentType, DEFECT_OPTIONS, DocumentType, GRADE_OPTIONS, ServiceOrderStatus, ServiceOrderType, SignatureMethod } from "./types"
@@ -19,6 +19,48 @@ const router = useRouter()
 
 const id = computed(() => route.params.id as string)
 const { loading, serviceOrder } = useServiceOrderDetail(id.value)
+
+const attachments = ref<any[]>([])
+const attachmentsLoading = ref(false)
+
+/**
+ * 載入附件列表
+ */
+async function loadAttachments() {
+  if (!serviceOrder.value?.id) return
+
+  try {
+    attachmentsLoading.value = true
+    const response = await getAttachmentList(serviceOrder.value.id)
+    if (response.success && response.data) {
+      attachments.value = response.data
+    }
+  } catch {
+    ElMessage.error("載入附件列表失敗")
+  } finally {
+    attachmentsLoading.value = false
+  }
+}
+
+/**
+ * 檢查是否有身分證附件
+ */
+const hasIdCardAttachments = computed(() => {
+  return attachments.value.some(
+    attachment => attachment.fileType === AttachmentType.ID_CARD
+  )
+})
+
+// 當 serviceOrder 載入完成後，載入附件列表
+watch(
+  () => serviceOrder.value?.id,
+  (newId) => {
+    if (newId) {
+      loadAttachments()
+    }
+  },
+  { immediate: true }
+)
 
 /**
  * 訂單類型文字
@@ -59,46 +101,6 @@ function getDocumentTypeText(documentType: DocumentType) {
  */
 function goBack() {
   router.push({ name: "ServiceOrderManagement" })
-}
-
-/**
- * 複製 Dropbox Sign 簽名連結
- */
-async function handleCopySignLink(dropboxSignRequestId: string) {
-  const signLink = `https://app.hellosign.com/sign/${dropboxSignRequestId}`
-  try {
-    await navigator.clipboard.writeText(signLink)
-    ElMessage.success("簽名連結已複製到剪貼簿")
-  } catch {
-    ElMessage.error("複製失敗,請手動複製")
-  }
-}
-
-/**
- * 重新發送簽名邀請
- */
-async function handleResendSignature(record: { id: string, signerName: string }) {
-  if (!serviceOrder.value)
-    return
-
-  ElMessageBox.confirm(
-    `確定要重新發送簽名邀請給 ${record.signerName} 嗎？`,
-    "重新發送簽名邀請",
-    {
-      confirmButtonText: "確定",
-      cancelButtonText: "取消",
-      type: "warning"
-    }
-  ).then(async () => {
-    try {
-      await resendSignature(serviceOrder.value!.id, {
-        signatureRecordId: record.id
-      })
-      ElMessage.success("簽名邀請已重新發送")
-    } catch {
-      ElMessage.error("發送失敗,請稍後再試")
-    }
-  })
 }
 
 /**
@@ -153,10 +155,10 @@ function getGradeLabel(value: string) {
             {{ formatDateTime(serviceOrder.createdAt) }}
           </el-descriptions-item>
           <el-descriptions-item label="建立人">
-            {{ serviceOrder.createdBy }}
+            {{ serviceOrder.createdByName }}
           </el-descriptions-item>
           <el-descriptions-item label="更新時間">
-            {{ formatDateTime(serviceOrder.updatedAt) }}
+            {{ serviceOrder.updatedAt ? formatDateTime(serviceOrder.updatedAt) : '-' }}
           </el-descriptions-item>
         </el-descriptions>
 
@@ -172,7 +174,7 @@ function getGradeLabel(value: string) {
             {{ serviceOrder.customerEmail || '未提供' }}
           </el-descriptions-item>
           <el-descriptions-item label="身分證字號">
-            {{ serviceOrder.customerIdCard }}
+            {{ serviceOrder.customerIdNumber }}
           </el-descriptions-item>
         </el-descriptions>
 
@@ -190,8 +192,17 @@ function getGradeLabel(value: string) {
             :data="serviceOrder.productItems"
             border
             stripe
+            style="width: 100%"
           >
             <el-table-column type="index" label="#" width="50" />
+            <el-table-column prop="grade" label="等級" width="100">
+              <template #default="{ row }">
+                <el-tag v-if="row.grade" type="info" size="small">
+                  {{ getGradeLabel(row.grade) }}
+                </el-tag>
+                <span v-else>-</span>
+              </template>
+            </el-table-column>
             <el-table-column prop="brandName" label="品牌名稱" min-width="120">
               <template #default="{ row }">
                 {{ row.brandName || '-' }}
@@ -205,14 +216,6 @@ function getGradeLabel(value: string) {
             <el-table-column prop="internalCode" label="內碼" width="120">
               <template #default="{ row }">
                 {{ row.internalCode || '-' }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="grade" label="商品等級" width="100">
-              <template #default="{ row }">
-                <el-tag v-if="row.grade" type="info" size="small">
-                  {{ getGradeLabel(row.grade) }}
-                </el-tag>
-                <span v-else>-</span>
               </template>
             </el-table-column>
             <el-table-column
@@ -270,7 +273,7 @@ function getGradeLabel(value: string) {
         </el-card>
 
         <!-- 附件管理 -->
-        <div class="section">
+        <div v-loading="attachmentsLoading" class="section">
           <h3 class="section-title">
             <el-icon><Upload /></el-icon>
             <span>附件管理</span>
@@ -280,11 +283,15 @@ function getGradeLabel(value: string) {
               <div class="attachment-section">
                 <div class="attachment-title">
                   身分證照片
+                  <el-tag v-if="!hasIdCardAttachments" type="info" size="small" style="margin-left: 8px;">
+                    僅供瀏覽
+                  </el-tag>
                 </div>
                 <AttachmentUploader
                   :service-order-id="serviceOrder.id"
                   :file-type="AttachmentType.ID_CARD"
                   :limit="2"
+                  :readonly="!hasIdCardAttachments"
                   :disabled="serviceOrder.status === ServiceOrderStatus.CANCELLED"
                 />
               </div>
@@ -298,21 +305,6 @@ function getGradeLabel(value: string) {
                   :service-order-id="serviceOrder.id"
                   :file-type="AttachmentType.CONTRACT"
                   :limit="5"
-                  :disabled="serviceOrder.status === ServiceOrderStatus.CANCELLED"
-                />
-              </div>
-            </el-col>
-          </el-row>
-          <el-row :gutter="20" style="margin-top: 20px;">
-            <el-col :span="24">
-              <div class="attachment-section">
-                <div class="attachment-title">
-                  其他附件
-                </div>
-                <AttachmentUploader
-                  :service-order-id="serviceOrder.id"
-                  :file-type="AttachmentType.OTHER"
-                  :limit="10"
                   :disabled="serviceOrder.status === ServiceOrderStatus.CANCELLED"
                 />
               </div>
@@ -360,7 +352,7 @@ function getGradeLabel(value: string) {
                   </div>
 
                   <!-- 線上簽名操作 -->
-                  <div v-if="record.signatureType === SignatureMethod.ONLINE && record.dropboxSignUrl" class="signature-actions">
+                  <!-- <div v-if="record.signatureType === SignatureMethod.ONLINE && record.dropboxSignUrl" class="signature-actions">
                     <el-button
                       :icon="CopyDocument"
                       size="small"
@@ -377,7 +369,7 @@ function getGradeLabel(value: string) {
                     >
                       重新發送邀請
                     </el-button>
-                  </div>
+                  </div> -->
                 </div>
               </div>
             </el-timeline-item>
@@ -428,6 +420,16 @@ function getGradeLabel(value: string) {
 
       .el-icon {
         color: var(--el-color-primary);
+      }
+    }
+
+    // 確保表格邊框完整顯示
+    :deep(.el-table) {
+      border-collapse: collapse;
+
+      .el-table__cell {
+        border-right: 1px solid var(--el-border-color);
+        border-bottom: 1px solid var(--el-border-color);
       }
     }
   }

@@ -274,7 +274,7 @@ export interface ServiceOrder {
   /** 客戶 Email（查詢詳細時回傳） */
   customerEmail?: string
   /** 客戶身分證字號（查詢詳細時回傳） */
-  customerIdCard?: string
+  customerIdNumber?: string
   /** 商品項目列表（1-4 件） */
   productItems: ProductItem[]
   /** 總金額 */
@@ -293,12 +293,10 @@ export interface ServiceOrder {
   notes?: string
   /** 建立時間（ISO 8601, UTC） */
   createdAt: string
-  /** 建立者（使用者 ID） */
-  createdBy: string
+  /** 建立者（使用者姓名） */
+  createdByName: string
   /** 最後更新時間（ISO 8601, UTC） */
   updatedAt?: string
-  /** 最後更新者（使用者 ID） */
-  updatedBy?: string
   /** 版本號（樂觀鎖） */
   version: number
 }
