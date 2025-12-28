@@ -60,9 +60,13 @@ const rules: FormRules = {
     { min: 1, max: 100, message: "款式長度為 1-100 字元", trigger: "blur" }
   ],
   internalCode: [{ max: 50, message: "內碼長度不超過 50 字元", trigger: "blur" }],
+  grade: [
+    { required: true, message: "請選擇商品等級", trigger: "change" }
+  ],
   amount: [
     { required: true, message: "請輸入金額", trigger: "blur" },
-    { type: "number", min: 0, message: "金額必須大於等於 0", trigger: "blur" }
+    { type: "number", min: 1, message: "金額必須大於等於 1", trigger: "blur" },
+    { type: "number", max: 10000000, message: "金額不能大於 10,000,000", trigger: "blur" }
   ]
 }
 
@@ -145,7 +149,7 @@ defineExpose({
     </el-form-item>
 
     <el-form-item label="商品等級" prop="grade">
-      <el-select v-model="formData.grade" placeholder="請選擇商品等級" clearable>
+      <el-select v-model="formData.grade" placeholder="請選擇商品等級">
         <el-option
           v-for="option in GRADE_OPTIONS"
           :key="option.value"
@@ -160,6 +164,7 @@ defineExpose({
       <el-input-number
         v-model="formData.amount"
         :min="0"
+        :max="10000000"
         :precision="0"
         :step="1000"
         :controls="false"

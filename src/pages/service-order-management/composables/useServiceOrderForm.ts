@@ -73,6 +73,7 @@ export function useServiceOrderForm() {
       brandName: item.brandName!,
       style: item.style!,
       internalCode: item.internalCode,
+      grade: item.grade,
       accessories: item.accessories,
       defects: item.defects,
       amount: item.amount
@@ -197,6 +198,8 @@ export function useServiceOrderForm() {
             brandName: item.brandName!,
             styleName: item.style,
             internalCode: item.internalCode,
+            grade: item.grade,
+            amount: item.amount,
             accessories: item.accessories
           })),
           totalAmount: formData.totalAmount!,
@@ -224,6 +227,8 @@ export function useServiceOrderForm() {
             brandName: item.brandName!,
             styleName: item.style,
             internalCode: item.internalCode,
+            grade: item.grade,
+            amount: item.amount,
             accessories: item.accessories,
             defects: item.defects
           })),
