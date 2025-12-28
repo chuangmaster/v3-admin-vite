@@ -3,11 +3,13 @@ import { formatDateTime } from "@@/utils/datetime"
 /**
  * 服務訂單詳情頁面
  */
-import { ArrowLeft, Goods, Upload } from "@element-plus/icons-vue"
+import { ArrowLeft, DocumentChecked, Goods, Upload } from "@element-plus/icons-vue"
 import { ElMessage } from "element-plus"
 import { getAttachmentList } from "./apis/attachment"
 import AttachmentUploader from "./components/AttachmentUploader.vue"
+import OfflineSignatureDialog from "./components/OfflineSignatureDialog.vue"
 import { useServiceOrderDetail } from "./composables/useServiceOrderDetail"
+import { useSignature } from "./composables/useSignature"
 import { ACCESSORY_OPTIONS, AttachmentType, DEFECT_OPTIONS, DocumentType, GRADE_OPTIONS, ServiceOrderStatus, ServiceOrderType, SignatureMethod } from "./types"
 
 defineOptions({
@@ -22,6 +24,19 @@ const { loading, serviceOrder } = useServiceOrderDetail(id.value)
 
 const attachments = ref<any[]>([])
 const attachmentsLoading = ref(false)
+
+// 簽名相關
+const {
+  loading: signatureLoading,
+  buybackContractPreviewUrl,
+  tradeApplicationPreviewUrl,
+  consignmentContractPreviewUrl,
+  generatePreview,
+  saveSignature
+} = useSignature()
+
+const showSignatureDialog = ref(false)
+const currentSignatureDocument = ref<DocumentType>()
 
 /**
  * 載入附件列表
@@ -49,6 +64,99 @@ const hasIdCardAttachments = computed(() => {
   return attachments.value.some(
     attachment => attachment.fileType === AttachmentType.ID_CARD
   )
+})
+
+/**
+ * 檢查特定文件類型是否已簽名
+ */
+function hasSignature(documentType: DocumentType): boolean {
+  if (!serviceOrder.value?.signatureRecords) return false
+  return serviceOrder.value.signatureRecords.some(
+    record => record.documentType === documentType && record.signedAt
+  )
+}
+
+/**
+ * 檢查是否有任何線下簽名記錄
+ */
+const hasOfflineSignature = computed(() => {
+  if (!serviceOrder.value?.signatureRecords) return false
+  return serviceOrder.value.signatureRecords.some(
+    record => record.signatureType === "OFFLINE"
+  )
+})
+
+/**
+ * 生成合約預覽
+ */
+async function handleGeneratePreview() {
+  if (!serviceOrder.value) return
+
+  const previewData = {
+    orderType: serviceOrder.value.orderType,
+    customer: {
+      name: serviceOrder.value.customerName || "",
+      phoneNumber: serviceOrder.value.customerPhone || "",
+      email: serviceOrder.value.customerEmail,
+      idCardNumber: serviceOrder.value.customerIdNumber || ""
+    },
+    productItems: serviceOrder.value.productItems || [],
+    totalAmount: serviceOrder.value.totalAmount || 0
+  }
+
+  await generatePreview(previewData)
+}
+
+/**
+ * 開始簽署文件
+ */
+async function handleStartSign(documentType: DocumentType) {
+  // 如果尚未生成預覽，先生成
+  const needPreview = serviceOrder.value?.orderType === ServiceOrderType.BUYBACK
+    ? !buybackContractPreviewUrl.value
+    : !consignmentContractPreviewUrl.value
+
+  if (needPreview) {
+    await handleGeneratePreview()
+  }
+
+  currentSignatureDocument.value = documentType
+  showSignatureDialog.value = true
+}
+
+/**
+ * 確認簽名
+ */
+async function handleConfirmSignature(signatureDataUrl: string) {
+  if (!serviceOrder.value || !currentSignatureDocument.value) return
+
+  const success = await saveSignature(
+    serviceOrder.value.id,
+    currentSignatureDocument.value,
+    signatureDataUrl,
+    serviceOrder.value.customerName
+  )
+
+  if (success) {
+    // 重新載入服務單資料以更新簽名記錄
+    window.location.reload()
+  }
+}
+
+/**
+ * 取得當前合約預覽 URL
+ */
+const currentContractUrl = computed(() => {
+  if (!currentSignatureDocument.value) return ""
+  if (currentSignatureDocument.value === DocumentType.BUYBACK_CONTRACT) {
+    return buybackContractPreviewUrl.value
+  } else if (currentSignatureDocument.value === DocumentType.TRADE_APPLICATION) {
+    return tradeApplicationPreviewUrl.value
+  } else if (currentSignatureDocument.value === DocumentType.CONSIGNMENT_CONTRACT) {
+    return consignmentContractPreviewUrl.value
+  }
+
+  return ""
 })
 
 // 當 serviceOrder 載入完成後，載入附件列表
@@ -300,14 +408,108 @@ function getGradeLabel(value: string) {
               <div class="attachment-section">
                 <div class="attachment-title">
                   合約文件
+                  <el-tag type="info" size="small" style="margin-left: 8px;">
+                    僅供瀏覽
+                  </el-tag>
                 </div>
                 <AttachmentUploader
                   :service-order-id="serviceOrder.id"
                   :file-type="AttachmentType.CONTRACT"
                   :limit="5"
+                  :readonly="true"
                   :disabled="serviceOrder.status === ServiceOrderStatus.CANCELLED"
                 />
               </div>
+            </el-col>
+          </el-row>
+        </div>
+
+        <!-- 線下簽章 -->
+        <div v-if="hasOfflineSignature && !hasSignature(serviceOrder.orderType === ServiceOrderType.BUYBACK ? DocumentType.BUYBACK_CONTRACT : DocumentType.CONSIGNMENT_CONTRACT)" class="section">
+          <h3 class="section-title">
+            <el-icon><DocumentChecked /></el-icon>
+            <span>文件簽署</span>
+          </h3>
+          <el-alert
+            type="info"
+            :closable="false"
+            style="margin-bottom: 16px;"
+          >
+            <template #title>
+              此訂單使用線下簽名方式，請先預覽合約內容後進行簽章
+            </template>
+          </el-alert>
+          <el-row v-if="serviceOrder.orderType === ServiceOrderType.BUYBACK" :gutter="16">
+            <el-col :span="12">
+              <el-card shadow="hover">
+                <template #header>
+                  <div class="card-title">
+                    <span>收購合約</span>
+                    <el-tag v-if="hasSignature(DocumentType.BUYBACK_CONTRACT)" type="success" size="small">
+                      已簽署
+                    </el-tag>
+                  </div>
+                </template>
+                <div class="contract-card-content">
+                  <p>請確認收購合約內容並進行簽署</p>
+                  <el-button
+                    v-if="!hasSignature(DocumentType.BUYBACK_CONTRACT)"
+                    type="primary"
+                    :loading="signatureLoading"
+                    @click="handleStartSign(DocumentType.BUYBACK_CONTRACT)"
+                  >
+                    預覽並簽署
+                  </el-button>
+                </div>
+              </el-card>
+            </el-col>
+            <el-col :span="12">
+              <el-card shadow="hover">
+                <template #header>
+                  <div class="card-title">
+                    <span>一時貿易申請書</span>
+                    <el-tag v-if="hasSignature(DocumentType.TRADE_APPLICATION)" type="success" size="small">
+                      已簽署
+                    </el-tag>
+                  </div>
+                </template>
+                <div class="contract-card-content">
+                  <p>請確認一時貿易申請書內容並進行簽署</p>
+                  <el-button
+                    v-if="!hasSignature(DocumentType.TRADE_APPLICATION)"
+                    type="primary"
+                    :loading="signatureLoading"
+                    @click="handleStartSign(DocumentType.TRADE_APPLICATION)"
+                  >
+                    預覽並簽署
+                  </el-button>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
+          <el-row v-else :gutter="16">
+            <el-col :span="12">
+              <el-card shadow="hover">
+                <template #header>
+                  <div class="card-title">
+                    <span>寄賣合約書</span>
+                    <el-tag v-if="hasSignature(DocumentType.CONSIGNMENT_CONTRACT)" type="success" size="small">
+                      已簽署
+                    </el-tag>
+                  </div>
+                </template>
+                <div class="contract-card-content">
+                  <p>請確認寄賣合約書內容並進行簽署</p>
+                  <el-button
+                    v-if="!hasSignature(DocumentType.CONSIGNMENT_CONTRACT)"
+                    type="primary"
+                    :loading="signatureLoading"
+                    @click="handleStartSign(DocumentType.CONSIGNMENT_CONTRACT)"
+                  >
+                    預覽並簽署
+                  </el-button>
+                </div>
+              </el-card>
             </el-col>
           </el-row>
         </div>
@@ -386,6 +588,15 @@ function getGradeLabel(value: string) {
 
       <el-empty v-else description="找不到訂單資料" />
     </el-card>
+
+    <!-- 線下簽名對話框 -->
+    <OfflineSignatureDialog
+      v-model="showSignatureDialog"
+      :contract-url="currentContractUrl"
+      :document-type="currentSignatureDocument!"
+      :document-type-text="currentSignatureDocument ? getDocumentTypeText(currentSignatureDocument) : ''"
+      @confirm="handleConfirmSignature"
+    />
   </div>
 </template>
 
@@ -503,6 +714,28 @@ function getGradeLabel(value: string) {
       font-size: 14px;
       font-weight: 500;
       color: var(--el-text-color-regular);
+    }
+  }
+
+  .card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .contract-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    padding: 20px 0;
+
+    p {
+      margin: 0;
+      color: var(--el-text-color-regular);
+      text-align: center;
     }
   }
 }
