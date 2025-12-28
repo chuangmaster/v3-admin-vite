@@ -5,6 +5,7 @@
  */
 import type { DocumentType } from "../types"
 import { ElMessage } from "element-plus"
+import SignaturePad from "./SignaturePad.vue"
 
 interface Props {
   /** 是否顯示對話框 */
@@ -24,10 +25,7 @@ const emit = defineEmits<{
   "confirm": [signatureDataUrl: string]
 }>()
 
-const canvasRef = ref<HTMLCanvasElement>()
-const isDrawing = ref(false)
-const lastX = ref(0)
-const lastY = ref(0)
+const signaturePadRef = ref<InstanceType<typeof SignaturePad>>()
 
 /**
  * 在新頁籤開啟合約
@@ -83,89 +81,9 @@ function openContractInNewWindow() {
 }
 
 /**
- * 開始繪製
+ * 處理簽名完成
  */
-function startDrawing(e: MouseEvent | TouchEvent) {
-  if (!canvasRef.value) return
-  isDrawing.value = true
-
-  const rect = canvasRef.value.getBoundingClientRect()
-  const clientX = "touches" in e ? e.touches[0].clientX : e.clientX
-  const clientY = "touches" in e ? e.touches[0].clientY : e.clientY
-
-  lastX.value = clientX - rect.left
-  lastY.value = clientY - rect.top
-}
-
-/**
- * 繪製
- */
-function draw(e: MouseEvent | TouchEvent) {
-  if (!isDrawing.value || !canvasRef.value) return
-
-  const ctx = canvasRef.value.getContext("2d")
-  if (!ctx) return
-
-  const rect = canvasRef.value.getBoundingClientRect()
-  const clientX = "touches" in e ? e.touches[0].clientX : e.clientX
-  const clientY = "touches" in e ? e.touches[0].clientY : e.clientY
-
-  const currentX = clientX - rect.left
-  const currentY = clientY - rect.top
-
-  ctx.beginPath()
-  ctx.moveTo(lastX.value, lastY.value)
-  ctx.lineTo(currentX, currentY)
-  ctx.strokeStyle = "#000000"
-  ctx.lineWidth = 2
-  ctx.lineCap = "round"
-  ctx.stroke()
-
-  lastX.value = currentX
-  lastY.value = currentY
-}
-
-/**
- * 停止繪製
- */
-function stopDrawing() {
-  isDrawing.value = false
-}
-
-/**
- * 清除簽名
- */
-function clearSignature() {
-  if (!canvasRef.value) return
-  const ctx = canvasRef.value.getContext("2d")
-  if (!ctx) return
-  ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height)
-}
-
-/**
- * 檢查畫布是否為空
- */
-function isCanvasEmpty(): boolean {
-  if (!canvasRef.value) return true
-  const ctx = canvasRef.value.getContext("2d")
-  if (!ctx) return true
-
-  const imageData = ctx.getImageData(0, 0, canvasRef.value.width, canvasRef.value.height)
-  return imageData.data.every(pixel => pixel === 0)
-}
-
-/**
- * 確認簽名
- */
-function handleConfirm() {
-  if (!canvasRef.value) return
-
-  if (isCanvasEmpty()) {
-    ElMessage.warning("請先簽名")
-    return
-  }
-
-  const dataUrl = canvasRef.value.toDataURL("image/png")
+function handleSigned(dataUrl: string) {
   emit("confirm", dataUrl)
   handleClose()
 }
@@ -174,35 +92,9 @@ function handleConfirm() {
  * 關閉對話框
  */
 function handleClose() {
-  clearSignature()
+  signaturePadRef.value?.clear()
   emit("update:modelValue", false)
 }
-
-/**
- * 初始化畫布
- */
-function initCanvas() {
-  if (!canvasRef.value) return
-  const canvas = canvasRef.value
-  const rect = canvas.getBoundingClientRect()
-
-  // 設置 canvas 實際尺寸與顯示尺寸一致
-  canvas.width = rect.width
-  canvas.height = 200
-
-  // 設置繪製樣式
-  const ctx = canvas.getContext("2d")
-  if (ctx) {
-    ctx.strokeStyle = "#000000"
-    ctx.lineWidth = 2
-    ctx.lineCap = "round"
-    ctx.lineJoin = "round"
-  }
-}
-
-onMounted(() => {
-  initCanvas()
-})
 </script>
 
 <template>
@@ -242,24 +134,7 @@ onMounted(() => {
       <!-- 簽名區 -->
       <div class="signature-section">
         <h4>客戶簽名</h4>
-        <div class="signature-pad-wrapper">
-          <canvas
-            ref="canvasRef"
-            class="signature-canvas"
-            @mousedown="startDrawing"
-            @mousemove="draw"
-            @mouseup="stopDrawing"
-            @mouseleave="stopDrawing"
-            @touchstart.prevent="startDrawing"
-            @touchmove.prevent="draw"
-            @touchend.prevent="stopDrawing"
-          />
-        </div>
-        <div class="signature-actions">
-          <el-button size="small" @click="clearSignature">
-            清除簽名
-          </el-button>
-        </div>
+        <SignaturePad ref="signaturePadRef" @signed="handleSigned" />
       </div>
     </div>
 
@@ -267,9 +142,6 @@ onMounted(() => {
       <div class="dialog-footer">
         <el-button @click="handleClose">
           取消
-        </el-button>
-        <el-button type="primary" @click="handleConfirm">
-          確認簽名
         </el-button>
       </div>
     </template>
@@ -319,26 +191,6 @@ onMounted(() => {
       font-size: 16px;
       font-weight: 500;
       color: var(--el-text-color-primary);
-    }
-
-    .signature-pad-wrapper {
-      border: 2px dashed var(--el-border-color);
-      border-radius: 4px;
-      background-color: #ffffff;
-      overflow: hidden;
-
-      .signature-canvas {
-        display: block;
-        width: 100%;
-        height: 200px;
-        cursor: crosshair;
-      }
-    }
-
-    .signature-actions {
-      margin-top: 12px;
-      display: flex;
-      justify-content: flex-end;
     }
   }
 }

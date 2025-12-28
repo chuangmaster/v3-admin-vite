@@ -57,10 +57,19 @@ function resizeCanvas() {
   // 設定畫布解析度
   canvas.width = canvas.offsetWidth * ratio
   canvas.height = canvas.offsetHeight * ratio
-  canvas.getContext("2d")?.scale(ratio, ratio)
+
+  const ctx = canvas.getContext("2d")
+  if (ctx) {
+    ctx.scale(ratio, ratio)
+  }
+
+  // 清空簽名板並重新初始化
+  signaturePad.clear()
 
   // 恢復簽名資料
-  signaturePad.fromData(data)
+  if (data && data.length > 0) {
+    signaturePad.fromData(data)
+  }
 }
 
 /**
@@ -105,7 +114,10 @@ function loadFromDataURL(dataUrl: string) {
 }
 
 onMounted(() => {
-  initSignaturePad()
+  // 使用 nextTick 確保 DOM 完全渲染後再初始化
+  nextTick(() => {
+    initSignaturePad()
+  })
 
   // 監聽視窗大小變化
   window.addEventListener("resize", resizeCanvas)
