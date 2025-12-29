@@ -12,7 +12,7 @@ import IdCardUploader from "./components/IdCardUploader.vue"
 import ProductItemForm from "./components/ProductItemForm.vue"
 import { useIdCardRecognition } from "./composables/useIdCardRecognition"
 import { useServiceOrderForm } from "./composables/useServiceOrderForm"
-import { ACCESSORY_OPTIONS, DEFECT_OPTIONS, GRADE_OPTIONS, ServiceOrderSource, ServiceOrderType } from "./types"
+import { ACCESSORY_OPTIONS, DEFECT_OPTIONS, GRADE_OPTIONS, RenewalOption, ServiceOrderSource, ServiceOrderType } from "./types"
 
 defineOptions({
   name: "ServiceOrderCreate"
@@ -363,6 +363,60 @@ function handleIdCardBackUploaded(data: { base64: string, contentType: string, f
               </el-option>
             </el-select>
           </el-form-item>
+
+          <!-- 寄賣單專屬欄位 -->
+          <template v-if="formData.orderType === ServiceOrderType.CONSIGNMENT">
+            <el-form-item label="起始日期" required>
+              <el-date-picker
+                v-model="formData.consignmentStartDate"
+                type="date"
+                placeholder="請選擇寄賣起始日期"
+                format="YYYY-MM-DD"
+                value-format="YYYY-MM-DD"
+                style="width: 100%;"
+              />
+            </el-form-item>
+
+            <el-form-item label="結束日期" required>
+              <el-date-picker
+                v-model="formData.consignmentEndDate"
+                type="date"
+                placeholder="請選擇寄賣結束日期"
+                format="YYYY-MM-DD"
+                value-format="YYYY-MM-DD"
+                style="width: 100%;"
+              />
+            </el-form-item>
+
+            <el-form-item label="到期處理" required>
+              <el-select v-model="formData.renewalOption" placeholder="請選擇到期處理方式">
+                <el-option
+                  label="到期自動取回"
+                  :value="RenewalOption.AUTO_RETRIEVE"
+                >
+                  <el-tag type="info" size="small">
+                    到期自動取回
+                  </el-tag>
+                </el-option>
+                <el-option
+                  label="第三個月起自動調降 10%"
+                  :value="RenewalOption.AUTO_DISCOUNT_10"
+                >
+                  <el-tag type="warning" size="small">
+                    第三個月起自動調降 10%
+                  </el-tag>
+                </el-option>
+                <el-option
+                  label="屆時討論"
+                  :value="RenewalOption.DISCUSS_LATER"
+                >
+                  <el-tag type="primary" size="small">
+                    屆時討論
+                  </el-tag>
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </template>
         </el-form>
       </el-card>
 

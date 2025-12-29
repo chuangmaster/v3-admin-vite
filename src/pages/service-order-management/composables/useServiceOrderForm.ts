@@ -167,7 +167,42 @@ export function useServiceOrderForm() {
         return { valid: false, message: "收購單的線下流程需要上傳身分證反面影本" }
       }
     }
-    // 寄賣單不需要驗證身分證
+
+    // 寄賣單日期驗證
+    if (formData.orderType === ServiceOrderType.CONSIGNMENT) {
+      if (!formData.consignmentStartDate) {
+        return { valid: false, message: "請選擇寄賣起始日期" }
+      }
+
+      if (!formData.consignmentEndDate) {
+        return { valid: false, message: "請選擇寄賣結束日期" }
+      }
+
+      if (!formData.renewalOption || formData.renewalOption === RenewalOption.NONE) {
+        return { valid: false, message: "請選擇到期處理方式" }
+      }
+
+      const startDate = new Date(formData.consignmentStartDate)
+      const endDate = new Date(formData.consignmentEndDate)
+
+      // 驗證結束日期必須晚於起始日期
+      if (endDate <= startDate) {
+        return { valid: false, message: "寄賣結束日期必須晚於起始日期" }
+      }
+
+      // 計算日期差異（天數）
+      const diffTime = endDate.getTime() - startDate.getTime()
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+      // 驗證期間必須介於 30 天至 180 天之間
+      if (diffDays < 30) {
+        return { valid: false, message: "寄賣期間至少需要 30 天" }
+      }
+
+      if (diffDays > 180) {
+        return { valid: false, message: "寄賣期間最多不能超過 180 天" }
+      }
+    }
 
     return { valid: true }
   }

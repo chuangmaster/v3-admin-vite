@@ -35,13 +35,13 @@ export enum ServiceOrderStatus {
 /** 續約設定 */
 export enum RenewalOption {
   /** 無續約 */
-  NONE = "none",
+  NONE = "NONE",
   /** 到期自動取回 */
-  AUTO_RETRIEVE = "auto_retrieve",
+  AUTO_RETRIEVE = "AUTO_RETRIEVE",
   /** 第三個月起自動調降 10% */
-  AUTO_DISCOUNT_10 = "auto_discount_10",
+  AUTO_DISCOUNT_10 = "AUTO_DISCOUNT_10",
   /** 屆時討論 */
-  DISCUSS_LATER = "discuss_later"
+  DISCUSS_LATER = "DISCUSS_LATER"
 }
 
 /** 簽名方式 */
@@ -571,13 +571,12 @@ export interface UploadAttachmentRequest {
 
 /** 儲存線下簽名請求 */
 export interface SaveOfflineSignatureRequest {
-  /** 簽名記錄 ID */
-  signatureRecordId: string
-
+  /** 簽名文件類型 */
+  documentType: DocumentType
   /** 簽名資料（Base64 PNG） */
   signatureData: string
   /** 簽名者姓名 */
-  signerName?: string
+  signerName: string
 }
 
 /** 發送線上簽名請求 */

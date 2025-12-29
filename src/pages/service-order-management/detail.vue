@@ -11,7 +11,7 @@ import AttachmentUploader from "./components/AttachmentUploader.vue"
 import OfflineSignatureDialog from "./components/OfflineSignatureDialog.vue"
 import { useServiceOrderDetail } from "./composables/useServiceOrderDetail"
 import { useSignature } from "./composables/useSignature"
-import { ACCESSORY_OPTIONS, AttachmentType, DEFECT_OPTIONS, DocumentType, GRADE_OPTIONS, ServiceOrderStatus, ServiceOrderType, SignatureMethod } from "./types"
+import { ACCESSORY_OPTIONS, AttachmentType, DEFECT_OPTIONS, DocumentType, GRADE_OPTIONS, RenewalOption, ServiceOrderStatus, ServiceOrderType, SignatureMethod } from "./types"
 
 defineOptions({
   name: "ServiceOrderDetail"
@@ -158,9 +158,9 @@ async function handleConfirmSignature(signatureDataUrl: string) {
 
   const success = await saveSignature(
     currentSignatureRecord.value.id,
-    currentSignatureDocument.value,
+    currentSignatureDocument.value!,
     signatureDataUrl,
-    serviceOrder.value.customerName
+    serviceOrder.value.customerName!
   )
 
   if (success) {
@@ -261,6 +261,19 @@ function getDefectLabel(value: string) {
 function getGradeLabel(value: string) {
   return GRADE_OPTIONS.find(opt => opt.value === value)?.label || value
 }
+
+/**
+ * 取得到期處理方式文字
+ */
+function getRenewalOptionText(option: string) {
+  const map: Record<string, string> = {
+    [RenewalOption.AUTO_RETRIEVE]: "到期自動取回",
+    [RenewalOption.AUTO_DISCOUNT_10]: "第三個月起自動調降 10%",
+    [RenewalOption.DISCUSS_LATER]: "屆時討論",
+    [RenewalOption.NONE]: "無"
+  }
+  return map[option] || option
+}
 </script>
 
 <template>
@@ -298,6 +311,21 @@ function getGradeLabel(value: string) {
           <el-descriptions-item label="更新時間">
             {{ serviceOrder.updatedAt ? formatDateTime(serviceOrder.updatedAt) : '-' }}
           </el-descriptions-item>
+          <!-- 寄賣單專屬欄位 -->
+          <template v-if="serviceOrder.orderType === ServiceOrderType.CONSIGNMENT">
+            <el-descriptions-item label="寄賣起始日期">
+              {{ serviceOrder.consignmentStartDate || '-' }}
+            </el-descriptions-item>
+            <el-descriptions-item label="寄賣結束日期">
+              {{ serviceOrder.consignmentEndDate || '-' }}
+            </el-descriptions-item>
+            <el-descriptions-item label="到期處理">
+              <el-tag v-if="serviceOrder.renewalOption" type="info" size="small">
+                {{ getRenewalOptionText(serviceOrder.renewalOption) }}
+              </el-tag>
+              <span v-else>-</span>
+            </el-descriptions-item>
+          </template>
         </el-descriptions>
 
         <!-- 客戶資訊 -->
