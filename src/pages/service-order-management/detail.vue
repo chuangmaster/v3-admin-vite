@@ -87,6 +87,16 @@ const hasOfflineSignature = computed(() => {
 })
 
 /**
+ * 取得待簽署的文件列表（線下簽名且尚未簽署）
+ */
+const pendingSignatureDocuments = computed(() => {
+  if (!serviceOrder.value?.signatureRecords) return []
+  return serviceOrder.value.signatureRecords.filter(
+    record => record.signatureType === "OFFLINE" && !record.signedAt
+  )
+})
+
+/**
  * 生成合約預覽
  */
 async function handleGeneratePreview() {
@@ -174,7 +184,8 @@ watch(
  * 訂單類型文字
  */
 function getOrderTypeText(type: ServiceOrderType) {
-  return type === ServiceOrderType.BUYBACK ? "收購單" : "寄賣單"
+  console.log("getOrderTypeText", type)
+  return type.toLowerCase() === ServiceOrderType.BUYBACK ? "收購單" : "寄賣單"
 }
 
 /**
@@ -425,7 +436,7 @@ function getGradeLabel(value: string) {
         </div>
 
         <!-- 線下簽章 -->
-        <div v-if="hasOfflineSignature && !hasSignature(serviceOrder.orderType === ServiceOrderType.BUYBACK ? DocumentType.BUYBACK_CONTRACT : DocumentType.CONSIGNMENT_CONTRACT)" class="section">
+        <div v-if="hasOfflineSignature && pendingSignatureDocuments.length > 0" class="section">
           <h3 class="section-title">
             <el-icon><DocumentChecked /></el-icon>
             <span>文件簽署</span>
@@ -439,72 +450,24 @@ function getGradeLabel(value: string) {
               此訂單使用線下簽名方式，請先預覽合約內容後進行簽章
             </template>
           </el-alert>
-          <el-row v-if="serviceOrder.orderType === ServiceOrderType.BUYBACK" :gutter="16">
-            <el-col :span="12">
+          <el-row :gutter="16">
+            <el-col v-for="record in pendingSignatureDocuments" :key="record.id" :span="12">
               <el-card shadow="hover">
                 <template #header>
                   <div class="card-title">
-                    <span>收購合約</span>
-                    <el-tag v-if="hasSignature(DocumentType.BUYBACK_CONTRACT)" type="success" size="small">
+                    <span>{{ getDocumentTypeText(record.documentType) }}</span>
+                    <el-tag v-if="hasSignature(record.documentType)" type="success" size="small">
                       已簽署
                     </el-tag>
                   </div>
                 </template>
                 <div class="contract-card-content">
-                  <p>請確認收購合約內容並進行簽署</p>
+                  <p>請確認{{ getDocumentTypeText(record.documentType) }}內容並進行簽署</p>
                   <el-button
-                    v-if="!hasSignature(DocumentType.BUYBACK_CONTRACT)"
+                    v-if="!hasSignature(record.documentType)"
                     type="primary"
                     :loading="signatureLoading"
-                    @click="handleStartSign(DocumentType.BUYBACK_CONTRACT)"
-                  >
-                    預覽並簽署
-                  </el-button>
-                </div>
-              </el-card>
-            </el-col>
-            <el-col :span="12">
-              <el-card shadow="hover">
-                <template #header>
-                  <div class="card-title">
-                    <span>一時貿易申請書</span>
-                    <el-tag v-if="hasSignature(DocumentType.TRADE_APPLICATION)" type="success" size="small">
-                      已簽署
-                    </el-tag>
-                  </div>
-                </template>
-                <div class="contract-card-content">
-                  <p>請確認一時貿易申請書內容並進行簽署</p>
-                  <el-button
-                    v-if="!hasSignature(DocumentType.TRADE_APPLICATION)"
-                    type="primary"
-                    :loading="signatureLoading"
-                    @click="handleStartSign(DocumentType.TRADE_APPLICATION)"
-                  >
-                    預覽並簽署
-                  </el-button>
-                </div>
-              </el-card>
-            </el-col>
-          </el-row>
-          <el-row v-else :gutter="16">
-            <el-col :span="12">
-              <el-card shadow="hover">
-                <template #header>
-                  <div class="card-title">
-                    <span>寄賣合約書</span>
-                    <el-tag v-if="hasSignature(DocumentType.CONSIGNMENT_CONTRACT)" type="success" size="small">
-                      已簽署
-                    </el-tag>
-                  </div>
-                </template>
-                <div class="contract-card-content">
-                  <p>請確認寄賣合約書內容並進行簽署</p>
-                  <el-button
-                    v-if="!hasSignature(DocumentType.CONSIGNMENT_CONTRACT)"
-                    type="primary"
-                    :loading="signatureLoading"
-                    @click="handleStartSign(DocumentType.CONSIGNMENT_CONTRACT)"
+                    @click="handleStartSign(record.documentType)"
                   >
                     預覽並簽署
                   </el-button>
