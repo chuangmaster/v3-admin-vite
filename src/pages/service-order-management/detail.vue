@@ -25,6 +25,21 @@ const { loading, serviceOrder } = useServiceOrderDetail(id.value)
 const attachments = ref<any[]>([])
 const attachmentsLoading = ref(false)
 
+/**
+ * 根據附件類型分類
+ */
+const idCardAttachments = computed(() => {
+  return attachments.value.filter(
+    att => att.attachmentType === "ID_CARD_FRONT" || att.attachmentType === "ID_CARD_BACK"
+  )
+})
+
+const contractAttachments = computed(() => {
+  return attachments.value.filter(
+    att => att.attachmentType === "CONTRACT"
+  )
+})
+
 // 簽名相關
 const {
   loading: signatureLoading,
@@ -58,25 +73,6 @@ async function loadAttachments() {
 }
 
 /**
- * 檢查是否有身分證附件
- */
-const hasIdCardAttachments = computed(() => {
-  return attachments.value.some(
-    attachment => attachment.fileType === AttachmentType.ID_CARD
-  )
-})
-
-/**
- * 檢查特定文件類型是否已簽名
- */
-function hasSignature(documentType: DocumentType): boolean {
-  if (!serviceOrder.value?.signatureRecords) return false
-  return serviceOrder.value.signatureRecords.some(
-    record => record.documentType === documentType && record.signedAt
-  )
-}
-
-/**
  * 檢查是否有任何線下簽名記錄
  */
 const hasOfflineSignature = computed(() => {
@@ -87,13 +83,21 @@ const hasOfflineSignature = computed(() => {
 })
 
 /**
- * 取得待簽署的文件列表（線下簽名且尚未簽署）
+ * 取得待簽署的文件列表（線下簽名且尚未有對應附件）
  */
 const pendingSignatureDocuments = computed(() => {
   if (!serviceOrder.value?.signatureRecords) return []
-  return serviceOrder.value.signatureRecords.filter(
-    record => record.signatureType === "OFFLINE" && !record.signedAt
-  )
+
+  // 只顯示線下簽名且還沒有對應合約附件的文件
+  return serviceOrder.value.signatureRecords.filter((record) => {
+    if (record.signatureType !== "OFFLINE") return false
+
+    // 檢查是否已經有合約附件（已簽署並上傳）
+    const hasContractFile = contractAttachments.value.length > 0
+
+    // 如果已經有合約附件，則不需要簽署
+    return !hasContractFile
+  })
 })
 
 /**
@@ -184,8 +188,7 @@ watch(
  * 訂單類型文字
  */
 function getOrderTypeText(type: ServiceOrderType) {
-  console.log("getOrderTypeText", type)
-  return type.toLowerCase() === ServiceOrderType.BUYBACK ? "收購單" : "寄賣單"
+  return type === ServiceOrderType.BUYBACK ? "收購單" : "寄賣單"
 }
 
 /**
@@ -402,15 +405,16 @@ function getGradeLabel(value: string) {
               <div class="attachment-section">
                 <div class="attachment-title">
                   身分證照片
-                  <el-tag v-if="!hasIdCardAttachments" type="info" size="small" style="margin-left: 8px;">
+                  <el-tag type="info" size="small" style="margin-left: 8px;">
                     僅供瀏覽
                   </el-tag>
                 </div>
                 <AttachmentUploader
                   :service-order-id="serviceOrder.id"
                   :file-type="AttachmentType.ID_CARD"
+                  :attachment-list="idCardAttachments"
                   :limit="2"
-                  :readonly="!hasIdCardAttachments"
+                  :readonly="true"
                   :disabled="serviceOrder.status === ServiceOrderStatus.CANCELLED"
                 />
               </div>
@@ -426,6 +430,7 @@ function getGradeLabel(value: string) {
                 <AttachmentUploader
                   :service-order-id="serviceOrder.id"
                   :file-type="AttachmentType.CONTRACT"
+                  :attachment-list="contractAttachments"
                   :limit="5"
                   :readonly="true"
                   :disabled="serviceOrder.status === ServiceOrderStatus.CANCELLED"
@@ -456,15 +461,10 @@ function getGradeLabel(value: string) {
                 <template #header>
                   <div class="card-title">
                     <span>{{ getDocumentTypeText(record.documentType) }}</span>
-                    <el-tag v-if="hasSignature(record.documentType)" type="success" size="small">
-                      已簽署
-                    </el-tag>
                   </div>
                 </template>
                 <div class="contract-card-content">
-                  <p>請確認{{ getDocumentTypeText(record.documentType) }}內容並進行簽署</p>
                   <el-button
-                    v-if="!hasSignature(record.documentType)"
                     type="primary"
                     :loading="signatureLoading"
                     @click="handleStartSign(record.documentType)"

@@ -3,9 +3,9 @@
 /** 服務單類型 */
 export enum ServiceOrderType {
   /** 寄賣單 */
-  CONSIGNMENT = "consignment",
+  CONSIGNMENT = "CONSIGNMENT",
   /** 收購單 */
-  BUYBACK = "buyback"
+  BUYBACK = "BUYBACK"
 }
 
 /** 服務單來源 */
@@ -191,6 +191,10 @@ export interface Customer {
 
 /** 附件實體 */
 export interface Attachment {
+  /**
+   * SAS URL（用於直接上傳/下載檔案，包含存取權杖）
+   */
+  sasUrl: string
   /** 唯一識別碼（UUID） */
   id: string
   /** 服務單 ID */

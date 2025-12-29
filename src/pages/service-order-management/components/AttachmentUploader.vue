@@ -20,12 +20,15 @@ interface Props {
   limit?: number
   /** 唯讀模式（僅顯示已上傳檔案，不顯示上傳區域） */
   readonly?: boolean
+  /** 外部傳入的附件清單（避免重複調用 API） */
+  attachmentList?: Attachment[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   limit: 10,
-  readonly: false
+  readonly: false,
+  attachmentList: undefined
 })
 
 const emit = defineEmits<{
@@ -42,9 +45,32 @@ const loading = ref(false)
 const MAX_FILE_SIZE = 10 * 1024 * 1024
 
 /**
- * 載入附件列表
+ * 監聽外部傳入的附件清單變化
+ */
+watch(
+  () => props.attachmentList,
+  (newList) => {
+    if (newList) {
+      attachments.value = newList
+      fileList.value = newList.map((attachment, index) => ({
+        name: attachment.fileName,
+        url: attachment.sasUrl || attachment.fileUrl,
+        uid: index,
+        status: "success" as const,
+        response: { id: attachment.id }
+      }))
+      emit("change", attachments.value)
+    }
+  },
+  { immediate: true }
+)
+
+/**
+ * 載入附件列表（僅在未提供 attachmentList 時調用）
  */
 async function loadAttachments() {
+  // 如果有外部傳入的清單，則不需要自己調用 API
+  if (props.attachmentList !== undefined) return
   if (!props.serviceOrderId) return
 
   try {
