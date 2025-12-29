@@ -57,7 +57,7 @@ export enum DocumentType {
   /** 收購合約 */
   BUYBACK_CONTRACT = "BUYBACK_CONTRACT",
   /** 一時貿易申請書 */
-  TRADE_APPLICATION = "TRADE_APPLICATION",
+  ONE_TIME_TRADE = "ONE_TIME_TRADE",
   /** 寄賣合約書 */
   CONSIGNMENT_CONTRACT = "CONSIGNMENT_CONTRACT"
 }
@@ -571,12 +571,13 @@ export interface UploadAttachmentRequest {
 
 /** 儲存線下簽名請求 */
 export interface SaveOfflineSignatureRequest {
-  /** 簽名文件類型 */
-  documentType: DocumentType
+  /** 簽名記錄 ID */
+  signatureRecordId: string
+
   /** 簽名資料（Base64 PNG） */
   signatureData: string
   /** 簽名者姓名 */
-  signerName: string
+  signerName?: string
 }
 
 /** 發送線上簽名請求 */
@@ -611,10 +612,10 @@ export interface MergeSignaturePreviewResponse {
   expiresAt: string
 }
 
-/** 生成合約預覽請求 */
-export interface GenerateContractPreviewRequest {
+/** 生成 Pdf 預覽請求 */
+export interface GeneratePdfPreviewRequest {
   /** 服務單類型 */
-  orderType: ServiceOrderType
+  documentType: DocumentType
   /** 客戶資訊 */
   customer: {
     /** 客戶姓名 */
@@ -637,7 +638,7 @@ export interface GenerateContractPreviewRequest {
 }
 
 /** 生成合約預覽回應 */
-export interface GenerateContractPreviewResponse {
+export interface GeneratePdfPreviewResponse {
   /** 收購合約預覽 URL（收購單） */
   buybackContractUrl?: string
   /** 一時貿易申請書預覽 URL（收購單） */

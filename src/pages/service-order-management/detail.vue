@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Attachment, GeneratePdfPreviewRequest, SignatureRecord } from "./types"
 import { formatDateTime } from "@@/utils/datetime"
 /**
  * 服務訂單詳情頁面
@@ -22,7 +23,7 @@ const router = useRouter()
 const id = computed(() => route.params.id as string)
 const { loading, serviceOrder } = useServiceOrderDetail(id.value)
 
-const attachments = ref<any[]>([])
+const attachments = ref<Attachment[]>([])
 const attachmentsLoading = ref(false)
 
 /**
@@ -30,13 +31,13 @@ const attachmentsLoading = ref(false)
  */
 const idCardAttachments = computed(() => {
   return attachments.value.filter(
-    att => att.attachmentType === "ID_CARD_FRONT" || att.attachmentType === "ID_CARD_BACK"
+    att => att.fileType === AttachmentType.ID_CARD
   )
 })
 
 const contractAttachments = computed(() => {
   return attachments.value.filter(
-    att => att.attachmentType === "CONTRACT"
+    att => att.fileType === AttachmentType.CONTRACT
   )
 })
 
@@ -52,6 +53,7 @@ const {
 
 const showSignatureDialog = ref(false)
 const currentSignatureDocument = ref<DocumentType>()
+const currentSignatureRecord = ref<SignatureRecord>()
 
 /**
  * 載入附件列表
@@ -103,11 +105,11 @@ const pendingSignatureDocuments = computed(() => {
 /**
  * 生成合約預覽
  */
-async function handleGeneratePreview() {
+async function handleGeneratePreview(documentType: DocumentType) {
   if (!serviceOrder.value) return
 
   const previewData = {
-    orderType: serviceOrder.value.orderType,
+    documentType,
     customer: {
       name: serviceOrder.value.customerName || "",
       phoneNumber: serviceOrder.value.customerPhone || "",
@@ -116,7 +118,7 @@ async function handleGeneratePreview() {
     },
     productItems: serviceOrder.value.productItems || [],
     totalAmount: serviceOrder.value.totalAmount || 0
-  }
+  } as GeneratePdfPreviewRequest
 
   await generatePreview(previewData)
 }
@@ -124,17 +126,27 @@ async function handleGeneratePreview() {
 /**
  * 開始簽署文件
  */
-async function handleStartSign(documentType: DocumentType) {
-  // 如果尚未生成預覽，先生成
-  const needPreview = serviceOrder.value?.orderType === ServiceOrderType.BUYBACK
-    ? !buybackContractPreviewUrl.value
-    : !consignmentContractPreviewUrl.value
-
-  if (needPreview) {
-    await handleGeneratePreview()
+async function handleStartSign(record: SignatureRecord) {
+  // 根據文件類型檢查是否需要生成預覽
+  let needPreview = false
+  if (record.documentType === DocumentType.BUYBACK_CONTRACT) {
+    needPreview = !buybackContractPreviewUrl.value
+  } else if (record.documentType === DocumentType.ONE_TIME_TRADE) {
+    needPreview = !tradeApplicationPreviewUrl.value
+  } else if (record.documentType === DocumentType.CONSIGNMENT_CONTRACT) {
+    needPreview = !consignmentContractPreviewUrl.value
   }
 
-  currentSignatureDocument.value = documentType
+  if (needPreview) {
+    // 如果後端返回的是 ONE_TIME_TRADE，轉換為 ONE_TIME_TRADE
+    const documentTypeForApi = record.documentType === "ONE_TIME_TRADE"
+      ? DocumentType.ONE_TIME_TRADE
+      : record.documentType as DocumentType
+    await handleGeneratePreview(documentTypeForApi)
+  }
+
+  currentSignatureDocument.value = record.documentType as DocumentType
+  currentSignatureRecord.value = record
   showSignatureDialog.value = true
 }
 
@@ -142,10 +154,10 @@ async function handleStartSign(documentType: DocumentType) {
  * 確認簽名
  */
 async function handleConfirmSignature(signatureDataUrl: string) {
-  if (!serviceOrder.value || !currentSignatureDocument.value) return
+  if (!serviceOrder.value || !currentSignatureDocument.value || !currentSignatureRecord.value) return
 
   const success = await saveSignature(
-    serviceOrder.value.id,
+    currentSignatureRecord.value.id,
     currentSignatureDocument.value,
     signatureDataUrl,
     serviceOrder.value.customerName
@@ -162,11 +174,15 @@ async function handleConfirmSignature(signatureDataUrl: string) {
  */
 const currentContractUrl = computed(() => {
   if (!currentSignatureDocument.value) return ""
-  if (currentSignatureDocument.value === DocumentType.BUYBACK_CONTRACT) {
+
+  const docType = currentSignatureDocument.value as string
+  console.log("取得當前合約預覽 URL", { docType, buybackContractPreviewUrl: buybackContractPreviewUrl.value, tradeApplicationPreviewUrl: tradeApplicationPreviewUrl.value })
+
+  if (docType === DocumentType.BUYBACK_CONTRACT || docType === "BUYBACK_CONTRACT") {
     return buybackContractPreviewUrl.value
-  } else if (currentSignatureDocument.value === DocumentType.TRADE_APPLICATION) {
+  } else if (docType === DocumentType.ONE_TIME_TRADE || docType === "TRADE_APPLICATION" || docType === "ONE_TIME_TRADE") {
     return tradeApplicationPreviewUrl.value
-  } else if (currentSignatureDocument.value === DocumentType.CONSIGNMENT_CONTRACT) {
+  } else if (docType === DocumentType.CONSIGNMENT_CONTRACT || docType === "CONSIGNMENT_CONTRACT") {
     return consignmentContractPreviewUrl.value
   }
 
@@ -212,7 +228,7 @@ function getStatusText(status: ServiceOrderStatus) {
 function getDocumentTypeText(documentType: DocumentType) {
   const map: Record<DocumentType, string> = {
     [DocumentType.BUYBACK_CONTRACT]: "收購合約",
-    [DocumentType.TRADE_APPLICATION]: "一時貿易申請書",
+    [DocumentType.ONE_TIME_TRADE]: "一時貿易申請書",
     [DocumentType.CONSIGNMENT_CONTRACT]: "寄賣合約書"
   }
   return map[documentType] || documentType
@@ -467,7 +483,7 @@ function getGradeLabel(value: string) {
                   <el-button
                     type="primary"
                     :loading="signatureLoading"
-                    @click="handleStartSign(record.documentType)"
+                    @click="handleStartSign(record)"
                   >
                     預覽並簽署
                   </el-button>

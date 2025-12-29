@@ -1,9 +1,9 @@
 /**
  * 簽名相關業務邏輯
  */
-import type { DocumentType, GenerateContractPreviewRequest, GenerateContractPreviewResponse, SignatureRecord } from "../types"
-import { generateContractPreview, mergeSignaturePreview, saveOfflineSignature } from "../apis/signature"
-import { ServiceOrderType } from "../types"
+import type { GeneratePdfPreviewRequest, GeneratePdfPreviewResponse, SignatureRecord } from "../types"
+import { generatePdfPreview, mergeSignaturePreview, saveOfflineSignature } from "../apis/signature"
+import { DocumentType } from "../types"
 
 /**
  * 將 Base64 編碼的 PDF 轉換為可顯示的 Data URL
@@ -38,21 +38,35 @@ export function useSignature() {
    * 生成合約預覽 PDF
    * @param data - 客戶資料、商品資料等
    */
-  async function generatePreview(data: GenerateContractPreviewRequest): Promise<GenerateContractPreviewResponse | null> {
+  async function generatePreview(data: GeneratePdfPreviewRequest): Promise<GeneratePdfPreviewResponse | null> {
     loading.value = true
     try {
-      const response = await generateContractPreview(data)
+      const response = await generatePdfPreview(data)
 
       if (response.success && response.data) {
         // 支援兩種格式：URL 格式（契約規格）或 Base64 格式（後端過渡版本）
-        const resData = response.data as GenerateContractPreviewResponse & { pdfBase64?: string }
+        const resData = response.data as GeneratePdfPreviewResponse & { pdfBase64?: string }
 
-        if (data.orderType === ServiceOrderType.BUYBACK) {
-          // 優先使用 URL，若無則使用 Base64 轉換
-          buybackContractPreviewUrl.value = resData.buybackContractUrl || base64ToDataUrl(resData.pdfBase64 || "")
-          tradeApplicationPreviewUrl.value = resData.tradeApplicationUrl || base64ToDataUrl(resData.pdfBase64 || "")
-        } else {
-          consignmentContractPreviewUrl.value = resData.consignmentContractUrl || base64ToDataUrl(resData.pdfBase64 || "")
+        // 根據後端返回的 URL 設定對應的預覽 URL（後端可能一次返回多個 URL）
+        if (resData.buybackContractUrl) {
+          buybackContractPreviewUrl.value = resData.buybackContractUrl
+        }
+        if (resData.tradeApplicationUrl) {
+          tradeApplicationPreviewUrl.value = resData.tradeApplicationUrl
+        }
+        if (resData.consignmentContractUrl) {
+          consignmentContractPreviewUrl.value = resData.consignmentContractUrl
+        }
+        // 向後相容：如果是舊版 API 返回 pdfBase64，則根據請求的文件類型設定對應的預覽 URL
+        if (resData.pdfBase64 && !resData.buybackContractUrl && !resData.tradeApplicationUrl && !resData.consignmentContractUrl) {
+          const pdfDataUrl = base64ToDataUrl(resData.pdfBase64)
+          if (data.documentType === DocumentType.BUYBACK_CONTRACT) {
+            buybackContractPreviewUrl.value = pdfDataUrl
+          } else if (data.documentType === DocumentType.ONE_TIME_TRADE) {
+            tradeApplicationPreviewUrl.value = pdfDataUrl
+          } else if (data.documentType === DocumentType.CONSIGNMENT_CONTRACT) {
+            consignmentContractPreviewUrl.value = pdfDataUrl
+          }
         }
         return response.data
       } else {
@@ -103,15 +117,15 @@ export function useSignature() {
    * 儲存離線簽名
    */
   async function saveSignature(
-    serviceOrderId: string,
+    signatureRecordId: string,
     documentType: DocumentType,
     signatureDataUrl: string,
     signerName: string = "客戶"
   ): Promise<boolean> {
     loading.value = true
     try {
-      const response = await saveOfflineSignature(serviceOrderId, {
-        documentType,
+      const response = await saveOfflineSignature({
+        signatureRecordId,
         signatureData: signatureDataUrl,
         signerName
       })

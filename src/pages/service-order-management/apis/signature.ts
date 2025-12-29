@@ -4,8 +4,8 @@
  */
 
 import type {
-  GenerateContractPreviewRequest,
-  GenerateContractPreviewResponse,
+  GeneratePdfPreviewRequest,
+  GeneratePdfPreviewResponse,
   MergeSignaturePreviewRequest,
   MergeSignaturePreviewResponse,
   ResendSignatureRequest,
@@ -34,16 +34,14 @@ export async function mergeSignaturePreview(
 
 /**
  * 儲存線下簽名
- * @param serviceOrderId - 服務單 ID（UUID）
- * @param data - 儲存線下簽名請求資料（文件類型、簽名資料、簽名者姓名）
+ * @param data - 儲存線下簽名請求資料（簽名記錄 ID、文件類型、簽名資料、簽名者姓名）
  * @returns 簽名記錄
  */
 export async function saveOfflineSignature(
-  serviceOrderId: string,
   data: SaveOfflineSignatureRequest
 ): Promise<ApiResponse<SignatureRecord>> {
   return request({
-    url: `/service-orders/${serviceOrderId}/signatures/offline`,
+    url: `/signatures/offline/confirm`,
     method: "POST",
     data
   })
@@ -100,13 +98,13 @@ export async function getSignatureRecords(
 /**
  * 生成合約預覽 PDF
  * @param data - 生成合約預覽請求資料（客戶資訊、商品項目等）
- * @returns 合約預覽 URL（收購單包含收購合約和一時貿易書，寄賣單包含寄賣合約書）
+ * @returns 合約預覽 URL（收購單包含收購合約和一時貿易申請書，寄賣單包含寄賣合約書）
  */
-export async function generateContractPreview(
-  data: GenerateContractPreviewRequest
-): Promise<ApiResponse<GenerateContractPreviewResponse>> {
+export async function generatePdfPreview(
+  data: GeneratePdfPreviewRequest
+): Promise<ApiResponse<GeneratePdfPreviewResponse>> {
   return request({
-    url: "/contracts/preview",
+    url: "/pdf/preview",
     method: "POST",
     data
   })
