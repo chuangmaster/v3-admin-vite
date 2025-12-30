@@ -34,10 +34,7 @@ const orderTypeOptions = [
 /** 訂單狀態選項 */
 const statusOptions = [
   { label: "全部", value: "" },
-  { label: "草稿", value: ServiceOrderStatus.DRAFT },
   { label: "待確認", value: ServiceOrderStatus.PENDING },
-  { label: "已確認", value: ServiceOrderStatus.CONFIRMED },
-  { label: "處理中", value: ServiceOrderStatus.IN_PROGRESS },
   { label: "已完成", value: ServiceOrderStatus.COMPLETED },
   { label: "已取消", value: ServiceOrderStatus.CANCELLED }
 ]
@@ -124,6 +121,7 @@ function getOrderTypeText(type: ServiceOrderType) {
               v-model="queryParams.orderType"
               placeholder="請選擇訂單類型"
               clearable
+              style="width: 180px"
               @change="refresh"
             >
               <el-option
@@ -140,6 +138,7 @@ function getOrderTypeText(type: ServiceOrderType) {
               v-model="queryParams.status"
               placeholder="請選擇訂單狀態"
               clearable
+              style="width: 180px"
               @change="refresh"
             >
               <el-option
