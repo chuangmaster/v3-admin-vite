@@ -19,17 +19,17 @@ export enum ServiceOrderSource {
 /** 服務單狀態 */
 export enum ServiceOrderStatus {
   /** 草稿 */
-  DRAFT = "draft",
+  DRAFT = "DRAFT",
   /** 待確認 */
-  PENDING = "pending",
+  PENDING = "PENDING",
   /** 已確認 */
-  CONFIRMED = "confirmed",
+  CONFIRMED = "CONFIRMED",
   /** 處理中 */
-  IN_PROGRESS = "in_progress",
+  IN_PROGRESS = "IN_PROGRESS",
   /** 已完成 */
-  COMPLETED = "completed",
+  COMPLETED = "COMPLETED",
   /** 已取消 */
-  CANCELLED = "cancelled"
+  CANCELLED = "CANCELLED"
 }
 
 /** 續約設定 */

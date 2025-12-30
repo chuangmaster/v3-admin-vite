@@ -42,9 +42,9 @@ const idCardAttachments = computed(() => {
 
 const contractAttachments = computed(() => {
   return attachments.value.filter((att) => {
-    // 支援 API 回傳的 attachmentType
+    // 支援 API 回傳的 attachmentType（包含所有合約類型）
     if (att.attachmentType) {
-      return att.attachmentType === "CONTRACT" || att.attachmentType.startsWith("CONTRACT")
+      return att.attachmentType.includes("CONTRACT")
     }
     // 相容舊的 fileType 欄位
     return att.fileType === AttachmentType.CONTRACT
@@ -95,23 +95,25 @@ const hasOfflineSignature = computed(() => {
 })
 
 /**
- * 取得待簽署的文件列表（線下簽名且尚未有對應附件）
+ * 取得待簽署的文件列表（線下簽名且尚未簽署完成）
+ * 規則：signatureRecord.documentType == attachmentType && signedAt.hasValue 表示已簽署
  */
 const pendingSignatureDocuments = computed(() => {
   if (!serviceOrder.value?.signatureRecords) return []
 
-  // 取得所有合約附件的 id 集合
-  const contractAttachmentIds = new Set(contractAttachments.value.map(att => att.id))
-
-  // 只顯示線下簽名且還沒有對應合約附件的文件
   return serviceOrder.value.signatureRecords.filter((record) => {
+    // 只處理線下簽名
     if (record.signatureType !== "OFFLINE") return false
 
-    // 檢查該簽名記錄的 id 是否已存在於合約附件中
-    const hasContractFile = contractAttachmentIds.has(record.id)
+    // 如果已經有簽署時間，表示已完成簽署，不需要再顯示
+    if (record.signedAt) return false
+    // 檢查是否已經有對應的合約附件（比對 documentType 和 attachmentType）
+    const hasMatchingAttachment = attachments.value.some(
+      att => att.attachmentType === record.documentType
+    )
 
-    // 如果已經有對應的合約附件，則不需要簽署
-    return !hasContractFile
+    // 如果還沒有對應的附件，表示需要簽署
+    return !hasMatchingAttachment
   })
 })
 
@@ -224,7 +226,7 @@ function getOrderTypeText(type: ServiceOrderType) {
  * 訂單狀態文字
  */
 function getStatusText(status: ServiceOrderStatus) {
-  const map: Record<ServiceOrderStatus, string> = {
+  const map: Record<string, string> = {
     [ServiceOrderStatus.DRAFT]: "草稿",
     [ServiceOrderStatus.PENDING]: "待確認",
     [ServiceOrderStatus.CONFIRMED]: "已確認",
@@ -327,10 +329,10 @@ function getRenewalOptionText(option: string) {
           <!-- 寄賣單專屬欄位 -->
           <template v-if="serviceOrder.orderType === ServiceOrderType.CONSIGNMENT">
             <el-descriptions-item label="寄賣起始日期">
-              {{ serviceOrder.consignmentStartDate || '-' }}
+              {{ formatDateTime(serviceOrder.consignmentStartDate) || '-' }}
             </el-descriptions-item>
             <el-descriptions-item label="寄賣結束日期">
-              {{ serviceOrder.consignmentEndDate || '-' }}
+              {{ formatDateTime(serviceOrder.consignmentEndDate) || '-' }}
             </el-descriptions-item>
             <el-descriptions-item label="到期處理">
               <el-tag v-if="serviceOrder.renewalOption" type="info" size="small">
