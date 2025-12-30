@@ -117,21 +117,20 @@ export function useSignature() {
    * 儲存離線簽名
    */
   async function saveSignature(
+    serviceOrderId: string,
     signatureRecordId: string,
-    documentType: DocumentType,
     signatureDataUrl: string,
     signerName: string = "客戶"
   ): Promise<boolean> {
     loading.value = true
     try {
-      const response = await saveOfflineSignature({
+      const response = await saveOfflineSignature(serviceOrderId, {
         signatureRecordId,
         signatureData: signatureDataUrl,
         signerName
       })
 
       if (response.success && response.data) {
-        signatureRecord.value = response.data
         ElMessage.success("簽名儲存成功")
         return true
       } else {

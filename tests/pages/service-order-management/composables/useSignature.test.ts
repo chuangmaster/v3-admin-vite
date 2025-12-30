@@ -24,7 +24,9 @@ describe("useSignature", () => {
       documentType: "BUYBACK_CONTRACT" as any,
       signatureMethod: "OFFLINE" as any,
       signerName: "客戶",
-      signedAt: "2025-01-01T00:00:00Z"
+      signedAt: "2025-01-01T00:00:00Z",
+      attachmentId: "attach-123",
+      signatureRecordId: "sig-record-123"
     }
 
     const signatureApi = await import("@/pages/service-order-management/apis/signature")
@@ -60,7 +62,7 @@ describe("useSignature", () => {
 
     // Act
     const { saveSignature } = useSignature()
-    const result = await saveSignature("order-123", "BUYBACK_CONTRACT" as any, "data:image/png;base64,abc")
+    const result = await saveSignature("order-123", "BUYBACK_CONTRACT" as any, "data:image/png;base64,abc", "客戶")
 
     // Assert
     expect(result).toBe(false)
@@ -108,7 +110,7 @@ describe("useSignature", () => {
 
     // Act
     const { saveSignature, loading } = useSignature()
-    const promise = saveSignature("order-123", "BUYBACK_CONTRACT" as any, "data:image/png;base64,abc")
+    const promise = saveSignature("order-123", "BUYBACK_CONTRACT" as any, "data:image/png;base64,abc", "客戶")
 
     // Assert - loading 應該為 true
     expect(loading.value).toBe(true)

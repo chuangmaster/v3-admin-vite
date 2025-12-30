@@ -195,22 +195,30 @@ export interface Attachment {
    * SAS URL（用於直接上傳/下載檔案，包含存取權杖）
    */
   sasUrl: string
+  /** SAS URL 過期時間（ISO 8601, UTC） */
+  expiresAt?: string
   /** 唯一識別碼（UUID） */
   id: string
   /** 服務單 ID */
-  serviceOrderId: string
+  serviceOrderId?: string
   /** 檔案名稱 */
   fileName: string
-  /** 檔案類型 */
-  fileType: AttachmentType
+  /** 檔案類型（前端使用） */
+  fileType?: AttachmentType
+  /** 附件類型（API 回傳，如 ID_CARD_FRONT, ID_CARD_BACK, CONTRACT） */
+  attachmentType?: string
   /** 檔案 URL */
-  fileUrl: string
+  fileUrl?: string
   /** 檔案大小（bytes） */
   fileSize: number
+  /** 檔案 MIME 類型 */
+  contentType?: string
   /** 上傳時間（ISO 8601, UTC） */
-  uploadedAt: string
+  uploadedAt?: string
+  /** 建立時間（ISO 8601, UTC） */
+  createdAt?: string
   /** 上傳者（使用者 ID） */
-  uploadedBy: string
+  uploadedBy?: string
 }
 
 /** 簽名記錄實體 */
@@ -571,8 +579,8 @@ export interface UploadAttachmentRequest {
 
 /** 儲存線下簽名請求 */
 export interface SaveOfflineSignatureRequest {
-  /** 簽名文件類型 */
-  documentType: DocumentType
+  /** 簽名記錄 ID */
+  signatureRecordId: string
   /** 簽名資料（Base64 PNG） */
   signatureData: string
   /** 簽名者姓名 */
@@ -646,6 +654,20 @@ export interface GeneratePdfPreviewResponse {
   consignmentContractUrl?: string
   /** 過期時間（ISO 8601, UTC） */
   expiresAt: string
+}
+
+/** 確認服務單並儲存最終文件回應 */
+export interface ConfirmOrderResponse {
+  /** 新建立的附件 ID */
+  attachmentId: string
+  /** 新建立的簽名記錄 ID */
+  signatureRecordId: string
+  /** Blob 路徑 */
+  blobPath?: string
+  /** SAS 下載連結 */
+  sasUrl?: string
+  /** SAS 過期時間 (UTC) */
+  expiresAt?: string
 }
 
 /** 記錄附件查看日誌請求 */

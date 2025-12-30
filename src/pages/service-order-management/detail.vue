@@ -30,15 +30,25 @@ const attachmentsLoading = ref(false)
  * 根據附件類型分類
  */
 const idCardAttachments = computed(() => {
-  return attachments.value.filter(
-    att => att.fileType === AttachmentType.ID_CARD
-  )
+  return attachments.value.filter((att) => {
+    // 支援 API 回傳的 attachmentType（ID_CARD_FRONT, ID_CARD_BACK）
+    if (att.attachmentType) {
+      return att.attachmentType.startsWith("ID_CARD")
+    }
+    // 相容舊的 fileType 欄位
+    return att.fileType === AttachmentType.ID_CARD
+  })
 })
 
 const contractAttachments = computed(() => {
-  return attachments.value.filter(
-    att => att.fileType === AttachmentType.CONTRACT
-  )
+  return attachments.value.filter((att) => {
+    // 支援 API 回傳的 attachmentType
+    if (att.attachmentType) {
+      return att.attachmentType === "CONTRACT" || att.attachmentType.startsWith("CONTRACT")
+    }
+    // 相容舊的 fileType 欄位
+    return att.fileType === AttachmentType.CONTRACT
+  })
 })
 
 // 簽名相關
@@ -90,14 +100,17 @@ const hasOfflineSignature = computed(() => {
 const pendingSignatureDocuments = computed(() => {
   if (!serviceOrder.value?.signatureRecords) return []
 
+  // 取得所有合約附件的 id 集合
+  const contractAttachmentIds = new Set(contractAttachments.value.map(att => att.id))
+
   // 只顯示線下簽名且還沒有對應合約附件的文件
   return serviceOrder.value.signatureRecords.filter((record) => {
     if (record.signatureType !== "OFFLINE") return false
 
-    // 檢查是否已經有合約附件（已簽署並上傳）
-    const hasContractFile = contractAttachments.value.length > 0
+    // 檢查該簽名記錄的 id 是否已存在於合約附件中
+    const hasContractFile = contractAttachmentIds.has(record.id)
 
-    // 如果已經有合約附件，則不需要簽署
+    // 如果已經有對應的合約附件，則不需要簽署
     return !hasContractFile
   })
 })
@@ -156,14 +169,14 @@ async function handleStartSign(record: SignatureRecord) {
 async function handleConfirmSignature(signatureDataUrl: string) {
   if (!serviceOrder.value || !currentSignatureDocument.value || !currentSignatureRecord.value) return
 
-  const success = await saveSignature(
+  const result = await saveSignature(
+    serviceOrder.value.id,
     currentSignatureRecord.value.id,
-    currentSignatureDocument.value!,
     signatureDataUrl,
     serviceOrder.value.customerName!
   )
 
-  if (success) {
+  if (result) {
     // 重新載入服務單資料以更新簽名記錄
     window.location.reload()
   }

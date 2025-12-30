@@ -4,6 +4,7 @@
  */
 
 import type {
+  ConfirmOrderResponse,
   GeneratePdfPreviewRequest,
   GeneratePdfPreviewResponse,
   MergeSignaturePreviewRequest,
@@ -34,14 +35,16 @@ export async function mergeSignaturePreview(
 
 /**
  * 儲存線下簽名
- * @param data - 儲存線下簽名請求資料（簽名記錄 ID、文件類型、簽名資料、簽名者姓名）
- * @returns 簽名記錄
+ * @param serviceOrderId - 服務單 ID（UUID）
+ * @param data - 儲存線下簽名請求資料（簽名記錄 ID、簽名資料、簽名者姓名）
+ * @returns 確認結果（包含附件 ID、SAS URL 等）
  */
 export async function saveOfflineSignature(
+  serviceOrderId: string,
   data: SaveOfflineSignatureRequest
-): Promise<ApiResponse<SignatureRecord>> {
+): Promise<ApiResponse<ConfirmOrderResponse>> {
   return request({
-    url: `/signatures/offline/confirm`,
+    url: `/service-orders/${serviceOrderId}/signatures/offline`,
     method: "POST",
     data
   })
