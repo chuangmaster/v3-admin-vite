@@ -15,11 +15,11 @@ export const useServiceOrderStore = defineStore("service-order", () => {
   const queryParams = ref<ServiceOrderListParams>({
     pageNumber: 1,
     pageSize: 20,
-    orderType: "BUYBACK" as any,
+    orderType: "" as any,
     customerName: undefined,
     startDate: undefined,
     endDate: undefined,
-    status: "PENDING" as any
+    status: "" as any
   })
 
   /** 當前服務單類型篩選（用於 UI 顯示） */
@@ -49,7 +49,7 @@ export const useServiceOrderStore = defineStore("service-order", () => {
     queryParams.value = {
       pageNumber: 1,
       pageSize: 20,
-      orderType: "BUYBACK" as any,
+      orderType: "" as any,
       customerName: undefined,
       startDate: undefined,
       endDate: undefined,

@@ -183,6 +183,10 @@ export interface Customer {
   email?: string
   /** 身分證字號 */
   idCardNumber: string
+  /** 居住地址 */
+  residentialAddress: string
+  /** Line ID */
+  lineId?: string
   /** 建立時間（ISO 8601, UTC） */
   createdAt: string
   /** 最後更新時間（ISO 8601, UTC） */
@@ -545,6 +549,10 @@ export interface CreateCustomerRequest {
   email?: string
   /** 身分證字號（支援台灣身分證與外籍人士格式） */
   idNumber: string
+  /** 居住地址 */
+  residentialAddress: string
+  /** Line ID（可選） */
+  lineId?: string
 }
 
 /** OCR 辨識身分證請求（使用 Base64 編碼） */

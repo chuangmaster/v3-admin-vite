@@ -450,6 +450,12 @@ function handleIdCardBackUploaded(data: { base64: string, contentType: string, f
             <el-descriptions-item label="身分證字號">
               {{ selectedCustomer.idCardNumber }}
             </el-descriptions-item>
+            <el-descriptions-item label="居住地址" :span="2">
+              {{ selectedCustomer.residentialAddress }}
+            </el-descriptions-item>
+            <el-descriptions-item label="Line ID">
+              {{ selectedCustomer.lineId || '未提供' }}
+            </el-descriptions-item>
           </el-descriptions>
 
           <!-- 身分證件上傳區（僅收購單需要） -->

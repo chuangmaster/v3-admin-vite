@@ -19,6 +19,8 @@ interface CustomerResponseDTO {
   phoneNumber: string
   email?: string
   idNumber: string
+  residentialAddress: string
+  lineId?: string
   createdAt: string
   updatedAt?: string
 }
@@ -33,6 +35,8 @@ function transformCustomer(dto: CustomerResponseDTO): Customer {
     phoneNumber: dto.phoneNumber,
     email: dto.email,
     idCardNumber: dto.idNumber,
+    residentialAddress: dto.residentialAddress,
+    lineId: dto.lineId,
     createdAt: dto.createdAt,
     updatedAt: dto.updatedAt
   }

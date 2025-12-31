@@ -66,6 +66,8 @@ function handleCreate() {
               <span v-if="customer.email">{{ customer.email }}</span>
               <span class="separator">|</span>
               <span>{{ customer.idCardNumber }}</span>
+              <span v-if="customer.lineId" class="separator">|</span>
+              <span v-if="customer.lineId">Line: {{ customer.lineId }}</span>
             </div>
           </div>
         </div>

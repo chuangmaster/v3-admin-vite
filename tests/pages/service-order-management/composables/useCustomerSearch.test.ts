@@ -28,6 +28,7 @@ describe("useCustomerSearch", () => {
         phoneNumber: "0912345678",
         email: "wang@example.com",
         idCardNumber: "A123456789",
+        residentialAddress: "台北市大安區",
         createdAt: "2025-01-01T00:00:00Z"
       }
     ]
@@ -105,6 +106,7 @@ describe("useCustomerSearch", () => {
         phoneNumber: "0912345678",
         email: "test@example.com",
         idCardNumber: "A123456789",
+        residentialAddress: "台北市大安區",
         createdAt: "2025-01-01T00:00:00Z"
       }
     ]

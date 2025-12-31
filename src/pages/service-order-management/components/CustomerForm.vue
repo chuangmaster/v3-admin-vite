@@ -22,7 +22,9 @@ const formData = reactive<CreateCustomerRequest>({
   name: "",
   phoneNumber: "",
   email: "",
-  idNumber: ""
+  idNumber: "",
+  residentialAddress: "",
+  lineId: ""
 })
 
 /** 表單驗證規則 */
@@ -68,6 +70,13 @@ const rules: FormRules = {
       },
       trigger: "blur"
     }
+  ],
+  residentialAddress: [
+    { required: true, message: "請輸入居住地址", trigger: "blur" },
+    { min: 5, max: 200, message: "地址長度為 5-200 字元", trigger: "blur" }
+  ],
+  lineId: [
+    { min: 0, max: 50, message: "Line ID 長度不可超過 50 字元", trigger: "blur" }
   ]
 }
 
@@ -117,6 +126,8 @@ function resetForm() {
   formData.phoneNumber = ""
   formData.email = ""
   formData.idNumber = ""
+  formData.residentialAddress = ""
+  formData.lineId = ""
 }
 
 /**
@@ -184,6 +195,22 @@ defineExpose({
           </el-tooltip>
         </template>
       </el-input>
+    </el-form-item>
+    <el-form-item label="居住地址" prop="residentialAddress">
+      <el-input
+        v-model="formData.residentialAddress"
+        placeholder="請輸入居住地址"
+        maxlength="200"
+        show-word-limit
+      />
+    </el-form-item>
+
+    <el-form-item label="Line ID" prop="lineId">
+      <el-input
+        v-model="formData.lineId"
+        placeholder="請輸入 Line ID（選填）"
+        maxlength="50"
+      />
     </el-form-item>
 
     <el-form-item>
