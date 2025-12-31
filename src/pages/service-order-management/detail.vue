@@ -129,7 +129,8 @@ async function handleGeneratePreview(documentType: DocumentType) {
       name: serviceOrder.value.customerName || "",
       phoneNumber: serviceOrder.value.customerPhone || "",
       email: serviceOrder.value.customerEmail,
-      idCardNumber: serviceOrder.value.customerIdNumber || ""
+      idCardNumber: serviceOrder.value.customerIdNumber || "",
+      residentialAddress: serviceOrder.value.customerAddress
     },
     productItems: serviceOrder.value.productItems || [],
     totalAmount: serviceOrder.value.totalAmount || 0
@@ -356,6 +357,12 @@ function getRenewalOptionText(option: string) {
           </el-descriptions-item>
           <el-descriptions-item label="身分證字號">
             {{ serviceOrder.customerIdNumber }}
+          </el-descriptions-item>
+          <el-descriptions-item label="居住地址" :span="2">
+            {{ serviceOrder.customerAddress || '未提供' }}
+          </el-descriptions-item>
+          <el-descriptions-item v-if="serviceOrder.customerLineId" label="Line ID" :span="2">
+            {{ serviceOrder.customerLineId }}
           </el-descriptions-item>
         </el-descriptions>
 

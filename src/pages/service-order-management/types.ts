@@ -291,6 +291,10 @@ export interface ServiceOrder {
   customerEmail?: string
   /** 客戶身分證字號（查詢詳細時回傳） */
   customerIdNumber?: string
+  /** 客戶地址（查詢詳細時回傳） */
+  customerAddress?: string
+  /** 客戶 Line ID（查詢詳細時回傳） */
+  customerLineId?: string
   /** 商品項目列表（1-4 件） */
   productItems: ProductItem[]
   /** 總金額 */
@@ -641,6 +645,8 @@ export interface GeneratePdfPreviewRequest {
     email?: string
     /** 身分證字號 */
     idCardNumber: string
+    /** 居住地址 */
+    residentialAddress?: string
   }
   /** 商品項目列表 */
   productItems: ProductItem[]
