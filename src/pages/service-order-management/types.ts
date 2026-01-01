@@ -633,41 +633,18 @@ export interface MergeSignaturePreviewResponse {
 
 /** 生成 Pdf 預覽請求 */
 export interface GeneratePdfPreviewRequest {
-  /** 服務單類型 */
+  /** 服務單 ID */
+  serviceOrderId: string
+  /** 文件類型 */
   documentType: DocumentType
-  /** 客戶資訊 */
-  customer: {
-    /** 客戶姓名 */
-    name: string
-    /** 電話號碼 */
-    phoneNumber: string
-    /** Email */
-    email?: string
-    /** 身分證字號 */
-    idCardNumber: string
-    /** 居住地址 */
-    residentialAddress?: string
-  }
-  /** 商品項目列表 */
-  productItems: ProductItem[]
-  /** 總金額 */
-  totalAmount: number
-  /** 寄賣起始日期（僅寄賣單） */
-  consignmentStartDate?: string
-  /** 寄賣結束日期（僅寄賣單） */
-  consignmentEndDate?: string
 }
 
 /** 生成合約預覽回應 */
 export interface GeneratePdfPreviewResponse {
-  /** 收購合約預覽 URL（收購單） */
-  buybackContractUrl?: string
-  /** 一時貿易申請書預覽 URL（收購單） */
-  tradeApplicationUrl?: string
-  /** 寄賣合約書預覽 URL（寄賣單） */
-  consignmentContractUrl?: string
-  /** 過期時間（ISO 8601, UTC） */
-  expiresAt: string
+  /** PDF Base64 編碼 */
+  pdfBase64: string
+  /** 內容類型 */
+  contentType: string
 }
 
 /** 確認服務單並儲存最終文件回應 */

@@ -1,9 +1,8 @@
 /**
  * 簽名相關業務邏輯
  */
-import type { GeneratePdfPreviewRequest, GeneratePdfPreviewResponse, SignatureRecord } from "../types"
+import type { DocumentType, GeneratePdfPreviewResponse, SignatureRecord } from "../types"
 import { generatePdfPreview, mergeSignaturePreview, saveOfflineSignature } from "../apis/signature"
-import { DocumentType } from "../types"
 
 /**
  * 將 Base64 編碼的 PDF 轉換為可顯示的 Data URL
@@ -36,38 +35,27 @@ export function useSignature() {
 
   /**
    * 生成合約預覽 PDF
-   * @param data - 客戶資料、商品資料等
+   * @param serviceOrderId - 服務單 ID
+   * @param documentType - 文件類型
    */
-  async function generatePreview(data: GeneratePdfPreviewRequest): Promise<GeneratePdfPreviewResponse | null> {
+  async function generatePreview(serviceOrderId: string, documentType: DocumentType): Promise<GeneratePdfPreviewResponse | null> {
     loading.value = true
     try {
-      const response = await generatePdfPreview(data)
+      const response = await generatePdfPreview({ serviceOrderId, documentType })
 
       if (response.success && response.data) {
-        // 支援兩種格式：URL 格式（契約規格）或 Base64 格式（後端過渡版本）
-        const resData = response.data as GeneratePdfPreviewResponse & { pdfBase64?: string }
+        const resData = response.data as GeneratePdfPreviewResponse
+        const pdfDataUrl = base64ToDataUrl(resData.pdfBase64)
 
-        // 根據後端返回的 URL 設定對應的預覽 URL（後端可能一次返回多個 URL）
-        if (resData.buybackContractUrl) {
-          buybackContractPreviewUrl.value = resData.buybackContractUrl
+        // 根據文件類型設定對應的預覽 URL
+        if (documentType === "BUYBACK_CONTRACT") {
+          buybackContractPreviewUrl.value = pdfDataUrl
+        } else if (documentType === "ONE_TIME_TRADE") {
+          tradeApplicationPreviewUrl.value = pdfDataUrl
+        } else if (documentType === "CONSIGNMENT_CONTRACT") {
+          consignmentContractPreviewUrl.value = pdfDataUrl
         }
-        if (resData.tradeApplicationUrl) {
-          tradeApplicationPreviewUrl.value = resData.tradeApplicationUrl
-        }
-        if (resData.consignmentContractUrl) {
-          consignmentContractPreviewUrl.value = resData.consignmentContractUrl
-        }
-        // 向後相容：如果是舊版 API 返回 pdfBase64，則根據請求的文件類型設定對應的預覽 URL
-        if (resData.pdfBase64 && !resData.buybackContractUrl && !resData.tradeApplicationUrl && !resData.consignmentContractUrl) {
-          const pdfDataUrl = base64ToDataUrl(resData.pdfBase64)
-          if (data.documentType === DocumentType.BUYBACK_CONTRACT) {
-            buybackContractPreviewUrl.value = pdfDataUrl
-          } else if (data.documentType === DocumentType.ONE_TIME_TRADE) {
-            tradeApplicationPreviewUrl.value = pdfDataUrl
-          } else if (data.documentType === DocumentType.CONSIGNMENT_CONTRACT) {
-            consignmentContractPreviewUrl.value = pdfDataUrl
-          }
-        }
+
         return response.data
       } else {
         ElMessage.error(response.message || "生成合約預覽失敗")

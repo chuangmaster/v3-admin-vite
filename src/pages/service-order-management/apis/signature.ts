@@ -100,7 +100,7 @@ export async function getSignatureRecords(
 
 /**
  * 生成合約預覽 PDF
- * @param data - 生成合約預覽請求資料（客戶資訊、商品項目等）
+ * @param data - 生成合約預覽請求資料（服務單 ID、文件類型）
  * @returns 合約預覽 URL（收購單包含收購合約和一時貿易申請書，寄賣單包含寄賣合約書）
  */
 export async function generatePdfPreview(

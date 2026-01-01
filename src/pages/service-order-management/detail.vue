@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Attachment, GeneratePdfPreviewRequest, SignatureRecord } from "./types"
+import type { Attachment, SignatureRecord } from "./types"
 import { formatDateTime } from "@@/utils/datetime"
 /**
  * 服務訂單詳情頁面
@@ -123,26 +123,15 @@ const pendingSignatureDocuments = computed(() => {
 async function handleGeneratePreview(documentType: DocumentType) {
   if (!serviceOrder.value) return
 
-  const previewData = {
-    documentType,
-    customer: {
-      name: serviceOrder.value.customerName || "",
-      phoneNumber: serviceOrder.value.customerPhone || "",
-      email: serviceOrder.value.customerEmail,
-      idCardNumber: serviceOrder.value.customerIdNumber || "",
-      residentialAddress: serviceOrder.value.customerAddress
-    },
-    productItems: serviceOrder.value.productItems || [],
-    totalAmount: serviceOrder.value.totalAmount || 0
-  } as GeneratePdfPreviewRequest
-
-  await generatePreview(previewData)
+  await generatePreview(serviceOrder.value.id, documentType)
 }
 
 /**
  * 開始簽署文件
  */
 async function handleStartSign(record: SignatureRecord) {
+  if (!serviceOrder.value) return
+
   // 根據文件類型檢查是否需要生成預覽
   let needPreview = false
   if (record.documentType === DocumentType.BUYBACK_CONTRACT) {
