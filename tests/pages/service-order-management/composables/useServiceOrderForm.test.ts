@@ -7,10 +7,16 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { ServiceOrderType } from "@/pages/service-order-management/types"
 
 // Mock API 函式
-const mockCreateServiceOrder = vi.fn()
+const mockCreateBuybackOrder = vi.fn()
+const mockCreateConsignmentOrder = vi.fn()
 
 vi.mock("@/pages/service-order-management/apis/service-order", () => ({
-  createServiceOrder: mockCreateServiceOrder
+  createBuybackOrder: mockCreateBuybackOrder,
+  createConsignmentOrder: mockCreateConsignmentOrder,
+  getServiceOrderList: vi.fn(),
+  deleteServiceOrder: vi.fn(),
+  updateServiceOrder: vi.fn(),
+  getServiceOrderDetail: vi.fn()
 }))
 
 describe("useServiceOrderForm", () => {
@@ -166,7 +172,7 @@ describe("useServiceOrderForm", () => {
       error: vi.fn()
     })
 
-    mockCreateServiceOrder.mockResolvedValue({
+    mockCreateBuybackOrder.mockResolvedValue({
       success: true,
       code: "SUCCESS",
       message: "建立成功",
@@ -177,7 +183,7 @@ describe("useServiceOrderForm", () => {
     })
 
     const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
-    const { setCustomer, addProductItem, setSignature, setIdCardUploaded, submitForm } = useServiceOrderForm()
+    const { setCustomer, addProductItem, setIdCardFrontImage, setIdCardBackImage, submitForm } = useServiceOrderForm()
 
     // 設定客戶
     setCustomer({
@@ -188,22 +194,21 @@ describe("useServiceOrderForm", () => {
     } as any)
 
     // 新增商品
-    const { ProductCategory } = await import("@/pages/service-order-management/types")
     addProductItem({
-      category: ProductCategory.GOLD_JEWELRY,
-      name: "金項鍊",
-      quantity: 1,
-      totalPrice: 6000
+      brandName: "CHANEL",
+      style: "金項鍊",
+      internalCode: "TEST001",
+      accessories: ["DUST_BAG"],
+      defects: [],
+      amount: 6000
     })
 
     // 設定身分證明文件已上傳（正反面都上傳，線下流程必填）
-    setIdCardUploaded({ front: true, back: true })
-
-    // 設定簽名（必填）
-    setSignature("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA")
+    setIdCardFrontImage("base64-front", "image/jpeg", "front.jpg")
+    setIdCardBackImage("base64-back", "image/jpeg", "back.jpg")
 
     await submitForm()
 
-    expect(mockCreateServiceOrder).toHaveBeenCalled()
+    expect(mockCreateBuybackOrder).toHaveBeenCalled()
   })
 })

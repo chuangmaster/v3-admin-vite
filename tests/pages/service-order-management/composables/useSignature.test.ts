@@ -18,15 +18,11 @@ describe("useSignature", () => {
 
   it("應該儲存簽名成功", async () => {
     // Arrange
-    const mockSignatureRecord = {
+    const mockResponseData = {
       id: "sig-123",
       serviceOrderId: "order-123",
-      documentType: "BUYBACK_CONTRACT" as any,
-      signatureMethod: "OFFLINE" as any,
-      signerName: "客戶",
-      signedAt: "2025-01-01T00:00:00Z",
-      attachmentId: "attach-123",
-      signatureRecordId: "sig-record-123"
+      signatureRecordId: "sig-record-123",
+      attachmentId: "attachment-123"
     }
 
     const signatureApi = await import("@/pages/service-order-management/apis/signature")
@@ -34,18 +30,22 @@ describe("useSignature", () => {
       success: true,
       code: "SUCCESS",
       message: "儲存成功",
-      data: mockSignatureRecord,
+      data: mockResponseData,
       timestamp: "2025-01-01T00:00:00Z",
       traceId: "test-trace-id"
     })
 
     // Act
-    const { saveSignature, signatureRecord } = useSignature()
-    const result = await saveSignature("order-123", "BUYBACK_CONTRACT" as any, "data:image/png;base64,abc", "客戶")
+    const { saveSignature } = useSignature()
+    const result = await saveSignature("order-123", "sig-record-123", "data:image/png;base64,abc", "客戶")
 
     // Assert
     expect(result).toBe(true)
-    expect(signatureRecord.value).toEqual(mockSignatureRecord)
+    expect(signatureApi.saveOfflineSignature).toHaveBeenCalledWith("order-123", {
+      signatureRecordId: "sig-record-123",
+      signatureData: "data:image/png;base64,abc",
+      signerName: "客戶"
+    })
   })
 
   it("應該處理儲存簽名失敗", async () => {
@@ -62,7 +62,7 @@ describe("useSignature", () => {
 
     // Act
     const { saveSignature } = useSignature()
-    const result = await saveSignature("order-123", "BUYBACK_CONTRACT" as any, "data:image/png;base64,abc", "客戶")
+    const result = await saveSignature("order-123", "sig-record-123", "data:image/png;base64,abc", "客戶")
 
     // Assert
     expect(result).toBe(false)
@@ -110,7 +110,7 @@ describe("useSignature", () => {
 
     // Act
     const { saveSignature, loading } = useSignature()
-    const promise = saveSignature("order-123", "BUYBACK_CONTRACT" as any, "data:image/png;base64,abc", "客戶")
+    const promise = saveSignature("order-123", "sig-record-123", "data:image/png;base64,abc", "客戶")
 
     // Assert - loading 應該為 true
     expect(loading.value).toBe(true)
