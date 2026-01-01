@@ -5,6 +5,7 @@
  */
 import type { DocumentType } from "../types"
 import { ElMessage } from "element-plus"
+import { DocumentType as DocType } from "../types"
 import SignaturePad from "./SignaturePad.vue"
 
 interface Props {
@@ -26,6 +27,13 @@ const emit = defineEmits<{
 }>()
 
 const signaturePadRef = ref<InstanceType<typeof SignaturePad>>()
+
+/**
+ * 檢查是否需要簽名（一時貿易申請書不需要簽名）
+ */
+const needsSignature = computed(() => {
+  return props.documentType !== DocType.ONE_TIME_TRADE
+})
 
 /**
  * 在新頁籤開啟合約
@@ -95,6 +103,15 @@ function handleClose() {
   signaturePadRef.value?.clear()
   emit("update:modelValue", false)
 }
+
+/**
+ * 處理確認（僅用於一時貿易申請書）
+ */
+function handleConfirm() {
+  // 一時貿易申請書不需要簽名，傳空字串
+  emit("confirm", "")
+  handleClose()
+}
 </script>
 
 <template>
@@ -131,17 +148,27 @@ function handleClose() {
         </div>
       </div>
 
-      <!-- 簽名區 -->
-      <div class="signature-section">
+      <!-- 簽名區（一時貿易申請書不需要簽名） -->
+      <div v-if="needsSignature" class="signature-section">
         <h4>客戶簽名</h4>
         <SignaturePad ref="signaturePadRef" @signed="handleSigned" />
       </div>
+
+      <!-- 一時貿易申請書僅需確認 -->
+      <el-alert v-else type="info" :closable="false" show-icon>
+        <template #title>
+          此文件僅需確認,無需簽名
+        </template>
+      </el-alert>
     </div>
 
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="handleClose">
           取消
+        </el-button>
+        <el-button v-if="!needsSignature" type="primary" @click="handleConfirm">
+          確認
         </el-button>
       </div>
     </template>
