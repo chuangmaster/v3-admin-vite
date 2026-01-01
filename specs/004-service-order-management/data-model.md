@@ -109,7 +109,7 @@ erDiagram
 | `status` | Enum | ✅ | 服務單狀態 | `PENDING`、`COMPLETED`、`TERMINATED` | FR-032 |
 | `consignmentStartDate` | Date | ❌ | 寄賣起始日期（僅寄賣單） | ISO 8601 格式 | FR-012 |
 | `consignmentEndDate` | Date | ❌ | 寄賣結束日期（僅寄賣單） | ISO 8601 格式，須晚於起始日期 | FR-012 |
-| `renewalOption` | Enum | ❌ | 續約設定（僅寄賣單） | `AUTO_RETRIEVE`、`AUTO_DISCOUNT_10`、`DISCUSS_LATER` | FR-015 |
+| `renewalOption` | Enum | ❌ | 續約設定(僅寄賣單) | `AUTO_RETRIEVE`、`AUTO_DISCOUNT_10`、`DISCUSS` | FR-015 |
 | `createdAt` | Timestamp | ✅ | 建立時間 | ISO 8601 格式（UTC） | FR-009, FR-020 |
 | `createdBy` | String | ✅ | 建立者（使用者 ID） | - | FR-009, FR-020 |
 | `updatedAt` | Timestamp | ❌ | 最後更新時間 | ISO 8601 格式（UTC） | FR-009, FR-020 |
@@ -119,7 +119,7 @@ erDiagram
 **續約設定選項**（`renewalOption`）:
 - `AUTO_RETRIEVE`: 到期自動取回
 - `AUTO_DISCOUNT_10`: 第三個月起自動調降 10%
-- `DISCUSS_LATER`: 屆時討論
+- `DISCUSS`: 屆時討論
 
 **狀態轉換規則**（FR-032）:
 ```typescript
@@ -450,9 +450,9 @@ export enum ServiceOrderStatus {
 
 /** 續約設定 */
 export enum RenewalOption {
-  AUTO_RETRIEVE = "auto_retrieve",       // 到期自動取回
-  AUTO_DISCOUNT_10 = "auto_discount_10", // 第三個月起自動調降 10%
-  DISCUSS_LATER = "discuss_later"        // 屆時討論
+  AUTO_RETRIEVE = "AUTO_RETRIEVE",       // 到期自動取回
+  AUTO_DISCOUNT_10 = "AUTO_DISCOUNT_10", // 第三個月起自動調降 10%
+  DISCUSS = "DISCUSS"                    // 屆時討論
 }
 
 /** 商品項目實體 */

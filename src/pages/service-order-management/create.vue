@@ -408,7 +408,7 @@ function handleIdCardBackUploaded(data: { base64: string, contentType: string, f
                 </el-option>
                 <el-option
                   label="屆時討論"
-                  :value="RenewalOption.DISCUSS_LATER"
+                  :value="RenewalOption.DISCUSS"
                 >
                   <el-tag type="primary" size="small">
                     屆時討論

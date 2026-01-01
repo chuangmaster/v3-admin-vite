@@ -286,7 +286,7 @@ function getRenewalOptionText(option: string) {
   const map: Record<string, string> = {
     [RenewalOption.AUTO_RETRIEVE]: "到期自動取回",
     [RenewalOption.AUTO_DISCOUNT_10]: "第三個月起自動調降 10%",
-    [RenewalOption.DISCUSS_LATER]: "屆時討論",
+    [RenewalOption.DISCUSS]: "屆時討論",
     [RenewalOption.NONE]: "無"
   }
   return map[option] || option

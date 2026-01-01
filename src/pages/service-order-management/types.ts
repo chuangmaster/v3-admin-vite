@@ -41,7 +41,7 @@ export enum RenewalOption {
   /** 第三個月起自動調降 10% */
   AUTO_DISCOUNT_10 = "AUTO_DISCOUNT_10",
   /** 屆時討論 */
-  DISCUSS_LATER = "DISCUSS_LATER"
+  DISCUSS = "DISCUSS"
 }
 
 /** 簽名方式 */

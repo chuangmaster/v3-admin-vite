@@ -310,7 +310,7 @@ interface CreateServiceOrderRequest {
   /** 寄賣結束日期（僅寄賣單，ISO 8601） */
   consignmentEndDate?: string
   /** 續約設定（僅寄賣單） */
-  renewalOption?: "auto_retrieve" | "auto_discount_10" | "discuss_later"
+  renewalOption?: "AUTO_RETRIEVE" | "AUTO_DISCOUNT_10" | "DISCUSS"
 }
 ```
 
@@ -436,7 +436,7 @@ interface UpdateServiceOrderRequest {
   /** 寄賣結束日期（僅寄賣單，ISO 8601） */
   consignmentEndDate?: string
   /** 續約設定（僅寄賣單） */
-  renewalOption?: "auto_retrieve" | "auto_discount_10" | "discuss_later"
+  renewalOption?: "AUTO_RETRIEVE" | "AUTO_DISCOUNT_10" | "DISCUSS"
   /** 版本號（樂觀鎖） */
   version: number
 }
