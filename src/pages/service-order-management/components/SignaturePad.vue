@@ -24,7 +24,7 @@ function initSignaturePad() {
     return
 
   signaturePad = new SignaturePad(canvasRef.value, {
-    backgroundColor: "rgb(255, 255, 255)",
+    backgroundColor: "rgba(0, 0, 0, 0)",
     penColor: "rgb(0, 0, 0)",
     minWidth: 1,
     maxWidth: 3,
@@ -48,20 +48,14 @@ function resizeCanvas() {
   if (!canvasRef.value || !signaturePad)
     return
 
-  const ratio = Math.max(window.devicePixelRatio || 1, 1)
   const canvas = canvasRef.value
 
   // 儲存當前簽名資料
   const data = signaturePad.toData()
 
-  // 設定畫布解析度
-  canvas.width = canvas.offsetWidth * ratio
-  canvas.height = canvas.offsetHeight * ratio
-
-  const ctx = canvas.getContext("2d")
-  if (ctx) {
-    ctx.scale(ratio, ratio)
-  }
+  // 設定畫布解析度（使用實際顯示尺寸，避免縮放導致簽名變小）
+  canvas.width = canvas.offsetWidth
+  canvas.height = canvas.offsetHeight
 
   // 清空簽名板並重新初始化
   signaturePad.clear()
@@ -188,7 +182,7 @@ defineExpose({
 .canvas-wrapper {
   position: relative;
   width: 100%;
-  height: 200px;
+  height: 300px;
   border: 2px dashed var(--el-border-color);
   border-radius: 4px;
   background-color: #ffffff;
