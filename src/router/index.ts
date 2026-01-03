@@ -242,6 +242,53 @@ export const dynamicRoutes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: "/service-order",
+    component: Layouts,
+    redirect: "/service-order/index",
+    name: "ServiceOrderManagement",
+    meta: {
+      title: { zhCN: "服务单管理", zhTW: "服務單管理", en: "Service Order Management" },
+      titleKey: "serviceOrderManagement",
+      elIcon: "Document",
+      alwaysShow: true
+    },
+    children: [
+      {
+        path: "index",
+        component: () => import("@/pages/service-order-management/index.vue"),
+        name: "ServiceOrderList",
+        meta: {
+          title: { zhCN: "服务单列表", zhTW: "服務單列表", en: "Service Order List" },
+          titleKey: "serviceOrderList",
+          keepAlive: true,
+          permissions: ["serviceOrder.buyback.read", "serviceOrder.consignment.read"]
+        }
+      },
+      {
+        path: "create",
+        component: () => import("@/pages/service-order-management/create.vue"),
+        name: "ServiceOrderCreate",
+        meta: {
+          title: { zhCN: "建立服务单", zhTW: "建立服務單", en: "Create Service Order" },
+          titleKey: "serviceOrderCreate",
+          hidden: true,
+          permissions: ["serviceOrder.buyback.create", "serviceOrder.consignment.create"]
+        }
+      },
+      {
+        path: "detail/:id",
+        component: () => import("@/pages/service-order-management/detail.vue"),
+        name: "ServiceOrderDetail",
+        meta: {
+          title: { zhCN: "服务单详情", zhTW: "服務單詳情", en: "Service Order Detail" },
+          titleKey: "serviceOrderDetail",
+          hidden: true,
+          permissions: ["serviceOrder.buyback.read", "serviceOrder.consignment.read"]
+        }
+      }
+    ]
+  },
+  {
     path: "/permission",
     component: Layouts,
     redirect: "/permission/page-level",

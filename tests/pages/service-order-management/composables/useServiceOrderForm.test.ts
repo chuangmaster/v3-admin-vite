@@ -1,0 +1,214 @@
+/**
+ * useServiceOrderForm 組合式函式單元測試
+ */
+
+import type { Customer } from "@/pages/service-order-management/types"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import { ServiceOrderType } from "@/pages/service-order-management/types"
+
+// Mock API 函式
+const mockCreateBuybackOrder = vi.fn()
+const mockCreateConsignmentOrder = vi.fn()
+
+vi.mock("@/pages/service-order-management/apis/service-order", () => ({
+  createBuybackOrder: mockCreateBuybackOrder,
+  createConsignmentOrder: mockCreateConsignmentOrder,
+  getServiceOrderList: vi.fn(),
+  deleteServiceOrder: vi.fn(),
+  updateServiceOrder: vi.fn(),
+  getServiceOrderDetail: vi.fn()
+}))
+
+describe("useServiceOrderForm", () => {
+  beforeEach(() => {
+    vi.resetModules()
+    vi.clearAllMocks()
+  })
+
+  it("should initialize with default form data", async () => {
+    const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
+    const { formData } = useServiceOrderForm()
+
+    expect(formData.orderType).toBe(ServiceOrderType.BUYBACK)
+    expect(formData.productItems).toHaveLength(0)
+    expect(formData.totalAmount).toBe(0)
+  })
+
+  it("should set customer correctly", async () => {
+    const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
+    const { selectedCustomer, setCustomer } = useServiceOrderForm()
+
+    const mockCustomer: Customer = {
+      id: "customer-123",
+      name: "王小明",
+      phoneNumber: "0912345678",
+      email: "wang@example.com",
+      idCardNumber: "A123456789",
+      residentialAddress: "台北市大安區",
+      createdAt: "2025-12-14T10:00:00Z",
+      updatedAt: undefined
+    }
+
+    setCustomer(mockCustomer)
+
+    expect(selectedCustomer.value).toEqual(mockCustomer)
+  })
+
+  it("should add product item correctly", async () => {
+    const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
+    const { productItems, addProductItem } = useServiceOrderForm()
+
+    const mockProduct = {
+      brandName: "CHANEL",
+      style: "金項鍊",
+      internalCode: "TEST001",
+      accessories: ["DUST_BAG", "CERTIFICATE"],
+      defects: [],
+      amount: 50000
+    }
+
+    addProductItem(mockProduct)
+
+    expect(productItems.value).toHaveLength(1)
+    expect(productItems.value[0].style).toEqual(mockProduct.style)
+    expect(productItems.value[0].amount).toBe(50000)
+  })
+
+  it("should update product item correctly", async () => {
+    const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
+    const { productItems, addProductItem, updateProductItem } = useServiceOrderForm()
+
+    const mockProduct = {
+      brandName: "CHANEL",
+      style: "金項鍊",
+      internalCode: "TEST001",
+      accessories: ["DUST_BAG"],
+      defects: [],
+      amount: 50000
+    }
+
+    addProductItem(mockProduct)
+
+    const updatedProduct = {
+      style: "金項鍊(已更新)",
+      internalCode: "TEST001-UPDATED",
+      amount: 55000
+    }
+
+    updateProductItem(0, updatedProduct)
+
+    expect(productItems.value[0].style).toBe("金項鍊(已更新)")
+    expect(productItems.value[0].internalCode).toBe("TEST001-UPDATED")
+    expect(productItems.value[0].amount).toBe(55000)
+  })
+
+  it("should remove product item correctly", async () => {
+    const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
+    const { productItems, addProductItem, removeProductItem } = useServiceOrderForm()
+
+    addProductItem({ brandName: "CHANEL", style: "金項鍊", internalCode: "TEST001", accessories: [], defects: [], amount: 50000 })
+    addProductItem({ brandName: "TIFFANY", style: "白金戒指", internalCode: "TEST002", accessories: [], defects: [], amount: 30000 })
+
+    expect(productItems.value).toHaveLength(2)
+
+    removeProductItem(0)
+
+    expect(productItems.value).toHaveLength(1)
+    expect(productItems.value[0].style).toBe("白金戒指")
+  })
+
+  it("should calculate total amount automatically", async () => {
+    const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
+    const { formData, addProductItem, updateProductItem, removeProductItem } = useServiceOrderForm()
+
+    // 添加第一個商品
+    addProductItem({ brandName: "CHANEL", style: "金項鍊", amount: 50000 })
+    expect(formData.totalAmount).toBe(50000)
+
+    // 添加第二個商品
+    addProductItem({ brandName: "TIFFANY", style: "白金戒指", amount: 30000 })
+    expect(formData.totalAmount).toBe(80000)
+
+    // 更新第一個商品金額
+    updateProductItem(0, { amount: 55000 })
+    expect(formData.totalAmount).toBe(85000)
+
+    // 刪除第一個商品
+    removeProductItem(0)
+    expect(formData.totalAmount).toBe(30000)
+  })
+
+  it("should allow manual total amount input", async () => {
+    const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
+    const { formData } = useServiceOrderForm()
+
+    // 手動設定總金額
+    formData.totalAmount = 15000
+
+    expect(formData.totalAmount).toBe(15000)
+  })
+
+  it("should set signature correctly", async () => {
+    const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
+    const { signatureDataUrl, setSignature } = useServiceOrderForm()
+
+    const signatureDataUrlValue = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA"
+
+    setSignature(signatureDataUrlValue)
+
+    expect(signatureDataUrl.value).toBe(signatureDataUrlValue)
+  })
+
+  it("should submit form successfully", async () => {
+    // Mock router
+    const mockPush = vi.fn()
+    vi.stubGlobal("useRouter", () => ({
+      push: mockPush
+    }))
+
+    // Mock ElMessage
+    vi.stubGlobal("ElMessage", {
+      success: vi.fn(),
+      error: vi.fn()
+    })
+
+    mockCreateBuybackOrder.mockResolvedValue({
+      success: true,
+      code: "SUCCESS",
+      message: "建立成功",
+      data: {
+        id: "new-order-id",
+        orderNumber: "BS20251214001"
+      }
+    })
+
+    const { useServiceOrderForm } = await import("@/pages/service-order-management/composables/useServiceOrderForm")
+    const { setCustomer, addProductItem, setIdCardFrontImage, setIdCardBackImage, submitForm } = useServiceOrderForm()
+
+    // 設定客戶
+    setCustomer({
+      id: "customer-123",
+      name: "王小明",
+      phoneNumber: "0912345678",
+      idCardNumber: "A123456789"
+    } as any)
+
+    // 新增商品
+    addProductItem({
+      brandName: "CHANEL",
+      style: "金項鍊",
+      internalCode: "TEST001",
+      accessories: ["DUST_BAG"],
+      defects: [],
+      amount: 6000
+    })
+
+    // 設定身分證明文件已上傳（正反面都上傳，線下流程必填）
+    setIdCardFrontImage("base64-front", "image/jpeg", "front.jpg")
+    setIdCardBackImage("base64-back", "image/jpeg", "back.jpg")
+
+    await submitForm()
+
+    expect(mockCreateBuybackOrder).toHaveBeenCalled()
+  })
+})

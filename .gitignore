@@ -1,18 +1,42 @@
 # Common
 dist
+dist-test
+build
 node_modules
 .eslintcache
 vite.config.*.timestamp*
+coverage
+*.swp
+*.swo
+*.tmp
 
 # MacOS
 .DS_Store
+Thumbs.db
 
 # Local env files
 *.local
+.env
+.env.local
+.env.*.local
 
 # Logs
 *.log
+logs
+*.log*
 
 # Use the pnpm
 package-lock.json
 yarn.lock
+pnpm-lock.yaml
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*.iml
+
+# Docker
+.dockerignore
+docker-compose.override.yml

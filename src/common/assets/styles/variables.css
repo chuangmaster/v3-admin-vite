@@ -1,6 +1,10 @@
 /* 全局 CSS 变量，这种变量不仅可以在 CSS 和 SCSS 中使用，还可以导入到 JS 中使用 */
 
 :root {
+  /* Element Plus 字體大小調整 */
+  --el-font-size-base: 15px; /* 預設 14px */
+  --el-font-size-small: 14px; /* 預設 12px */
+  --el-font-size-large: 20px; /* 預設 16px */
   /* Body */
   --v3-body-text-color: var(--el-text-color-primary);
   --v3-body-bg-color: var(--el-bg-color-page);

@@ -55,10 +55,59 @@ export const ROLE_PERMISSIONS = {
 } as const
 
 /**
+ * 服務單管理模組權限常數
+ */
+export const SERVICE_ORDER_PERMISSIONS = {
+  /** 寄賣單權限 */
+  CONSIGNMENT: {
+    /** 查看寄賣單（路由權限） */
+    READ: "serviceOrder.consignment.read",
+    /** 新增寄賣單（功能權限） */
+    CREATE: "serviceOrder.consignment.create",
+    /** 修改寄賣單（功能權限） */
+    UPDATE: "serviceOrder.consignment.update",
+    /** 刪除寄賣單（功能權限） */
+    DELETE: "serviceOrder.consignment.delete"
+  },
+  /** 收購單權限 */
+  BUYBACK: {
+    /** 查看收購單（路由權限） */
+    READ: "serviceOrder.buyback.read",
+    /** 新增收購單（功能權限） */
+    CREATE: "serviceOrder.buyback.create",
+    /** 修改收購單（功能權限） */
+    UPDATE: "serviceOrder.buyback.update",
+    /** 刪除收購單（功能權限） */
+    DELETE: "serviceOrder.buyback.delete"
+  },
+  /** 附件權限 */
+  ATTACHMENT: {
+    /** 查看敏感附件（如身分證明文件） */
+    VIEW_SENSITIVE: "serviceOrder.attachment.viewSensitive"
+  }
+} as const
+
+/**
+ * 客戶管理權限常數
+ */
+export const CUSTOMER_PERMISSIONS = {
+  /** 查看客戶資料 */
+  READ: "customer.read",
+  /** 新增客戶資料 */
+  CREATE: "customer.create",
+  /** 修改客戶資料 */
+  UPDATE: "customer.update",
+  /** 刪除客戶資料 */
+  DELETE: "customer.delete"
+} as const
+
+/**
  * 系統所有權限常數集合
  */
 export const SYSTEM_PERMISSIONS = {
   ...USER_PERMISSIONS,
   ...PERMISSION_PERMISSIONS,
-  ...ROLE_PERMISSIONS
+  ...ROLE_PERMISSIONS,
+  ...SERVICE_ORDER_PERMISSIONS,
+  ...CUSTOMER_PERMISSIONS
 } as const
