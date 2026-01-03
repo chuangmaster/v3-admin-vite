@@ -105,8 +105,7 @@ export const ACCESSORY_OPTIONS = [
   { label: "鎖頭/鑰匙", value: "lockKey" },
   { label: "緞帶/花", value: "ribbon" },
   { label: "品牌小卡", value: "brandCard" },
-  { label: "保證書", value: "certificate" },
-  { label: "無", value: "none" }
+  { label: "雨衣", value: "raincoat" }
 ] as const
 
 /** 商品瑕疵選項 */
