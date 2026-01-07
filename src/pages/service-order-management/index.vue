@@ -5,7 +5,7 @@
 import { formatDateTime } from "@@/utils/datetime"
 import { Plus, Refresh, Search, View } from "@element-plus/icons-vue"
 import { useServiceOrderList } from "./composables/useServiceOrderList"
-import { ServiceOrderStatus, ServiceOrderType } from "./types"
+import { ServiceOrderSource, ServiceOrderStatus, ServiceOrderType } from "./types"
 
 defineOptions({
   name: "ServiceOrderManagement"
@@ -29,6 +29,13 @@ const orderTypeOptions = [
   { label: "全部", value: "" },
   { label: "收購單", value: ServiceOrderType.BUYBACK },
   { label: "寄賣單", value: ServiceOrderType.CONSIGNMENT }
+]
+
+/** 訂單來源選項 */
+const orderSourceOptions = [
+  { label: "全部", value: "" },
+  { label: "線上", value: ServiceOrderSource.ONLINE },
+  { label: "線下", value: ServiceOrderSource.OFFLINE }
 ]
 
 /** 訂單狀態選項 */
@@ -84,6 +91,24 @@ function getStatusText(status: ServiceOrderStatus | string) {
 function getOrderTypeText(type: ServiceOrderType) {
   return type === ServiceOrderType.BUYBACK ? "收購單" : "寄賣單"
 }
+
+/**
+ * 訂單來源文字
+ */
+function getOrderSourceText(source: ServiceOrderSource | string) {
+  if (!source) return "-"
+  const normalizedSource = source.toString().toLowerCase().trim()
+  return normalizedSource === "online" ? "線上" : "線下"
+}
+
+/**
+ * 訂單來源標籤類型
+ */
+function getOrderSourceTag(source: ServiceOrderSource | string) {
+  if (!source) return "info"
+  const normalizedSource = source.toString().toLowerCase().trim()
+  return normalizedSource === "online" ? "primary" : "info"
+}
 </script>
 
 <template>
@@ -126,6 +151,23 @@ function getOrderTypeText(type: ServiceOrderType) {
             >
               <el-option
                 v-for="option in orderTypeOptions"
+                :key="option.value"
+                :label="option.label"
+                :value="option.value"
+              />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item label="訂單來源">
+            <el-select
+              v-model="queryParams.orderSource"
+              placeholder="請選擇訂單來源"
+              clearable
+              style="width: 180px"
+              @change="refresh"
+            >
+              <el-option
+                v-for="option in orderSourceOptions"
                 :key="option.value"
                 :label="option.label"
                 :value="option.value"
@@ -195,6 +237,14 @@ function getOrderTypeText(type: ServiceOrderType) {
             <el-tag :type="getOrderTypeTag(row.orderType)">
               {{ getOrderTypeText(row.orderType) }}
             </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="orderSource" label="訂單來源" width="100">
+          <template #default="{ row }">
+            <el-tag v-if="row.orderSource" :type="getOrderSourceTag(row.orderSource)">
+              {{ getOrderSourceText(row.orderSource) }}
+            </el-tag>
+            <span v-else>-</span>
           </template>
         </el-table-column>
         <el-table-column prop="customerName" label="客戶姓名" width="120" />

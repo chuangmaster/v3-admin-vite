@@ -11,9 +11,9 @@ export enum ServiceOrderType {
 /** 服務單來源 */
 export enum ServiceOrderSource {
   /** 線上 */
-  ONLINE = "online",
+  ONLINE = "ONLINE",
   /** 線下 */
-  OFFLINE = "offline"
+  OFFLINE = "OFFLINE"
 }
 
 /** 服務單狀態 */
@@ -522,6 +522,8 @@ export interface ServiceOrderListParams {
   pageSize: number
   /** 服務單類型（可選） */
   orderType?: ServiceOrderType
+  /** 服務單來源（可選） */
+  orderSource?: ServiceOrderSource
   /** 客戶名稱（模糊搜尋，可選） */
   customerName?: string
   /** 單號（模糊搜尋，可選） */
