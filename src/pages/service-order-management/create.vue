@@ -462,16 +462,13 @@ function handleIdCardBackUploaded(data: { base64: string, contentType: string, f
           <div v-if="formData.orderType === ServiceOrderType.BUYBACK" class="id-card-section">
             <div class="section-subtitle">
               <span>身分證件</span>
-              <el-tag v-if="formData.orderSource === ServiceOrderSource.OFFLINE" type="danger" size="small">
+              <el-tag type="danger" size="small">
                 正反面必填
-              </el-tag>
-              <el-tag v-else type="warning" size="small">
-                正面必填
               </el-tag>
             </div>
             <IdCardUploader
               ref="mainIdCardUploaderRef"
-              :require-both-sides="formData.orderSource === ServiceOrderSource.OFFLINE"
+              :require-both-sides="true"
               :show-recognize="false"
               @update:model-value="setIdCardUploaded"
               @front-uploaded="handleIdCardFrontUploaded"

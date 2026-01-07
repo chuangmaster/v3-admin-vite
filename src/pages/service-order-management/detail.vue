@@ -161,7 +161,7 @@ async function handleStartSign(record: SignatureRecord) {
 async function handleConfirmSignature(signatureDataUrl: string) {
   if (!serviceOrder.value || !currentSignatureDocument.value || !currentSignatureRecord.value) return
 
-  // 一時貿易申請書不需要簽名,signatureDataUrl 為空字串
+  // 線下情境的所有文件都需要簽名（包含一時貿易申請書）
   const result = await saveSignature(
     serviceOrder.value.id,
     currentSignatureRecord.value.id,
