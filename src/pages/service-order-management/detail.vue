@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Attachment, SignatureRecord } from "./types"
+import type { Attachment, ServiceOrderSource, SignatureRecord } from "./types"
 import { formatDateTime } from "@@/utils/datetime"
 /**
  * 服務訂單詳情頁面
@@ -214,6 +214,24 @@ function getOrderTypeText(type: ServiceOrderType) {
 }
 
 /**
+ * 訂單來源文字
+ */
+function getOrderSourceText(source: ServiceOrderSource | string) {
+  if (!source) return "-"
+  const normalizedSource = source.toString().toLowerCase().trim()
+  return normalizedSource === "online" ? "線上" : "線下"
+}
+
+/**
+ * 訂單來源標籤類型
+ */
+function getOrderSourceTag(source: ServiceOrderSource | string) {
+  if (!source) return "info"
+  const normalizedSource = source.toString().toLowerCase().trim()
+  return normalizedSource === "online" ? "primary" : "info"
+}
+
+/**
  * 訂單狀態文字
  */
 function getStatusText(status: ServiceOrderStatus) {
@@ -303,6 +321,11 @@ function getRenewalOptionText(option: string) {
           <el-descriptions-item label="訂單類型">
             <el-tag :type="serviceOrder.orderType === ServiceOrderType.BUYBACK ? 'success' : 'warning'">
               {{ getOrderTypeText(serviceOrder.orderType) }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="訂單來源">
+            <el-tag :type="getOrderSourceTag(serviceOrder.orderSource)">
+              {{ getOrderSourceText(serviceOrder.orderSource) }}
             </el-tag>
           </el-descriptions-item>
           <el-descriptions-item label="訂單狀態">
