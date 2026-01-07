@@ -5,7 +5,6 @@
  */
 import type { DocumentType } from "../types"
 import { ElMessage } from "element-plus"
-import { DocumentType as DocType } from "../types"
 import SignaturePad from "./SignaturePad.vue"
 
 interface Props {
@@ -29,10 +28,10 @@ const emit = defineEmits<{
 const signaturePadRef = ref<InstanceType<typeof SignaturePad>>()
 
 /**
- * 檢查是否需要簽名（一時貿易申請書不需要簽名）
+ * 檢查是否需要簽名
  */
 const needsSignature = computed(() => {
-  return props.documentType !== DocType.ONE_TIME_TRADE
+  return true
 })
 
 /**

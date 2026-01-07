@@ -88,7 +88,7 @@
 
 - [X] T026 [US1] 建立服務單表單元件 `src/pages/service-order-management/components/ServiceOrderForm.vue` (整合 CustomerSearch、CustomerForm、ProductItemForm、IdCardUploader、SignaturePad，收購單表單邏輯，驗證必填欄位，支援新增/編輯模式)
 - [X] T027 [US1] 建立服務單建立頁面 `src/pages/service-order-management/create.vue` (路由參數接收服務單類型 buyback，顯示 ServiceOrderForm，處理提交成功/失敗，導航邏輯)
-- [ ] T028 [US1] 實作收購單線下簽名流程 (提交表單後產生收購合約與一時貿易申請書，顯示 SignaturePad，每次簽名即時儲存，呼叫 saveOfflineSignature API，Base64 傳送後端，後端合併 PDF 與簽名，前端顯示預覽確認)
+- [ ] T028 [US1] 實作收購單線下簽名流程 (提交表單後產生收購合約與一時貿易申請書，顯示 SignaturePad 讓客戶分別對兩份文件簽名，每次簽名即時儲存，呼叫 saveOfflineSignature API，Base64 傳送後端，後端合併 PDF 與簽名，前端顯示預覽確認，兩份文件均需完成簽名與確認)
 - [ ] T029 [US1] 實作收購單線上簽名流程 (提交表單後呼叫 sendOnlineSignature API，透過 Dropbox Sign API 寄送合約至客戶 Email，處理發送失敗顯示錯誤訊息，服務單狀態設為已終止，提示重新建單)
 - [X] T030 [US1] 實作身分證明文件強制驗證 (提交前檢查是否已上傳 fileType=ID_CARD 的附件，若未上傳則阻止提交並顯示錯誤訊息「身分證明文件為必要附件，請上傳或拍攝身分證照片」，焦點移至上傳區域)
 - [X] T031 [US1] 實作 AI 辨識自動搜尋客戶邏輯 (辨識成功後自動以身分證字號呼叫 searchCustomers API，若找到客戶自動選擇並填入表單，若找不到填入新增客戶表單，比對姓名一致性顯示警告，若已選客戶但身分證字號不符則顯示錯誤阻止繼續)
