@@ -56,6 +56,18 @@ export enum OnlineSignatureStatus {
   /** 已中止 */
   TERMINATED = "TERMINATED"
 }
+
+/** 文件類型（簽章文件類型，需與後端保持一致） */
+export enum DocumentType {
+  /** 收購合約 */
+  BUYBACK_CONTRACT = "BUYBACK_CONTRACT",
+  /** 一次性交易 */
+  ONE_TIME_TRADE = "ONE_TIME_TRADE",
+  /** 寄賣合約 */
+  CONSIGNMENT_CONTRACT = "CONSIGNMENT_CONTRACT",
+  /** 收購合約與一次性交易 */
+  BUYBACK_CONTRACT_WITH_ONE_TIME_TRADE = "BUYBACK_CONTRACT_WITH_ONE_TIME_TRADE"
+}
 ```
 
 ### 1.2 擴展 SignatureRecord 型別
@@ -154,6 +166,7 @@ import { request } from "@/http/axios"
  * @param serviceOrderId - 服務單 ID
  * @param data - 發送請求資料（可選）
  * @returns 簽章請求回應
+ * @remarks 後端會根據 serviceOrderId 自動判斷文件類型（documentType），前端無需指定
  */
 export async function sendOnlineSignature(
   serviceOrderId: string,
@@ -170,6 +183,8 @@ export async function sendOnlineSignature(
  * 重新發送線上簽章請求
  * @param serviceOrderId - 服務單 ID
  * @returns 簽章請求回應
+ * @remarks 重新發送頻率限制（一小時內僅能操作一次）由後端強制執行，
+ *          若違反限制，後端會回傳錯誤，前端僅需顯示錯誤訊息即可
  */
 export async function resendOnlineSignature(
   serviceOrderId: string
@@ -305,6 +320,7 @@ export function useOnlineSignature() {
   /**
    * 檢查是否可以重新發送
    * @param record - 簽章紀錄
+   * @remarks 僅檢查狀態，頻率限制由後端處理
    */
   function canResend(record: SignatureRecord): boolean {
     // 僅 PENDING 狀態可以重新發送
@@ -407,28 +423,29 @@ const canSendRequest = computed(() => {
  * 處理發送簽章請求
  */
 async function handleSendRequest(): Promise<void> {
-  // 假設發送收購合約簽章請求
-  // TODO: 根據服務單類型決定 documentType
-  const documentType = props.serviceOrder.orderType === "BUYBACK"
-    ?不需要指定 documentType，後端會根據服務單類型自動決定
+  // 後端會根據 serviceOrderId 自動判斷文件類型，前端無需指定
   const success = await sendSignatureRequest(
     props.serviceOrder.id
+  )
+  
+  if (success) {
     emit("success")
   }
 }
 
 /**
  * 處理重新發送簽章請求
+ * @remarks 頻率限制由後端處理，若違反會收到錯誤訊息
  */
 async function handleResend(record: SignatureRecord): Promise<void> {
   const success = await resendSignatureRequest(
-    props.serviceOrder.id,
-    record.id
+    props.serviceOrder.id
   )
   
-  if (success) {): Promise<void> {
-  const success = await resendSignatureRequest(
-    props.serviceOrder
+  if (success) {
+    emit("success")
+  }
+}
 
 /**
  * 處理複製簽章連結
@@ -810,8 +827,8 @@ const formattedDate = formatDateTime(record.sentAt)
    - 緩解：與後端確認錯誤碼規範，做好錯誤處理
 
 2. **頻率限制檢查**
-   - 風險：前端無法準確判斷是否可重新發送
-   - 緩解：依賴後端 API 回傳的錯誤，前端僅做 UI 提示
+   - 風險：使用者可能不了解為何無法立即重新發送
+   - 緩解：後端強制執行一小時限制並回傳明確錯誤訊息，前端顯示錯誤提示即可
 
 3. **簽章狀態同步**
    - 風險：客戶完成簽署後狀態未即時更新
