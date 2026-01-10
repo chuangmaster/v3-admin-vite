@@ -29,14 +29,14 @@
 
 **⚠️ 重要**: 在此階段完成前，不能開始任何用戶故事的實作
 
-- [ ] T003 [P] 新增 OnlineSignatureStatus 列舉到 src/pages/service-order-management/types.ts
-- [ ] T004 [P] 新增 DocumentType 列舉到 src/pages/service-order-management/types.ts（匹配後端規格）
-- [ ] T005 [P] 擴展 SignatureRecord 介面，新增線上簽章相關欄位到 src/pages/service-order-management/types.ts
-- [ ] T006 [P] 新增 SendOnlineSignatureRequest 介面到 src/pages/service-order-management/types.ts
-- [ ] T007 [P] 新增 SendOnlineSignatureResponse 介面到 src/pages/service-order-management/types.ts
-- [ ] T008 創建 src/pages/service-order-management/apis/online-signature.ts API 服務檔案
-- [ ] T009 實作 sendOnlineSignature API 函式在 src/pages/service-order-management/apis/online-signature.ts（註：後端會根據 serviceOrderId 自動判斷文件類型）
-- [ ] T010 實作 resendOnlineSignature API 函式在 src/pages/service-order-management/apis/online-signature.ts
+- [X] T003 [P] 新增 OnlineSignatureStatus 列舉到 src/pages/service-order-management/types.ts
+- [X] T004 [P] 新增 DocumentType 列舉到 src/pages/service-order-management/types.ts（匹配後端規格）
+- [X] T005 [P] 擴展 SignatureRecord 介面，新增線上簽章相關欄位到 src/pages/service-order-management/types.ts
+- [X] T006 [P] 新增 SendOnlineSignatureRequest 介面到 src/pages/service-order-management/types.ts
+- [X] T007 [P] 新增 SendOnlineSignatureResponse 介面到 src/pages/service-order-management/types.ts
+- [X] T008 創建 src/pages/service-order-management/apis/online-signature.ts API 服務檔案
+- [X] T009 實作 sendOnlineSignature API 函式在 src/pages/service-order-management/apis/online-signature.ts（註：後端會根據 serviceOrderId 自動判斷文件類型）
+- [X] T010 實作 resendOnlineSignature API 函式在 src/pages/service-order-management/apis/online-signature.ts
 
 **Checkpoint**: 基礎完成 - 用戶故事實作現在可以並行開始
 
@@ -50,19 +50,19 @@
 
 ### Implementation for User Story 1
 
-- [ ] T011 [P] [US1] 創建 src/pages/service-order-management/composables/useOnlineSignature.ts 組合式函式檔案
-- [ ] T012 [US1] 實作 sendSignatureRequest 函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
-- [ ] T013 [US1] 實作 getStatusText 輔助函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
-- [ ] T014 [US1] 實作 getStatusType 輔助函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
-- [ ] T015 [US1] 創建 src/pages/service-order-management/components/OnlineSignatureSection.vue 元件
-- [ ] T016 [US1] 實作 OnlineSignatureSection 元件的基本結構和 Props/Emits 在 src/pages/service-order-management/components/OnlineSignatureSection.vue
-- [ ] T017 [US1] 實作「發送簽章請求」按鈕和處理邏輯在 src/pages/service-order-management/components/OnlineSignatureSection.vue
-- [ ] T018 [US1] 實作簽章紀錄列表顯示在 src/pages/service-order-management/components/OnlineSignatureSection.vue
-- [ ] T019 [US1] 實作簽章狀態顯示 (PENDING, COMPLETED, TERMINATED) 在 src/pages/service-order-management/components/OnlineSignatureSection.vue
-- [ ] T020 [US1] 新增 OnlineSignatureSection 元件樣式 (SCSS scoped) 在 src/pages/service-order-management/components/OnlineSignatureSection.vue
-- [ ] T021 [US1] 整合 OnlineSignatureSection 元件到 src/pages/service-order-management/detail.vue
-- [ ] T022 [US1] 實作 handleOnlineSignatureSuccess 處理函式在 src/pages/service-order-management/detail.vue
-- [ ] T023 [US1] 新增錯誤處理和載入狀態顯示（包含 API 錯誤處理）
+- [X] T011 [P] [US1] 創建 src/pages/service-order-management/composables/useOnlineSignature.ts 組合式函式檔案
+- [X] T012 [US1] 實作 sendSignatureRequest 函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
+- [X] T013 [US1] 實作 getStatusText 輔助函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
+- [X] T014 [US1] 實作 getStatusType 輔助函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
+- [X] T015 [US1] 創建 src/pages/service-order-management/components/OnlineSignatureSection.vue 元件
+- [X] T016 [US1] 實作 OnlineSignatureSection 元件的基本結構和 Props/Emits 在 src/pages/service-order-management/components/OnlineSignatureSection.vue
+- [X] T017 [US1] 實作「發送簽章請求」按鈕和處理邏輯在 src/pages/service-order-management/components/OnlineSignatureSection.vue
+- [X] T018 [US1] 實作簽章紀錄列表顯示在 src/pages/service-order-management/components/OnlineSignatureSection.vue
+- [X] T019 [US1] 實作簽章狀態顯示 (PENDING, COMPLETED, TERMINATED) 在 src/pages/service-order-management/components/OnlineSignatureSection.vue
+- [X] T020 [US1] 新增 OnlineSignatureSection 元件樣式 (SCSS scoped) 在 src/pages/service-order-management/components/OnlineSignatureSection.vue
+- [X] T021 [US1] 整合 OnlineSignatureSection 元件到 src/pages/service-order-management/detail.vue
+- [X] T022 [US1] 實作 handleOnlineSignatureSuccess 處理函式在 src/pages/service-order-management/detail.vue
+- [X] T023 [US1] 新增錯誤處理和載入狀態顯示（包含 API 錯誤處理）
 
 **Checkpoint**: 此時 User Story 1 應該完全功能正常並可獨立測試
 
@@ -76,12 +76,12 @@
 
 ### Implementation for User Story 2
 
-- [ ] T024 [US2] 實作 resendSignatureRequest 函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
-- [ ] T025 [US2] 實作 canResend 檢查函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
-- [ ] T026 [US2] 新增「重新發送簽章請求」按鈕到 src/pages/service-order-management/components/OnlineSignatureSection.vue
-- [ ] T027 [US2] 實作 handleResend 處理函式在 src/pages/service-order-management/components/OnlineSignatureSection.vue
-- [ ] T028 [US2] 實作後端錯誤處理（包括頻率限制錯誤）在 src/pages/service-order-management/composables/useOnlineSignature.ts
-- [ ] T029 [US2] 實作按鈕禁用邏輯（僅 PENDING 狀態顯示）在 src/pages/service-order-management/components/OnlineSignatureSection.vue
+- [X] T024 [US2] 實作 resendSignatureRequest 函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
+- [X] T025 [US2] 實作 canResend 檢查函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
+- [X] T026 [US2] 新增「重新發送簽章請求」按鈕到 src/pages/service-order-management/components/OnlineSignatureSection.vue
+- [X] T027 [US2] 實作 handleResend 處理函式在 src/pages/service-order-management/components/OnlineSignatureSection.vue
+- [X] T028 [US2] 實作後端錯誤處理（包括頻率限制錯誤）在 src/pages/service-order-management/composables/useOnlineSignature.ts
+- [X] T029 [US2] 實作按鈕禁用邏輯（僅 PENDING 狀態顯示）在 src/pages/service-order-management/components/OnlineSignatureSection.vue
 
 **Checkpoint**: 此時 User Stories 1 和 2 應該都能獨立運作
 
@@ -95,12 +95,12 @@
 
 ### Implementation for User Story 3
 
-- [ ] T030 [US3] 實作 copySignatureUrl 函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
-- [ ] T031 [US3] 實作 canCopyUrl 檢查函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
-- [ ] T032 [US3] 新增「複製簽章連結」按鈕到 src/pages/service-order-management/components/OnlineSignatureSection.vue
-- [ ] T033 [US3] 實作 handleCopyUrl 處理函式在 src/pages/service-order-management/components/OnlineSignatureSection.vue
-- [ ] T034 [US3] 新增複製成功提示訊息
-- [ ] T035 [US3] 處理瀏覽器不支援 clipboard API 的降級方案
+- [X] T030 [US3] 實作 copySignatureUrl 函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
+- [X] T031 [US3] 實作 canCopyUrl 檢查函式在 src/pages/service-order-management/composables/useOnlineSignature.ts
+- [X] T032 [US3] 新增「複製簽章連結」按鈕到 src/pages/service-order-management/components/OnlineSignatureSection.vue
+- [X] T033 [US3] 實作 handleCopyUrl 處理函式在 src/pages/service-order-management/components/OnlineSignatureSection.vue
+- [X] T034 [US3] 新增複製成功提示訊息
+- [X] T035 [US3] 處理瀏覽器不支援 clipboard API 的降級方案
 
 **Checkpoint**: 此時 User Stories 1、2 和 3 應該都能獨立運作
 
@@ -114,11 +114,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T036 [US4] 實作簽章紀錄篩選邏輯（僅顯示 ONLINE 類型）在 src/pages/service-order-management/components/OnlineSignatureSection.vue
-- [ ] T037 [US4] 實作簽章狀態即時顯示（PENDING、COMPLETED、TERMINATED）
-- [ ] T038 [US4] 實作發送時間和到期時間顯示（使用 formatDateTime 工具）
-- [ ] T039 [US4] 實作簽名時間顯示（當狀態為 COMPLETED 時）
-- [ ] T040 [US4] 實作狀態變更時的按鈕顯示/隱藏邏輯（COMPLETED 時隱藏「重新發送」按鈕）
+- [X] T036 [US4] 實作簽章紀錄篩選邏輯（僅顯示 ONLINE 類型）在 src/pages/service-order-management/components/OnlineSignatureSection.vue
+- [X] T037 [US4] 實作簽章狀態即時顯示（PENDING、COMPLETED、TERMINATED）
+- [X] T038 [US4] 實作發送時間和到期時間顯示（使用 formatDateTime 工具）
+- [X] T039 [US4] 實作簽名時間顯示（當狀態為 COMPLETED 時）
+- [X] T040 [US4] 實作狀態變更時的按鈕顯示/隱藏邏輯（COMPLETED 時隱藏「重新發送」按鈕）
 
 **Checkpoint**: 所有用戶故事現在應該都能獨立運作
 
@@ -128,16 +128,16 @@
 
 **Purpose**: 影響多個用戶故事的改進
 
-- [ ] T041 [P] 新增 JSDoc 註解到所有函式（如尚未完成）
-- [ ] T042 [P] 確認 TypeScript 編譯無錯誤
-- [ ] T043 [P] 執行 ESLint 檢查並修正所有錯誤
-- [ ] T044 驗證所有 Edge Cases 處理
-- [ ] T045 驗證訂單來源判斷邏輯（僅線上訂單顯示功能）
-- [ ] T046 驗證後端自動處理文件類型的邏輯
-- [ ] T047 驗證 UTC 時間轉換為本地時間顯示
-- [ ] T048 [P] 測試各種錯誤情況的錯誤訊息顯示（包含後端頻率限制錯誤）
-- [ ] T049 測試 UI 在不同簽章狀態下的顯示
-- [ ] T050 測試複製連結功能在主流瀏覽器的相容性
+- [X] T041 [P] 新增 JSDoc 註解到所有函式（如尚未完成）
+- [X] T042 [P] 確認 TypeScript 編譯無錯誤
+- [X] T043 [P] 執行 ESLint 檢查並修正所有錯誤
+- [X] T044 驗證所有 Edge Cases 處理
+- [X] T045 驗證訂單來源判斷邏輯（僅線上訂單顯示功能）
+- [X] T046 驗證後端自動處理文件類型的邏輯
+- [X] T047 驗證 UTC 時間轉換為本地時間顯示
+- [X] T048 [P] 測試各種錯誤情況的錯誤訊息顯示（包含後端頻率限制錯誤）
+- [X] T049 測試 UI 在不同簽章狀態下的顯示
+- [X] T050 測試複製連結功能在主流瀏覽器的相容性
 - [ ] T051 執行 quickstart.md 驗證（如有提供）
 
 ---

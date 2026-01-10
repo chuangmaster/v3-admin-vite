@@ -9,6 +9,7 @@ import { ElMessage } from "element-plus"
 import { getAttachmentList } from "./apis/attachment"
 import AttachmentUploader from "./components/AttachmentUploader.vue"
 import OfflineSignatureDialog from "./components/OfflineSignatureDialog.vue"
+import OnlineSignatureSection from "./components/OnlineSignatureSection.vue"
 import { useServiceOrderDetail } from "./composables/useServiceOrderDetail"
 import { useSignature } from "./composables/useSignature"
 import { ACCESSORY_OPTIONS, AttachmentType, DEFECT_OPTIONS, DocumentType, GRADE_OPTIONS, RenewalOption, ServiceOrderStatus, ServiceOrderType, SignatureMethod } from "./types"
@@ -207,6 +208,15 @@ watch(
 )
 
 /**
+ * 處理線上簽章操作成功
+ * 重新載入服務單資料以更新簽章狀態
+ */
+function handleOnlineSignatureSuccess(): void {
+  // 重新載入服務單資料
+  window.location.reload()
+}
+
+/**
  * 訂單類型文字
  */
 function getOrderTypeText(type: ServiceOrderType) {
@@ -253,7 +263,8 @@ function getDocumentTypeText(documentType: DocumentType) {
   const map: Record<DocumentType, string> = {
     [DocumentType.BUYBACK_CONTRACT]: "收購合約",
     [DocumentType.ONE_TIME_TRADE]: "一時貿易申請書",
-    [DocumentType.CONSIGNMENT_CONTRACT]: "寄賣合約書"
+    [DocumentType.CONSIGNMENT_CONTRACT]: "寄賣合約書",
+    [DocumentType.BUYBACK_CONTRACT_WITH_ONE_TIME_TRADE]: "收購合約與一次性交易"
   }
   return map[documentType] || documentType
 }
@@ -619,6 +630,13 @@ function getRenewalOptionText(option: string) {
             </el-timeline-item>
           </el-timeline>
         </div>
+
+        <!-- 線上簽章區塊 -->
+        <OnlineSignatureSection
+          v-if="serviceOrder"
+          :service-order="serviceOrder"
+          @success="handleOnlineSignatureSuccess"
+        />
 
         <!-- 備註 -->
         <el-descriptions v-if="serviceOrder.notes" title="備註說明" :column="1" border class="section">

@@ -56,10 +56,22 @@ export enum SignatureMethod {
 export enum DocumentType {
   /** 收購合約 */
   BUYBACK_CONTRACT = "BUYBACK_CONTRACT",
-  /** 一時貿易申請書 */
+  /** 一次性交易 */
   ONE_TIME_TRADE = "ONE_TIME_TRADE",
-  /** 寄賣合約書 */
-  CONSIGNMENT_CONTRACT = "CONSIGNMENT_CONTRACT"
+  /** 寄賣合約 */
+  CONSIGNMENT_CONTRACT = "CONSIGNMENT_CONTRACT",
+  /** 收購合約與一次性交易 */
+  BUYBACK_CONTRACT_WITH_ONE_TIME_TRADE = "BUYBACK_CONTRACT_WITH_ONE_TIME_TRADE"
+}
+
+/** 線上簽章狀態 */
+export enum OnlineSignatureStatus {
+  /** 待簽名 */
+  PENDING = "PENDING",
+  /** 完成簽名 */
+  COMPLETED = "COMPLETED",
+  /** 已中止 */
+  TERMINATED = "TERMINATED"
 }
 
 /** 附件類型 */
@@ -246,6 +258,14 @@ export interface SignatureRecord {
   signerName: string
   /** 簽名時間（ISO 8601, UTC） */
   signedAt: string
+  /** 線上簽章狀態（僅線上簽名） */
+  status?: OnlineSignatureStatus
+  /** 發送時間（ISO 8601, UTC，僅線上簽名） */
+  sentAt?: string
+  /** 到期時間（ISO 8601, UTC，僅線上簽名） */
+  expiresAt?: string
+  /** 最後通知時間（ISO 8601, UTC，用於頻率限制） */
+  lastNotifiedAt?: string
 }
 
 /** 修改歷史實體 */
@@ -600,16 +620,6 @@ export interface SaveOfflineSignatureRequest {
   signerName: string
 }
 
-/** 發送線上簽名請求 */
-export interface SendOnlineSignatureRequest {
-  /** 簽名文件類型 */
-  documentType: DocumentType
-  /** 簽名者姓名 */
-  signerName: string
-  /** 簽名者 Email */
-  signerEmail: string
-}
-
 /** 重新發送簽名請求 */
 export interface ResendSignatureRequest {
   /** 簽名記錄 ID */
@@ -682,4 +692,26 @@ export interface LogAttachmentViewResponse {
   action: "VIEW" | "DOWNLOAD"
   /** 查看時間（ISO 8601, UTC） */
   viewedAt: string
+}
+
+/** 發送線上簽章請求（選填參數） */
+export interface SendOnlineSignatureRequest {
+  /** 自訂訊息（選填，最多 500 字元） */
+  customMessage?: string
+}
+
+/** 發送線上簽章請求回應 */
+export interface SendOnlineSignatureResponse {
+  /** 簽章紀錄 ID */
+  signatureRecordId: string
+  /** Dropbox Sign 請求 ID */
+  dropboxSignRequestId?: string
+  /** 簽章 URL */
+  signatureUrl?: string
+  /** 發送時間（ISO 8601, UTC） */
+  sentAt: string
+  /** 到期時間（ISO 8601, UTC） */
+  expiresAt: string
+  /** 訊息 */
+  message?: string
 }
