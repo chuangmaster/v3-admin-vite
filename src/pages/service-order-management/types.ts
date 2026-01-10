@@ -66,6 +66,8 @@ export enum DocumentType {
 
 /** 線上簽章狀態 */
 export enum OnlineSignatureStatus {
+  /** 未發送 */
+  NOT_SENT = "NOT_SENT",
   /** 待簽名 */
   PENDING = "PENDING",
   /** 完成簽名 */

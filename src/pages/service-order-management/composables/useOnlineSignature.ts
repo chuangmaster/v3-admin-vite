@@ -94,6 +94,7 @@ export function useOnlineSignature() {
    */
   function getStatusText(status?: OnlineSignatureStatus | string): string {
     const statusMap: Record<string, string> = {
+      NOT_SENT: "未發送",
       PENDING: "待簽名",
       COMPLETED: "已完成",
       TERMINATED: "已中止"
@@ -108,6 +109,7 @@ export function useOnlineSignature() {
    */
   function getStatusType(status?: OnlineSignatureStatus | string): "success" | "warning" | "info" {
     const typeMap: Record<string, "success" | "warning" | "info"> = {
+      NOT_SENT: "info",
       PENDING: "warning",
       COMPLETED: "success",
       TERMINATED: "info"

@@ -64,7 +64,7 @@
 
 **Acceptance Scenarios**:
 
-1. **Given** 簽章請求已發送，**When** 服務人員查看服務單詳情，**Then** 簽名紀錄區塊顯示當前簽章狀態（PENDING：待簽名、COMPLETED：已完成、TERMINATED：已中止）
+1. **Given** 簽章請求已發送，**When** 服務人員查看服務單詳情，**Then** 簽名紀錄區塊顯示當前簽章狀態（NOT_SENT：未發送、PENDING：待簽名、COMPLETED：已完成、TERMINATED：已中止）
 2. **Given** 客戶已完成線上簽署，**When** 服務人員重新整理或開啟服務單詳情，**Then** 簽章狀態更新為「COMPLETED」，且「重新發送簽章請求」按鈕被隱藏或停用
 
 ---
@@ -83,7 +83,7 @@
 ### Session 2026-01-10
 
 - Q: 簽章連結發送方式 → A: 後端決定，前端不需要知道
-- Q: 簽章狀態的完整列表 → A: PENDING (待簽名)、COMPLETED (完成簽名)、TERMINATED (中止)
+- Q: 簽章狀態的完整列表 → A: NOT_SENT (未發送)、PENDING (待簽名)、COMPLETED (完成簽名)、TERMINATED (中止)
 - Q: 重新發送簽章請求的行為 → A: 委託 Dropbox Sign 重新通知給客戶（寄信），一小時只能操作一次（後端強制執行），連結保持不變
 - Q: 發送成功後的確認訊息 → A: 僅顯示成功訊息「簽章請求已成功發送」
 - Q: 簽章連結有效期 → A: 30 天（後端決定）
@@ -112,7 +112,7 @@
   - 簽章連結: 客戶用來簽署的 URL（有效期 30 天）
   - 發送時間: 簽章請求發送的時間戳記
   - 到期時間: 簽章連結的有效期限（發送時間 + 30 天）
-  - 簽章狀態: PENDING（待簽名）、COMPLETED（完成簽名）、TERMINATED（中止）
+  - 簽章狀態: NOT_SENT（未發送）、PENDING（待簽名）、COMPLETED（完成簽名）、TERMINATED（中止）
   - 最後通知時間: 記錄最近一次重新發送通知的時間（用於限制一小時內僅能操作一次）
 
 - **服務單（Service Order）**: 需要客戶簽署的收購單或寄賣單
