@@ -71,7 +71,7 @@ erDiagram
         string serviceOrderId FK
         string documentType
         string signatureData
-        string signatureMethod
+        string signatureType
         string dropboxSignRequestId
         string signerName
         timestamp signedAt
@@ -261,7 +261,7 @@ TERMINATED → (任何狀態) ❌ // 終態不可逆
 | `serviceOrderId` | UUID | ✅ | 服務單 ID（外鍵） | 必須為有效的服務單 ID | 關聯服務單 |
 | `documentType` | Enum | ✅ | 簽名文件類型 | `BUYBACK_CONTRACT`、`TRADE_APPLICATION`、`CONSIGNMENT_CONTRACT` | FR-007, FR-018 |
 | `signatureData` | Text | ❌ | 簽名資料（Base64 PNG） | 僅線下簽名有此欄位 | FR-007, FR-018 |
-| `signatureMethod` | Enum | ✅ | 簽名方式 | `OFFLINE`（線下）或 `ONLINE`（線上） | FR-007, FR-019 |
+| `signatureType` | Enum | ✅ | 簽名方式 | `OFFLINE`（線下）或 `ONLINE`（線上） | FR-007, FR-019 |
 | `dropboxSignRequestId` | String | ❌ | Dropbox Sign 請求 ID | 僅線上簽名有此欄位 | FR-008, FR-019 |
 | `signerName` | String | ✅ | 簽名者姓名 | - | 系統記錄 |
 | `signedAt` | Timestamp | ✅ | 簽名時間 | ISO 8601 格式（UTC） | 系統自動記錄 |
@@ -560,7 +560,7 @@ export interface SignatureRecord {
   /** 簽名資料（Base64 PNG，僅線下簽名） */
   signatureData?: string
   /** 簽名方式 */
-  signatureMethod: "OFFLINE" | "ONLINE"
+  signatureType: "OFFLINE" | "ONLINE"
   /** Dropbox Sign 請求 ID（僅線上簽名） */
   dropboxSignRequestId?: string
   /** 簽名者姓名 */

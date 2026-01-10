@@ -96,7 +96,7 @@ export function useOnlineSignature() {
     const statusMap: Record<string, string> = {
       NOT_SENT: "未發送",
       PENDING: "待簽名",
-      COMPLETED: "已完成",
+      SIGNED: "已簽署",
       TERMINATED: "已中止"
     }
     return status ? statusMap[status] || status : "-"
@@ -111,7 +111,7 @@ export function useOnlineSignature() {
     const typeMap: Record<string, "success" | "warning" | "info"> = {
       NOT_SENT: "info",
       PENDING: "warning",
-      COMPLETED: "success",
+      SIGNED: "success",
       TERMINATED: "info"
     }
     return status ? (typeMap[status] || "info") : "info"
@@ -125,7 +125,8 @@ export function useOnlineSignature() {
    */
   function canResend(record: SignatureRecord): boolean {
     // 僅 PENDING 狀態可以重新發送
-    return record.status === "PENDING"
+    const status = record.statusKey
+    return status === "PENDING"
   }
 
   /**
@@ -134,10 +135,12 @@ export function useOnlineSignature() {
    * @returns 是否可以複製連結
    */
   function canCopyUrl(record: SignatureRecord): boolean {
-    // 有簽章 URL 且狀態為 PENDING 或 COMPLETED
+    // 有簽章 URL 且狀態為 PENDING 或 SIGNED
+    const status = record.statusKey
+    const signatureUrl = record.dropboxSignUrl || record.signatureUrl
     return !!(
-      record.signatureUrl
-      && (record.status === "PENDING" || record.status === "COMPLETED")
+      signatureUrl
+      && (status === "PENDING" || status === "SIGNED")
     )
   }
 

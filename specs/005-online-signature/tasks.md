@@ -58,7 +58,7 @@
 - [X] T016 [US1] 實作 OnlineSignatureSection 元件的基本結構和 Props/Emits 在 src/pages/service-order-management/components/OnlineSignatureSection.vue
 - [X] T017 [US1] 實作「發送簽章請求」按鈕和處理邏輯在 src/pages/service-order-management/components/OnlineSignatureSection.vue
 - [X] T018 [US1] 實作簽章紀錄列表顯示在 src/pages/service-order-management/components/OnlineSignatureSection.vue
-- [X] T019 [US1] 實作簽章狀態顯示 (PENDING, COMPLETED, TERMINATED) 在 src/pages/service-order-management/components/OnlineSignatureSection.vue
+- [X] T019 [US1] 實作簽章狀態顯示 (NOT_SENT, PENDING, COMPLETED, TERMINATED) 在 src/pages/service-order-management/components/OnlineSignatureSection.vue
 - [X] T020 [US1] 新增 OnlineSignatureSection 元件樣式 (SCSS scoped) 在 src/pages/service-order-management/components/OnlineSignatureSection.vue
 - [X] T021 [US1] 整合 OnlineSignatureSection 元件到 src/pages/service-order-management/detail.vue
 - [X] T022 [US1] 實作 handleOnlineSignatureSuccess 處理函式在 src/pages/service-order-management/detail.vue
@@ -115,7 +115,7 @@
 ### Implementation for User Story 4
 
 - [X] T036 [US4] 實作簽章紀錄篩選邏輯（僅顯示 ONLINE 類型）在 src/pages/service-order-management/components/OnlineSignatureSection.vue
-- [X] T037 [US4] 實作簽章狀態即時顯示（PENDING、COMPLETED、TERMINATED）
+- [X] T037 [US4] 實作簽章狀態即時顯示（NOT_SENT、PENDING、COMPLETED、TERMINATED）
 - [X] T038 [US4] 實作發送時間和到期時間顯示（使用 formatDateTime 工具）
 - [X] T039 [US4] 實作簽名時間顯示（當狀態為 COMPLETED 時）
 - [X] T040 [US4] 實作狀態變更時的按鈕顯示/隱藏邏輯（COMPLETED 時隱藏「重新發送」按鈕）

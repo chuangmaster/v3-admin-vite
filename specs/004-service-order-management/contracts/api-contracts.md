@@ -938,7 +938,7 @@ interface SaveOfflineSignatureRequest {
     "id": "990e8400-e29b-41d4-a716-446655440004",
     "serviceOrderId": "550e8400-e29b-41d4-a716-446655440000",
     "documentType": "CONSIGNMENT_CONTRACT",
-    "signatureMethod": "OFFLINE",
+    "signatureType": "OFFLINE",
     "signerName": "王小明",
     "signedAt": "2025-12-14T02:30:00Z"
   },
@@ -989,7 +989,7 @@ interface SendOnlineSignatureRequest {
     "id": "990e8400-e29b-41d4-a716-446655440004",
     "serviceOrderId": "550e8400-e29b-41d4-a716-446655440000",
     "documentType": "CONSIGNMENT_CONTRACT",
-    "signatureMethod": "ONLINE",
+    "signatureType": "ONLINE",
     "dropboxSignRequestId": "fa5c8a0b6f07",
     "signerName": "王小明",
     "signedAt": null
@@ -1176,7 +1176,7 @@ interface LogAttachmentViewRequest {
       "id": "990e8400-e29b-41d4-a716-446655440004",
       "serviceOrderId": "550e8400-e29b-41d4-a716-446655440000",
       "documentType": "CONSIGNMENT_CONTRACT",
-      "signatureMethod": "OFFLINE",
+      "signatureType": "OFFLINE",
       "signerName": "王小明",
       "signedAt": "2025-12-14T02:30:00Z"
     }

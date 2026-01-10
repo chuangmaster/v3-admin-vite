@@ -12,7 +12,7 @@ import OfflineSignatureDialog from "./components/OfflineSignatureDialog.vue"
 import OnlineSignatureSection from "./components/OnlineSignatureSection.vue"
 import { useServiceOrderDetail } from "./composables/useServiceOrderDetail"
 import { useSignature } from "./composables/useSignature"
-import { ACCESSORY_OPTIONS, AttachmentType, DEFECT_OPTIONS, DocumentType, GRADE_OPTIONS, RenewalOption, ServiceOrderStatus, ServiceOrderType, SignatureMethod } from "./types"
+import { ACCESSORY_OPTIONS, AttachmentType, DEFECT_OPTIONS, DocumentType, GRADE_OPTIONS, RenewalOption, ServiceOrderStatus, ServiceOrderType, SignatureType } from "./types"
 
 defineOptions({
   name: "ServiceOrderDetail"
@@ -583,20 +583,14 @@ function getRenewalOptionText(option: string) {
                   <p><strong>文件類型：</strong>{{ getDocumentTypeText(record.documentType) }}</p>
                   <p>
                     <strong>簽名方式：</strong>
-                    <el-tag :type="record.signatureType === SignatureMethod.ONLINE ? 'warning' : 'success'">
-                      {{ record.signatureType === SignatureMethod.ONLINE ? '線上簽名' : '線下簽名' }}
+                    <el-tag :type="record.signatureType === SignatureType.ONLINE ? 'warning' : 'success'">
+                      {{ record.signatureType === SignatureType.ONLINE ? '線上簽名' : '線下簽名' }}
                     </el-tag>
                   </p>
                   <p><strong>簽名人：</strong>{{ record.signerName }}</p>
-                  <!-- <p v-if="record.signatureType === SignatureMethod.ONLINE && record.dropboxSignUrl">
-                    <strong>簽名狀態：</strong>
-                    <el-tag :type="record.signedAt ? 'success' : 'info'">
-                      {{ record.signedAt ? '已完成' : '待簽名' }}
-                    </el-tag>
-                  </p> -->
 
                   <!-- 線下簽名圖片 -->
-                  <div v-if="record.signatureType === SignatureMethod.OFFLINE && record.signatureUrl">
+                  <div v-if="record.signatureType === SignatureType.OFFLINE && record.signatureUrl">
                     <strong>簽名圖片：</strong>
                     <el-image
                       :src="record.signatureUrl"
@@ -605,33 +599,13 @@ function getRenewalOptionText(option: string) {
                       class="signature-image"
                     />
                   </div>
-
-                  <!-- 線上簽名操作 -->
-                  <!-- <div v-if="record.signatureType === SignatureMethod.ONLINE && record.dropboxSignUrl" class="signature-actions">
-                    <el-button
-                      :icon="CopyDocument"
-                      size="small"
-                      @click="handleCopySignLink(record.dropboxSignUrl!)"
-                    >
-                      複製簽名連結
-                    </el-button>
-                    <el-button
-                      v-if="!record.signedAt"
-                      :icon="Refresh"
-                      size="small"
-                      type="primary"
-                      @click="handleResendSignature({ id: record.id, signerName: record.signerName })"
-                    >
-                      重新發送邀請
-                    </el-button>
-                  </div> -->
                 </div>
               </div>
             </el-timeline-item>
           </el-timeline>
         </div>
 
-        <!-- 線上簽章區塊 -->
+        <!-- 線上簽章資訊區塊 -->
         <OnlineSignatureSection
           v-if="serviceOrder"
           :service-order="serviceOrder"

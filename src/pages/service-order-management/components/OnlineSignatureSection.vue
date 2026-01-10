@@ -4,6 +4,7 @@ import { formatDateTime } from "@@/utils/datetime"
 import { CopyDocument, DocumentChecked, Promotion, Refresh } from "@element-plus/icons-vue"
 import { computed } from "vue"
 import { useOnlineSignature } from "../composables/useOnlineSignature"
+import { SignatureType } from "../types"
 
 interface Props {
   /** 服務單資料 */
@@ -34,7 +35,7 @@ const {
  */
 const onlineSignatureRecords = computed(() => {
   return props.serviceOrder.signatureRecords?.filter(
-    record => record.signatureMethod === "ONLINE"
+    record => record.signatureType === SignatureType.ONLINE
   ) || []
 })
 
@@ -46,14 +47,11 @@ const hasOnlineSignature = computed(() => {
 })
 
 /**
- * 是否可以發送簽章請求
- * 條件：服務單來源為線上 && 尚未有線上簽章紀錄
+ * 是否可以發送簽章請求（僅在沒有任何簽章紀錄時顯示）
+ * 條件：服務單來源為線上 && 沒有線上簽章紀錄
  */
 const canSendRequest = computed(() => {
-  return (
-    props.serviceOrder.orderSource === "ONLINE"
-    && !hasOnlineSignature.value
-  )
+  return props.serviceOrder.orderSource === "ONLINE" && !hasOnlineSignature.value
 })
 
 /**
@@ -88,8 +86,9 @@ async function handleResend(_record: SignatureRecord): Promise<void> {
  * 處理複製簽章連結
  */
 function handleCopyUrl(record: SignatureRecord): void {
-  if (record.signatureUrl) {
-    copySignatureUrl(record.signatureUrl)
+  const url = record.dropboxSignUrl || record.signatureUrl
+  if (url) {
+    copySignatureUrl(url)
   }
 }
 </script>
@@ -126,33 +125,33 @@ function handleCopyUrl(record: SignatureRecord): void {
         <el-timeline-item
           v-for="record in onlineSignatureRecords"
           :key="record.id"
-          :timestamp="record.sentAt ? formatDateTime(record.sentAt) : '待發送'"
+          :timestamp="`更新時間：${record.updatedAt ? formatDateTime(record.updatedAt) : '-'}`"
         >
           <el-card shadow="hover">
             <div class="record-header">
               <span class="record-title">
                 {{
-                  record.documentType === "BUYBACK_CONTRACT"
-                    ? "收購合約"
-                    : record.documentType === "CONSIGNMENT_CONTRACT"
-                      ? "寄賣合約"
-                      : record.documentType === "BUYBACK_CONTRACT_WITH_ONE_TIME_TRADE"
-                        ? "收購合約與一次性交易"
+                  record.documentType === "BUYBACK_CONTRACT_WITH_ONE_TIME_TRADE"
+                    ? "收購合約與一次性交易"
+                    : record.documentType === "BUYBACK_CONTRACT"
+                      ? "收購合約"
+                      : record.documentType === "CONSIGNMENT_CONTRACT"
+                        ? "寄賣合約"
                         : "合約"
                 }}
               </span>
-              <el-tag :type="getStatusType(record.status)" size="small">
-                {{ getStatusText(record.status) }}
+              <el-tag :type="getStatusType(record.statusKey)" size="small">
+                {{ getStatusText(record.statusKey) }}
               </el-tag>
             </div>
 
             <div class="record-content">
-              <p><strong>簽名者：</strong>{{ record.signerName }}</p>
+              <p><strong>簽名人：</strong>{{ record.signerName }}</p>
               <p v-if="record.sentAt">
                 <strong>發送時間：</strong>{{ formatDateTime(record.sentAt) }}
               </p>
-              <p v-if="record.expiresAt">
-                <strong>到期時間：</strong>{{ formatDateTime(record.expiresAt) }}
+              <p v-if="record.expiresAt && record.statusKey !== 'SIGNED'">
+                <strong>簽章連結到期時間：</strong>{{ formatDateTime(record.expiresAt) }}
               </p>
               <p v-if="record.signedAt">
                 <strong>簽名時間：</strong>{{ formatDateTime(record.signedAt) }}
@@ -160,6 +159,16 @@ function handleCopyUrl(record: SignatureRecord): void {
 
               <!-- 操作按鈕 -->
               <div class="record-actions">
+                <el-button
+                  v-if="record.statusKey === 'NOT_SENT'"
+                  :icon="Promotion"
+                  size="small"
+                  type="primary"
+                  :loading="loading"
+                  @click="handleSendRequest"
+                >
+                  發送簽章請求
+                </el-button>
                 <el-button
                   v-if="canResend(record)"
                   :icon="Refresh"
@@ -171,7 +180,7 @@ function handleCopyUrl(record: SignatureRecord): void {
                   重新發送簽章請求
                 </el-button>
                 <el-button
-                  v-if="canCopyUrl(record)"
+                  v-if="canCopyUrl(record) && record.statusKey !== 'SIGNED'"
                   :icon="CopyDocument"
                   size="small"
                   @click="handleCopyUrl(record)"

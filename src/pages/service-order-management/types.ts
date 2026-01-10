@@ -44,12 +44,12 @@ export enum RenewalOption {
   DISCUSS = "DISCUSS"
 }
 
-/** 簽名方式 */
-export enum SignatureMethod {
-  /** 線下簽名 */
-  OFFLINE = "OFFLINE",
+/** 簽名類型 */
+export enum SignatureType {
   /** 線上簽名 */
-  ONLINE = "ONLINE"
+  ONLINE = "ONLINE",
+  /** 線下簽名 */
+  OFFLINE = "OFFLINE"
 }
 
 /** 簽名文件類型 */
@@ -70,8 +70,8 @@ export enum OnlineSignatureStatus {
   NOT_SENT = "NOT_SENT",
   /** 待簽名 */
   PENDING = "PENDING",
-  /** 完成簽名 */
-  COMPLETED = "COMPLETED",
+  /** 已簽署 */
+  SIGNED = "SIGNED",
   /** 已中止 */
   TERMINATED = "TERMINATED"
 }
@@ -246,28 +246,36 @@ export interface SignatureRecord {
   serviceOrderId: string
   /** 簽名文件類型 */
   documentType: DocumentType
-  /** 簽名類型（用於顯示） */
-  signatureType?: string
+  /** 簽名類型（ONLINE: 線上簽名, OFFLINE: 線下簽名） */
+  signatureType: string
   /** 簽名資料（Base64 PNG，僅線下簽名） */
   signatureData?: string
   /** 簽名 URL（用於顯示簽名圖片） */
   signatureUrl?: string
-  /** 簽名方式 */
-  signatureMethod: SignatureMethod
   /** Dropbox Sign 請求 ID（僅線上簽名） */
   dropboxSignRequestId?: string
+  /** Dropbox Sign URL（線上簽章連結） */
+  dropboxSignUrl?: string
+  /** Dropbox Sign 狀態 */
+  dropboxSignStatus?: string
   /** 簽名者姓名 */
   signerName: string
   /** 簽名時間（ISO 8601, UTC） */
-  signedAt: string
-  /** 線上簽章狀態（僅線上簽名） */
-  status?: OnlineSignatureStatus
+  signedAt?: string
+  /** 線上簽章狀態鍵值（API 回傳欄位） */
+  statusKey?: string
+  /** 是否已過期 */
+  isExpired?: boolean
   /** 發送時間（ISO 8601, UTC，僅線上簽名） */
   sentAt?: string
   /** 到期時間（ISO 8601, UTC，僅線上簽名） */
   expiresAt?: string
   /** 最後通知時間（ISO 8601, UTC，用於頻率限制） */
   lastNotifiedAt?: string
+  /** 建立時間（ISO 8601, UTC） */
+  createdAt?: string
+  /** 更新時間（ISO 8601, UTC） */
+  updatedAt?: string
 }
 
 /** 修改歷史實體 */
