@@ -118,6 +118,15 @@ export function useOnlineSignature() {
   }
 
   /**
+   * 檢查是否可以發送簽章請求
+   * @param record - 簽章紀錄
+   * @returns 是否可以發送簽章請求
+   */
+  function canSend(record: SignatureRecord): boolean {
+    return record.statusKey === "NOT_SENT"
+  }
+
+  /**
    * 檢查是否可以重新發送
    * @param record - 簽章紀錄
    * @returns 是否可以重新發送
@@ -135,12 +144,12 @@ export function useOnlineSignature() {
    * @returns 是否可以複製連結
    */
   function canCopyUrl(record: SignatureRecord): boolean {
-    // 有簽章 URL 且狀態為 PENDING 或 SIGNED
+    // 有簽章 URL 且狀態為 PENDING
     const status = record.statusKey
     const signatureUrl = record.dropboxSignUrl || record.signatureUrl
     return !!(
       signatureUrl
-      && (status === "PENDING" || status === "SIGNED")
+      && status === "PENDING"
     )
   }
 
@@ -151,6 +160,7 @@ export function useOnlineSignature() {
     copySignatureUrl,
     getStatusText,
     getStatusType,
+    canSend,
     canResend,
     canCopyUrl
   }

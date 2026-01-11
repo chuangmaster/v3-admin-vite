@@ -4,12 +4,12 @@ import { formatDateTime } from "@@/utils/datetime"
 /**
  * 服務訂單詳情頁面
  */
-import { ArrowLeft, DocumentChecked, Goods, Upload } from "@element-plus/icons-vue"
+import { ArrowLeft, CopyDocument, DocumentChecked, Goods, Promotion, Refresh, Upload } from "@element-plus/icons-vue"
 import { ElMessage } from "element-plus"
 import { getAttachmentList } from "./apis/attachment"
 import AttachmentUploader from "./components/AttachmentUploader.vue"
 import OfflineSignatureDialog from "./components/OfflineSignatureDialog.vue"
-import OnlineSignatureSection from "./components/OnlineSignatureSection.vue"
+import { useOnlineSignature } from "./composables/useOnlineSignature"
 import { useServiceOrderDetail } from "./composables/useServiceOrderDetail"
 import { useSignature } from "./composables/useSignature"
 import { ACCESSORY_OPTIONS, AttachmentType, DEFECT_OPTIONS, DocumentType, GRADE_OPTIONS, RenewalOption, ServiceOrderStatus, ServiceOrderType, SignatureType } from "./types"
@@ -62,6 +62,19 @@ const {
   saveSignature
 } = useSignature()
 
+// 線上簽章相關
+const {
+  loading: onlineSignatureLoading,
+  sendSignatureRequest,
+  resendSignatureRequest,
+  copySignatureUrl,
+  getStatusText: getOnlineSignatureStatusText,
+  getStatusType: getOnlineSignatureStatusType,
+  canSend,
+  canResend,
+  canCopyUrl
+} = useOnlineSignature()
+
 const showSignatureDialog = ref(false)
 const currentSignatureDocument = ref<DocumentType>()
 const currentSignatureRecord = ref<SignatureRecord>()
@@ -93,6 +106,41 @@ const hasOfflineSignature = computed(() => {
   return serviceOrder.value.signatureRecords.some(
     record => record.signatureType === "OFFLINE"
   )
+})
+
+/**
+ * 線上簽名記錄
+ */
+const onlineSignatureRecords = computed(() => {
+  if (!serviceOrder.value?.signatureRecords) return []
+  return serviceOrder.value.signatureRecords.filter(
+    record => record.signatureType === SignatureType.ONLINE
+  )
+})
+
+/**
+ * 線下簽名記錄
+ */
+const offlineSignatureRecords = computed(() => {
+  if (!serviceOrder.value?.signatureRecords) return []
+  return serviceOrder.value.signatureRecords.filter(
+    record => record.signatureType === SignatureType.OFFLINE
+  )
+})
+
+/**
+ * 是否有線上簽名記錄
+ */
+const hasOnlineSignature = computed(() => {
+  return onlineSignatureRecords.value.length > 0
+})
+
+/**
+ * 是否可以發送簽章請求（僅在沒有任何簽章紀錄時顯示）
+ * 條件：服務單來源為線上 && 沒有線上簽章紀錄
+ */
+const canSendRequest = computed(() => {
+  return serviceOrder.value?.orderSource === "ONLINE" && !hasOnlineSignature.value
 })
 
 /**
@@ -217,6 +265,43 @@ function handleOnlineSignatureSuccess(): void {
 }
 
 /**
+ * 處理發送簽章請求
+ */
+async function handleSendSignatureRequest(): Promise<void> {
+  if (!serviceOrder.value) return
+
+  // 後端會根據 serviceOrderId 自動判斷文件類型，前端無需指定
+  const success = await sendSignatureRequest(serviceOrder.value.id)
+
+  if (success) {
+    handleOnlineSignatureSuccess()
+  }
+}
+
+/**
+ * 處理重新發送簽章請求
+ */
+async function handleResendSignatureRequest(_record: SignatureRecord): Promise<void> {
+  if (!serviceOrder.value) return
+
+  const success = await resendSignatureRequest(serviceOrder.value.id)
+
+  if (success) {
+    handleOnlineSignatureSuccess()
+  }
+}
+
+/**
+ * 處理複製簽章連結
+ */
+function handleCopySignatureUrl(record: SignatureRecord): void {
+  const url = record.dropboxSignUrl || record.signatureUrl
+  if (url) {
+    copySignatureUrl(url)
+  }
+}
+
+/**
  * 訂單類型文字
  */
 function getOrderTypeText(type: ServiceOrderType) {
@@ -264,7 +349,7 @@ function getDocumentTypeText(documentType: DocumentType) {
     [DocumentType.BUYBACK_CONTRACT]: "收購合約",
     [DocumentType.ONE_TIME_TRADE]: "一時貿易申請書",
     [DocumentType.CONSIGNMENT_CONTRACT]: "寄賣合約書",
-    [DocumentType.BUYBACK_CONTRACT_WITH_ONE_TIME_TRADE]: "收購合約與一次性交易"
+    [DocumentType.BUYBACK_CONTRACT_WITH_ONE_TIME_TRADE]: "收購合約與一時貿易申請書"
   }
   return map[documentType] || documentType
 }
@@ -567,30 +652,123 @@ function getRenewalOptionText(option: string) {
           </el-row>
         </div>
 
-        <!-- 簽名記錄 -->
-        <div v-if="serviceOrder.signatureRecords && serviceOrder.signatureRecords.length > 0" class="section">
+        <!-- 線上簽名記錄 -->
+        <div v-if="serviceOrder.orderSource === 'ONLINE'" class="section">
           <h3 class="section-title">
-            簽名記錄
+            <el-icon><DocumentChecked /></el-icon>
+            <span>線上簽名記錄</span>
+          </h3>
+
+          <!-- 發送簽章請求按鈕（尚未發送時顯示） -->
+          <div v-if="canSendRequest" class="send-request-container">
+            <el-alert
+              type="info"
+              :closable="false"
+              style="margin-bottom: 16px;"
+            >
+              此訂單來自線上渠道，請發送簽章請求給客戶完成合約簽署。
+            </el-alert>
+            <el-button
+              type="primary"
+              :icon="Promotion"
+              :loading="onlineSignatureLoading"
+              @click="handleSendSignatureRequest"
+            >
+              發送簽章請求
+            </el-button>
+          </div>
+
+          <!-- 線上簽章記錄列表 -->
+          <div v-if="hasOnlineSignature">
+            <el-timeline>
+              <el-timeline-item
+                v-for="record in onlineSignatureRecords"
+                :key="record.id"
+                :timestamp="`更新時間：${record.updatedAt ? formatDateTime(record.updatedAt) : '-'}`"
+              >
+                <el-card shadow="hover">
+                  <div class="record-header">
+                    <span class="record-title">{{ getDocumentTypeText(record.documentType) }}</span>
+                    <el-tag :type="getOnlineSignatureStatusType(record.statusKey)" size="small">
+                      {{ getOnlineSignatureStatusText(record.statusKey) }}
+                    </el-tag>
+                  </div>
+
+                  <div class="record-content">
+                    <p><strong>簽名人：</strong>{{ record.signerName }}</p>
+                    <p v-if="record.sentAt">
+                      <strong>發送時間：</strong>{{ formatDateTime(record.sentAt) }}
+                    </p>
+                    <p v-if="record.expiresAt && record.statusKey !== 'SIGNED'">
+                      <strong>簽章連結到期時間：</strong>{{ formatDateTime(record.expiresAt) }}
+                    </p>
+                    <p v-if="record.signedAt">
+                      <strong>簽名時間：</strong>{{ formatDateTime(record.signedAt) }}
+                    </p>
+
+                    <!-- 操作按鈕 -->
+                    <div class="record-actions">
+                      <el-button
+                        v-if="canSend(record)"
+                        :icon="Promotion"
+                        size="small"
+                        type="primary"
+                        :loading="onlineSignatureLoading"
+                        @click="handleSendSignatureRequest"
+                      >
+                        發送簽章請求
+                      </el-button>
+                      <el-button
+                        v-if="canResend(record)"
+                        :icon="Refresh"
+                        size="small"
+                        type="primary"
+                        :loading="onlineSignatureLoading"
+                        @click="handleResendSignatureRequest(record)"
+                      >
+                        重新發送簽章請求
+                      </el-button>
+                      <el-button
+                        v-if="canCopyUrl(record)"
+                        :icon="CopyDocument"
+                        size="small"
+                        @click="handleCopySignatureUrl(record)"
+                      >
+                        複製簽章連結
+                      </el-button>
+                    </div>
+                  </div>
+                </el-card>
+              </el-timeline-item>
+            </el-timeline>
+          </div>
+        </div>
+
+        <!-- 線下簽名記錄 -->
+        <div v-if="offlineSignatureRecords.length > 0" class="section">
+          <h3 class="section-title">
+            <el-icon><DocumentChecked /></el-icon>
+            <span>線下簽名記錄</span>
           </h3>
           <el-timeline>
             <el-timeline-item
-              v-for="record in serviceOrder.signatureRecords"
+              v-for="record in offlineSignatureRecords"
               :key="record.id"
               :timestamp="record.signedAt ? formatDateTime(record.signedAt) : '待簽名'"
             >
-              <div class="signature-record">
-                <div class="signature-info">
-                  <p><strong>文件類型：</strong>{{ getDocumentTypeText(record.documentType) }}</p>
-                  <p>
-                    <strong>簽名方式：</strong>
-                    <el-tag :type="record.signatureType === SignatureType.ONLINE ? 'warning' : 'success'">
-                      {{ record.signatureType === SignatureType.ONLINE ? '線上簽名' : '線下簽名' }}
-                    </el-tag>
-                  </p>
+              <el-card shadow="hover">
+                <div class="record-header">
+                  <span class="record-title">{{ getDocumentTypeText(record.documentType) }}</span>
+                  <el-tag type="success" size="small">
+                    線下簽名
+                  </el-tag>
+                </div>
+
+                <div class="record-content">
                   <p><strong>簽名人：</strong>{{ record.signerName }}</p>
 
                   <!-- 線下簽名圖片 -->
-                  <div v-if="record.signatureType === SignatureType.OFFLINE && record.signatureUrl">
+                  <div v-if="record.signatureUrl" class="signature-image-container">
                     <strong>簽名圖片：</strong>
                     <el-image
                       :src="record.signatureUrl"
@@ -600,17 +778,10 @@ function getRenewalOptionText(option: string) {
                     />
                   </div>
                 </div>
-              </div>
+              </el-card>
             </el-timeline-item>
           </el-timeline>
         </div>
-
-        <!-- 線上簽章資訊區塊 -->
-        <OnlineSignatureSection
-          v-if="serviceOrder"
-          :service-order="serviceOrder"
-          @success="handleOnlineSignatureSuccess"
-        />
 
         <!-- 備註 -->
         <el-descriptions v-if="serviceOrder.notes" title="備註說明" :column="1" border class="section">
@@ -716,29 +887,47 @@ function getRenewalOptionText(option: string) {
     }
   }
 
-  .signature-record {
+  .send-request-container {
+    padding: 16px;
+    background-color: var(--el-fill-color-light);
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+
+  .record-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    .record-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+
+  .record-content {
     p {
       margin: 8px 0;
+      color: var(--el-text-color-regular);
     }
 
-    .signature-info {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .signature-image {
-      max-width: 300px;
-      max-height: 150px;
-      margin-top: 8px;
-      border: 1px solid var(--el-border-color);
-      border-radius: 4px;
-    }
-
-    .signature-actions {
+    .record-actions {
       display: flex;
       gap: 8px;
+      margin-top: 16px;
+    }
+
+    .signature-image-container {
       margin-top: 12px;
+
+      .signature-image {
+        max-width: 300px;
+        max-height: 150px;
+        margin-top: 8px;
+        border: 1px solid var(--el-border-color);
+        border-radius: 4px;
+      }
     }
   }
 
