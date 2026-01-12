@@ -40,3 +40,6 @@ pnpm-lock.yaml
 # Docker
 .dockerignore
 docker-compose.override.yml
+
+# Auto-generated types
+types/auto/
