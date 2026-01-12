@@ -75,7 +75,7 @@ describe("useSignature", () => {
       id: "sig-123",
       serviceOrderId: "order-123",
       documentType: "BUYBACK_CONTRACT" as any,
-      signatureMethod: "OFFLINE" as any,
+      signatureType: "OFFLINE",
       signerName: "客戶",
       signedAt: "2025-01-01T00:00:00Z"
     }
