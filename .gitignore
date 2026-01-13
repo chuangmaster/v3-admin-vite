@@ -4,6 +4,9 @@ node_modules
 .eslintcache
 vite.config.*.timestamp*
 
+# Auto-generated types
+types/auto
+
 # MacOS
 .DS_Store
 
