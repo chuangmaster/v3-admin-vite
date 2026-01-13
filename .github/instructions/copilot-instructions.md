@@ -114,7 +114,7 @@
 - 元件命名：始終採用單字大寫開頭 (PascalCase)，並避免與 HTML 元素衝突
 - 元件命名範例：以全域 `SearchMenu` 元件 `@@/components/SearchMenu/index.vue` 和 `@@/components/SearchMenu/Modal.vue` 為參考，注意 `index` 不需遵循大駝峰格式
 - 頁面命名：始終採用短橫線連接 (kebab-case)
-- 頁面命名範例：以 CRUD 範例頁面為參考 `@/pages/demo/element-plus/index.vue`
+- 頁面命名範例：`@/pages/user-management/index.vue`
 - 組合式函式命名：始終採用小駝峰 (camelCase)
 - 組合式函式命名範例：以水印組合式函式為參考 `@@/composables/useWatermark.ts`
 - Props 命名：宣告時採用小駝峰 (camelCase)，模板與 JSX 中採用短橫線連接 (kebab-case)
@@ -162,7 +162,7 @@
 
 ## 參考範例檔案
 
-@/pages/demo/element-plus/index.vue
+@/pages/user-management/index.vue
 
 # TypeScript 開發規範
 
