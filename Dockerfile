@@ -6,8 +6,10 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 RUN CI=true pnpm install --frozen-lockfile
 
 # 可在 build 時傳入環境變數覆寫預設值
+ARG VITE_APP_TITLE="Real You"
 ARG VITE_BASE_URL=/api
 ARG VITE_PUBLIC_PATH=/
+ENV VITE_APP_TITLE=${VITE_APP_TITLE}
 ENV VITE_BASE_URL=${VITE_BASE_URL}
 ENV VITE_PUBLIC_PATH=${VITE_PUBLIC_PATH}
 
