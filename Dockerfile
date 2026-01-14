@@ -5,7 +5,7 @@ COPY . .
 RUN corepack enable && corepack prepare pnpm@latest --activate
 RUN CI=true pnpm install --frozen-lockfile
 ENV VITE_PUBLIC_PATH=/
-RUN pnpm run build
+RUN pnpm exec vite build
 
 # 運行階段
 FROM nginx:alpine
