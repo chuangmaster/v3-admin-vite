@@ -10,6 +10,9 @@ coverage
 *.swo
 *.tmp
 
+# Auto-generated types
+types/auto
+
 # MacOS
 .DS_Store
 Thumbs.db
