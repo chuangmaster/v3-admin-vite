@@ -5,7 +5,7 @@
 **Generated**: 2026-01-19  
 **Input**: Design documents from `/specs/004-user-profile/`
 
-**Tests**: ❌ 無測試任務（spec.md 未明確要求 TDD 方法）
+**Tests**: ✅ 包含測試任務（為關鍵組合式函式與元件編寫單元測試）
 
 **Organization**: 任務按用戶故事分組，每個故事可獨立實作與驗證
 
@@ -37,6 +37,8 @@
 - [ ] T002 [P] 擴展 API 型別定義，新增 UserProfile 相關型別至 `src/common/apis/users/type.ts`
 - [ ] T003 [P] 建立頁面私有型別定義檔案 `src/pages/profile/types.ts`（定義 UserProfile, ChangePasswordFormData, ChangePasswordRequest）
 - [ ] T004 更新 getCurrentUserApi 函式，確保回傳完整 UserProfile（包含 id, version）於 `src/common/apis/users/index.ts`
+- [ ] T004.1 [P] 檢查並統一 Pinia store (useUserStore) 中的欄位命名，將 username 改為 account 於 `src/pinia/stores/user.ts`（對齊後端 API 欄位名稱）
+- [ ] T004.2 [P] 檢查專案中所有使用 username 的地方，統一改為 account（搜尋 `src/` 目錄）
 
 **檢查點**: 基礎設施就緒 - 用戶故事現在可以開始平行實作
 
@@ -57,6 +59,11 @@
 - [ ] T009 [US1] 更新 NavigationBar 選單，新增「個人資訊」項目至 `src/layouts/components/NavigationBar/index.vue`（使用 router-link to="/profile"）
 - [ ] T010 [US1] 新增頁面樣式與響應式佈局至 `src/pages/profile/index.vue`（使用 el-row, el-col 實作雙卡片佈局）
 
+### 測試 User Story 1
+
+- [ ] T010.1 [P] [US1] 編寫 useUserProfile 組合式函式單元測試 `tests/composables/useUserProfile.test.ts`（測試 fetchUserProfile, refreshProfile）
+- [ ] T010.2 [P] [US1] 編寫 UserInfoCard 元件測試 `tests/pages/profile/components/UserInfoCard.test.ts`（測試資料顯示、loading 狀態）
+
 **檢查點**: 此時 User Story 1 應完全可用且可獨立測試
 
 ---
@@ -76,6 +83,11 @@
 - [ ] T015 [US2] 實作併發衝突處理邏輯於 `src/pages/profile/composables/useChangePassword.ts`（捕捉 409 Conflict，觸發 refresh-required 事件）
 - [ ] T016 [US2] 實作密碼修改錯誤處理於 `src/pages/profile/composables/useChangePassword.ts`（401 舊密碼錯誤、400 驗證錯誤、500 伺服器錯誤）
 - [ ] T017 [US2] 新增密碼修改成功提示與表單重置邏輯至 `src/pages/profile/composables/useChangePassword.ts`
+
+### 測試 User Story 2
+
+- [ ] T017.1 [P] [US2] 編寫 useChangePassword 組合式函式單元測試 `tests/composables/useChangePassword.test.ts`（測試表單驗證、提交邏輯、錯誤處理）
+- [ ] T017.2 [P] [US2] 編寫 ChangePasswordForm 元件測試 `tests/pages/profile/components/ChangePasswordForm.test.ts`（測試表單輸入、驗證規則、提交流程）
 
 **檢查點**: 此時 User Story 1 與 User Story 2 應同時可用且可獨立測試
 
@@ -111,8 +123,9 @@
 - [ ] T026 [P] 新增錯誤狀態處理與重試機制至 `src/pages/profile/composables/useUserProfile.ts`
 - [ ] T027 程式碼重構：提取共用邏輯與常數至 `src/pages/profile/` 相關檔案
 - [ ] T028 [P] 新增 JSDoc 註解至所有組合式函式與公開方法
-- [ ] T029 效能優化：確認 API 呼叫僅在必要時觸發（避免重複載入）
+- [ ] T029 效能優化：確認 useUserProfile 僅在 mounted 時呼叫一次 fetchUserProfile API（避免重複載入）
 - [ ] T030 執行 quickstart.md 驗證流程（按照 Step 1-8 測試完整功能）
+- [ ] T031 [P] 執行所有單元測試並確保通過率 100%（`pnpm test`）
 
 ---
 
@@ -212,21 +225,21 @@ Task T014-T017: "實作表單驗證、錯誤處理、併發控制邏輯"
 
 ## Summary（摘要）
 
-**總任務數**: 30 個任務
+**總任務數**: 37 個任務
 
 **任務分佈**:
 - Phase 1 (Setup): 1 個任務
-- Phase 2 (Foundational): 3 個任務
-- Phase 3 (US1 - 查看個人資訊): 6 個任務
-- Phase 4 (US2 - 修改密碼): 7 個任務
+- Phase 2 (Foundational): 5 個任務（包含 account 欄位統一）
+- Phase 3 (US1 - 查看個人資訊): 6 個實作任務 + 2 個測試任務 = 8 個任務
+- Phase 4 (US2 - 修改密碼): 7 個實作任務 + 2 個測試任務 = 9 個任務
 - Phase 5 (US3 - 選單權限): 4 個任務
-- Phase 6 (Polish): 9 個任務
+- Phase 6 (Polish): 10 個任務（包含測試執行）
 
 **平行執行機會**: 
-- Foundational: 2 個平行任務（T002, T003）
-- User Story 1: 2 個平行任務（T005, T006）
-- User Story 2: 2 個平行任務（T011, T012）
-- Polish: 6 個平行任務（T022-T028）
+- Foundational: 4 個平行任務（T002, T003, T004.1, T004.2）
+- User Story 1: 4 個平行任務（T005, T006, T010.1, T010.2）
+- User Story 2: 4 個平行任務（T011, T012, T017.1, T017.2）
+- Polish: 7 個平行任務（T022-T028, T031）
 
 **獨立測試標準**:
 - **US1**: 用戶可進入頁面並查看完整個人資訊
@@ -234,9 +247,9 @@ Task T014-T017: "實作表單驗證、錯誤處理、併發控制邏輯"
 - **US3**: 不同權限用戶看到的選單項目符合權限配置
 
 **建議 MVP 範圍**: 
-- **最小範圍**: Phase 1 + Phase 2 + Phase 3（User Story 1）
-- **推薦範圍**: Phase 1 + Phase 2 + Phase 3 + Phase 4（User Story 1 & 2）
-- **完整範圍**: 所有 Phase（包含 User Story 3 與 Polish）
+- **最小範圍**: Phase 1 + Phase 2 + Phase 3（User Story 1）- 約 14 個任務
+- **推薦範圍**: Phase 1 + Phase 2 + Phase 3 + Phase 4（User Story 1 & 2 含測試）- 約 23 個任務
+- **完整範圍**: 所有 Phase（包含 User Story 3、Polish 與完整測試）- 37 個任務
 
 ---
 
@@ -246,9 +259,13 @@ Task T014-T017: "實作表單驗證、錯誤處理、併發控制邏輯"
 - ✅ [P] 任務表示不同檔案、無依賴關係
 - ✅ [Story] 標籤將任務映射至特定用戶故事以便追蹤
 - ✅ 每個用戶故事可獨立完成與測試
+- ✅ 包含單元測試任務確保程式碼品質
+- ✅ FR-012 account 欄位統一已整合至 Phase 2（前端範圍）
+- ✅ FR-005-1 錯誤密碼日誌由後端處理，前端無需額外任務
 - ⚠️ 避免：模糊任務、同檔案衝突、破壞獨立性的跨故事依賴
 - 📝 每個任務或邏輯群組後提交 commit
 - 🔍 在任何檢查點停下來獨立驗證故事
+- 🧪 測試任務應在對應實作完成後立即執行
 - 🎯 優先完成 User Story 1 與 2（P1 優先級），再考慮 User Story 3
 
 ---
