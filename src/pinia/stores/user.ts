@@ -12,7 +12,14 @@ export const useUserStore = defineStore("user", () => {
   const roles = ref<string[]>([])
   const permissions = ref<string[]>([])
 
-  const username = ref<string>("")
+  /** 用戶 ID（來自 API） */
+  const userId = ref<string>("")
+  /** 用戶帳號（登入名稱） */
+  const account = ref<string>("")
+  /** 用戶顯示名稱 */
+  const displayName = ref<string>("")
+  /** 資料版本號（用於併發控制） */
+  const version = ref<number>(0)
 
   const tagsViewStore = useTagsViewStore()
 
@@ -24,13 +31,16 @@ export const useUserStore = defineStore("user", () => {
     token.value = value
   }
 
-  // 获取用户详情
+  // 獲取用戶詳情
   const getInfo = async () => {
     const { data } = await getCurrentUserApi()
-    username.value = data?.username || ""
-    // 验证返回的 roles 是否为一个非空数组（保留用於向後兼容）
+    userId.value = data?.id || ""
+    account.value = data?.account || ""
+    displayName.value = data?.displayName || ""
+    version.value = data?.version ?? 0
+    // 驗證返回的 roles 是否為一個非空陣列（保留用於向後兼容）
     roles.value = data?.roles ?? []
-    // 验证返回的 permissions 是否为一个非空数组，否则塞入一个没有任何作用的默认权限，防止路由守卫逻辑进入无限循环
+    // 驗證返回的 permissions 是否為一個非空陣列，否則塞入一個沒有任何作用的默認權限，防止路由守衛邏輯進入無限循環
     permissions.value = (data?.permissions?.length ?? 0) > 0 ? data!.permissions : routerConfig.defaultPermissions
   }
 
@@ -69,7 +79,7 @@ export const useUserStore = defineStore("user", () => {
     }
   }
 
-  return { token, roles, permissions, username, setToken, getInfo, changeRoles, logout, resetToken }
+  return { token, roles, permissions, userId, account, displayName, version, setToken, getInfo, changeRoles, logout, resetToken }
 })
 
 /**

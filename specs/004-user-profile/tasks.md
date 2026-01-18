@@ -24,7 +24,7 @@
 
 **目的**: 建立專案基礎結構與目錄
 
-- [ ] T001 建立個人資料模組目錄結構 `src/pages/profile/`（包含 components, composables 子目錄）
+- [X] T001 建立個人資料模組目錄結構 `src/pages/profile/`（包含 components, composables 子目錄）
 
 ---
 
@@ -34,11 +34,11 @@
 
 **⚠️ 關鍵**: 此階段必須完成，才能開始任何用戶故事
 
-- [ ] T002 [P] 擴展 API 型別定義，新增 UserProfile 相關型別至 `src/common/apis/users/type.ts`
-- [ ] T003 [P] 建立頁面私有型別定義檔案 `src/pages/profile/types.ts`（定義 UserProfile, ChangePasswordFormData, ChangePasswordRequest）
-- [ ] T004 更新 getCurrentUserApi 函式，確保回傳完整 UserProfile（包含 id, version）於 `src/common/apis/users/index.ts`
-- [ ] T004.1 [P] 檢查並統一 Pinia store (useUserStore) 中的欄位命名，將 username 改為 account 於 `src/pinia/stores/user.ts`（對齊後端 API 欄位名稱）
-- [ ] T004.2 [P] 檢查專案中所有使用 username 的地方，統一改為 account（搜尋 `src/` 目錄）
+- [X] T002 [P] 擴展 API 型別定義，新增 UserProfile 相關型別至 `src/common/apis/users/type.ts`
+- [X] T003 [P] 建立頁面私有型別定義檔案 `src/pages/profile/types.ts`（定義 UserProfile, ChangePasswordFormData, ChangePasswordRequest）
+- [X] T004 更新 getCurrentUserApi 函式，確保回傳完整 UserProfile（包含 id, version）於 `src/common/apis/users/index.ts`
+- [X] T004.1 [P] 檢查並統一 Pinia store (useUserStore) 中的欄位命名，將 username 改為 account 於 `src/pinia/stores/user.ts`（對齊後端 API 欄位名稱）
+- [X] T004.2 [P] 檢查專案中所有使用 username 的地方，統一改為 account（搜尋 `src/` 目錄）
 
 **檢查點**: 基礎設施就緒 - 用戶故事現在可以開始平行實作
 
@@ -52,17 +52,17 @@
 
 ### 實作 User Story 1
 
-- [ ] T005 [P] [US1] 建立用戶資料組合式函式 `src/pages/profile/composables/useUserProfile.ts`（包含 fetchUserProfile, refreshProfile）
-- [ ] T006 [P] [US1] 建立用戶資訊卡片元件 `src/pages/profile/components/UserInfoCard.vue`（使用 el-descriptions 顯示資訊）
-- [ ] T007 [US1] 建立個人資料主頁面 `src/pages/profile/index.vue`（整合 UserInfoCard，呼叫 useUserProfile）
-- [ ] T008 [US1] 新增個人資料路由至 `src/router/index.ts`（path: "/profile", name: "UserProfile", meta.hidden: true）
-- [ ] T009 [US1] 更新 NavigationBar 選單，新增「個人資訊」項目至 `src/layouts/components/NavigationBar/index.vue`（使用 router-link to="/profile"）
-- [ ] T010 [US1] 新增頁面樣式與響應式佈局至 `src/pages/profile/index.vue`（使用 el-row, el-col 實作雙卡片佈局）
+- [X] T005 [P] [US1] 建立用戶資料組合式函式 `src/pages/profile/composables/useUserProfile.ts`（包含 fetchUserProfile, refreshProfile）
+- [X] T006 [P] [US1] 建立用戶資訊卡片元件 `src/pages/profile/components/UserInfoCard.vue`（使用 el-descriptions 顯示資訊）
+- [X] T007 [US1] 建立個人資料主頁面 `src/pages/profile/index.vue`（整合 UserInfoCard，呼叫 useUserProfile）
+- [X] T008 [US1] 新增個人資料路由至 `src/router/index.ts`（path: "/profile", name: "UserProfile", meta.hidden: true）
+- [X] T009 [US1] 更新 NavigationBar 選單，新增「個人資訊」項目至 `src/layouts/components/NavigationBar/index.vue`（使用 router-link to="/profile"）
+- [X] T010 [US1] 新增頁面樣式與響應式佈局至 `src/pages/profile/index.vue`（使用 el-row, el-col 實作雙卡片佈局）
 
 ### 測試 User Story 1
 
-- [ ] T010.1 [P] [US1] 編寫 useUserProfile 組合式函式單元測試 `tests/composables/useUserProfile.test.ts`（測試 fetchUserProfile, refreshProfile）
-- [ ] T010.2 [P] [US1] 編寫 UserInfoCard 元件測試 `tests/pages/profile/components/UserInfoCard.test.ts`（測試資料顯示、loading 狀態）
+- [X] T010.1 [P] [US1] 編寫 useUserProfile 組合式函式單元測試 `tests/composables/useUserProfile.test.ts`（測試 fetchUserProfile, refreshProfile）
+- [X] T010.2 [P] [US1] 編寫 UserInfoCard 元件測試 `tests/pages/profile/components/UserInfoCard.test.ts`（測試資料顯示、loading 狀態）
 
 **檢查點**: 此時 User Story 1 應完全可用且可獨立測試
 
@@ -76,18 +76,18 @@
 
 ### 實作 User Story 2
 
-- [ ] T011 [P] [US2] 建立密碼修改組合式函式 `src/pages/profile/composables/useChangePassword.ts`（包含表單驗證、提交邏輯、錯誤處理）
-- [ ] T012 [P] [US2] 建立密碼修改表單元件 `src/pages/profile/components/ChangePasswordForm.vue`（使用 el-form，包含舊密碼、新密碼、確認密碼欄位）
-- [ ] T013 [US2] 整合密碼修改表單至主頁面 `src/pages/profile/index.vue`（傳遞 userId 與 version props，監聽 password-changed 與 refresh-required 事件）
-- [ ] T014 [US2] 實作表單驗證規則於 `src/pages/profile/composables/useChangePassword.ts`（必填、最小長度、確認密碼一致性）
-- [ ] T015 [US2] 實作併發衝突處理邏輯於 `src/pages/profile/composables/useChangePassword.ts`（捕捉 409 Conflict，觸發 refresh-required 事件）
-- [ ] T016 [US2] 實作密碼修改錯誤處理於 `src/pages/profile/composables/useChangePassword.ts`（401 舊密碼錯誤、400 驗證錯誤、500 伺服器錯誤）
-- [ ] T017 [US2] 新增密碼修改成功提示與表單重置邏輯至 `src/pages/profile/composables/useChangePassword.ts`
+- [X] T011 [P] [US2] 建立密碼修改組合式函式 `src/pages/profile/composables/useChangePassword.ts`（包含表單驗證、提交邏輯、錯誤處理）
+- [X] T012 [P] [US2] 建立密碼修改表單元件 `src/pages/profile/components/ChangePasswordForm.vue`（使用 el-form，包含舊密碼、新密碼、確認密碼欄位）
+- [X] T013 [US2] 整合密碼修改表單至主頁面 `src/pages/profile/index.vue`（傳遞 userId 與 version props，監聽 password-changed 與 refresh-required 事件）
+- [X] T014 [US2] 實作表單驗證規則於 `src/pages/profile/composables/useChangePassword.ts`（必填、最小長度、確認密碼一致性）
+- [X] T015 [US2] 實作併發衝突處理邏輯於 `src/pages/profile/composables/useChangePassword.ts`（捕捉 409 Conflict，觸發 refresh-required 事件）
+- [X] T016 [US2] 實作密碼修改錯誤處理於 `src/pages/profile/composables/useChangePassword.ts`（401 舊密碼錯誤、400 驗證錯誤、500 伺服器錯誤）
+- [X] T017 [US2] 新增密碼修改成功提示與表單重置邏輯至 `src/pages/profile/composables/useChangePassword.ts`
 
 ### 測試 User Story 2
 
-- [ ] T017.1 [P] [US2] 編寫 useChangePassword 組合式函式單元測試 `tests/composables/useChangePassword.test.ts`（測試表單驗證、提交邏輯、錯誤處理）
-- [ ] T017.2 [P] [US2] 編寫 ChangePasswordForm 元件測試 `tests/pages/profile/components/ChangePasswordForm.test.ts`（測試表單輸入、驗證規則、提交流程）
+- [X] T017.1 [P] [US2] 編寫 useChangePassword 組合式函式單元測試 `tests/composables/useChangePassword.test.ts`（測試表單驗證、提交邏輯、錯誤處理）
+- [X] T017.2 [P] [US2] 編寫 ChangePasswordForm 元件測試 `tests/pages/profile/components/ChangePasswordForm.test.ts`（測試表單輸入、驗證規則、提交流程）
 
 **檢查點**: 此時 User Story 1 與 User Story 2 應同時可用且可獨立測試
 
@@ -101,10 +101,10 @@
 
 ### 實作 User Story 3
 
-- [ ] T018 [US3] 檢查並確認 Sidebar 元件的權限過濾邏輯正確實作於 `src/layouts/components/Sidebar/`
-- [ ] T019 [US3] 確認路由配置的 permissions 與 roles 屬性正確使用於 `src/router/index.ts`
-- [ ] T020 [US3] 驗證路由守衛的權限檢查邏輯於 `src/router/guard.ts`（確保無權限用戶無法透過 URL 直接存取）
-- [ ] T021 [US3] 測試多種權限組合（管理員、一般用戶、無權限用戶）的選單顯示結果
+- [X] T018 [US3] 檢查並確認 Sidebar 元件的權限過濾邏輯正確實作於 `src/layouts/components/Sidebar/`
+- [X] T019 [US3] 確認路由配置的 permissions 與 roles 屬性正確使用於 `src/router/index.ts`
+- [X] T020 [US3] 驗證路由守衛的權限檢查邏輯於 `src/router/guard.ts`（確保無權限用戶無法透過 URL 直接存取）
+- [X] T021 [US3] 測試多種權限組合（管理員、一般用戶、無權限用戶）的選單顯示結果
 
 **注意**: User Story 3 主要為驗證與測試工作，因現有系統已實作基本權限機制
 
@@ -118,14 +118,14 @@
 
 - [ ] T022 [P] 新增用戶資訊卡片元件樣式優化至 `src/pages/profile/components/UserInfoCard.vue`（調整間距、字體大小、卡片陰影）
 - [ ] T023 [P] 新增密碼修改表單元件樣式優化至 `src/pages/profile/components/ChangePasswordForm.vue`（按鈕對齊、輸入框寬度）
-- [ ] T024 [P] 新增 Loading 狀態顯示至 `src/pages/profile/components/UserInfoCard.vue`（使用 v-loading 指令）
-- [ ] T025 [P] 新增密碼修改提交中狀態至 `src/pages/profile/components/ChangePasswordForm.vue`（按鈕 loading 狀態）
-- [ ] T026 [P] 新增錯誤狀態處理與重試機制至 `src/pages/profile/composables/useUserProfile.ts`
+- [X] T024 [P] 新增 Loading 狀態顯示至 `src/pages/profile/components/UserInfoCard.vue`（使用 v-loading 指令）
+- [X] T025 [P] 新增密碼修改提交中狀態至 `src/pages/profile/components/ChangePasswordForm.vue`（按鈕 loading 狀態）
+- [X] T026 [P] 新增錯誤狀態處理與重試機制至 `src/pages/profile/composables/useUserProfile.ts`
 - [ ] T027 程式碼重構：提取共用邏輯與常數至 `src/pages/profile/` 相關檔案
-- [ ] T028 [P] 新增 JSDoc 註解至所有組合式函式與公開方法
-- [ ] T029 效能優化：確認 useUserProfile 僅在 mounted 時呼叫一次 fetchUserProfile API（避免重複載入）
-- [ ] T030 執行 quickstart.md 驗證流程（按照 Step 1-8 測試完整功能）
-- [ ] T031 [P] 執行所有單元測試並確保通過率 100%（`pnpm test`）
+- [X] T028 [P] 新增 JSDoc 註解至所有組合式函式與公開方法
+- [X] T029 效能優化：確認 useUserProfile 僅在 mounted 時呼叫一次 fetchUserProfile API（避免重複載入）
+- [X] T030 執行 quickstart.md 驗證流程（按照 Step 1-8 測試完整功能）
+- [X] T031 [P] 執行所有單元測試並確保通過率 100%（`pnpm test`）
 
 ---
 

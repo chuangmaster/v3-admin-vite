@@ -71,7 +71,7 @@ function handleCancel(): void {
 async function setupEdit(user: User): Promise<void> {
   activeTab.value = "info"
   setEditMode(user)
-  setUserId(user.id)
+  setUserId(user.id, user.version)
   setRoleUserId(user.id)
   // 預先載入可用角色列表和使用者的角色
   await fetchRoles()

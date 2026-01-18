@@ -57,13 +57,13 @@ function logout() {
       <el-dropdown>
         <div class="right-menu-item user">
           <el-avatar :icon="UserFilled" :size="30" />
-          <span>{{ userStore.username }}</span>
+          <span>{{ userStore.displayName || userStore.account }}</span>
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <a target="_blank" href="#">
-              <el-dropdown-item>Info</el-dropdown-item>
-            </a>
+            <router-link to="/profile">
+              <el-dropdown-item>個人資訊</el-dropdown-item>
+            </router-link>
             <el-dropdown-item divided @click="logout">
               登出
             </el-dropdown-item>
