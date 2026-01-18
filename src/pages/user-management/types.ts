@@ -40,6 +40,8 @@ export interface ChangePasswordRequest {
   oldPassword: string
   /** 新密碼（最少 8 字元，包含大小寫字母與數字） */
   newPassword: string
+  /** 資料版本號（用於併發控制） */
+  version: number
 }
 
 /** 刪除用戶請求 */

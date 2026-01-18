@@ -61,9 +61,10 @@ describe("useChangePasswordForm composable", () => {
   it("should set user ID with setUserId", () => {
     const { formData, setUserId } = useChangePasswordForm()
 
-    setUserId("user123")
+    setUserId("user123", 5)
 
     expect(formData.userId).toBe("user123")
+    expect(formData.version).toBe(5)
   })
 
   it("should reset form data", () => {
