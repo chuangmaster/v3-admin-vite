@@ -1,270 +1,272 @@
-# Research: 用戶個人資料與選單權限管理
+# Research: 用戶個人資料與密碼管理
 
-**Date**: 2026-01-16  
+**Date**: 2026-01-19  
 **Feature**: 004-user-profile  
-**Purpose**: 解決 Technical Context 中的技術決策，研究最佳實踐
+**Status**: ✅ Complete
 
----
+## Overview
 
-## 研究任務清單
+本文件記錄實作「用戶個人資料與密碼管理」功能前的技術研究與決策過程，解決 Technical Context 中的所有 NEEDS CLARIFICATION 項目。
 
-### 1. 用戶個人資料 API 整合方案
-### 2. 密碼修改流程與安全性最佳實踐
-### 3. Session 失效機制前端處理策略
-### 4. 選單權限動態顯示實作方案
-### 5. 錯誤處理與用戶回饋設計
+## Research Tasks
 
----
+### 1. API 整合策略
 
-## 1. 用戶個人資料 API 整合方案
+**研究問題**: 如何整合現有 `/api/Account/me` API 並處理併發控制？
 
-### Decision
-使用 `/api/Account/me` API 取得當前登入用戶資料，並在前端快取於 Pinia store。
+**調查結果**:
+- 專案已有 `getCurrentUserApi()` 位於 `@/common/apis/users/index.ts`
+- 目前回應型別為 `{ username: string, roles: string[], permissions: string[] }`
+- 用戶需求新增欄位：`id`, `displayName`, `version`
+- 密碼修改 API 已存在於 `@/pages/user-management/apis/user.ts` 中的 `changePassword()`
 
-### Rationale
-- **API 規格明確**: Swagger 定義清楚 `GET /api/Account/me` 端點，回傳 `UserProfileResponse` 包含 account, displayName, roles, permissions
-- **最小化請求**: 登入後僅需呼叫一次，資料存放於 Pinia store `user.ts`，避免重複請求
-- **權限整合**: API 已回傳 permissions 陣列，前端可直接用於選單過濾與按鈕權限控制
-- **符合既有架構**: 專案已有 `@/pinia/stores/user.ts`，可擴充 `profile` state
+**決策**: 
+- **擴展現有 API 型別定義**，在 `@/common/apis/users/type.ts` 新增：
+  ```typescript
+  export type CurrentUserResponseData = ApiResponse<{
+    id: string
+    account: string          // 對應 username
+    displayName: string
+    roles: string[]
+    permissions: string[]
+    version: number
+  }>
+  ```
+- **重用 changePassword API**，從 user-management 模組匯入
+- **處理併發衝突**：捕捉 409 Conflict 錯誤碼，提示用戶重新載入資料
 
-### Alternatives Considered
-1. **每次存取時重新取得**: 不快取，每次需要時呼叫 API
-   - **Rejected**: 效能差，增加伺服器負擔，不符合 SPA 最佳實踐
-2. **使用 LocalStorage 儲存**: 將 profile 資料存於 LocalStorage
-   - **Rejected**: 違反安全原則 (Constitution VII)，敏感資料不應存於前端儲存
+**替代方案**:
+- ❌ 建立新的 API 函式：會產生重複程式碼
+- ❌ 不處理併發控制：可能導致資料覆蓋問題
 
-### Implementation Notes
+**技術細節**:
 ```typescript
-// @/common/apis/account/profile.ts
-export async function getUserProfile(): Promise<ApiResponse<UserProfileResponse>> {
-  return request({
-    url: "/api/Account/me",
-    method: "GET"
-  })
-}
-
-// @/pinia/stores/user.ts
-interface UserState {
-  profile: UserProfileResponse | null
-  // ... 其他 state
-}
-
-async function fetchProfile() {
-  const response = await getUserProfile()
-  if (response.success && response.data) {
-    profile.value = response.data
+// 錯誤處理範例
+try {
+  await changePassword({ id: userId, oldPassword, newPassword, version })
+} catch (error) {
+  if (error.response?.status === 409) {
+    ElMessage.error('資料已被其他使用者修改，請重新整理後再試')
+    // 重新載入用戶資料
+    await refreshUserData()
   }
 }
 ```
 
 ---
 
-## 2. 密碼修改流程與安全性最佳實踐
+### 2. Session 管理策略
 
-### Decision
-採用獨立頁面 (`/profile/change-password`) 或對話框元件，整合 `/api/Account/{id}/password` API，前端執行基本驗證後提交至後端。
+**研究問題**: 密碼修改後如何實作「僅保留當前 session，其他裝置 session 失效」？
 
-### Rationale
-- **API 規格支援**: `PUT /api/Account/{id}/password` 需要 `oldPassword` 與 `newPassword`，後端負責驗證舊密碼正確性
-- **前端驗證減少無效請求**: 
-  - 檢查新密碼與確認密碼一致性
-  - 檢查密碼強度 (長度、複雜度)
-  - 檢查新密碼不得與舊密碼相同 (可選，後端也會檢查)
-- **錯誤碼處理**: 
-  - `401`: 舊密碼錯誤 → 顯示「舊密碼不正確」
-  - `422`: 新密碼與舊密碼相同 → 顯示警告訊息
-  - `409`: 並發衝突 → 提示重新載入
-- **樂觀鎖定**: API 需要 `version` 參數，前端需在提交時帶上 (從 user profile 取得)
+**調查結果**:
+- 專案使用 Cookie 儲存 JWT Token（`@/common/utils/cache/cookies.ts`）
+- Pinia store (`useUserStore`) 管理登入狀態
+- 後端應負責 session 失效邏輯（JWT token 管理）
 
-### Alternatives Considered
-1. **僅前端驗證**: 不呼叫後端，僅檢查格式
-   - **Rejected**: 無法確認舊密碼正確性，違反安全性原則
-2. **簡化驗證**: 不檢查新舊密碼相同
-   - **Accepted with Warning**: 根據 spec clarification，允許相同密碼但需顯示警告
+**決策**: 
+- **前端不實作 session 失效邏輯**（後端負責）
+- **前端責任**：密碼修改成功後顯示提示訊息，告知用戶其他裝置需重新登入
+- **當前裝置**：保持 token 不變，無需重新登入
 
-### Implementation Notes
+**Rationale**: 
+- JWT token 失效應由後端控制（如：修改 token secret、記錄 token 黑名單）
+- 前端無法可靠地使其他裝置登出（分散式架構）
+- 保持職責分離，前端專注於 UI/UX
+
+**替代方案**:
+- ❌ 前端強制登出：無法影響其他裝置，且體驗不佳
+- ❌ 使用 WebSocket 廣播登出：過度工程化，需額外基礎設施
+
+---
+
+### 3. 表單驗證策略
+
+**研究問題**: 如何實作密碼修改表單驗證（舊密碼、新密碼、確認密碼）？
+
+**調查結果**:
+- Element Plus 提供 `el-form` 與驗證規則（`rules`）
+- 專案已有類似實作：`@/pages/user-management` 的 UserForm
+- 專案使用組合式函式模式管理表單邏輯
+
+**決策**: 
+- **使用 Element Plus 原生驗證**（`el-form` + `rules`）
+- **建立組合式函式** `useChangePasswordForm.ts`：
+  - 表單資料響應式管理
+  - 驗證規則定義
+  - 提交邏輯處理
+- **驗證規則**：
+  - 舊密碼：必填
+  - 新密碼：必填 + 最小長度（依後端規則，預設 6 字元）
+  - 確認密碼：必填 + 與新密碼一致
+
+**Best Practices**:
 ```typescript
-// @/common/apis/account/profile.ts
-export async function changePassword(
-  id: string,
-  data: ChangePasswordRequest,
-  version: number
-): Promise<ApiResponse<null>> {
-  return request({
-    url: `/api/Account/${id}/password?version=${version}`,
-    method: "PUT",
-    data
+// 組合式函式範例
+export function useChangePasswordForm() {
+  const formRef = ref<FormInstance>()
+  const formData = reactive({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   })
-}
-
-// 前端驗證規則
-const rules: FormRules = {
-  oldPassword: [
-    { required: true, message: "請輸入舊密碼", trigger: "blur" }
-  ],
-  newPassword: [
-    { required: true, message: "請輸入新密碼", trigger: "blur" },
-    { min: 8, message: "密碼至少 8 個字元", trigger: "blur" },
-    { 
-      pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
-      message: "密碼需包含大小寫字母與數字",
-      trigger: "blur"
+  
+  const rules: FormRules = {
+    oldPassword: [{ required: true, message: '請輸入舊密碼', trigger: 'blur' }],
+    newPassword: [
+      { required: true, message: '請輸入新密碼', trigger: 'blur' },
+      { min: 6, message: '密碼長度至少 6 字元', trigger: 'blur' }
+    ],
+    confirmPassword: [
+      { required: true, message: '請再次輸入新密碼', trigger: 'blur' },
+      { validator: validateConfirmPassword, trigger: 'blur' }
+    ]
+  }
+  
+  const validateConfirmPassword = (rule: any, value: string, callback: any) => {
+    if (value !== formData.newPassword) {
+      callback(new Error('兩次輸入的密碼不一致'))
+    } else {
+      callback()
     }
-  ],
-  confirmPassword: [
-    { required: true, message: "請確認新密碼", trigger: "blur" },
-    {
-      validator: (rule, value, callback) => {
-        if (value !== formData.newPassword) {
-          callback(new Error("兩次密碼輸入不一致"))
-        } else {
-          callback()
-        }
-      },
-      trigger: "blur"
+  }
+  
+  return { formRef, formData, rules }
+}
+```
+
+**替代方案**:
+- ❌ 手動驗證邏輯：重複造輪子，維護成本高
+- ❌ 第三方驗證庫（如 Vuelidate）：引入額外依賴，Element Plus 已足夠
+
+---
+
+### 4. 選單權限控制實作
+
+**研究問題**: 如何實作「根據權限顯示/隱藏選單項目」？
+
+**調查結果**:
+- 專案已有權限管理機制（`useUserStore` 的 `permissions`）
+- 動態路由配置支援 `permissions` 與 `roles` 屬性
+- 側邊欄選單（Sidebar）已實作權限過濾
+
+**決策**: 
+- **個人資料頁面無需權限檢查**（所有登入用戶可存取）
+- **NavigationBar 下拉選單項目**：不需特殊權限判斷
+- **既有選單權限過濾**：檢查 Sidebar 元件邏輯，確保已正確實作
+
+**技術實作**:
+```typescript
+// 路由配置（個人資料頁面）
+{
+  path: "/profile",
+  component: Layouts,
+  meta: { hidden: true },  // 不顯示在側邊欄
+  children: [{
+    path: "",
+    component: () => import("@/pages/profile/index.vue"),
+    name: "UserProfile",
+    meta: { 
+      title: { zhTW: "個人資訊", en: "Profile" },
+      titleKey: "userProfile"
+      // 無 permissions 屬性 = 所有人可存取
     }
-  ]
+  }]
 }
 ```
 
+**Best Practices**:
+- 個人資料頁面使用 `hidden: true`，不在側邊欄顯示
+- 透過 NavigationBar 下拉選單進入（類似「登出」按鈕位置）
+- 若未來需要權限控制，可新增 `permissions: ["profile.read"]`
+
+**替代方案**:
+- ❌ 為個人資料頁面設定權限：不必要，所有用戶都應能查看自己的資料
+- ❌ 手動檢查權限：路由守衛已處理，重複實作
+
 ---
 
-## 3. Session 失效機制前端處理策略
+### 5. UI/UX 設計決策
 
-### Decision
-密碼修改成功後，前端保持當前 session (不登出)，顯示成功訊息。其他裝置 session 由後端處理 (invalidate tokens)，前端 401 錯誤攔截器會自動導向登入頁。
+**研究問題**: 個人資料頁面與密碼修改功能的 UI 佈局？
 
-### Rationale
-- **符合需求 FR-006-1**: 密碼修改後，其他裝置 session 失效，當前 session 保留
-- **後端負責**: Token invalidation 由後端執行，前端無需主動處理
-- **既有機制**: 專案已有 Axios 攔截器處理 401，自動清除 token 並導向登入頁
-- **用戶體驗**: 當前操作者不需重新登入，體驗流暢
+**調查結果**:
+- Element Plus 提供 `el-card`、`el-descriptions`、`el-form` 等元件
+- 專案已有類似佈局：用戶管理頁面（表格 + 表單對話框）
+- 需求強調「單頁設計，無需跳轉」
 
-### Alternatives Considered
-1. **前端主動登出所有 session**: 密碼修改後登出當前用戶
-   - **Rejected**: 違反需求，當前 session 應保留
-2. **前端輪詢檢查 token 有效性**: 定期檢查 token
-   - **Rejected**: 不必要的複雜性，後端 401 機制已足夠
+**決策**: 
+- **雙卡片佈局**：
+  1. **用戶資訊卡片**（`UserInfoCard.vue`）：
+     - 使用 `el-descriptions` 顯示帳號、顯示名稱、角色
+     - 唯讀展示，無編輯功能
+  2. **密碼修改卡片**（`ChangePasswordForm.vue`）：
+     - 使用 `el-form` 包含三個密碼輸入欄位
+     - 提交按鈕與重置按鈕
 
-### Implementation Notes
-```typescript
-// 密碼修改成功處理
-async function handlePasswordChange() {
-  const response = await changePassword(userId, formData, version)
-  
-  if (response.success) {
-    ElMessage.success("密碼修改成功")
-    // 不執行登出，保持當前 session
-    // 其他裝置會在下次請求時收到 401 並自動登出
-  } else if (response.code === "OLD_PASSWORD_INCORRECT") {
-    ElMessage.error("舊密碼不正確")
-  } else if (response.code === "SAME_AS_OLD_PASSWORD") {
-    ElMessage.warning("新密碼與舊密碼相同")
-  }
-}
+- **響應式設計**：
+  - 桌面：左右並排（60% + 40%）
+  - 平板/手機：上下堆疊
+
+**視覺設計**:
+```vue
+<template>
+  <div class="profile-page">
+    <el-row :gutter="20">
+      <el-col :xs="24" :sm="24" :md="14">
+        <UserInfoCard />
+      </el-col>
+      <el-col :xs="24" :sm="24" :md="10">
+        <ChangePasswordForm />
+      </el-col>
+    </el-row>
+  </div>
+</template>
 ```
 
----
+**Best Practices**:
+- 使用 Element Plus 柵格系統（`el-row` + `el-col`）
+- 遵循專案現有樣式變數（`--v3-*`）
+- 提供 loading 狀態與錯誤提示
 
-## 4. 選單權限動態顯示實作方案
-
-### Decision
-使用 router helper 函式過濾選單項目，根據用戶 permissions 陣列決定是否顯示。路由定義中加入 `meta.permission` 欄位，選單渲染時檢查用戶是否擁有該權限。
-
-### Rationale
-- **集中管理**: 權限邏輯集中在 router 層級，易於維護
-- **既有機制**: 專案已有 `v-permission` 指令處理按鈕權限，選單採用類似邏輯
-- **權限資料來源**: Pinia store 中的 `profile.permissions` 陣列
-- **效能**: 選單僅在登入時或權限變更時重新計算，無需頻繁檢查
-
-### Alternatives Considered
-1. **元件層級檢查**: 每個選單項目自行檢查權限
-   - **Rejected**: 分散邏輯，難以維護
-2. **後端回傳選單結構**: API 直接回傳用戶可見選單
-   - **Rejected**: 增加後端負擔，前端失去彈性
-
-### Implementation Notes
-```typescript
-// @/router/helper.ts
-export function filterMenusByPermission(
-  routes: RouteRecordRaw[],
-  userPermissions: string[]
-): RouteRecordRaw[] {
-  return routes.filter(route => {
-    const permission = route.meta?.permission
-    if (!permission) return true // 無權限要求則顯示
-    return userPermissions.includes(permission)
-  })
-}
-
-// @/layouts/components/Sidebar.vue
-const visibleRoutes = computed(() => {
-  const permissions = userStore.profile?.permissions || []
-  return filterMenusByPermission(routes, permissions)
-})
-```
+**替代方案**:
+- ❌ 單卡片 + 選項卡：增加操作步驟
+- ❌ 密碼修改使用對話框：與「單頁設計」需求不符
 
 ---
 
-## 5. 錯誤處理與用戶回饋設計
+## Technology Choices Summary
 
-### Decision
-使用 Element Plus Message 元件顯示操作結果，錯誤訊息根據後端回應碼 (`code`) 對應顯示繁體中文訊息。
-
-### Rationale
-- **一致性**: 專案既有使用 `ElMessage` 作為通知元件
-- **業務錯誤碼對應**: 後端 API 回傳標準 `ApiResponseModel` 包含 `code` 與 `message`，前端對應顯示友善訊息
-- **用戶體驗**: 明確告知操作結果與失敗原因
-
-### Error Code Mapping
-
-| Backend Code | Frontend Message | Message Type |
-|--------------|------------------|--------------|
-| `SUCCESS` / `success: true` | 「操作成功」或功能特定訊息 | success |
-| `VALIDATION_ERROR` | 「輸入資料驗證失敗」 | error |
-| `UNAUTHORIZED` | 「未授權，請重新登入」 | error |
-| `OLD_PASSWORD_INCORRECT` | 「舊密碼不正確」 | error |
-| `SAME_AS_OLD_PASSWORD` | 「新密碼與舊密碼相同」 | warning |
-| `CONCURRENT_UPDATE_CONFLICT` | 「資料已被修改，請重新整理」 | error |
-| `NOT_FOUND` | 「找不到用戶資料」 | error |
-| Network Error | 「網路連線錯誤，請稍後再試」 | error |
-
-### Implementation Notes
-```typescript
-// 統一錯誤處理函式
-function handleApiError(response: ApiResponse<any>) {
-  const codeMessageMap: Record<string, string> = {
-    VALIDATION_ERROR: "輸入資料驗證失敗",
-    UNAUTHORIZED: "未授權，請重新登入",
-    OLD_PASSWORD_INCORRECT: "舊密碼不正確",
-    SAME_AS_OLD_PASSWORD: "新密碼與舊密碼相同",
-    CONCURRENT_UPDATE_CONFLICT: "資料已被修改，請重新整理",
-    NOT_FOUND: "找不到用戶資料"
-  }
-  
-  const message = codeMessageMap[response.code] || response.message || "操作失敗"
-  const type = response.code === "SAME_AS_OLD_PASSWORD" ? "warning" : "error"
-  
-  ElMessage({ message, type })
-}
-```
+| 決策項目 | 選擇 | 原因 |
+|---------|------|------|
+| API 整合 | 擴展現有 API 型別 | 避免重複，遵循 DRY 原則 |
+| 併發控制 | version 欄位 + 409 錯誤處理 | 遵循後端 API 規格 |
+| Session 管理 | 後端負責，前端僅提示 | 職責分離，架構合理 |
+| 表單驗證 | Element Plus 原生驗證 | 充分利用現有工具，避免過度工程化 |
+| 狀態管理 | 組合式函式 + Pinia | 遵循 Vue 3 最佳實踐 |
+| UI 佈局 | 雙卡片響應式設計 | 平衡桌面與移動端體驗 |
+| 權限控制 | 無特殊權限（所有用戶可存取） | 個人資料屬於基本功能 |
+| 路由配置 | `hidden: true` 不顯示在側邊欄 | 透過 NavigationBar 進入 |
 
 ---
 
-## 總結
+## Resolved Clarifications
 
-### 關鍵技術決策
-1. **API 整合**: 使用 `/api/Account/me` 與 `/api/Account/{id}/password`，資料快取於 Pinia
-2. **密碼修改**: 獨立頁面或對話框，前端基本驗證 + 後端安全驗證
-3. **Session 管理**: 後端處理 token invalidation，前端既有 401 攔截器處理
-4. **選單權限**: Router helper 過濾，根據 `profile.permissions` 動態顯示
-5. **錯誤處理**: 標準 `ElMessage`，業務錯誤碼對應繁體中文訊息
+所有 Technical Context 中的 NEEDS CLARIFICATION 已解決：
 
-### 無需進一步研究項目
-- 既有架構已完整支援所需功能
-- Vue 3 + Element Plus 生態系穩定成熟
-- Pinia 狀態管理符合需求
-- 專案規範明確，無技術不確定性
+✅ **Primary Dependencies**: Vue 3.5, Element Plus, Pinia, Axios - 所有依賴已確認  
+✅ **Testing Strategy**: Vitest 單元測試 + 元件測試 - 測試策略已定義  
+✅ **Performance Goals**: 頁面載入 < 3 秒，互動回應 < 500ms - 目標已確認  
+✅ **Constraints**: 併發控制透過 version 欄位實作 - 實作策略已確定  
+✅ **Scope**: 單一功能頁面，3-5 個元件，500-800 行程式碼 - 範圍已明確
 
-### 下一步
-進入 Phase 1：設計資料模型與 API 契約
+---
+
+## Next Steps (Phase 1)
+
+1. 建立 `data-model.md`：定義資料實體與狀態管理結構
+2. 建立 `contracts/api-contracts.md`：定義前端 API 介面合約
+3. 建立 `quickstart.md`：提供開發者快速上手指南
+4. 更新 AI Agent Context（Copilot 指示）
+
+**Phase 0 Complete** ✅

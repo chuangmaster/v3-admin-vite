@@ -1,409 +1,481 @@
-# API Contracts: 用戶個人資料與選單權限管理
+# API Contracts: 用戶個人資料與密碼管理
 
-**Date**: 2026-01-16  
+**Date**: 2026-01-19  
 **Feature**: 004-user-profile  
-**Backend API Spec**: http://localhost:5176/swagger/v1/swagger.json
+**Status**: ✅ Complete
+
+## Overview
+
+本文件定義前端與後端 API 的介面合約，確保雙方對資料格式、錯誤處理與業務邏輯的一致理解。所有 API 遵循 `V3.Admin.Backend.API.yaml` 規格。
 
 ---
 
-## 概述
+## API Endpoints
 
-本文件定義前端與後端 API 的契約規範，所有端點均遵循後端 OpenAPI 規格 (V3.Admin.Backend.API.yaml)。
+### 1. 取得當前用戶資訊
 
----
+**Endpoint**: `GET /api/Account/me`
 
-## 1. 查詢當前用戶個人資料
+**描述**: 取得當前登入用戶的完整個人資料，包含帳號、顯示名稱、角色、權限與版本號。
 
-### Endpoint
-```
-GET /api/Account/me
-```
+**Authorization**: ✅ Required (JWT Bearer Token)
 
-### 描述
-允許已登入用戶查詢自己的個人資料，包含用戶名稱、顯示名稱和角色清單。
+#### Request
 
-### 權限
-- **需要**: `user.profile.read`
-- **Authentication**: JWT Bearer Token
-
-### Request
-
-#### Headers
-```
-Authorization: Bearer {jwt_token}
-```
-
-#### Query Parameters
-無
-
-#### Request Body
-無
-
-### Response
-
-#### Success (200 OK)
-```typescript
-{
-  "success": true,
-  "code": "SUCCESS",
-  "message": "查詢成功",
-  "data": {
-    "account": "admin",           // 帳號
-    "displayName": "管理員",      // 顯示名稱
-    "roles": ["系統管理員"],      // 角色名稱清單
-    "permissions": [              // 權限代碼清單 (聚合所有角色權限，去重)
-      "user.read",
-      "user.create",
-      "permission.read"
-    ]
-  },
-  "timestamp": "2026-01-16T10:30:00Z",
-  "traceId": "abc123"
-}
-```
-
-**Data Schema**: `UserProfileResponse`
-- `account`: string | null - 帳號
-- `displayName`: string | null - 顯示名稱
-- `roles`: string[] - 角色名稱清單 (若無角色則為空陣列)
-- `permissions`: string[] - 權限代碼清單 (若無權限則為空陣列)
-
-#### Error Responses
-
-**401 Unauthorized** - Token 無效、過期或用戶已停用
-```typescript
-{
-  "success": false,
-  "code": "UNAUTHORIZED",
-  "message": "未授權 - Token 無效、過期或用戶已停用",
-  "data": null,
-  "timestamp": "2026-01-16T10:30:00Z",
-  "traceId": "abc123"
-}
-```
-
-**403 Forbidden** - 無 `user.profile.read` 權限
-```typescript
-{
-  "success": false,
-  "code": "FORBIDDEN",
-  "message": "禁止存取 - 無 user.profile.read 權限",
-  "data": null,
-  "timestamp": "2026-01-16T10:30:00Z",
-  "traceId": "abc123"
-}
-```
-
-**404 Not Found** - 用戶不存在
-```typescript
-{
-  "success": false,
-  "code": "NOT_FOUND",
-  "message": "用戶不存在",
-  "data": null,
-  "timestamp": "2026-01-16T10:30:00Z",
-  "traceId": "abc123"
-}
-```
-
-### 前端處理邏輯
-
-```typescript
-// @/common/apis/account/profile.ts
-export async function getUserProfile(): Promise<ApiResponse<UserProfileResponse>> {
-  return request({
-    url: "/api/Account/me",
-    method: "GET"
-  })
-}
-
-// 使用範例
-try {
-  const response = await getUserProfile()
-  if (response.success && response.data) {
-    userStore.profile = response.data
-  } else {
-    ElMessage.error(response.message || "載入個人資料失敗")
-  }
-} catch (error) {
-  console.error("getUserProfile error:", error)
-  ElMessage.error("網路連線錯誤")
-}
-```
-
----
-
-## 2. 變更密碼
-
-### Endpoint
-```
-PUT /api/Account/{id}/password
-```
-
-### 描述
-變更指定帳號的密碼，需要提供舊密碼與新密碼。變更成功後，該用戶的其他 session 將失效。
-
-### 權限
-- **需要**: 用戶本人或具有 `user.update` 權限
-- **Authentication**: JWT Bearer Token
-
-### Request
-
-#### Path Parameters
-- `id` (string, required): 帳號 ID (UUID 格式)
-
-#### Query Parameters
-- `version` (integer, optional): 版本號 (預設 1，用於樂觀並發控制)
-
-#### Headers
-```
-Authorization: Bearer {jwt_token}
+**Headers**:
+```http
+Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 ```
 
-#### Request Body
-```typescript
-{
-  "oldPassword": "OldPass123",
-  "newPassword": "NewPass456"
-}
-```
+**Query Parameters**: 無
 
-**Schema**: `ChangePasswordRequest`
-- `oldPassword`: string (required) - 舊密碼
-- `newPassword`: string (required) - 新密碼
+**Request Body**: 無
 
-### Response
+---
 
-#### Success (200 OK)
-```typescript
+#### Response
+
+**Success (200 OK)**:
+```json
 {
   "success": true,
   "code": "SUCCESS",
-  "message": "變更成功",
-  "data": null,
-  "timestamp": "2026-01-16T10:35:00Z",
-  "traceId": "def456"
+  "message": "操作成功",
+  "data": {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "account": "john.doe",
+    "displayName": "John Doe",
+    "roles": ["Admin", "User"],
+    "permissions": [
+      "account.read",
+      "account.write",
+      "permission.read",
+      "role.read"
+    ],
+    "version": 5
+  },
+  "timestamp": "2026-01-19T10:30:00.000Z",
+  "traceId": "abc123def456"
 }
 ```
 
-#### Error Responses
+**Error Responses**:
 
-**400 Bad Request** - 輸入驗證錯誤
-```typescript
+| Status Code | Code | Message | 處理方式 |
+|------------|------|---------|---------|
+| 401 Unauthorized | `UNAUTHORIZED` | "未授權或 Token 已過期" | 重導至登入頁面 |
+| 500 Internal Server Error | `INTERNAL_ERROR` | "伺服器內部錯誤" | 顯示通用錯誤訊息 |
+
+**Error Response Example (401)**:
+```json
 {
   "success": false,
-  "code": "VALIDATION_ERROR",
-  "message": "輸入驗證錯誤",
+  "code": "UNAUTHORIZED",
+  "message": "未授權或 Token 已過期",
   "data": null,
-  "timestamp": "2026-01-16T10:35:00Z",
-  "traceId": "def456"
+  "timestamp": "2026-01-19T10:30:00.000Z",
+  "traceId": "xyz789abc123"
 }
 ```
 
-**401 Unauthorized** - 未授權或舊密碼錯誤
+---
+
+#### Frontend Integration
+
+**API Function** (`@/common/apis/users/index.ts`):
 ```typescript
+import type { UserProfile } from '@/pages/profile/types'
+import { request } from '@/http/axios'
+
+/** 取得當前登入用戶詳情 */
+export function getCurrentUserApi() {
+  return request<ApiResponse<UserProfile>>({
+    url: '/Account/me',
+    method: 'get'
+  })
+}
+```
+
+**Usage Example**:
+```typescript
+// 在組合式函式中使用
+const fetchUserProfile = async () => {
+  loading.value = true
+  error.value = null
+  
+  try {
+    const response = await getCurrentUserApi()
+    if (response.success) {
+      userInfo.value = response.data
+    } else {
+      error.value = response.message
+    }
+  } catch (err: any) {
+    if (err.response?.status === 401) {
+      // 重導至登入頁面
+      router.push('/login')
+    } else {
+      error.value = '載入用戶資料失敗，請稍後再試'
+    }
+  } finally {
+    loading.value = false
+  }
+}
+```
+
+---
+
+### 2. 修改密碼
+
+**Endpoint**: `PUT /api/Account/{id}/password`
+
+**描述**: 更新指定用戶的密碼，需提供舊密碼驗證與版本號進行併發控制。
+
+**Authorization**: ✅ Required (JWT Bearer Token)
+
+#### Request
+
+**Path Parameters**:
+| 參數 | 型別 | 描述 | 範例 |
+|-----|------|------|------|
+| `id` | `string` (UUID) | 用戶 ID（來自 `/api/Account/me` 回應） | `3fa85f64-5717-4562-b3fc-2c963f66afa6` |
+
+**Headers**:
+```http
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+```
+
+**Request Body**:
+```json
 {
-  "success": false,
-  "code": "OLD_PASSWORD_INCORRECT", // 或 "UNAUTHORIZED"
-  "message": "未授權或舊密碼錯誤",
-  "data": null,
-  "timestamp": "2026-01-16T10:35:00Z",
-  "traceId": "def456"
+  "oldPassword": "CurrentP@ssw0rd",
+  "newPassword": "NewSecureP@ss123",
+  "version": 5
 }
 ```
 
-**404 Not Found** - 帳號不存在
-```typescript
+**Field Descriptions**:
+| 欄位 | 型別 | 必填 | 描述 | 驗證規則 |
+|-----|------|------|------|---------|
+| `oldPassword` | `string` | ✅ | 當前密碼 | 必填，後端驗證正確性 |
+| `newPassword` | `string` | ✅ | 新密碼 | 必填，後端驗證強度規則 |
+| `version` | `number` | ✅ | 資料版本號 | 整數，用於併發控制 |
+
+---
+
+#### Response
+
+**Success (200 OK)**:
+```json
 {
-  "success": false,
-  "code": "NOT_FOUND",
-  "message": "帳號不存在",
+  "success": true,
+  "code": "SUCCESS",
+  "message": "密碼修改成功",
   "data": null,
-  "timestamp": "2026-01-16T10:35:00Z",
-  "traceId": "def456"
+  "timestamp": "2026-01-19T10:35:00.000Z",
+  "traceId": "def456ghi789"
 }
 ```
 
-**409 Conflict** - 並發更新衝突
-```typescript
+**Error Responses**:
+
+| Status Code | Code | Message | 描述 | 前端處理 |
+|------------|------|---------|------|---------|
+| 400 Bad Request | `VALIDATION_ERROR` | "新密碼不符合安全規範" | 密碼強度不足 | 顯示具體錯誤訊息 |
+| 401 Unauthorized | `INVALID_OLD_PASSWORD` | "舊密碼不正確" | 舊密碼驗證失敗 | 提示用戶重新輸入 |
+| 409 Conflict | `CONCURRENT_UPDATE_CONFLICT` | "資料已被修改，請重新整理" | 版本號不匹配 | 重新載入用戶資料 |
+| 500 Internal Server Error | `INTERNAL_ERROR` | "伺服器內部錯誤" | 未預期錯誤 | 顯示通用錯誤訊息 |
+
+**Error Response Example (409 Conflict)**:
+```json
 {
   "success": false,
   "code": "CONCURRENT_UPDATE_CONFLICT",
-  "message": "並發更新衝突",
+  "message": "資料已被修改，請重新整理後再試",
   "data": null,
-  "timestamp": "2026-01-16T10:35:00Z",
-  "traceId": "def456"
+  "timestamp": "2026-01-19T10:35:00.000Z",
+  "traceId": "ghi789jkl012"
 }
 ```
 
-**422 Unprocessable Entity** - 新密碼與舊密碼相同
-```typescript
+**Error Response Example (401 Invalid Password)**:
+```json
 {
   "success": false,
-  "code": "SAME_AS_OLD_PASSWORD",
-  "message": "新密碼與舊密碼相同",
+  "code": "INVALID_OLD_PASSWORD",
+  "message": "舊密碼不正確，請重新輸入",
   "data": null,
-  "timestamp": "2026-01-16T10:35:00Z",
-  "traceId": "def456"
+  "timestamp": "2026-01-19T10:35:00.000Z",
+  "traceId": "jkl012mno345"
 }
 ```
 
-### 前端處理邏輯
+---
 
+#### Frontend Integration
+
+**API Function** (`@/pages/user-management/apis/user.ts`):
 ```typescript
-// @/common/apis/account/profile.ts
+import type { ChangePasswordRequest } from '@/pages/profile/types'
+import { request } from '@/http/axios'
+
+/**
+ * 變更密碼
+ * @param request - 變更密碼請求資料（包含 id, oldPassword, newPassword, version）
+ * @returns 變更結果（data 為 null）
+ */
 export async function changePassword(
-  id: string,
-  data: ChangePasswordRequest,
-  version: number = 1
+  request: ChangePasswordRequest
 ): Promise<ApiResponse<null>> {
-  return request({
-    url: `/api/Account/${id}/password?version=${version}`,
-    method: "PUT",
-    data
+  const { id, ...data } = request
+  return request({ 
+    url: `/account/${id}/password`, 
+    method: 'PUT', 
+    data 
   })
 }
+```
 
-// 使用範例
-async function handleChangePassword(formData: ChangePasswordFormData) {
-  // 前端驗證
-  if (formData.newPassword !== formData.confirmPassword) {
-    ElMessage.error("兩次密碼輸入不一致")
-    return
-  }
-
+**Usage Example**:
+```typescript
+// 在組合式函式中使用
+const handleSubmit = async (userId: string, version: number) => {
+  // 表單驗證
+  const isValid = await validateForm()
+  if (!isValid) return
+  
+  submitting.value = true
+  
   try {
-    const userId = userStore.profile?.id // 假設 profile 包含 id
-    const version = userStore.profile?.version || 1
-    
-    const response = await changePassword(
-      userId!,
-      {
-        oldPassword: formData.oldPassword,
-        newPassword: formData.newPassword
-      },
+    const response = await changePassword({
+      id: userId,
+      oldPassword: formData.oldPassword,
+      newPassword: formData.newPassword,
       version
-    )
-
+    })
+    
     if (response.success) {
-      ElMessage.success("密碼修改成功")
-      // 不執行登出，保持當前 session
+      ElMessage.success('密碼修改成功')
+      handleReset()
+      // 重新載入用戶資料
+      emit('password-changed')
     } else {
-      // 根據錯誤碼顯示對應訊息
-      switch (response.code) {
-        case "OLD_PASSWORD_INCORRECT":
-          ElMessage.error("舊密碼不正確")
-          break
-        case "SAME_AS_OLD_PASSWORD":
-          ElMessage.warning("新密碼與舊密碼相同")
-          // 允許繼續，不阻擋提交
-          break
-        case "CONCURRENT_UPDATE_CONFLICT":
-          ElMessage.error("資料已被修改，請重新整理")
-          break
-        default:
-          ElMessage.error(response.message || "密碼修改失敗")
-      }
+      ElMessage.error(response.message)
     }
-  } catch (error) {
-    console.error("changePassword error:", error)
-    ElMessage.error("網路連線錯誤")
+  } catch (err: any) {
+    const status = err.response?.status
+    const code = err.response?.data?.code
+    
+    if (status === 409 && code === 'CONCURRENT_UPDATE_CONFLICT') {
+      ElMessage.error('資料已被其他使用者修改，請重新整理後再試')
+      emit('refresh-required')
+    } else if (status === 401 && code === 'INVALID_OLD_PASSWORD') {
+      ElMessage.error('舊密碼不正確，請重新輸入')
+    } else {
+      ElMessage.error('密碼修改失敗，請稍後再試')
+    }
+  } finally {
+    submitting.value = false
   }
 }
 ```
 
 ---
 
-## 標準 API 回應格式
+## Data Type Specifications
 
-所有 API 端點均遵循統一的 `ApiResponseModel<T>` 格式：
+### TypeScript Type Definitions
 
 ```typescript
-interface ApiResponseModel<T = any> {
-  /** 操作是否成功 (通常與 HTTP 狀態碼對應) */
+// 位置：@/pages/profile/types.ts
+
+/** API 標準回應格式 */
+export interface ApiResponse<T> {
   success: boolean
-  
-  /** 業務邏輯代碼，用於細分不同的業務場景 */
   code: string
-  
-  /** 響應訊息 (繁體中文) */
   message: string
-  
-  /** 回應資料 (可為 null) */
-  data: T | null
-  
-  /** 回應時間戳記 (ISO 8601, UTC) */
+  data: T
   timestamp: string
-  
-  /** 分散式追蹤 ID */
   traceId: string
 }
+
+/** 用戶資料實體（對應 /api/Account/me 回應） */
+export interface UserProfile {
+  id: string                // UUID v4
+  account: string           // 用戶帳號
+  displayName: string       // 顯示名稱
+  roles: string[]           // 角色列表
+  permissions: string[]     // 權限列表
+  version: number           // 資料版本號
+}
+
+/** 密碼修改請求（對應 PUT /api/Account/{id}/password） */
+export interface ChangePasswordRequest {
+  oldPassword: string       // 當前密碼
+  newPassword: string       // 新密碼
+  version: number           // 資料版本號
+}
+
+/** 密碼修改表單（含前端驗證欄位） */
+export interface ChangePasswordFormData {
+  oldPassword: string
+  newPassword: string
+  confirmPassword: string   // 僅用於前端驗證，不傳送至後端
+}
 ```
-
-### 業務錯誤碼清單
-
-| Code | HTTP Status | Description | Frontend Action |
-|------|-------------|-------------|-----------------|
-| `SUCCESS` | 200/201 | 操作成功 | 顯示成功訊息 |
-| `VALIDATION_ERROR` | 400 | 輸入驗證錯誤 | 顯示驗證錯誤訊息 |
-| `UNAUTHORIZED` | 401 | 未授權 | 導向登入頁 |
-| `FORBIDDEN` | 403 | 禁止存取 | 顯示權限不足訊息 |
-| `NOT_FOUND` | 404 | 資源不存在 | 顯示找不到訊息 |
-| `CONCURRENT_UPDATE_CONFLICT` | 409 | 並發衝突 | 提示重新載入 |
-| `SAME_AS_OLD_PASSWORD` | 422 | 新舊密碼相同 | 顯示警告 (不阻擋) |
-| `OLD_PASSWORD_INCORRECT` | 401 | 舊密碼錯誤 | 標記欄位錯誤 |
 
 ---
 
-## 前端 Axios 請求攔截器配置
+## Business Rules
 
+### 1. 密碼強度規則（後端實作）
+
+**預期規則**（根據一般實務）:
+- 最小長度：6 字元
+- 必須包含：字母與數字
+- 可選：特殊字元（`@`, `#`, `$`, `%`, `&`, `*`）
+- 禁止：與舊密碼相同（後端警告，但允許設定）
+
+**前端驗證** (部分規則前置檢查):
 ```typescript
-// @/http/axios.ts
+{
+  min: 6,
+  pattern: /^(?=.*[A-Za-z])(?=.*\d).+$/,
+  message: '密碼至少 6 字元，且包含字母與數字'
+}
+```
 
-// Request Interceptor
-request.interceptors.request.use(
-  (config) => {
-    const token = userStore.token
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => Promise.reject(error)
-)
+**後端驗證** (完整規則):
+- 檢查密碼強度（複雜度）
+- 檢查是否與舊密碼相同（可選警告）
+- 檢查是否為常見弱密碼（如 `123456`）
 
-// Response Interceptor
-request.interceptors.response.use(
-  (response) => response.data, // 直接回傳 ApiResponseModel
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token 失效，清除用戶資料並導向登入頁
-      userStore.clearUser()
-      router.push("/login")
+---
+
+### 2. 併發控制規則
+
+**樂觀鎖機制**:
+1. 前端從 `/api/Account/me` 取得 `version` 值
+2. 用戶修改密碼時，將 `version` 一併傳送
+3. 後端比對資料庫版本號：
+   - **一致** → 執行更新 → 版本號 +1
+   - **不一致** → 拒絕更新 → 回傳 `409 Conflict`
+4. 前端處理衝突：
+   - 顯示錯誤訊息
+   - 重新載入用戶資料（取得最新 `version`）
+   - 提示用戶重新提交
+
+**衝突場景**:
+- 同一用戶在多個裝置同時修改密碼
+- 系統管理員與用戶同時修改同一帳號
+
+---
+
+### 3. Session 管理規則
+
+**密碼修改後的 Session 處理**:
+- **當前 Session**（修改密碼的裝置）：保持登入狀態
+- **其他 Session**（其他裝置/瀏覽器）：失效，需重新登入
+
+**實作方式**（後端負責）:
+- 方案 A：JWT Token 黑名單（記錄失效的 Token）
+- 方案 B：更新 Token Secret（使所有舊 Token 失效，發放新 Token 給當前裝置）
+- 方案 C：Session ID 管理（記錄所有 Session，失效除當前外的所有 Session）
+
+**前端職責**:
+- 修改成功後顯示提示：「密碼已更新，其他裝置需重新登入」
+- 無需額外邏輯（後端自動處理）
+
+---
+
+## Error Handling Matrix
+
+| 場景 | HTTP Status | Error Code | 前端處理 | 用戶提示 |
+|-----|------------|------------|---------|---------|
+| 舊密碼錯誤 | 401 | `INVALID_OLD_PASSWORD` | 清空密碼欄位，焦點回到舊密碼欄位 | "舊密碼不正確，請重新輸入" |
+| 新密碼強度不足 | 400 | `VALIDATION_ERROR` | 高亮新密碼欄位，顯示具體規則 | "密碼至少 6 字元，需包含字母與數字" |
+| 併發衝突 | 409 | `CONCURRENT_UPDATE_CONFLICT` | 重新載入用戶資料，清空表單 | "資料已被修改，請重新整理後再試" |
+| Token 過期 | 401 | `UNAUTHORIZED` | 重導至登入頁面 | "登入已過期，請重新登入" |
+| 網路錯誤 | - | - | 顯示重試按鈕 | "網路連線異常，請檢查網路後重試" |
+| 伺服器錯誤 | 500 | `INTERNAL_ERROR` | 記錄錯誤日誌，顯示通用訊息 | "系統暫時無法處理，請稍後再試" |
+
+---
+
+## Testing Scenarios
+
+### API 整合測試
+
+**Test Case 1: 取得用戶資料成功**
+```typescript
+describe('GET /api/Account/me', () => {
+  it('should return user profile with version', async () => {
+    const response = await getCurrentUserApi()
+    
+    expect(response.success).toBe(true)
+    expect(response.data).toHaveProperty('id')
+    expect(response.data).toHaveProperty('version')
+    expect(typeof response.data.version).toBe('number')
+  })
+})
+```
+
+**Test Case 2: 修改密碼成功**
+```typescript
+describe('PUT /api/Account/{id}/password', () => {
+  it('should change password successfully', async () => {
+    const userId = 'test-user-id'
+    const request: ChangePasswordRequest = {
+      oldPassword: 'OldPass123',
+      newPassword: 'NewPass456',
+      version: 1
     }
-    return Promise.reject(error)
-  }
-)
+    
+    const response = await changePassword(userId, request)
+    
+    expect(response.success).toBe(true)
+    expect(response.message).toContain('成功')
+  })
+})
+```
+
+**Test Case 3: 併發衝突處理**
+```typescript
+describe('Concurrent Update Handling', () => {
+  it('should handle 409 conflict error', async () => {
+    const userId = 'test-user-id'
+    const request: ChangePasswordRequest = {
+      oldPassword: 'OldPass123',
+      newPassword: 'NewPass456',
+      version: 1  // 過期的版本號
+    }
+    
+    try {
+      await changePassword(userId, request)
+      fail('Should throw error')
+    } catch (error: any) {
+      expect(error.response.status).toBe(409)
+      expect(error.response.data.code).toBe('CONCURRENT_UPDATE_CONFLICT')
+    }
+  })
+})
 ```
 
 ---
 
-## 總結
+## API Contract Checklist
 
-### API 端點清單
-1. **GET /api/Account/me**: 查詢當前用戶個人資料
-2. **PUT /api/Account/{id}/password**: 變更密碼
+✅ **所有 API 遵循 `ApiResponseModel<T>` 格式**  
+✅ **使用 JWT Bearer Token 認證（除 `/api/auth/login`）**  
+✅ **錯誤代碼定義明確（`SUCCESS`, `VALIDATION_ERROR`, `UNAUTHORIZED`, `CONCURRENT_UPDATE_CONFLICT`）**  
+✅ **併發控制使用 `version` 欄位**  
+✅ **分頁參數標準化（本功能不涉及分頁）**  
+✅ **請求/回應型別與 Schema 定義一致**  
+✅ **不假設或發明未在規格中的 API 行為**  
+✅ **API 需求不明確時，優先參考規格文件**
 
-### 關鍵約定
-- **認證方式**: JWT Bearer Token (所有端點除 `/api/Auth/login` 外均需要)
-- **回應格式**: 統一使用 `ApiResponseModel<T>`
-- **錯誤處理**: 根據 `code` 欄位對應前端訊息
-- **時區**: 所有時間戳記使用 UTC (ISO 8601 格式)
-- **樂觀鎖定**: 修改操作需帶 `version` 參數
+---
 
-### 前端實作要點
-- 所有 API 呼叫均透過 `@/http/axios` 的 `request` 函式
-- 統一錯誤處理於 Axios 攔截器
-- 業務錯誤碼對應繁體中文訊息於元件層級
-- Session 失效自動導向登入頁 (401 攔截器)
+**Phase 1.2 Complete** ✅  
+**Next**: 建立 `quickstart.md`

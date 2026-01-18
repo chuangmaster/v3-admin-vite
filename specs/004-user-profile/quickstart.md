@@ -1,650 +1,660 @@
-# Quickstart Guide: 用戶個人資料與選單權限管理
+# Quickstart Guide: 用戶個人資料與密碼管理
 
-**Date**: 2026-01-16  
+**Date**: 2026-01-19  
 **Feature**: 004-user-profile  
-**Target Audience**: 開發者
+**Status**: ✅ Complete
+
+## Overview
+
+本指南提供開發者快速上手「用戶個人資料與密碼管理」功能的開發、測試與部署流程。
 
 ---
 
-## 概述
+## Prerequisites
 
-本指南提供用戶個人資料功能的快速入門，包含開發環境設定、核心功能實作步驟與測試方法。
+**環境需求**:
+- Node.js 20+
+- pnpm 9+
+- Git
+- VS Code（推薦）
 
----
+**專案依賴**（已安裝）:
+- Vue 3.5+
+- Vite 7+
+- TypeScript 5.7+
+- Element Plus
+- Pinia
+- Vue Router
 
-## 前置需求
-
-### 環境
-- Node.js >= 18
-- pnpm >= 8
-- VS Code (推薦)
-
-### 專案依賴
-```json
-{
-  "vue": "^3.5.0",
-  "vue-router": "^4.0.0",
-  "pinia": "^2.0.0",
-  "element-plus": "^2.0.0",
-  "axios": "^1.0.0",
-  "@vueuse/core": "^10.0.0"
-}
-```
-
-### 後端 API
-確保後端服務已啟動並可存取：
-- **Base URL**: `http://localhost:5176`
-- **Swagger**: `http://localhost:5176/swagger`
-- **Test Account**: 使用既有測試帳號或建立新帳號
+**後端 API**（需確認可用）:
+- `GET /api/Account/me`
+- `PUT /api/Account/{id}/password`
 
 ---
 
-## 快速開始
+## Quick Start (5 分鐘)
 
-### 1. 安裝依賴
+### 1. Clone & Install
+
 ```bash
-cd d:\Repository\v3-admin-vite
+# Clone 專案（若尚未 clone）
+git clone <repository-url>
+cd v3-admin-vite
+
+# 切換至功能分支
+git checkout 004-user-profile
+
+# 安裝依賴
 pnpm install
 ```
 
-### 2. 啟動開發伺服器
+### 2. Start Development Server
+
 ```bash
+# 啟動開發伺服器
 pnpm dev
+
+# 伺服器將在 http://localhost:3000 啟動
 ```
 
-瀏覽器開啟 `http://localhost:5173`
+### 3. Access Profile Page
 
-### 3. 核心檔案結構
+1. 登入系統（`http://localhost:3000/login`）
+2. 點擊右上角用戶頭像
+3. 選擇「個人資訊」選單項目
+4. 進入個人資料頁面（`http://localhost:3000/profile`）
 
-```
+---
+
+## Project Structure
+
+```text
 src/
-├── common/
-│   ├── apis/account/
-│   │   └── profile.ts              # API 呼叫函式
-│   ├── components/UserProfile/
-│   │   ├── index.vue               # Profile 顯示元件
-│   │   └── ChangePasswordDialog.vue # 密碼修改對話框
-│   └── composables/
-│       └── useProfile.ts           # Profile 組合式函式
-├── layouts/components/
-│   └── Header.vue                  # Layout Header (修改)
-├── pages/profile/
-│   └── change-password.vue         # 密碼修改獨立頁面 (可選)
-├── pinia/stores/
-│   └── user.ts                     # User Store (擴充)
-└── router/
-    ├── guard.ts                    # 路由守衛 (修改)
-    └── helper.ts                   # 選單過濾邏輯 (修改)
+├── pages/
+│   └── profile/                      # 個人資料模組
+│       ├── index.vue                 # 📄 主頁面
+│       ├── components/               # 頁面元件
+│       │   ├── UserInfoCard.vue      # 用戶資訊卡片
+│       │   └── ChangePasswordForm.vue # 密碼修改表單
+│       ├── composables/              # 組合式函式
+│       │   ├── useUserProfile.ts     # 用戶資料邏輯
+│       │   └── useChangePassword.ts  # 密碼修改邏輯
+│       └── types.ts                  # 型別定義
+│
+├── layouts/components/NavigationBar/ # NavigationBar 元件
+├── common/apis/users/                # 用戶 API
+└── router/index.ts                   # 路由配置
+
+tests/
+└── pages/profile/                    # 測試檔案
+    ├── profile.test.ts
+    └── components/
 ```
 
 ---
 
-## 實作步驟
+## Development Workflow
 
-### Step 1: 建立 API 呼叫函式
+### Step 1: 建立型別定義
+
+**File**: `src/pages/profile/types.ts`
 
 ```typescript
-// @/common/apis/account/profile.ts
-
-import type { ApiResponse } from "@/types/api"
-import { request } from "@/http/axios"
-
-/** 用戶個人資料回應 */
-export interface UserProfileResponse {
-  /** 帳號 */
-  account: string | null
-  /** 顯示名稱 */
-  displayName: string | null
-  /** 角色名稱清單 */
+/** 用戶資料實體 */
+export interface UserProfile {
+  id: string
+  account: string
+  displayName: string
   roles: string[]
-  /** 權限代碼清單 */
   permissions: string[]
+  version: number
 }
 
-/** 變更密碼請求 */
-export interface ChangePasswordRequest {
+/** 密碼修改表單資料 */
+export interface ChangePasswordFormData {
   oldPassword: string
   newPassword: string
+  confirmPassword: string
 }
 
-/**
- * 查詢當前用戶個人資料
- */
-export async function getUserProfile(): Promise<ApiResponse<UserProfileResponse>> {
-  return request({
-    url: "/api/Account/me",
-    method: "GET"
-  })
-}
-
-/**
- * 變更密碼
- * @param id 用戶 ID
- * @param data 變更密碼請求
- * @param version 版本號 (預設 1)
- */
-export async function changePassword(
-  id: string,
-  data: ChangePasswordRequest,
-  version: number = 1
-): Promise<ApiResponse<null>> {
-  return request({
-    url: `/api/Account/${id}/password?version=${version}`,
-    method: "PUT",
-    data
-  })
+/** 密碼修改 API 請求 */
+export interface ChangePasswordRequest {
+  id: string
+  oldPassword: string
+  newPassword: string
+  version: number
 }
 ```
 
-### Step 2: 擴充 Pinia User Store
+---
+
+### Step 2: 建立用戶資料組合式函式
+
+**File**: `src/pages/profile/composables/useUserProfile.ts`
 
 ```typescript
-// @/pinia/stores/user.ts
+import { ref } from 'vue'
+import { getCurrentUserApi } from '@@/apis/users'
+import type { UserProfile } from '../types'
 
-import { defineStore } from "pinia"
-import { ref, computed } from "vue"
-import type { UserProfileResponse } from "@/common/apis/account/profile"
-import { getUserProfile, changePassword } from "@/common/apis/account/profile"
-import type { ChangePasswordRequest } from "@/common/apis/account/profile"
+export function useUserProfile() {
+  const userInfo = ref<UserProfile | null>(null)
+  const loading = ref(false)
+  const error = ref<string | null>(null)
 
-export const useUserStore = defineStore("user", () => {
-  // State
-  const token = ref<string | null>(localStorage.getItem("token"))
-  const profile = ref<UserProfileResponse | null>(null)
-  const profileLoading = ref(false)
-
-  // Getters
-  const isLoggedIn = computed(() => !!token.value)
-  const displayName = computed(() => profile.value?.displayName || profile.value?.account || "")
-  const permissions = computed(() => profile.value?.permissions || [])
-  const hasPermission = computed(() => (permission: string) => {
-    return permissions.value.includes(permission)
-  })
-
-  // Actions
-  async function fetchProfile() {
-    profileLoading.value = true
+  /** 載入用戶資料 */
+  const fetchUserProfile = async () => {
+    loading.value = true
+    error.value = null
+    
     try {
-      const response = await getUserProfile()
-      if (response.success && response.data) {
-        profile.value = response.data
+      const response = await getCurrentUserApi()
+      if (response.success) {
+        userInfo.value = response.data
+      } else {
+        error.value = response.message
       }
+    } catch (err: any) {
+      console.error('載入用戶資料失敗:', err)
+      error.value = '載入用戶資料失敗，請稍後再試'
     } finally {
-      profileLoading.value = false
+      loading.value = false
     }
   }
 
-  async function changeUserPassword(data: ChangePasswordRequest) {
-    if (!profile.value?.id) throw new Error("User ID not found")
-    
-    const response = await changePassword(
-      profile.value.id,
-      data,
-      profile.value.version || 1
-    )
-    
-    if (!response.success) {
-      throw new Error(response.message || "密碼修改失敗")
-    }
-  }
-
-  function clearUser() {
-    token.value = null
-    profile.value = null
-    localStorage.removeItem("token")
+  /** 重新載入用戶資料 */
+  const refreshProfile = async () => {
+    await fetchUserProfile()
   }
 
   return {
-    token,
-    profile,
-    profileLoading,
-    isLoggedIn,
-    displayName,
-    permissions,
-    hasPermission,
-    fetchProfile,
-    changeUserPassword,
-    clearUser
+    userInfo,
+    loading,
+    error,
+    fetchUserProfile,
+    refreshProfile
   }
-})
+}
 ```
 
-### Step 3: 建立 Profile 元件
+---
+
+### Step 3: 建立密碼修改組合式函式
+
+**File**: `src/pages/profile/composables/useChangePassword.ts`
+
+```typescript
+import { reactive, ref } from 'vue'
+import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessage } from 'element-plus'
+import { changePassword } from '@/pages/user-management/apis/user'
+import type { ChangePasswordFormData, ChangePasswordRequest } from '../types'
+
+export function useChangePasswordForm(emit: any) {
+  const formRef = ref<FormInstance>()
+  const submitting = ref(false)
+
+  const formData = reactive<ChangePasswordFormData>({
+    oldPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
+
+  /** 驗證確認密碼 */
+  const validateConfirmPassword = (rule: any, value: string, callback: any) => {
+    if (value !== formData.newPassword) {
+      callback(new Error('兩次輸入的密碼不一致'))
+    } else {
+      callback()
+    }
+  }
+
+  const rules: FormRules = {
+    oldPassword: [
+      { required: true, message: '請輸入舊密碼', trigger: 'blur' }
+    ],
+    newPassword: [
+      { required: true, message: '請輸入新密碼', trigger: 'blur' },
+      { min: 6, message: '密碼長度至少 6 字元', trigger: 'blur' }
+    ],
+    confirmPassword: [
+      { required: true, message: '請再次輸入新密碼', trigger: 'blur' },
+      { validator: validateConfirmPassword, trigger: 'blur' }
+    ]
+  }
+
+  /** 驗證表單 */
+  const validateForm = async (): Promise<boolean> => {
+    if (!formRef.value) return false
+    return formRef.value.validate().catch(() => false)
+  }
+
+  /** 提交表單 */
+  const handleSubmit = async (userId: string, version: number) => {
+    const isValid = await validateForm()
+    if (!isValid) return
+
+    submitting.value = true
+
+    try {
+      const response = await changePassword({
+        id: userId,
+        oldPassword: formData.oldPassword,
+        newPassword: formData.newPassword,
+        version
+      })
+
+      if (response.success) {
+        ElMessage.success('密碼修改成功')
+        handleReset()
+        emit('password-changed')
+      } else {
+        ElMessage.error(response.message)
+      }
+    } catch (err: any) {
+      const status = err.response?.status
+      const code = err.response?.data?.code
+
+      if (status === 409 && code === 'CONCURRENT_UPDATE_CONFLICT') {
+        ElMessage.error('資料已被修改，請重新整理後再試')
+        emit('refresh-required')
+      } else if (status === 401) {
+        ElMessage.error('舊密碼不正確，請重新輸入')
+      } else {
+        ElMessage.error('密碼修改失敗，請稍後再試')
+      }
+    } finally {
+      submitting.value = false
+    }
+  }
+
+  /** 重置表單 */
+  const handleReset = () => {
+    formRef.value?.resetFields()
+  }
+
+  return {
+    formRef,
+    formData,
+    rules,
+    submitting,
+    handleSubmit,
+    handleReset
+  }
+}
+```
+
+---
+
+### Step 4: 建立用戶資訊卡片元件
+
+**File**: `src/pages/profile/components/UserInfoCard.vue`
 
 ```vue
-<!-- @/common/components/UserProfile/index.vue -->
+<script lang="ts" setup>
+import type { UserProfile } from '../types'
 
-<script setup lang="ts">
-import { computed } from "vue"
-import { useUserStore } from "@/pinia/stores/user"
-import { User, Key, SwitchButton } from "@element-plus/icons-vue"
-
-const userStore = useUserStore()
-
-const displayName = computed(() => userStore.displayName)
-const account = computed(() => userStore.profile?.account)
-const roles = computed(() => userStore.profile?.roles || [])
-
-function handleChangePassword() {
-  // 導向密碼修改頁面或開啟對話框
-  console.log("Change password")
+interface Props {
+  userInfo: UserProfile | null
+  loading: boolean
 }
 
-function handleLogout() {
-  userStore.clearUser()
-  // 導向登入頁
-}
+defineProps<Props>()
 </script>
 
 <template>
-  <el-dropdown trigger="click" class="user-profile">
-    <div class="profile-trigger">
-      <el-avatar :icon="User" />
-      <span class="display-name">{{ displayName }}</span>
-    </div>
-    
-    <template #dropdown>
-      <el-dropdown-menu>
-        <el-dropdown-item disabled>
-          <div class="profile-info">
-            <div class="info-item">
-              <span class="label">顯示名稱：</span>
-              <span class="value">{{ displayName }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">帳號：</span>
-              <span class="value">{{ account }}</span>
-            </div>
-            <div class="info-item">
-              <span class="label">角色：</span>
-              <span class="value">{{ roles.join(", ") || "無" }}</span>
-            </div>
-          </div>
-        </el-dropdown-item>
-        
-        <el-dropdown-item divided :icon="Key" @click="handleChangePassword">
-          修改密碼
-        </el-dropdown-item>
-        
-        <el-dropdown-item :icon="SwitchButton" @click="handleLogout">
-          登出
-        </el-dropdown-item>
-      </el-dropdown-menu>
+  <el-card v-loading="loading" class="user-info-card">
+    <template #header>
+      <div class="card-header">
+        <span>個人資訊</span>
+      </div>
     </template>
-  </el-dropdown>
+
+    <el-descriptions v-if="userInfo" :column="1" border>
+      <el-descriptions-item label="帳號">
+        {{ userInfo.account }}
+      </el-descriptions-item>
+      <el-descriptions-item label="顯示名稱">
+        {{ userInfo.displayName }}
+      </el-descriptions-item>
+      <el-descriptions-item label="角色">
+        <el-tag v-for="role in userInfo.roles" :key="role" type="primary">
+          {{ role }}
+        </el-tag>
+      </el-descriptions-item>
+    </el-descriptions>
+
+    <el-empty v-else description="無資料" />
+  </el-card>
 </template>
 
 <style scoped lang="scss">
-.user-profile {
-  cursor: pointer;
-}
-
-.profile-trigger {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.display-name {
-  font-size: 14px;
-  color: var(--el-text-color-primary);
-}
-
-.profile-info {
-  padding: 8px 0;
-  min-width: 200px;
-  
-  .info-item {
+.user-info-card {
+  .card-header {
     display: flex;
-    padding: 4px 0;
-    
-    .label {
-      font-weight: 600;
-      margin-right: 8px;
-      color: var(--el-text-color-secondary);
-    }
-    
-    .value {
-      color: var(--el-text-color-primary);
-    }
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .el-tag {
+    margin-right: 10px;
   }
 }
 </style>
 ```
 
-### Step 4: 整合至 Layout Header
+---
+
+### Step 5: 建立密碼修改表單元件
+
+**File**: `src/pages/profile/components/ChangePasswordForm.vue`
 
 ```vue
-<!-- @/layouts/components/Header.vue -->
+<script lang="ts" setup>
+import { useChangePasswordForm } from '../composables/useChangePassword'
 
-<script setup lang="ts">
-import UserProfile from "@@/components/UserProfile/index.vue"
-// ... 其他 imports
+interface Props {
+  userId: string
+  version: number
+}
+
+const props = defineProps<Props>()
+
+const emit = defineEmits<{
+  'password-changed': []
+  'refresh-required': []
+}>()
+
+const { formRef, formData, rules, submitting, handleSubmit, handleReset } = 
+  useChangePasswordForm(emit)
+
+const onSubmit = () => handleSubmit(props.userId, props.version)
 </script>
 
 <template>
-  <div class="layout-header">
-    <!-- 其他 header 內容 -->
-    
-    <div class="header-right">
-      <!-- 其他右側元件 -->
-      <UserProfile />
-    </div>
+  <el-card class="change-password-card">
+    <template #header>
+      <div class="card-header">
+        <span>修改密碼</span>
+      </div>
+    </template>
+
+    <el-form
+      ref="formRef"
+      :model="formData"
+      :rules="rules"
+      label-width="100px"
+    >
+      <el-form-item label="舊密碼" prop="oldPassword">
+        <el-input
+          v-model="formData.oldPassword"
+          type="password"
+          placeholder="請輸入舊密碼"
+          show-password
+        />
+      </el-form-item>
+
+      <el-form-item label="新密碼" prop="newPassword">
+        <el-input
+          v-model="formData.newPassword"
+          type="password"
+          placeholder="請輸入新密碼"
+          show-password
+        />
+      </el-form-item>
+
+      <el-form-item label="確認密碼" prop="confirmPassword">
+        <el-input
+          v-model="formData.confirmPassword"
+          type="password"
+          placeholder="請再次輸入新密碼"
+          show-password
+        />
+      </el-form-item>
+
+      <el-form-item>
+        <el-button
+          type="primary"
+          :loading="submitting"
+          @click="onSubmit"
+        >
+          提交
+        </el-button>
+        <el-button @click="handleReset">
+          重置
+        </el-button>
+      </el-form-item>
+    </el-form>
+  </el-card>
+</template>
+
+<style scoped lang="scss">
+.change-password-card {
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+</style>
+```
+
+---
+
+### Step 6: 建立個人資料頁面
+
+**File**: `src/pages/profile/index.vue`
+
+```vue
+<script lang="ts" setup>
+import { onMounted } from 'vue'
+import { useUserProfile } from './composables/useUserProfile'
+import UserInfoCard from './components/UserInfoCard.vue'
+import ChangePasswordForm from './components/ChangePasswordForm.vue'
+
+const { userInfo, loading, fetchUserProfile, refreshProfile } = useUserProfile()
+
+const handlePasswordChanged = () => {
+  // 可選：重新載入用戶資料
+  refreshProfile()
+}
+
+const handleRefreshRequired = () => {
+  // 併發衝突時重新載入資料
+  refreshProfile()
+}
+
+onMounted(() => {
+  fetchUserProfile()
+})
+</script>
+
+<template>
+  <div class="profile-page">
+    <el-row :gutter="20">
+      <el-col :xs="24" :sm="24" :md="14">
+        <UserInfoCard :user-info="userInfo" :loading="loading" />
+      </el-col>
+      <el-col :xs="24" :sm="24" :md="10">
+        <ChangePasswordForm
+          v-if="userInfo"
+          :user-id="userInfo.id"
+          :version="userInfo.version"
+          @password-changed="handlePasswordChanged"
+          @refresh-required="handleRefreshRequired"
+        />
+      </el-col>
+    </el-row>
   </div>
+</template>
+
+<style scoped lang="scss">
+.profile-page {
+  padding: 20px;
+}
+</style>
+```
+
+---
+
+### Step 7: 更新 NavigationBar 選單
+
+**File**: `src/layouts/components/NavigationBar/index.vue`
+
+在 `<template>` 中的 `<el-dropdown-menu>` 新增個人資訊選單項目：
+
+```vue
+<template #dropdown>
+  <el-dropdown-menu>
+    <!-- 新增：個人資訊選單項目 -->
+    <router-link to="/profile">
+      <el-dropdown-item>個人資訊</el-dropdown-item>
+    </router-link>
+    
+    <!-- 保留原有選單項目 -->
+    <a target="_blank" href="#">
+      <el-dropdown-item>Info</el-dropdown-item>
+    </a>
+    <el-dropdown-item divided @click="logout">
+      登出
+    </el-dropdown-item>
+  </el-dropdown-menu>
 </template>
 ```
 
-### Step 5: 實作密碼修改功能 (擇一)
+---
 
-#### 選項 A: 獨立頁面
+### Step 8: 新增路由配置
 
-```vue
-<!-- @/pages/profile/change-password.vue -->
+**File**: `src/router/index.ts`
 
-<script setup lang="ts">
-import { ref, reactive } from "vue"
-import { useRouter } from "vue-router"
-import { useUserStore } from "@/pinia/stores/user"
-import { ElMessage, type FormInstance, type FormRules } from "element-plus"
+在 `constantRoutes` 陣列中新增個人資料路由：
 
-const router = useRouter()
-const userStore = useUserStore()
-
-const formRef = ref<FormInstance>()
-const loading = ref(false)
-
-const formData = reactive({
-  oldPassword: "",
-  newPassword: "",
-  confirmPassword: ""
-})
-
-const rules: FormRules = {
-  oldPassword: [
-    { required: true, message: "請輸入舊密碼", trigger: "blur" }
-  ],
-  newPassword: [
-    { required: true, message: "請輸入新密碼", trigger: "blur" },
-    { min: 8, message: "密碼至少 8 個字元", trigger: "blur" },
-    { 
-      pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
-      message: "密碼需包含大小寫字母與數字",
-      trigger: "blur"
-    }
-  ],
-  confirmPassword: [
-    { required: true, message: "請確認新密碼", trigger: "blur" },
+```typescript
+{
+  path: "/profile",
+  component: Layouts,
+  meta: {
+    hidden: true  // 不在側邊欄顯示
+  },
+  children: [
     {
-      validator: (_rule, value, callback) => {
-        if (value !== formData.newPassword) {
-          callback(new Error("兩次密碼輸入不一致"))
-        } else {
-          callback()
-        }
-      },
-      trigger: "blur"
+      path: "",
+      component: () => import("@/pages/profile/index.vue"),
+      name: "UserProfile",
+      meta: {
+        title: { zhCN: "个人信息", zhTW: "個人資訊", en: "Profile" },
+        titleKey: "userProfile"
+      }
     }
   ]
 }
-
-async function handleSubmit() {
-  if (!formRef.value) return
-  
-  try {
-    await formRef.value.validate()
-    loading.value = true
-    
-    await userStore.changeUserPassword({
-      oldPassword: formData.oldPassword,
-      newPassword: formData.newPassword
-    })
-    
-    ElMessage.success("密碼修改成功")
-    router.back()
-  } catch (error: any) {
-    if (error.message) {
-      ElMessage.error(error.message)
-    }
-  } finally {
-    loading.value = false
-  }
-}
-
-function handleCancel() {
-  router.back()
-}
-</script>
-
-<template>
-  <div class="change-password-page">
-    <el-card>
-      <template #header>
-        <span>修改密碼</span>
-      </template>
-      
-      <el-form
-        ref="formRef"
-        :model="formData"
-        :rules="rules"
-        label-width="100px"
-      >
-        <el-form-item label="舊密碼" prop="oldPassword">
-          <el-input
-            v-model="formData.oldPassword"
-            type="password"
-            placeholder="請輸入舊密碼"
-            show-password
-          />
-        </el-form-item>
-        
-        <el-form-item label="新密碼" prop="newPassword">
-          <el-input
-            v-model="formData.newPassword"
-            type="password"
-            placeholder="請輸入新密碼"
-            show-password
-          />
-        </el-form-item>
-        
-        <el-form-item label="確認新密碼" prop="confirmPassword">
-          <el-input
-            v-model="formData.confirmPassword"
-            type="password"
-            placeholder="請再次輸入新密碼"
-            show-password
-          />
-        </el-form-item>
-        
-        <el-form-item>
-          <el-button type="primary" :loading="loading" @click="handleSubmit">
-            確認修改
-          </el-button>
-          <el-button @click="handleCancel">取消</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
-  </div>
-</template>
-
-<style scoped lang="scss">
-.change-password-page {
-  padding: 20px;
-  
-  .el-card {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-}
-</style>
-```
-
-### Step 6: 選單權限過濾
-
-```typescript
-// @/router/helper.ts
-
-import type { RouteRecordRaw } from "vue-router"
-
-/**
- * 根據用戶權限過濾選單項目
- * @param routes 路由配置
- * @param userPermissions 用戶權限清單
- */
-export function filterMenusByPermission(
-  routes: RouteRecordRaw[],
-  userPermissions: string[]
-): RouteRecordRaw[] {
-  return routes.filter(route => {
-    const permission = route.meta?.permission as string | undefined
-    
-    // 無權限要求則顯示
-    if (!permission) return true
-    
-    // 檢查用戶是否擁有該權限
-    return userPermissions.includes(permission)
-  }).map(route => {
-    // 遞迴過濾子選單
-    if (route.children) {
-      return {
-        ...route,
-        children: filterMenusByPermission(route.children, userPermissions)
-      }
-    }
-    return route
-  })
-}
-```
-
-```vue
-<!-- @/layouts/components/Sidebar.vue -->
-
-<script setup lang="ts">
-import { computed } from "vue"
-import { useRouter } from "vue-router"
-import { useUserStore } from "@/pinia/stores/user"
-import { filterMenusByPermission } from "@/router/helper"
-
-const router = useRouter()
-const userStore = useUserStore()
-
-const visibleRoutes = computed(() => {
-  const routes = router.getRoutes()
-  const permissions = userStore.permissions
-  return filterMenusByPermission(routes, permissions)
-})
-</script>
-
-<template>
-  <el-menu :default-active="activeMenu">
-    <template v-for="route in visibleRoutes" :key="route.path">
-      <!-- 渲染選單項目 -->
-    </template>
-  </el-menu>
-</template>
 ```
 
 ---
 
-## 測試
+## Testing
 
-### 單元測試
+### Unit Tests
 
+**Run Tests**:
+```bash
+# 執行所有測試
+pnpm test
+
+# 執行特定測試
+pnpm test -- profile
+
+# 執行測試並生成覆蓋率報告
+pnpm test:coverage
+```
+
+**Test Example** (`tests/pages/profile/profile.test.ts`):
 ```typescript
-// tests/composables/useProfile.test.ts
+import { describe, it, expect, vi } from 'vitest'
+import { mount } from '@vue/test-utils'
+import { useUserProfile } from '@/pages/profile/composables/useUserProfile'
 
-import { describe, it, expect, vi, beforeEach } from "vitest"
-import { setActivePinia, createPinia } from "pinia"
-import { useUserStore } from "@/pinia/stores/user"
-import * as profileApi from "@/common/apis/account/profile"
-
-vi.mock("@/common/apis/account/profile")
-
-describe("useProfile", () => {
-  beforeEach(() => {
-    setActivePinia(createPinia())
-  })
-
-  it("should fetch user profile", async () => {
-    const mockProfile = {
-      account: "testuser",
-      displayName: "Test User",
-      roles: ["Admin"],
-      permissions: ["user.read"]
-    }
-
-    vi.mocked(profileApi.getUserProfile).mockResolvedValue({
-      success: true,
-      code: "SUCCESS",
-      message: "查詢成功",
-      data: mockProfile,
-      timestamp: "2026-01-16T10:00:00Z",
-      traceId: "test-trace"
-    })
-
-    const store = useUserStore()
-    await store.fetchProfile()
-
-    expect(store.profile).toEqual(mockProfile)
-    expect(store.displayName).toBe("Test User")
-  })
-
-  it("should check permission correctly", () => {
-    const store = useUserStore()
-    store.profile = {
-      account: "testuser",
-      displayName: "Test User",
-      roles: ["Admin"],
-      permissions: ["user.read", "user.create"]
-    }
-
-    expect(store.hasPermission("user.read")).toBe(true)
-    expect(store.hasPermission("user.delete")).toBe(false)
+describe('useUserProfile', () => {
+  it('should fetch user profile successfully', async () => {
+    const { userInfo, fetchUserProfile } = useUserProfile()
+    
+    await fetchUserProfile()
+    
+    expect(userInfo.value).toBeDefined()
+    expect(userInfo.value?.id).toBeTruthy()
+    expect(userInfo.value?.version).toBeGreaterThanOrEqual(0)
   })
 })
 ```
 
-### 手動測試
+---
 
-1. **登入測試**
-   - 登入系統
-   - 確認右上角顯示 Profile 選單
-   - 點擊 Profile 下拉，確認顯示用戶資訊
+## Common Issues & Solutions
 
-2. **密碼修改測試**
-   - 點擊「修改密碼」
-   - 輸入錯誤舊密碼，確認顯示錯誤訊息
-   - 輸入正確舊密碼與新密碼，確認修改成功
-   - 開啟另一瀏覽器登入同一帳號，確認原 session 失效
+### Issue 1: API 回應缺少 `version` 欄位
 
-3. **選單權限測試**
-   - 以不同權限帳號登入
-   - 確認僅顯示有權限的選單項目
-   - 嘗試直接存取無權限路徑，確認被阻擋
+**Error**:
+```
+TypeError: Cannot read property 'version' of undefined
+```
+
+**Solution**:
+1. 確認後端 API `/api/Account/me` 已實作 `version` 欄位
+2. 檢查型別定義是否與後端回應一致
+3. 檢查 Axios 攔截器是否正確處理回應
 
 ---
 
-## 常見問題
+### Issue 2: 密碼修改後其他裝置未失效
 
-### Q1: Profile 資料何時載入？
-**A**: 登入成功後立即呼叫 `userStore.fetchProfile()`，資料快取於 Pinia。
+**Symptom**: 修改密碼後，其他裝置仍可正常使用
 
-### Q2: 密碼修改後需要重新登入嗎？
-**A**: 不需要。當前 session 保持，其他裝置 session 由後端失效。
-
-### Q3: 選單權限更新需要重新登入嗎？
-**A**: 根據 spec，需重新載入頁面。可在權限變更後重新呼叫 `fetchProfile()`。
-
-### Q4: 如何測試 401 錯誤處理？
-**A**: 手動清除 localStorage token，重新整理頁面，應自動導向登入頁。
+**Solution**:
+- 此問題屬於後端職責，前端無法直接解決
+- 確認後端已實作 Session 失效邏輯（JWT Token 黑名單或 Secret 更新）
+- 前端僅需提示用戶「其他裝置需重新登入」
 
 ---
 
-## 下一步
+### Issue 3: 併發衝突未正確處理
 
-- 閱讀 [data-model.md](./data-model.md) 了解資料模型
-- 閱讀 [api-contracts.md](./contracts/api-contracts.md) 了解 API 契約
-- 查看 [spec.md](./spec.md) 完整功能需求
+**Error**: 修改密碼時回傳 `409 Conflict`，但未重新載入資料
+
+**Solution**:
+1. 確認錯誤處理邏輯中捕捉 `status === 409`
+2. 呼叫 `refreshProfile()` 重新載入用戶資料
+3. 顯示提示訊息告知用戶資料已更新
+
+```typescript
+if (status === 409) {
+  ElMessage.error('資料已被修改，請重新整理後再試')
+  emit('refresh-required')  // 觸發重新載入
+}
+```
 
 ---
 
-**Last Updated**: 2026-01-16
+## API Integration Checklist
+
+✅ **確認 `/api/Account/me` 可用並回傳完整欄位（包含 `id`, `version`）**  
+✅ **確認 `/api/Account/{id}/password` 可用並處理併發控制**  
+✅ **檢查 JWT Token 認證是否正確設定**  
+✅ **驗證錯誤代碼處理邏輯（`401`, `409`, `500`）**  
+✅ **測試併發場景（多裝置同時修改密碼）**
+
+---
+
+## Next Steps
+
+1. **完成程式碼實作**（按照 Step 1-8）
+2. **執行單元測試** (`pnpm test`)
+3. **手動測試功能** （登入 → 進入個人資料頁面 → 修改密碼）
+4. **整合測試** （測試併發場景與錯誤處理）
+5. **Code Review** （提交 PR 至 `main` 分支）
+6. **部署至測試環境** （驗證後端整合）
+
+---
+
+**Phase 1.3 Complete** ✅  
+**Next**: 更新 AI Agent Context
