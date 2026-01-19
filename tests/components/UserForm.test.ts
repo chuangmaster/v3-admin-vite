@@ -16,6 +16,20 @@ vi.mock("@/pages/user-management/apis/user", () => ({
   changePassword: vi.fn().mockResolvedValue({ code: 0, success: true })
 }))
 
+vi.mock("@/pages/user-management/apis/user-roles", () => ({
+  getUserRoles: vi.fn().mockResolvedValue({ success: true, data: [] }),
+  assignUserRoles: vi.fn().mockResolvedValue({ success: true }),
+  removeUserRole: vi.fn().mockResolvedValue({ success: true })
+}))
+
+// Mock Pinia store
+vi.mock("@/pinia/stores/role", () => ({
+  useRoleStore: vi.fn(() => ({
+    roles: [],
+    fetchRoles: vi.fn().mockResolvedValue(undefined)
+  }))
+}))
+
 describe("userForm component", () => {
   it("should render form elements", () => {
     const wrapper = mount(UserForm, {

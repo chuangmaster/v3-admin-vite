@@ -47,6 +47,24 @@ export const constantRoutes: RouteRecordRaw[] = [
     }
   },
   {
+    path: "/profile",
+    component: Layouts,
+    meta: {
+      hidden: true
+    },
+    children: [
+      {
+        path: "",
+        component: () => import("@/pages/profile/index.vue"),
+        name: "UserProfile",
+        meta: {
+          title: { zhCN: "个人信息", zhTW: "個人資訊", en: "Profile" },
+          titleKey: "userProfile"
+        }
+      }
+    ]
+  },
+  {
     path: "/",
     component: Layouts,
     redirect: "/dashboard",

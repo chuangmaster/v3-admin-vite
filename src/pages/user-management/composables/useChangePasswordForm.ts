@@ -40,7 +40,8 @@ export function useChangePasswordForm() {
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
-    userId: undefined
+    userId: undefined,
+    version: 0
   })
 
   /**
@@ -107,7 +108,8 @@ export function useChangePasswordForm() {
 
       const response = await changePassword(formData.userId, {
         oldPassword: formData.oldPassword,
-        newPassword: formData.newPassword
+        newPassword: formData.newPassword,
+        version: formData.version
       } as ChangePasswordRequest)
 
       if (response.success) {
@@ -143,11 +145,13 @@ export function useChangePasswordForm() {
   }
 
   /**
-   * 設定要修改密碼的用戶 ID
+   * 設定要修改密碼的用戶 ID 與版本號
    * @param userId - 用戶 ID
+   * @param version - 資料版本號（用於併發控制）
    */
-  function setUserId(userId: string): void {
+  function setUserId(userId: string, version: number): void {
     formData.userId = userId
+    formData.version = version
   }
 
   return {
