@@ -7,8 +7,10 @@ import type {
   Customer,
   ProductItem
 } from "../types"
+import { ElMessage } from "element-plus"
 import { createBuybackOrder, createConsignmentOrder } from "../apis/service-order"
 import { RenewalOption, ServiceOrderSource, ServiceOrderType } from "../types"
+import "element-plus/es/components/message/style/css"
 
 export function useServiceOrderForm() {
   const router = useRouter()
