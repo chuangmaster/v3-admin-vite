@@ -39,7 +39,7 @@ describe("useExportExcel composable", () => {
       },
       {
         id: "2",
-        username: "inactiveuser",
+        account: "inactiveuser",
         displayName: "Inactive User",
         status: "inactive",
         createdAt: "2025-11-15T00:00:00Z",
@@ -61,7 +61,7 @@ describe("useExportExcel composable", () => {
     const mockUsers: User[] = [
       {
         id: "1",
-        username: "activeuser",
+        account: "activeuser",
         displayName: "Active User",
         status: "active",
         createdAt: "2025-11-16T00:00:00Z",

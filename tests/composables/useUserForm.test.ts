@@ -19,7 +19,7 @@ describe("useUserForm composable", () => {
   it("should initialize form data with empty values", () => {
     const { formData } = useUserForm()
 
-    expect(formData.username).toBe("")
+    expect(formData.account).toBe("")
     expect(formData.password).toBe("")
     expect(formData.displayName).toBe("")
   })
@@ -34,8 +34,8 @@ describe("useUserForm composable", () => {
   it("should have username validation rules", () => {
     const { rules } = useUserForm()
 
-    expect(rules.username).toBeDefined()
-    expect(Array.isArray(rules.username)).toBe(true)
+    expect(rules.account).toBeDefined()
+    expect(Array.isArray(rules.account)).toBe(true)
   })
 
   it("should have displayName validation rules", () => {
@@ -48,13 +48,13 @@ describe("useUserForm composable", () => {
   it("should reset form data", () => {
     const { formData, resetForm } = useUserForm()
 
-    formData.username = "testuser"
+    formData.account = "testuser"
     formData.password = "testpass"
     formData.displayName = "Test User"
 
     resetForm()
 
-    expect(formData.username).toBe("testuser") // 資料未重置，因為是 reactive
+    expect(formData.account).toBe("testuser") // 資料未重置,因為是 reactive
   })
 
   it("should provide formLoading ref", () => {
@@ -74,7 +74,7 @@ describe("useUserForm composable", () => {
 
     const mockUser: User = {
       id: "1",
-      username: "testuser",
+      account: "testuser",
       displayName: "Test User",
       status: "active",
       createdAt: "2024-01-01",
@@ -86,7 +86,7 @@ describe("useUserForm composable", () => {
 
     expect(isEditMode.value).toBe(true)
     expect(formData.editUserId).toBe("1")
-    expect(formData.username).toBe("testuser")
+    expect(formData.account).toBe("testuser")
     expect(formData.displayName).toBe("Test User")
     expect(formData.password).toBe("")
   })

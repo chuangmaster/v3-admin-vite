@@ -99,9 +99,9 @@ defineExpose({
         label-width="120px"
         :disabled="formLoading"
       >
-        <el-form-item label="用戶名" prop="username">
+        <el-form-item label="用戶名" prop="account">
           <el-input
-            v-model="formData.username"
+            v-model="formData.account"
             :readonly="isEditMode"
             placeholder="請輸入用戶名（3-20 字元，僅英數字與底線）"
             maxlength="20"
