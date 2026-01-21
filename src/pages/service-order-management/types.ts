@@ -132,10 +132,11 @@ export const DEFECT_OPTIONS = [
 
 /** 商品等級選項 */
 export const GRADE_OPTIONS = [
+  { label: "N", value: "N" },
+  { label: "NA", value: "NA" },
   { label: "A", value: "A" },
   { label: "B", value: "B" },
-  { label: "C", value: "C" },
-  { label: "D", value: "D" }
+  { label: "C", value: "C" }
 ] as const
 
 /** 商品項目實體（包含收購單和寄賣單的所有欄位） */
