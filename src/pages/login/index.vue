@@ -30,14 +30,14 @@ const codeUrl = ref("")
 
 /** 登录表单数据 */
 const loginFormData: LoginRequestData = reactive({
-  username: "admin",
+  account: "admin",
   password: "Admin@12345",
   code: ""
 })
 
 /** 登录表单校验规则 */
 const loginFormRules: FormRules = {
-  username: [
+  account: [
     { required: true, message: "请输入用户名", trigger: "blur" }
   ],
   password: [
@@ -97,7 +97,7 @@ createCode()
         <el-form ref="loginFormRef" :model="loginFormData" :rules="loginFormRules" @keyup.enter="handleLogin">
           <el-form-item prop="username">
             <el-input
-              v-model.trim="loginFormData.username"
+              v-model.trim="loginFormData.account"
               placeholder="用户名"
               type="text"
               tabindex="1"

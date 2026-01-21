@@ -3,7 +3,7 @@ export interface User {
   /** 用戶唯一識別碼（UUID） */
   id: string
   /** 帳號名稱（登入用） */
-  username: string
+  account: string
   /** 顯示名稱 */
   displayName: string
   /** 用戶狀態：active（啟用）、inactive（已停用） */
@@ -19,7 +19,7 @@ export interface User {
 /** 新增用戶請求 */
 export interface CreateUserRequest {
   /** 帳號名稱（3-20 字元，僅英數字與底線） */
-  username: string
+  account: string
   /** 密碼（最少 8 字元，包含大小寫字母與數字） */
   password: string
   /** 顯示名稱（1-100 字元） */
