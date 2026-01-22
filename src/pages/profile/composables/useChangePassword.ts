@@ -99,7 +99,6 @@ export function useChangePasswordForm(emit: ChangePasswordEmits) {
     if (!isValid) return
 
     submitting.value = true
-
     try {
       const response = await changePassword(userId, {
         oldPassword: formData.oldPassword,
