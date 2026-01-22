@@ -28,9 +28,9 @@
 
 **⚠️ 關鍵**: 此階段必須完成後，用戶故事才能開始實作
 
-- [ ] T003 [P] 新增 ResetPasswordRequest 型別定義於 src/pages/user-management/types.ts
-- [ ] T004 [P] 新增 resetPassword API 函式於 src/pages/user-management/apis/user.ts
-- [ ] T005 修改 changePassword API 端點路徑為 /account/me/password 於 src/pages/user-management/apis/user.ts
+- [X] T003 [P] 新增 ResetPasswordRequest 型別定義於 src/pages/user-management/types.ts
+- [X] T004 [P] 新增 resetPassword API 函式於 src/pages/user-management/apis/user.ts
+- [X] T005 修改 changePassword API 端點路徑為 /account/me/password 於 src/pages/user-management/apis/user.ts
 
 **檢查點**: API 層與型別定義完成 - 用戶故事實作可以開始
 
@@ -44,13 +44,13 @@
 
 ### 實作 User Story 1
 
-- [ ] T006 [US1] 更新 useChangePasswordForm 組合式函式的 import 為 resetPassword 於 src/pages/user-management/composables/useChangePasswordForm.ts
-- [ ] T007 [US1] 移除 FormData 介面中的 oldPassword 欄位於 src/pages/user-management/composables/useChangePasswordForm.ts
-- [ ] T008 [US1] 移除 formData reactive 物件中的 oldPassword 初始值於 src/pages/user-management/composables/useChangePasswordForm.ts
-- [ ] T009 [US1] 移除 rules 中的 oldPassword 驗證規則於 src/pages/user-management/composables/useChangePasswordForm.ts
-- [ ] T010 [US1] 更新 submitForm 函式呼叫 resetPassword API 並移除 oldPassword 參數於 src/pages/user-management/composables/useChangePasswordForm.ts
-- [ ] T011 [US1] 更新 handleApiError 移除 INVALID_OLD_PASSWORD 處理，新增 403 和 404 錯誤處理於 src/pages/user-management/composables/useChangePasswordForm.ts
-- [ ] T012 [US1] 檢查並更新 ChangePasswordModal 元件，移除舊密碼輸入欄位（如果存在）於 src/pages/user-management/components/ChangePasswordModal.vue
+- [X] T006 [US1] 更新 useChangePasswordForm 組合式函式的 import 為 resetPassword 於 src/pages/user-management/composables/useChangePasswordForm.ts
+- [X] T007 [US1] 移除 FormData 介面中的 oldPassword 欄位於 src/pages/user-management/composables/useChangePasswordForm.ts
+- [X] T008 [US1] 移除 formData reactive 物件中的 oldPassword 初始值於 src/pages/user-management/composables/useChangePasswordForm.ts
+- [X] T009 [US1] 移除 rules 中的 oldPassword 驗證規則於 src/pages/user-management/composables/useChangePasswordForm.ts
+- [X] T010 [US1] 更新 submitForm 函式呼叫 resetPassword API 並移除 oldPassword 參數於 src/pages/user-management/composables/useChangePasswordForm.ts
+- [X] T011 [US1] 更新 handleApiError 移除 INVALID_OLD_PASSWORD 處理，新增 403 和 404 錯誤處理於 src/pages/user-management/composables/useChangePasswordForm.ts
+- [X] T012 [US1] 檢查並更新 ChangePasswordModal 元件，移除舊密碼輸入欄位（如果存在）於 src/pages/user-management/components/ChangePasswordModal.vue
 
 **檢查點**: 管理者應能成功重設用戶密碼，無需提供舊密碼
 
@@ -64,9 +64,9 @@
 
 ### 實作 User Story 2
 
-- [ ] T013 [US2] 確認 useChangePasswordForm 組合式函式保持 oldPassword 欄位不變於 src/pages/profile/composables/useChangePassword.ts
-- [ ] T014 [US2] 確認 ChangePasswordForm 元件包含舊密碼輸入欄位於 src/pages/profile/components/ChangePasswordForm.vue
-- [ ] T015 [US2] 確認 changePassword API 使用 /account/me/password 端點且包含 oldPassword 參數
+- [X] T013 [US2] 確認 useChangePasswordForm 組合式函式保持 oldPassword 欄位不變於 src/pages/profile/composables/useChangePassword.ts
+- [X] T014 [US2] 確認 ChangePasswordForm 元件包含舊密碼輸入欄位於 src/pages/profile/components/ChangePasswordForm.vue
+- [X] T015 [US2] 確認 changePassword API 使用 /account/me/password 端點且包含 oldPassword 參數
 
 **檢查點**: 用戶應能成功修改密碼，且必須提供正確的舊密碼
 
@@ -76,13 +76,13 @@
 
 **目的**: 更新測試以反映新的 API 行為
 
-- [ ] T016 [P] 更新 useChangePasswordForm 測試的 mock 函式為 resetPassword 於 tests/composables/useChangePasswordForm.test.ts
-- [ ] T017 [P] 更新管理者密碼重設測試案例，移除 oldPassword 相關驗證於 tests/composables/useChangePasswordForm.test.ts
-- [ ] T018 [P] 新增管理者權限錯誤測試（403 Forbidden）於 tests/composables/useChangePasswordForm.test.ts
-- [ ] T019 [P] 新增用戶不存在錯誤測試（404 Not Found）於 tests/composables/useChangePasswordForm.test.ts
-- [ ] T020 [P] 新增 resetPassword API 單元測試於 tests/apis/user.test.ts
-- [ ] T021 [P] 確認 useChangePassword 測試保持不變，包含 oldPassword 驗證於 tests/composables/useChangePassword.test.ts
-- [ ] T022 執行所有測試確保通過：pnpm test
+- [X] T016 [P] 更新 useChangePasswordForm 測試的 mock 函式為 resetPassword 於 tests/composables/useChangePasswordForm.test.ts
+- [X] T017 [P] 更新管理者密碼重設測試案例，移除 oldPassword 相關驗證於 tests/composables/useChangePasswordForm.test.ts
+- [X] T018 [P] 新增管理者權限錯誤測試（403 Forbidden）於 tests/composables/useChangePasswordForm.test.ts
+- [X] T019 [P] 新增用戶不存在錯誤測試（404 Not Found）於 tests/composables/useChangePasswordForm.test.ts
+- [X] T020 [P] 新增 resetPassword API 單元測試於 tests/apis/user.test.ts
+- [X] T021 [P] 確認 useChangePassword 測試保持不變，包含 oldPassword 驗證於 tests/composables/useChangePassword.test.ts
+- [X] T022 執行所有測試確保通過：pnpm test
 
 ---
 
@@ -90,9 +90,9 @@
 
 **目的**: 建立完整的 API 規格與開發指南
 
-- [ ] T023 [P] 建立 API Contracts 文件於 specs/005-password-api-adjustment/contracts/api-contracts.md
-- [ ] T024 [P] 建立 Data Model 文件於 specs/005-password-api-adjustment/data-model.md
-- [ ] T025 [P] 建立 Quickstart 文件於 specs/005-password-api-adjustment/quickstart.md
+- [X] T023 [P] 建立 API Contracts 文件於 specs/005-password-api-adjustment/contracts/api-contracts.md
+- [X] T024 [P] 建立 Data Model 文件於 specs/005-password-api-adjustment/data-model.md
+- [X] T025 [P] 建立 Quickstart 文件於 specs/005-password-api-adjustment/quickstart.md
 
 ---
 
@@ -100,9 +100,9 @@
 
 **目的**: 確保所有功能正常運作
 
-- [ ] T026 執行完整測試套件：pnpm test
-- [ ] T027 執行 TypeScript 類型檢查：pnpm type-check
-- [ ] T028 執行 ESLint 檢查：pnpm lint
+- [X] T026 執行完整測試套件：pnpm test
+- [X] T027 執行 TypeScript 類型檢查：pnpm type-check
+- [X] T028 執行 ESLint 檢查：pnpm lint
 - [ ] T029 手動測試管理者重設密碼功能（無需舊密碼）
 - [ ] T030 手動測試用戶自行修改密碼功能（需提供舊密碼）
 - [ ] T031 測試密碼驗證規則（長度、複雜度）
