@@ -23,7 +23,22 @@ import { request } from "@/http/axios"
 export async function getServiceOrderList(
   params: ServiceOrderListParams
 ): Promise<PagedApiResponse<ServiceOrderListItem[]>> {
-  return request({ url: "/service-orders", method: "GET", params })
+  // 處理日期範圍參數，將 createdDateRange 轉換為 createdAtStart 和 createdAtEnd
+  const apiParams = { ...params }
+  if (apiParams.createdDateRange && apiParams.createdDateRange.length === 2) {
+    // 將 YYYY-MM-DD 格式轉換為瀏覽器本地時區的開始時間（00:00:00）
+    const startDate = new Date(`${apiParams.createdDateRange[0]}T00:00:00`)
+    // 將 YYYY-MM-DD 格式轉換為瀏覽器本地時區的結束時間（23:59:59）
+    const endDate = new Date(`${apiParams.createdDateRange[1]}T23:59:59`)
+
+    // 轉換為 ISO 8601 格式（包含時區資訊）
+    apiParams.createdAtStart = startDate.toISOString()
+    apiParams.createdAtEnd = endDate.toISOString()
+  }
+  // 移除前端用的 createdDateRange，避免傳給後端
+  delete (apiParams as any).createdDateRange
+
+  return request({ url: "/service-orders", method: "GET", params: apiParams })
 }
 
 /**

@@ -17,8 +17,8 @@ export const useServiceOrderStore = defineStore("service-order", () => {
     pageSize: 20,
     orderType: "" as any,
     customerName: undefined,
-    startDate: undefined,
-    endDate: undefined,
+    createdAtStart: undefined,
+    createdAtEnd: undefined,
     status: "" as any
   })
 
@@ -51,8 +51,8 @@ export const useServiceOrderStore = defineStore("service-order", () => {
       pageSize: 20,
       orderType: "" as any,
       customerName: undefined,
-      startDate: undefined,
-      endDate: undefined,
+      createdAtStart: undefined,
+      createdAtEnd: undefined,
       status: "pending" as any
     }
     currentOrderType.value = undefined
@@ -117,12 +117,12 @@ export const useServiceOrderStore = defineStore("service-order", () => {
 
   /**
    * 設定日期範圍篩選
-   * @param startDate - 起始日期（ISO 8601）
-   * @param endDate - 結束日期（ISO 8601）
+   * @param createdAtStart - 起始日期（ISO 8601）
+   * @param createdAtEnd - 結束日期（ISO 8601）
    */
-  const setDateRange = (startDate: string | undefined, endDate: string | undefined) => {
-    queryParams.value.startDate = startDate
-    queryParams.value.endDate = endDate
+  const setDateRange = (createdAtStart: string | undefined, createdAtEnd: string | undefined) => {
+    queryParams.value.createdAtStart = createdAtStart
+    queryParams.value.createdAtEnd = createdAtEnd
     queryParams.value.pageNumber = 1 // 重置到第一頁
   }
 

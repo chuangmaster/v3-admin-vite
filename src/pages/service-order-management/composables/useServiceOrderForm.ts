@@ -270,8 +270,13 @@ export function useServiceOrderForm() {
             defects: item.defects
           })),
           totalAmount: formData.totalAmount!,
-          consignmentStartDate: formData.consignmentStartDate,
-          consignmentEndDate: formData.consignmentEndDate,
+          // 將日期字串轉換為包含時區資訊的 ISO 8601 格式
+          consignmentStartDate: formData.consignmentStartDate
+            ? new Date(`${formData.consignmentStartDate}T00:00:00`).toISOString()
+            : undefined,
+          consignmentEndDate: formData.consignmentEndDate
+            ? new Date(`${formData.consignmentEndDate}T23:59:59`).toISOString()
+            : undefined,
           renewalOption: formData.renewalOption,
           remarks: formData.notes
         }

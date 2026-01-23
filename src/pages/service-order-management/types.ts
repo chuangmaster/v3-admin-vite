@@ -561,10 +561,10 @@ export interface ServiceOrderListParams {
   orderNumber?: string
   /** 日期範圍（可選，用於前端篩選） */
   createdDateRange?: [string, string]
-  /** 起始日期（ISO 8601，可選） */
-  startDate?: string
-  /** 結束日期（ISO 8601，可選） */
-  endDate?: string
+  /** 建立日期起始（ISO 8601，可選） */
+  createdAtStart?: string
+  /** 建立日期結束（ISO 8601，可選） */
+  createdAtEnd?: string
   /** 服務單狀態（可選） */
   status?: ServiceOrderStatus
 }
