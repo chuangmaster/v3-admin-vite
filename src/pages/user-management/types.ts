@@ -3,7 +3,7 @@ export interface User {
   /** 用戶唯一識別碼（UUID） */
   id: string
   /** 帳號名稱（登入用） */
-  username: string
+  account: string
   /** 顯示名稱 */
   displayName: string
   /** 用戶狀態：active（啟用）、inactive（已停用） */
@@ -19,7 +19,7 @@ export interface User {
 /** 新增用戶請求 */
 export interface CreateUserRequest {
   /** 帳號名稱（3-20 字元，僅英數字與底線） */
-  username: string
+  account: string
   /** 密碼（最少 8 字元，包含大小寫字母與數字） */
   password: string
   /** 顯示名稱（1-100 字元） */
@@ -43,7 +43,13 @@ export interface ChangePasswordRequest {
   /** 資料版本號（用於併發控制） */
   version: number
 }
-
+/** 管理者重設密碼請求（管理者無需提供舊密碼） */
+export interface ResetPasswordRequest {
+  /** 新密碼（最少 8 字元,包含大小寫字母與數字） */
+  newPassword: string
+  /** 資料版本號（用於併發控制） */
+  version: number
+}
 /** 刪除用戶請求 */
 export interface DeleteUserRequest {
   /** 確認訊息（必須為 "CONFIRM"） */

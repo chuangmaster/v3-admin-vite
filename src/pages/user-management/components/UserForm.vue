@@ -99,9 +99,9 @@ defineExpose({
         label-width="120px"
         :disabled="formLoading"
       >
-        <el-form-item label="用戶名" prop="username">
+        <el-form-item label="用戶名" prop="account">
           <el-input
-            v-model="formData.username"
+            v-model="formData.account"
             :readonly="isEditMode"
             placeholder="請輸入用戶名（3-20 字元，僅英數字與底線）"
             maxlength="20"
@@ -128,7 +128,7 @@ defineExpose({
     </el-tab-pane>
 
     <!-- 密碼修改分頁（僅在編輯模式下顯示） -->
-    <el-tab-pane v-if="isEditMode" label="修改密碼" name="password">
+    <el-tab-pane v-if="isEditMode" label="重設密碼" name="password">
       <el-form
         ref="passwordFormRef"
         :model="passwordData"
@@ -136,14 +136,6 @@ defineExpose({
         label-width="120px"
         :disabled="passwordLoading"
       >
-        <el-form-item label="舊密碼" prop="oldPassword">
-          <el-input
-            v-model="passwordData.oldPassword"
-            type="password"
-            placeholder="請輸入舊密碼"
-            show-password
-          />
-        </el-form-item>
         <el-form-item label="新密碼" prop="newPassword">
           <el-input
             v-model="passwordData.newPassword"
