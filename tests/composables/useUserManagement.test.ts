@@ -34,7 +34,7 @@ describe("useUserManagement", () => {
     const mockUsers: User[] = [
       {
         id: "1",
-        username: "testuser",
+        account: "testuser",
         displayName: "Test User",
         status: "active",
         createdAt: "2025-11-16T00:00:00Z",
@@ -65,7 +65,7 @@ describe("useUserManagement", () => {
     await fetchUsers()
 
     expect(users.value).toHaveLength(1)
-    expect(users.value[0].username).toBe("testuser")
+    expect(users.value[0].account).toBe("testuser")
     expect(pagination.value.total).toBe(1)
   })
 
@@ -152,7 +152,7 @@ describe("useUserManagement", () => {
 
     const mockUser: User = {
       id: "1",
-      username: "testuser",
+      account: "testuser",
       displayName: "Test User",
       status: "active",
       createdAt: "2025-11-16T00:00:00Z",
@@ -195,7 +195,7 @@ describe("useUserManagement", () => {
 
     const mockUser: User = {
       id: "1",
-      username: "testuser",
+      account: "testuser",
       displayName: "Test User",
       status: "active",
       createdAt: "2025-11-16T00:00:00Z",
