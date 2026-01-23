@@ -43,7 +43,13 @@ export interface ChangePasswordRequest {
   /** 資料版本號（用於併發控制） */
   version: number
 }
-
+/** 管理者重設密碼請求（管理者無需提供舊密碼） */
+export interface ResetPasswordRequest {
+  /** 新密碼（最少 8 字元,包含大小寫字母與數字） */
+  newPassword: string
+  /** 資料版本號（用於併發控制） */
+  version: number
+}
 /** 刪除用戶請求 */
 export interface DeleteUserRequest {
   /** 確認訊息（必須為 "CONFIRM"） */
