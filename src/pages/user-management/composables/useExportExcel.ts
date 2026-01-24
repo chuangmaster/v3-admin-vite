@@ -4,7 +4,7 @@
  */
 
 import type { User, UserExportData } from "../types"
-import dayjs from "dayjs"
+import { formatDateTime } from "@@/utils/datetime"
 import * as XLSX from "xlsx"
 
 /**
@@ -27,8 +27,8 @@ export function useExportExcel() {
       用戶名: user.account,
       顯示名稱: user.displayName,
       狀態: user.status === "active" ? "啟用" : "已停用",
-      建立時間: dayjs(user.createdAt).format("YYYY-MM-DD HH:mm:ss"),
-      最後更新時間: user.updatedAt ? dayjs(user.updatedAt).format("YYYY-MM-DD HH:mm:ss") : "-"
+      建立時間: formatDateTime(user.createdAt),
+      最後更新時間: formatDateTime(user.updatedAt)
     }))
 
     // 建立工作表
@@ -49,7 +49,7 @@ export function useExportExcel() {
     XLSX.utils.book_append_sheet(workbook, worksheet, "用戶列表")
 
     // 生成檔名（包含時間戳）
-    const filename = `用戶列表_${dayjs().format("YYYYMMDD_HHmmss")}.xlsx`
+    const filename = `用戶列表_${formatDateTime(new Date(), "YYYYMMDD_HHmmss")}.xlsx`
 
     // 下載檔案
     XLSX.writeFile(workbook, filename)
