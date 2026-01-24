@@ -39,7 +39,7 @@ export function useUserForm() {
 
   /** 表單資料 */
   const formData = reactive<FormData>({
-    username: "",
+    account: "",
     password: "",
     displayName: "",
     editUserId: undefined
@@ -63,7 +63,7 @@ export function useUserForm() {
 
   /** 表單驗證規則 */
   const rules: FormRules = {
-    username: [
+    account: [
       { required: true, message: "請輸入用戶名", trigger: "blur" },
       { min: 3, max: 20, message: "用戶名長度為 3-20 字元", trigger: "blur" },
       {
@@ -152,7 +152,7 @@ export function useUserForm() {
   function setEditMode(user: User): void {
     isEditMode.value = true
     formData.editUserId = user.id
-    formData.username = user.username
+    formData.account = user.account
     formData.displayName = user.displayName
     // 編輯模式下密碼不需要填寫（可選）
     formData.password = ""

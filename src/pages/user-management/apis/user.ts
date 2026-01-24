@@ -7,6 +7,7 @@ import type {
   ChangePasswordRequest,
   CreateUserRequest,
   DeleteUserRequest,
+  ResetPasswordRequest,
   UpdateUserRequest,
   User,
   UserListParams,
@@ -70,14 +71,41 @@ export async function deleteUser(id: string): Promise<ApiResponse<null>> {
 }
 
 /**
- * 變更密碼
- * @param id - 用戶 ID（UUID）
+ * 用戶自行修改密碼（後端規格：PUT /api/Account/me/password）
+ *
+ * 此 API 用於用戶修改自己的密碼，必須提供舊密碼驗證。
+ * 實際使用時，傳入的 id 應為當前登入用戶的 ID。
+ *
+ * @param id - 用戶 ID（UUID，應為當前用戶 ID）
  * @param data - 變更密碼請求資料
  * @returns 變更結果（data 為 null）
+ * @throws {409} API_CODE_CONCURRENT_UPDATE_CONFLICT - 版本衝突
+ * @throws {401} INVALID_OLD_PASSWORD - 舊密碼錯誤
+ * @throws {400} VALIDATION_ERROR - 新密碼不符合規則
  */
 export async function changePassword(
   id: string,
   data: ChangePasswordRequest
 ): Promise<ApiResponse<null>> {
-  return request({ url: `/account/${id}/password`, method: "PUT", data })
+  return request({ url: "/account/me/password", method: "PUT", data })
+}
+
+/**
+ * 管理者重設用戶密碼（後端規格：PUT /api/Account/{id}/reset-password）
+ *
+ * 此 API 僅供管理者使用，無需提供用戶的舊密碼。
+ *
+ * @param id - 目標用戶 ID（UUID）
+ * @param data - 重設密碼請求資料
+ * @returns 重設結果（data 為 null）
+ * @throws {409} API_CODE_CONCURRENT_UPDATE_CONFLICT - 版本衝突
+ * @throws {400} VALIDATION_ERROR - 新密碼不符合規則
+ * @throws {403} FORBIDDEN - 非管理者權限
+ * @throws {404} NOT_FOUND - 用戶不存在
+ */
+export async function resetPassword(
+  id: string,
+  data: ResetPasswordRequest
+): Promise<ApiResponse<null>> {
+  return request({ url: `/account/${id}/reset-password`, method: "PUT", data })
 }

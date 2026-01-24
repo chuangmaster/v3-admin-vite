@@ -18,7 +18,7 @@ vi.mock("element-plus", async () => {
 })
 
 vi.mock("@/pages/user-management/apis/user", () => ({
-  changePassword: vi.fn()
+  resetPassword: vi.fn()
 }))
 
 describe("useChangePasswordForm composable", () => {
@@ -29,7 +29,6 @@ describe("useChangePasswordForm composable", () => {
   it("should initialize form data with empty values", () => {
     const { formData } = useChangePasswordForm()
 
-    expect(formData.oldPassword).toBe("")
     expect(formData.newPassword).toBe("")
     expect(formData.confirmPassword).toBe("")
     expect(formData.userId).toBeUndefined()
@@ -38,10 +37,8 @@ describe("useChangePasswordForm composable", () => {
   it("should have password validation rules", () => {
     const { rules } = useChangePasswordForm()
 
-    expect(rules.oldPassword).toBeDefined()
     expect(rules.newPassword).toBeDefined()
     expect(rules.confirmPassword).toBeDefined()
-    expect(Array.isArray(rules.oldPassword)).toBe(true)
     expect(Array.isArray(rules.newPassword)).toBe(true)
     expect(Array.isArray(rules.confirmPassword)).toBe(true)
   })
@@ -69,7 +66,6 @@ describe("useChangePasswordForm composable", () => {
 
   it("should reset form data", () => {
     const { formData, resetForm, formRef } = useChangePasswordForm()
-    formData.oldPassword = "oldpass123"
     formData.newPassword = "newpass123"
     formData.confirmPassword = "newpass123"
     formData.userId = "user123"
@@ -77,7 +73,6 @@ describe("useChangePasswordForm composable", () => {
     // provide a mock formRef that clears fields when resetFields is called
     formRef.value = {
       resetFields: () => {
-        formData.oldPassword = ""
         formData.newPassword = ""
         formData.confirmPassword = ""
       }
@@ -85,7 +80,6 @@ describe("useChangePasswordForm composable", () => {
 
     resetForm()
 
-    expect(formData.oldPassword).toBe("")
     expect(formData.newPassword).toBe("")
     expect(formData.confirmPassword).toBe("")
     expect(formData.userId).toBeUndefined()
@@ -118,7 +112,6 @@ describe("useChangePasswordForm composable", () => {
   it("should have required validation rules for all fields", () => {
     const { rules } = useChangePasswordForm()
 
-    expect(rules.oldPassword).toBeDefined()
     expect(rules.newPassword).toBeDefined()
     expect(rules.confirmPassword).toBeDefined()
   })

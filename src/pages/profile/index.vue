@@ -8,7 +8,7 @@ const { userInfo, loading, fetchUserProfile, refreshProfile } = useUserProfile()
 
 /**
  * 處理密碼修改成功事件
- * @description 密碼修改成功後可選擇重新載入用戶資料
+ * @description 密碼修改成功後重新載入用戶資料，並同步更新 Pinia Store
  */
 function handlePasswordChanged(): void {
   refreshProfile()
@@ -16,7 +16,7 @@ function handlePasswordChanged(): void {
 
 /**
  * 處理需要重新載入事件
- * @description 併發衝突時重新載入用戶資料以取得最新 version
+ * @description 併發衝突時重新載入用戶資料以取得最新 version，並同步更新 Pinia Store
  */
 function handleRefreshRequired(): void {
   refreshProfile()

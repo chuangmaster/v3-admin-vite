@@ -141,7 +141,7 @@ describe("userForm component", () => {
 
     const mockUser: User = {
       id: "1",
-      username: "testuser",
+      account: "testuser",
       displayName: "Test User",
       status: "active",
       createdAt: "2024-01-01",
@@ -183,7 +183,7 @@ describe("userForm component", () => {
 
     const mockUser: User = {
       id: "1",
-      username: "testuser",
+      account: "testuser",
       displayName: "Test User",
       status: "active",
       createdAt: "2024-01-01",

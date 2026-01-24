@@ -6,6 +6,7 @@
 import type { UserProfile } from "../types"
 import { getCurrentUserApi } from "@@/apis/users"
 import { ref } from "vue"
+import { useUserStore } from "@/pinia/stores/user"
 
 /**
  * 用戶資料管理組合式函式
@@ -22,8 +23,9 @@ export function useUserProfile() {
   /**
    * 載入用戶資料
    * @description 呼叫 API 取得當前登入用戶的完整資料
+   * @param syncToStore - 是否同步更新 Pinia Store（預設為 true）
    */
-  const fetchUserProfile = async (): Promise<void> => {
+  const fetchUserProfile = async (syncToStore = true): Promise<void> => {
     loading.value = true
     error.value = null
 
@@ -31,6 +33,17 @@ export function useUserProfile() {
       const response = await getCurrentUserApi()
       if (response.success && response.data) {
         userInfo.value = response.data
+
+        // 同步更新 Pinia Store，確保全域狀態一致
+        if (syncToStore) {
+          const userStore = useUserStore()
+          userStore.userId = response.data.id
+          userStore.account = response.data.account
+          userStore.displayName = response.data.displayName
+          userStore.version = response.data.version
+          userStore.roles = response.data.roles
+          userStore.permissions = response.data.permissions
+        }
       } else {
         error.value = response.message || "載入用戶資料失敗"
       }
@@ -44,10 +57,10 @@ export function useUserProfile() {
 
   /**
    * 重新載入用戶資料
-   * @description 用於密碼修改後或併發衝突時重新取得最新資料
+   * @description 用於密碼修改後或併發衝突時重新取得最新資料，並同步更新 Pinia Store
    */
   const refreshProfile = async (): Promise<void> => {
-    await fetchUserProfile()
+    await fetchUserProfile(true)
   }
 
   return {

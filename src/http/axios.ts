@@ -66,10 +66,17 @@ function createInstance() {
     },
     (error) => {
       const status = get(error, "response.status")
+      const code = get(error, "response.data.code")
       const message = get(error, "response.data.message")
 
       error.message = message || `HTTP ${status}`
 
+      // 驗證錯誤（如舊密碼錯誤、密碼格式錯誤）是業務邏輯錯誤，不應該觸發登出，也不顯示全局錯誤（由業務邏輯層處理）
+      if (status === 400 && code === "VALIDATION_ERROR") {
+        return Promise.reject(error)
+      }
+
+      // 401 錯誤需要登出
       if (status === 401) {
         logout()
       }

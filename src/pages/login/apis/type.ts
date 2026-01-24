@@ -1,6 +1,6 @@
 export interface LoginRequestData {
   /** 用户名 */
-  username: string
+  account: string
   /** 密码 */
   password: string
   /** 验证码 */

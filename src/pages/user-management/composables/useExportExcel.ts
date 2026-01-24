@@ -24,7 +24,7 @@ export function useExportExcel() {
   function exportUsers(users: User[]): void {
     // 轉換資料格式
     const exportData: UserExportData[] = users.map(user => ({
-      用戶名: user.username,
+      用戶名: user.account,
       顯示名稱: user.displayName,
       狀態: user.status === "active" ? "啟用" : "已停用",
       建立時間: dayjs(user.createdAt).format("YYYY-MM-DD HH:mm:ss"),

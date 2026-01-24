@@ -27,8 +27,8 @@ const {
 } = useChangePasswordForm(emit)
 
 /** 處理表單提交 */
-function onSubmit(): void {
-  handleSubmit(props.userId, props.version)
+async function onSubmit(): Promise<void> {
+  await handleSubmit(props.userId, props.version)
 }
 </script>
 

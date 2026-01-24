@@ -5,18 +5,22 @@
  */
 
 import type { FormInstance, FormRules } from "element-plus"
-import type { ChangePasswordRequest } from "../types"
+import type { ResetPasswordRequest } from "../types"
 import { API_CODE_CONCURRENT_UPDATE_CONFLICT } from "@@/constants/api-code"
 import { ElMessage } from "element-plus"
 import { reactive, ref } from "vue"
-import { changePassword } from "../apis/user"
+import { resetPassword } from "../apis/user"
 
 /** 表單數據類型 */
-interface PasswordFormData extends ChangePasswordRequest {
+interface PasswordFormData {
+  /** 新密碼 */
+  newPassword: string
   /** 確認新密碼 */
   confirmPassword: string
   /** 待修改的用戶 ID */
   userId?: string
+  /** 資料版本號 */
+  version: number
 }
 
 /**
@@ -37,7 +41,6 @@ export function useChangePasswordForm() {
 
   /** 表單資料 */
   const formData = reactive<PasswordFormData>({
-    oldPassword: "",
     newPassword: "",
     confirmPassword: "",
     userId: undefined,
@@ -75,10 +78,6 @@ export function useChangePasswordForm() {
 
   /** 表單驗證規則 */
   const rules: FormRules = {
-    oldPassword: [
-      { required: true, message: "請輸入舊密碼", trigger: "blur" },
-      { min: 8, message: "密碼至少需要 8 字元", trigger: "blur" }
-    ],
     newPassword: [
       { required: true, message: "請輸入新密碼", trigger: "blur" },
       { validator: passwordValidator, trigger: "blur" }
@@ -90,7 +89,7 @@ export function useChangePasswordForm() {
   }
 
   /**
-   * 提交表單（變更密碼）
+   * 提交表單（管理者重設密碼）
    * @returns 成功返回 true，失敗返回 false
    */
   async function submitForm(): Promise<boolean> {
@@ -106,14 +105,13 @@ export function useChangePasswordForm() {
 
       formLoading.value = true
 
-      const response = await changePassword(formData.userId, {
-        oldPassword: formData.oldPassword,
+      const response = await resetPassword(formData.userId, {
         newPassword: formData.newPassword,
         version: formData.version
-      } as ChangePasswordRequest)
+      } as ResetPasswordRequest)
 
       if (response.success) {
-        ElMessage.success("密碼修改成功")
+        ElMessage.success("密碼重設成功")
         return true
       }
 
@@ -124,11 +122,23 @@ export function useChangePasswordForm() {
       }
 
       return false
-    } catch (error) {
-      // 捕獲任何異常（包括 409 衝突等其他 HTTP 錯誤）
-      const errorMessage = error instanceof Error ? error.message : "提交失敗"
-      if (!errorMessage.includes("資料已被其他使用者更新")) {
-        ElMessage.error(errorMessage)
+    } catch (error: any) {
+      // 捕獲任何異常
+      const status = error?.response?.status
+      const code = error?.response?.data?.code
+
+      if (status === 409 && code === API_CODE_CONCURRENT_UPDATE_CONFLICT) {
+        ElMessage.error("資料已被其他操作修改，請重新整理後再試")
+      } else if (status === 403) {
+        ElMessage.error("您沒有權限執行此操作")
+      } else if (status === 404) {
+        ElMessage.error("找不到指定的用戶")
+      } else if (status === 400) {
+        const message = error?.response?.data?.message || "輸入資料格式錯誤"
+        ElMessage.error(message)
+      } else {
+        console.error("密碼重設失敗:", error)
+        ElMessage.error("密碼重設失敗，請稍後再試")
       }
       return false
     } finally {
