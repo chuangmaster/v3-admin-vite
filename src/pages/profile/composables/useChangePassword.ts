@@ -133,6 +133,8 @@ export function useChangePasswordForm(emit: ChangePasswordEmits) {
     if (status === 409 && code === API_CODE_CONCURRENT_UPDATE_CONFLICT) {
       ElMessage.error("資料已被其他操作修改，請重新整理後再試")
       emit("refresh-required")
+    } else if (status === 400 && code === "INVALID_OLD_PASSWORD") {
+      ElMessage.error("舊密碼不正確，請重新輸入")
     } else if (status === 400 && code === "VALIDATION_ERROR") {
       // 顯示後端返回的驗證錯誤訊息（可能是舊密碼錯誤或密碼格式錯誤）
       const message = error.response?.data?.message || "輸入資料驗證錯誤"
