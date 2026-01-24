@@ -5,6 +5,7 @@
 
 import type { Role } from "../types"
 
+import { formatDateTime } from "@@/utils/datetime"
 import { ElMessageBox } from "element-plus"
 import * as XLSX from "xlsx"
 
@@ -34,7 +35,7 @@ export function useExportExcel() {
         const exportData = roles.map(role => ({
           角色名稱: role.roleName,
           角色描述: role.description || "",
-          建立時間: new Date(role.createdAt).toLocaleString("zh-TW"),
+          建立時間: formatDateTime(role.createdAt),
           版本號: role.version
         }))
 

@@ -5,6 +5,7 @@
  */
 
 import type { Permission } from "../types"
+import { formatDateTime } from "@@/utils/datetime"
 import { ElMessage } from "element-plus"
 import { ref } from "vue"
 import * as XLSX from "xlsx"
@@ -37,8 +38,8 @@ export function useExportExcel() {
         描述: permission.description || "-",
         系統權限: permission.isSystem ? "是" : "否",
         版本: permission.version,
-        建立時間: formatDate(permission.createdAt),
-        更新時間: formatDate(permission.updatedAt),
+        建立時間: formatDateTime(permission.createdAt),
+        更新時間: formatDateTime(permission.updatedAt),
         建立者: (permission as any).createdBy || "-",
         更新者: (permission as any).updatedBy || "-"
       }))
@@ -66,30 +67,6 @@ export function useExportExcel() {
       ElMessage.error("匯出失敗")
     } finally {
       exporting.value = false
-    }
-  }
-
-  /**
-   * 將資料轉換為 CSV 格式
-   */
-  // CSV 轉換與下載相關函式已移除，改為使用 xlsx 套件產生 .xlsx
-
-  /**
-   * 格式化日期
-   */
-  function formatDate(dateString: string): string {
-    try {
-      const date = new Date(dateString)
-      return date.toLocaleString("zh-TW", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-      })
-    } catch {
-      return dateString
     }
   }
 

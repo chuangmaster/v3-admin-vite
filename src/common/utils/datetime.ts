@@ -14,7 +14,7 @@ const INVALID_DATE = "N/A"
  * @param template - 格式模板
  * @returns 格式化後的日期時間字串（使用瀏覽器本地時區）
  */
-export function formatDateTime(datetime: string | number | Date = "", template: string = "YYYY-MM-DD HH:mm:ss") {
+export function formatDateTime(datetime?: string | number | Date | null, template: string = "YYYY-MM-DD HH:mm:ss") {
   if (!datetime) return INVALID_DATE
 
   // dayjs 會自動將 ISO 8601 字串轉換為本地時區
