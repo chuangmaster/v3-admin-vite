@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { User } from "../types"
 import { USER_PERMISSIONS } from "@@/constants/permissions"
-import dayjs from "dayjs"
+import { formatDateTime } from "@@/utils/datetime"
 
 interface Props {
   /** 用戶列表資料 */
@@ -74,12 +74,12 @@ defineExpose({
     </el-table-column>
     <el-table-column prop="createdAt" label="建立時間" width="180">
       <template #default="{ row }">
-        {{ dayjs(row.createdAt).format("YYYY-MM-DD HH:mm:ss") }}
+        {{ formatDateTime(row.createdAt) }}
       </template>
     </el-table-column>
     <el-table-column prop="updatedAt" label="最後更新時間" width="180">
       <template #default="{ row }">
-        {{ row.updatedAt ? dayjs(row.updatedAt).format("YYYY-MM-DD HH:mm:ss") : "-" }}
+        {{ row.updatedAt ? formatDateTime(row.updatedAt) : "-" }}
       </template>
     </el-table-column>
     <el-table-column label="操作" width="180" fixed="right">
