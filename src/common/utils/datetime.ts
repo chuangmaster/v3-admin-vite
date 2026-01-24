@@ -21,3 +21,15 @@ export function formatDateTime(datetime: string | number | Date | null | undefin
   const day = dayjs(datetime)
   return day.isValid() ? day.format(template) : INVALID_DATE
 }
+
+/**
+ * 將日期字串轉換為 UTC+0 的 ISO String
+ * @param dateString - 日期字串（YYYY-MM-DD 格式）
+ * @param endOfDay - 是否為當天結束時間（23:59:59），預設為開始時間（00:00:00）
+ * @returns UTC+0 的 ISO String 格式
+ */
+export function toUTC0ISOString(dateString: string, endOfDay: boolean = false): string {
+  const time = endOfDay ? "23:59:59" : "00:00:00"
+  // 使用 dayjs 解析日期並設定為 UTC+0
+  return dayjs.utc(`${dateString} ${time}`, "YYYY-MM-DD HH:mm:ss").toISOString()
+}
