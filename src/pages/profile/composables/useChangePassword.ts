@@ -99,7 +99,6 @@ export function useChangePasswordForm(emit: ChangePasswordEmits) {
     if (!isValid) return
 
     submitting.value = true
-
     try {
       const response = await changePassword(userId, {
         oldPassword: formData.oldPassword,
@@ -124,6 +123,7 @@ export function useChangePasswordForm(emit: ChangePasswordEmits) {
   /**
    * 處理 API 錯誤
    * @param err - 錯誤物件
+   * @remarks 對於 VALIDATION_ERROR 錯誤（如舊密碼錯誤），axios 攔截器不會顯示全局錯誤訊息，由此函式負責顯示友好的錯誤提示
    */
   const handleApiError = (err: unknown): void => {
     const error = err as { response?: { status?: number, data?: { code?: string, message?: string } } }
@@ -133,8 +133,12 @@ export function useChangePasswordForm(emit: ChangePasswordEmits) {
     if (status === 409 && code === API_CODE_CONCURRENT_UPDATE_CONFLICT) {
       ElMessage.error("資料已被其他操作修改，請重新整理後再試")
       emit("refresh-required")
-    } else if (status === 401 && code === "INVALID_OLD_PASSWORD") {
+    } else if (status === 400 && code === "INVALID_OLD_PASSWORD") {
       ElMessage.error("舊密碼不正確，請重新輸入")
+    } else if (status === 400 && code === "VALIDATION_ERROR") {
+      // 顯示後端返回的驗證錯誤訊息（可能是舊密碼錯誤或密碼格式錯誤）
+      const message = error.response?.data?.message || "輸入資料驗證錯誤"
+      ElMessage.error(message)
     } else if (status === 400) {
       const message = error.response?.data?.message || "輸入資料格式錯誤"
       ElMessage.error(message)

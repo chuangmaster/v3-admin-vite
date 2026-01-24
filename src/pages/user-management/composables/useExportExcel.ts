@@ -28,7 +28,7 @@ export function useExportExcel() {
       顯示名稱: user.displayName,
       狀態: user.status === "active" ? "啟用" : "已停用",
       建立時間: formatDateTime(user.createdAt),
-      最後更新時間: formatDateTime(user.updatedAt)
+      最後更新時間: user.updatedAt ? formatDateTime(user.updatedAt) : "-"
     }))
 
     // 建立工作表
