@@ -6,6 +6,7 @@ import { formatDateTime } from "@@/utils/datetime"
  */
 import { ArrowLeft, CopyDocument, DocumentChecked, Goods, Promotion, Refresh, Upload } from "@element-plus/icons-vue"
 import { ElMessage } from "element-plus"
+import { useTagsViewStore } from "@/pinia/stores/tags-view"
 import { getAttachmentList } from "./apis/attachment"
 import AttachmentUploader from "./components/AttachmentUploader.vue"
 import OfflineSignatureDialog from "./components/OfflineSignatureDialog.vue"
@@ -20,9 +21,43 @@ defineOptions({
 
 const route = useRoute()
 const router = useRouter()
+const tagsViewStore = useTagsViewStore()
 
 const id = computed(() => route.params.id as string)
 const { loading, serviceOrder } = useServiceOrderDetail(id.value)
+
+/**
+ * 更新頁籤標題為服務單號
+ */
+watch(
+  () => serviceOrder.value?.orderNumber,
+  (orderNumber) => {
+    if (orderNumber) {
+      // 更新路由 meta 中的 title
+      const newTitle = {
+        zhCN: `服务单详情 - ${orderNumber}`,
+        zhTW: `服務單詳情 - ${orderNumber}`,
+        en: `Service Order Detail - ${orderNumber}`
+      }
+
+      // 找到當前路由在 visitedViews 中的索引
+      const index = tagsViewStore.visitedViews.findIndex(v => v.path === route.path)
+      if (index !== -1) {
+        // 更新該標籤的 meta.title
+        const view = tagsViewStore.visitedViews[index]
+        if (view.meta) {
+          view.meta = {
+            ...view.meta,
+            title: newTitle
+          }
+          // 強制觸發響應式更新
+          tagsViewStore.visitedViews[index] = { ...view }
+        }
+      }
+    }
+  },
+  { immediate: true }
+)
 
 const attachments = ref<Attachment[]>([])
 const attachmentsLoading = ref(false)

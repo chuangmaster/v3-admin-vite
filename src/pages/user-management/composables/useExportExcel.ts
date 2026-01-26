@@ -4,6 +4,7 @@
  */
 
 import type { User, UserExportData } from "../types"
+import { formatDateTime } from "@@/utils/datetime"
 import dayjs from "dayjs"
 import * as XLSX from "xlsx"
 
@@ -27,8 +28,8 @@ export function useExportExcel() {
       用戶名: user.account,
       顯示名稱: user.displayName,
       狀態: user.status === "active" ? "啟用" : "已停用",
-      建立時間: dayjs(user.createdAt).format("YYYY-MM-DD HH:mm:ss"),
-      最後更新時間: user.updatedAt ? dayjs(user.updatedAt).format("YYYY-MM-DD HH:mm:ss") : "-"
+      建立時間: formatDateTime(user.createdAt),
+      最後更新時間: user.updatedAt ? formatDateTime(user.updatedAt) : "-"
     }))
 
     // 建立工作表

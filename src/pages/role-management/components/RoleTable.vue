@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Role } from "../types"
-import dayjs from "dayjs"
+import { formatDateTime } from "@@/utils/datetime"
 
 interface Props {
   /** 角色資料 */
@@ -24,7 +24,7 @@ defineEmits<Emits>()
     <el-table-column prop="description" label="角色描述" min-width="250" show-overflow-tooltip />
     <el-table-column prop="createdAt" label="建立時間" min-width="180">
       <template #default="{ row }">
-        {{ dayjs(row.createdAt).format('YYYY-MM-DD HH:mm:ss') }}
+        {{ formatDateTime(row.createdAt) }}
       </template>
     </el-table-column>
     <el-table-column label="操作" width="180" fixed="right" align="center">

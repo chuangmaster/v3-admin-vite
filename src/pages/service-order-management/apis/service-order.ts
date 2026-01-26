@@ -1,8 +1,3 @@
-/**
- * 服務單管理 API 服務
- * @module @/pages/service-order-management/apis/service-order
- */
-
 import type { PagedApiResponse } from "types/api"
 import type {
   CreateBuybackOrderRequest,
@@ -13,6 +8,7 @@ import type {
   ServiceOrderListParams,
   UpdateStatusRequest
 } from "../types"
+import { toUTC0ISOString } from "@@/utils/datetime"
 import { request } from "@/http/axios"
 
 /**
@@ -23,7 +19,17 @@ import { request } from "@/http/axios"
 export async function getServiceOrderList(
   params: ServiceOrderListParams
 ): Promise<PagedApiResponse<ServiceOrderListItem[]>> {
-  return request({ url: "/service-orders", method: "GET", params })
+  // 處理日期範圍參數，將 createdDateRange 轉換為 createdAtStart 和 createdAtEnd
+  const apiParams = { ...params }
+  if (apiParams.createdDateRange && apiParams.createdDateRange.length === 2) {
+    // 轉換為 UTC+0 的 ISO String 格式
+    apiParams.createdAtStart = toUTC0ISOString(apiParams.createdDateRange[0], false)
+    apiParams.createdAtEnd = toUTC0ISOString(apiParams.createdDateRange[1], true)
+  }
+  // 移除前端用的 createdDateRange，避免傳給後端
+  delete (apiParams as any).createdDateRange
+
+  return request({ url: "/service-orders", method: "GET", params: apiParams })
 }
 
 /**

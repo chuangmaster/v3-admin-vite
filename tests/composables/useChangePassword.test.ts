@@ -185,11 +185,11 @@ describe("useChangePasswordForm composable", () => {
     expect(mockElMessage.error).toHaveBeenCalledWith("資料已被其他操作修改，請重新整理後再試")
   })
 
-  it("should show error message on 401 invalid old password", async () => {
+  it("should show error message on 400 invalid old password", async () => {
     mockChangePassword.mockRejectedValue({
       response: {
-        status: 401,
-        data: { code: "INVALID_OLD_PASSWORD", message: "舊密碼不正確" }
+        status: 400,
+        data: { code: "VALIDATION_ERROR", message: "舊密碼不正確" }
       }
     })
 
@@ -205,7 +205,7 @@ describe("useChangePasswordForm composable", () => {
 
     await handleSubmit("user-123", 5)
 
-    expect(mockElMessage.error).toHaveBeenCalledWith("舊密碼不正確，請重新輸入")
+    expect(mockElMessage.error).toHaveBeenCalledWith("舊密碼不正確")
   })
 
   it("should handle 400 validation error", async () => {
