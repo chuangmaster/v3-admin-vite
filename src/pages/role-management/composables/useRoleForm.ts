@@ -11,11 +11,11 @@ import type {
   Role,
   UpdateRoleRequest
 } from "../types"
-import { ElMessage } from "element-plus"
 
 import { nextTick, ref } from "vue"
 
 import { assignPermissions, createRole, getPermissions, getRoleDetail, removePermission, updateRole } from "../apis/role"
+
 import { usePermissionTree } from "./usePermissionTree"
 
 /**
@@ -198,7 +198,16 @@ export function useRoleForm(onSuccess?: () => void) {
         if (response.data) {
           formData.value.version = response.data.version
         }
-        ElMessage.success("角色更新成功")
+        ElNotification({
+          title: "更新成功",
+          message: "角色資訊已成功更新",
+          type: "success",
+          duration: 2000,
+          position: "top-right",
+          offset: 60
+        })
+        // 延遲刷新，讓使用者看到成功提示
+        await new Promise(resolve => setTimeout(resolve, 500))
         onSuccess?.()
       } else {
         // 新增模式：建立新角色
@@ -215,7 +224,16 @@ export function useRoleForm(onSuccess?: () => void) {
         // 保存新建的角色 ID
         currentRoleId.value = response.data!.id
         isEditMode.value = true
-        ElMessage.success("角色建立成功")
+        ElNotification({
+          title: "建立成功",
+          message: `角色「${formData.value.roleName}」已成功建立`,
+          type: "success",
+          duration: 2000,
+          position: "top-right",
+          offset: 60
+        })
+        // 延遲刷新，讓使用者看到成功提示
+        await new Promise(resolve => setTimeout(resolve, 500))
         onSuccess?.()
       }
     } catch (error) {
@@ -276,7 +294,20 @@ export function useRoleForm(onSuccess?: () => void) {
 
       // 更新原始權限 ID
       originalPermissionIds.value = [...currentIds]
-      ElMessage.success("權限更新成功")
+
+      ElNotification({
+        title: "權限更新成功",
+        message: addedIds.length > 0 || removedIds.length > 0
+          ? `已新增 ${addedIds.length} 個權限，移除 ${removedIds.length} 個權限`
+          : "權限配置無變更",
+        type: "success",
+        duration: 2500,
+        position: "top-right",
+        offset: 60
+      })
+
+      // 延遲刷新，讓使用者看到成功提示
+      await new Promise(resolve => setTimeout(resolve, 500))
       onSuccess?.()
     } catch (error) {
       console.error("[useRoleForm] submitPermission failed:", error)
