@@ -69,12 +69,15 @@ describe("customerSearch.vue", () => {
     // Arrange
     const mockCustomer: Customer = {
       id: "1",
-      name: "王小明",
+      name: "測試客戶",
       phoneNumber: "0912345678",
-      email: "wang@example.com",
-      idCardNumber: "A123456789",
-      residentialAddress: "台北市大安區",
-      createdAt: "2025-01-01T00:00:00Z"
+      email: "test@example.com",
+      idNumber: "A123456789",
+      residentialAddress: "測試地址",
+      lineId: null,
+      createdAt: "2025-01-01T00:00:00Z",
+      updatedAt: null,
+      version: 1
     }
 
     wrapper = mount(CustomerSearch, {

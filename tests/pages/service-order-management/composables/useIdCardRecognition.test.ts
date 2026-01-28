@@ -1,14 +1,14 @@
-import type { OCRIDCardResponse } from "@/pages/service-order-management/types"
+import type { IdCardRecognitionResponse } from "@/pages/customer-management/types"
 /**
  * useIdCardRecognition 組合式函式測試
  */
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import * as ocrApi from "@/pages/service-order-management/apis/ocr"
+import { customerApi } from "@/pages/customer-management/apis/customer"
 import { useIdCardRecognition } from "@/pages/service-order-management/composables/useIdCardRecognition"
 
 // Mock API
-vi.mock("@/pages/service-order-management/apis/ocr")
+vi.mock("@/pages/customer-management/apis/customer")
 
 // Mock Element Plus globals
 vi.stubGlobal("ElMessage", {
@@ -35,16 +35,15 @@ describe("useIdCardRecognition", () => {
   it("應該成功辨識身分證", async () => {
     // Arrange
     const mockFile = new File(["test"], "id-card.jpg", { type: "image/jpeg" })
-    const mockResult: OCRIDCardResponse = {
+    const mockResult: IdCardRecognitionResponse = {
       name: "王小明",
       idNumber: "A123456789",
-      confidence: 0.95,
-      isLowConfidence: false
+      address: "台北市大安區"
     }
 
-    vi.mocked(ocrApi.recognizeIDCard).mockResolvedValue({
+    vi.mocked(customerApi.recognizeIdCard).mockResolvedValue({
       success: true,
-      code: "SUCCESS",
+      code: "200",
       message: "辨識成功",
       data: mockResult,
       timestamp: "2025-01-01T00:00:00Z",
@@ -59,29 +58,28 @@ describe("useIdCardRecognition", () => {
     // Assert
     expect(recognizing.value).toBe(false)
     expect(recognitionResult.value).toEqual(mockResult)
-    expect(ocrApi.recognizeIDCard).toHaveBeenCalled()
+    expect(customerApi.recognizeIdCard).toHaveBeenCalled()
   })
 
-  it("應該在辨識失敗時重試（最多 3 次）", async () => {
+  it("應該在辨識失敗時重試(最多 3 次)", async () => {
     // Arrange
     const mockFile = new File(["test"], "id-card.jpg", { type: "image/jpeg" })
 
     // Mock confirm 返回 true 以重試
     vi.mocked(ElMessageBox.confirm).mockResolvedValue("confirm" as any)
 
-    // 前兩次失敗，第三次成功
-    vi.mocked(ocrApi.recognizeIDCard)
+    // 前兩次失敗,第三次成功
+    vi.mocked(customerApi.recognizeIdCard)
       .mockRejectedValueOnce(new Error("Network error"))
       .mockRejectedValueOnce(new Error("Network error"))
       .mockResolvedValueOnce({
         success: true,
-        code: "SUCCESS",
+        code: "200",
         message: "辨識成功",
         data: {
           name: "王小明",
           idNumber: "A123456789",
-          confidence: 0.9,
-          isLowConfidence: false
+          address: "台北市大安區"
         },
         timestamp: "2025-01-01T00:00:00Z",
         traceId: "test-trace-id"
@@ -93,7 +91,7 @@ describe("useIdCardRecognition", () => {
     await flushPromises()
 
     // Assert
-    expect(ocrApi.recognizeIDCard).toHaveBeenCalledTimes(3)
+    expect(customerApi.recognizeIdCard).toHaveBeenCalledTimes(3)
     expect(recognitionResult.value).toBeTruthy()
     expect(recognitionResult.value?.name).toBe("王小明")
   })
@@ -105,7 +103,7 @@ describe("useIdCardRecognition", () => {
     // Mock confirm 返回 true 以重試
     vi.mocked(ElMessageBox.confirm).mockResolvedValue("confirm" as any)
 
-    vi.mocked(ocrApi.recognizeIDCard).mockRejectedValue(new Error("Network error"))
+    vi.mocked(customerApi.recognizeIdCard).mockRejectedValue(new Error("Network error"))
 
     // Act
     const { recognize, recognitionResult } = useIdCardRecognition()
@@ -113,7 +111,7 @@ describe("useIdCardRecognition", () => {
     await flushPromises()
 
     // Assert
-    expect(ocrApi.recognizeIDCard).toHaveBeenCalledTimes(3)
+    expect(customerApi.recognizeIdCard).toHaveBeenCalledTimes(3)
     expect(recognitionResult.value).toBeUndefined()
   })
 

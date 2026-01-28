@@ -27,19 +27,25 @@ describe("useCustomerSearch", () => {
         name: "王小明",
         phoneNumber: "0912345678",
         email: "wang@example.com",
-        idCardNumber: "A123456789",
+        idNumber: "A123456789",
         residentialAddress: "台北市大安區",
-        createdAt: "2025-01-01T00:00:00Z"
+        lineId: null,
+        createdAt: "2025-01-01T00:00:00Z",
+        updatedAt: null,
+        version: 1
       }
     ]
 
     vi.mocked(customerApi.searchCustomers).mockResolvedValue({
       success: true,
-      code: "SUCCESS",
+      code: "200",
       message: "查詢成功",
       data: mockCustomers,
       timestamp: "2025-01-01T00:00:00Z",
-      traceId: "test-trace-id"
+      traceId: "test-trace-id",
+      pageNumber: 1,
+      pageSize: 20,
+      totalCount: 1
     })
 
     // Act
@@ -76,11 +82,14 @@ describe("useCustomerSearch", () => {
     // Arrange
     vi.mocked(customerApi.searchCustomers).mockResolvedValue({
       success: false,
-      code: "ERROR",
+      code: "500",
       message: "搜尋失敗",
       data: null,
       timestamp: "2025-01-01T00:00:00Z",
-      traceId: "test-trace-id"
+      traceId: "test-trace-id",
+      pageNumber: 1,
+      pageSize: 20,
+      totalCount: 0
     })
 
     // Act
@@ -105,9 +114,12 @@ describe("useCustomerSearch", () => {
         name: "測試客戶",
         phoneNumber: "0912345678",
         email: "test@example.com",
-        idCardNumber: "A123456789",
+        idNumber: "A123456789",
         residentialAddress: "台北市大安區",
-        createdAt: "2025-01-01T00:00:00Z"
+        lineId: null,
+        createdAt: "2025-01-01T00:00:00Z",
+        updatedAt: null,
+        version: 1
       }
     ]
 

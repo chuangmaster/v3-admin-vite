@@ -10,3 +10,17 @@ tests/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Build outputs
+dist/
+dist-test/
+build/
+
+# Documentation
+README*.md
+RAILWAY-DEPLOY.md
+LICENSE
+specs/
+
+# Auto-generated types
+types/auto/

@@ -1,7 +1,7 @@
 /**
  * 身分證辨識業務邏輯
  */
-import { recognizeIDCard } from "../apis/ocr"
+import { customerApi } from "@/pages/customer-management/apis/customer"
 
 export function useIdCardRecognition() {
   const recognizing = ref(false)
@@ -15,37 +15,19 @@ export function useIdCardRecognition() {
   }>()
 
   /**
-   * 將檔案轉換為 Base64
-   */
-  function fileToBase64(file: File): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => {
-        const result = reader.result as string
-        // 移除 data:image/xxx;base64, 前綴
-        const base64 = result.split(",")[1]
-        resolve(base64)
-      }
-      reader.onerror = reject
-      reader.readAsDataURL(file)
-    })
-  }
-
-  /**
    * 執行辨識
    */
   async function recognize(file: File): Promise<boolean> {
     recognizing.value = true
     try {
-      // 將圖片轉換為 Base64
-      const base64 = await fileToBase64(file)
-      const contentType = file.type || "image/jpeg"
-      const fileName = file.name
-
-      const response = await recognizeIDCard(base64, contentType, fileName)
+      // 呼叫統一的 OCR API
+      const response = await customerApi.recognizeIdCard([file])
 
       if (response.success && response.data) {
-        recognitionResult.value = response.data
+        recognitionResult.value = {
+          name: response.data.name || "",
+          idNumber: response.data.idNumber || ""
+        }
         retryCount.value = 0
         ElMessage.success("辨識成功")
         return true
@@ -57,7 +39,7 @@ export function useIdCardRecognition() {
 
       if (retryCount.value < MAX_RETRY_COUNT) {
         const shouldRetry = await ElMessageBox.confirm(
-          `辨識失敗，是否重試？（剩餘 ${MAX_RETRY_COUNT - retryCount.value} 次機會）`,
+          `辨識失敗,是否重試?(剩餘 ${MAX_RETRY_COUNT - retryCount.value} 次機會)`,
           "提示",
           {
             confirmButtonText: "重試",
@@ -73,7 +55,7 @@ export function useIdCardRecognition() {
           return false
         }
       } else {
-        ElMessage.error("已達最大重試次數，請檢查圖片是否清晰或手動輸入資料")
+        ElMessage.error("已達最大重試次數,請檢查圖片是否清晰或手動輸入資料")
         retryCount.value = 0
         return false
       }
