@@ -233,6 +233,21 @@ function handleRemoveProduct(index: number) {
  * 提交訂單
  */
 async function handleSubmit() {
+  // 驗證線上訂單必須有客戶 email
+  if (formData.orderSource === ServiceOrderSource.ONLINE) {
+    if (!selectedCustomer.value?.email || selectedCustomer.value.email.trim() === "") {
+      ElMessageBox.alert(
+        "線上訂單需要客戶的 Email 地址以便發送通知。請先更新客戶資料，補充 Email 後再建立訂單。",
+        "缺少客戶 Email",
+        {
+          confirmButtonText: "確定",
+          type: "warning"
+        }
+      )
+      return
+    }
+  }
+
   await submitForm()
 }
 

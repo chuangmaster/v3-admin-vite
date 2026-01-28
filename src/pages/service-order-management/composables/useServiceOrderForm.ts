@@ -7,7 +7,8 @@ import type {
   Customer,
   ProductItem
 } from "../types"
-
+import { toUTC0ISOString } from "@@/utils/datetime"
+import { ElMessage } from "element-plus"
 import { createBuybackOrder, createConsignmentOrder } from "../apis/service-order"
 import { RenewalOption, ServiceOrderSource, ServiceOrderType } from "../types"
 
@@ -269,8 +270,13 @@ export function useServiceOrderForm() {
             defects: item.defects
           })),
           totalAmount: formData.totalAmount!,
-          consignmentStartDate: formData.consignmentStartDate,
-          consignmentEndDate: formData.consignmentEndDate,
+          // 將日期字串轉換為 UTC+0 的 ISO String 格式
+          consignmentStartDate: formData.consignmentStartDate
+            ? toUTC0ISOString(formData.consignmentStartDate, false)
+            : undefined,
+          consignmentEndDate: formData.consignmentEndDate
+            ? toUTC0ISOString(formData.consignmentEndDate, true)
+            : undefined,
           renewalOption: formData.renewalOption,
           remarks: formData.notes
         }

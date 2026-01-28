@@ -30,6 +30,55 @@ const formRef = ref<FormInstance>()
 /** 是否為寄賣單 */
 const isConsignment = computed(() => props.orderType === ServiceOrderType.CONSIGNMENT)
 
+/** 品牌清單 */
+const BRAND_OPTIONS = [
+  "Hermès (愛馬仕)",
+  "Chanel (香奈兒)",
+  "Louis Vuitton (LV)",
+  "Celine",
+  "Dior (迪奧)",
+  "Goyard",
+  "Loewe",
+  "Balenciaga (巴黎世家)",
+  "Bottega Veneta (BV)",
+  "Burberry",
+  "Fendi",
+  "Miu Miu",
+  "Chloé",
+  "Valentino",
+  "Saint Laurent (YSL)",
+  "Gucci",
+  "Prada",
+  "Rolex (勞力士)",
+  "Cartier (卡地亞)",
+  "Chrome Hearts",
+  "Jacquemus",
+  "Ami Paris",
+  "Thom Browne",
+  "Maison Margiela",
+  "Van Cleef & Arpels (VCA)",
+  "Loro Piana",
+  "Golden Goose",
+  "Autry",
+  "Givenchy",
+  "Rimowa",
+  "Longchamp",
+  "Vivienne Westwood",
+  "Polène"
+]
+
+/**
+ * 品牌自動完成查詢
+ */
+function queryBrandSearch(queryString: string, cb: (results: Array<{ value: string }>) => void) {
+  const results = queryString
+    ? BRAND_OPTIONS.filter(brand =>
+        brand.toLowerCase().includes(queryString.toLowerCase())
+      ).map(brand => ({ value: brand }))
+    : BRAND_OPTIONS.map(brand => ({ value: brand }))
+  cb(results)
+}
+
 /** 表單資料 */
 const formData = reactive<{
   brandName: string
@@ -137,7 +186,15 @@ defineExpose({
   <el-form ref="formRef" :model="formData" :rules="rules" label-width="100px">
     <!-- 共用欄位：品牌名稱、款式、內碼 -->
     <el-form-item label="品牌名稱" prop="brandName">
-      <el-input v-model="formData.brandName" placeholder="請輸入品牌名稱" maxlength="100" show-word-limit />
+      <el-autocomplete
+        v-model="formData.brandName as string"
+        :fetch-suggestions="queryBrandSearch"
+        placeholder="請輸入或選擇品牌名稱"
+        maxlength="100"
+        style="width: 100%;"
+        clearable
+        :trigger-on-focus="true"
+      />
     </el-form-item>
 
     <el-form-item label="款式" prop="style">
