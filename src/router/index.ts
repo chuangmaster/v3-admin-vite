@@ -145,14 +145,14 @@ export const dynamicRoutes: RouteRecordRaw[] = [
     meta: {
       title: { zhCN: "客户管理", zhTW: "客戶管理", en: "Customer Management" },
       titleKey: "customerManagement",
-      elIcon: "User",
-      permissions: ["customer.read"]
+      elIcon: "UserFilled",
+      alwaysShow: true
     },
     children: [
       {
         path: "index",
         component: () => import("@/pages/customer-management/index.vue"),
-        name: "CustomerManagementPage",
+        name: "CustomerList",
         meta: {
           title: { zhCN: "客户列表", zhTW: "客戶列表", en: "Customer List" },
           titleKey: "customerList",

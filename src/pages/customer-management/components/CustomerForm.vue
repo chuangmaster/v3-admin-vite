@@ -20,8 +20,10 @@ import IdCardUpload from "./IdCardUpload.vue"
 interface Props {
   /** 編輯模式下的客戶資料 */
   customer?: Customer
-  /** 表單模式: create(新增) | edit(編輯) */
-  mode?: "create" | "edit"
+  /** 初始資料（用於 create/edit/view 模式） */
+  initialData?: Customer
+  /** 表單模式: create(新增) | edit(編輯) | view(查看) */
+  mode?: "create" | "edit" | "view"
   /** 載入中狀態 */
   loading?: boolean
 }
@@ -60,29 +62,35 @@ const formData = ref({
   version: undefined as number | undefined
 })
 
+/** 是否為查看模式 */
+const isViewMode = computed(() => props.mode === "view")
+
 /** 表單驗證規則 */
 const rules = computed(() => {
+  if (props.mode === "view") return {}
   return props.mode === "create" ? createCustomerRules : updateCustomerRules
 })
 
 /** 表單標題 */
 const title = computed(() => {
+  if (props.mode === "view") return "客戶詳情"
   return props.mode === "create" ? "新增客戶" : "編輯客戶"
 })
 
 /** 監聽客戶資料變更,填入表單 */
 watch(
-  () => props.customer,
-  (newCustomer) => {
-    if (newCustomer && props.mode === "edit") {
+  () => [props.customer, props.initialData] as const,
+  ([newCustomer, newInitialData]) => {
+    const data = newCustomer || newInitialData
+    if (data && (props.mode === "edit" || props.mode === "view")) {
       formData.value = {
-        name: newCustomer.name,
-        phoneNumber: newCustomer.phoneNumber,
-        email: newCustomer.email || "",
-        idNumber: newCustomer.idNumber,
-        residentialAddress: newCustomer.residentialAddress,
-        lineId: newCustomer.lineId || "",
-        version: newCustomer.version
+        name: data.name,
+        phoneNumber: data.phoneNumber,
+        email: data.email || "",
+        idNumber: data.idNumber,
+        residentialAddress: data.residentialAddress,
+        lineId: data.lineId || "",
+        version: data.version
       }
     } else if (props.mode === "create") {
       formData.value = {
@@ -210,6 +218,7 @@ defineExpose({
           maxlength="100"
           show-word-limit
           clearable
+          :disabled="isViewMode"
         />
       </ElFormItem>
 
@@ -219,11 +228,11 @@ defineExpose({
           v-model="formData.idNumber"
           placeholder="請輸入身分證字號 (例: A123456789)"
           maxlength="10"
-          :disabled="mode === 'edit'"
+          :disabled="mode === 'edit' || isViewMode"
           clearable
         />
         <template #extra>
-          <span v-if="mode === 'edit'" class="form-tip">
+          <span v-if="mode === 'edit' && !isViewMode" class="form-tip">
             身分證字號不可修改
           </span>
         </template>
@@ -236,6 +245,7 @@ defineExpose({
           placeholder="請輸入手機號碼 (例: 0912345678)"
           maxlength="10"
           clearable
+          :disabled="isViewMode"
         />
       </ElFormItem>
 
@@ -247,6 +257,7 @@ defineExpose({
           maxlength="100"
           type="email"
           clearable
+          :disabled="isViewMode"
         />
       </ElFormItem>
 
@@ -260,6 +271,7 @@ defineExpose({
           :rows="3"
           show-word-limit
           clearable
+          :disabled="isViewMode"
         />
       </ElFormItem>
 
@@ -270,11 +282,12 @@ defineExpose({
           placeholder="請輸入 LINE ID (選填)"
           maxlength="50"
           clearable
+          :disabled="isViewMode"
         />
       </ElFormItem>
 
       <!-- 按鈕區 -->
-      <ElFormItem>
+      <ElFormItem v-if="!isViewMode">
         <ElButton
           type="primary"
           :loading="props.loading"
