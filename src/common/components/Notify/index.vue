@@ -1,21 +1,15 @@
 <script lang="ts" setup>
 import type { TabPaneName } from "element-plus"
-import type { NotifyItem } from "./type"
 import { Bell } from "@element-plus/icons-vue"
 import { useI18n } from "vue-i18n"
-import { messageData, notifyData, todoData } from "./data"
 import List from "./List.vue"
-
-interface DataItem {
-  name: TabPaneName
-  type: "primary" | "success" | "warning" | "danger" | "info"
-  list: NotifyItem[]
-}
+import { useNotifyStore } from "./store"
 
 const { t } = useI18n()
+const notifyStore = useNotifyStore()
 
 /** 角標目前數量 */
-const badgeValue = computed(() => data.value.reduce((sum, item) => sum + item.list.length, 0))
+const badgeValue = computed(() => notifyStore.badgeValue)
 
 /** 角標最大值 */
 const badgeMax = 99
@@ -23,30 +17,11 @@ const badgeMax = 99
 /** 面板寬度 */
 const popoverWidth = 350
 
-/** 目前分頁（標籤） */
+/** 目前分頁(標籤) */
 const activeName = ref<TabPaneName>("notification")
 
 /** 全部資料 */
-const data = ref<DataItem[]>([
-  // 通知資料
-  {
-    name: "notification",
-    type: "primary",
-    list: notifyData
-  },
-  // 訊息資料
-  {
-    name: "message",
-    type: "danger",
-    list: messageData
-  },
-  // 待辦資料
-  {
-    name: "todo",
-    type: "warning",
-    list: todoData
-  }
-])
+const data = computed(() => notifyStore.data)
 
 function handleHistory() {
   const label = t(`components.notify.${activeName.value}`)

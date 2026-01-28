@@ -43,10 +43,12 @@ describe("useServiceOrderForm", () => {
       name: "王小明",
       phoneNumber: "0912345678",
       email: "wang@example.com",
-      idCardNumber: "A123456789",
+      idNumber: "A123456789",
       residentialAddress: "台北市大安區",
+      lineId: null,
       createdAt: "2025-12-14T10:00:00Z",
-      updatedAt: undefined
+      updatedAt: null,
+      version: 1
     }
 
     setCustomer(mockCustomer)
@@ -190,7 +192,7 @@ describe("useServiceOrderForm", () => {
       id: "customer-123",
       name: "王小明",
       phoneNumber: "0912345678",
-      idCardNumber: "A123456789"
+      idNumber: "A123456789"
     } as any)
 
     // 新增商品

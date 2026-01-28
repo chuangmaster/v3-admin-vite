@@ -18,16 +18,37 @@
 
 ---
 
-## Phase 1: Setup（專案初始化）
+## Phase 1: Setup(專案初始化)
 
 **Purpose**: 建立基礎專案結構與目錄
 
-- [ ] T001 建立客戶管理模組目錄結構 src/pages/customer-management/
-- [ ] T002 [P] 建立子目錄 src/pages/customer-management/apis/
-- [ ] T003 [P] 建立子目錄 src/pages/customer-management/components/
-- [ ] T004 [P] 建立子目錄 src/pages/customer-management/composables/
-- [ ] T004a [P] 建立子目錄 src/pages/customer-management/workers/
-- [ ] T005 [P] 建立測試目錄 tests/pages/customer-management/
+- [x] T001 建立客戶管理模組目錄結構 src/pages/customer-management/
+- [x] T002 [P] 建立子目錄 src/pages/customer-management/apis/
+- [x] T003 [P] 建立子目錄 src/pages/customer-management/components/
+- [x] T004 [P] 建立子目錄 src/pages/customer-management/composables/
+- [x] T004a [P] 建立子目錄 src/pages/customer-management/workers/
+- [x] T005 [P] 建立測試目錄 tests/pages/customer-management/
+
+---
+
+## Phase 2: Foundational(核心基礎設施)
+
+**Purpose**: 所有 user story 都依賴的共用基礎設施
+
+**⚠️ CRITICAL**: 此階段必須完成後才能開始任何 user story 實作
+
+### 路由與權限
+
+- [x] T006 在 src/router/ 中新增客戶管理路由,路徑 /customer-management,元件指向 src/pages/customer-management/index.vue
+- [x] T007 在 src/common/constants/permissions.ts 新增 CUSTOMER_PERMISSIONS 常數物件,包含 READ, CREATE, UPDATE, DELETE 權限字串
+
+### 型別定義
+
+- [x] T008 [P] 建立 src/pages/customer-management/types.ts,定義 Customer interface(10 個欄位:id, name, phoneNumber, email, idNumber, residentialAddress, lineId, createdAt, updatedAt, version)
+- [x] T009 [P] 在 types.ts 新增 CreateCustomerRequest interface(6 個欄位:name, phoneNumber, email?, idNumber, residentialAddress, lineId?)
+- [x] T010 [P] 在 types.ts 新增 UpdateCustomerRequest interface(6 個欄位 + version)
+- [x] T011 [P] 在 types.ts 新增 CustomerListParams interface(3 個欄位:pageNumber, pageSize, keyword?)
+- [x] T012 [P] 在 types.ts 新增 IdCardRecognitionResponse interface(3 個欄位:name, idNumber, address,皆為 string | null)
 
 ---
 
@@ -61,13 +82,8 @@
 - [ ] T018 [P] 在 customer.ts 實作 create 方法（POST /api/customers，接收 CreateCustomerRequest，回傳 ApiResponseModel\<Customer\>）
 - [ ] T019 [P] 在 customer.ts 實作 getById 方法（GET /api/customers/{id}，接收 id: string，回傳 ApiResponseModel\<Customer\>）
 - [ ] T020 [P] 在 customer.ts 實作 update 方法（PUT /api/customers/{id}，接收 id: string 和 UpdateCustomerRequest，回傳 ApiResponseModel\<Customer\>）
-- [ ] T021 [P] 在 customer.ts 實作 delete 方法（DELETE /api/customers/{id}，接收 id: string，回傳 ApiResponseModel<null>）
-- [ ] T022 [P] 在 customer.ts 實作 recognizeIdCard 方法（POST /api/ocr/id-card-multi，接收 frontImage: File, backImage: File，使用 FormData，設定 30 秒逾時，回傳 ApiResponseModel<IdCardRecognitionResponse>）
-
-### Audit Log 整合
-
-- [ ] T022a 在 customer.ts 或建立 auditLog.ts，實作 sendAuditLog 函式（POST /api/audit-logs，接收 customerId, action: 'create'|'update'|'delete', operatorId）
-- [ ] T022b 在 create/update/delete 方法成功後呼叫 sendAuditLog 記錄操作日誌（非阻塞式，失敗不影響主流程）
+- [X] T021 [P] 在 customer.ts 實作 delete 方法（DELETE /api/customers/{id}，接收 id: string，回傳 ApiResponse<null>）
+- [X] T022 [P] 在 customer.ts 實作 recognizeIdCard 方法（POST /api/ocr/id-card-multi，接收 files: File[]，使用 FormData，設定 30 秒逾時，回傳 ApiResponse<IdCardRecognitionResponse>）
 
 **Checkpoint**: 基礎設施就緒 - user story 實作可以開始
 

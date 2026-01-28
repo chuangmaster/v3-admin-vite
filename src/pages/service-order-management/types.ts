@@ -1,5 +1,7 @@
 /** 服務單管理模組型別定義 */
 
+import type { Customer } from "@/pages/customer-management/types"
+
 /** 服務單類型 */
 export enum ServiceOrderType {
   /** 寄賣單 */
@@ -184,27 +186,11 @@ export interface ProductItem {
   amount?: number
 }
 
-/** 客戶實體 */
-export interface Customer {
-  /** 唯一識別碼（UUID） */
-  id: string
-  /** 客戶姓名 */
-  name: string
-  /** 電話號碼 */
-  phoneNumber: string
-  /** Email */
-  email?: string
-  /** 身分證字號 */
-  idCardNumber: string
-  /** 居住地址 */
-  residentialAddress: string
-  /** Line ID */
-  lineId?: string
-  /** 建立時間（ISO 8601, UTC） */
-  createdAt: string
-  /** 最後更新時間（ISO 8601, UTC） */
-  updatedAt?: string
-}
+/**
+ * 客戶實體
+ * @description 從 customer-management 模組匯入,避免重複定義
+ */
+export type { Customer } from "@/pages/customer-management/types"
 
 /** 附件實體 */
 export interface Attachment {
@@ -571,7 +557,11 @@ export interface ServiceOrderListParams {
 /** 客戶搜尋參數 */
 export interface CustomerSearchParams {
   /** 搜尋關鍵字(姓名、電話、Email、身分證字號) */
-  keyword: string
+  keyword?: string
+  /** 頁碼(從 1 開始) */
+  pageNumber?: number
+  /** 每頁筆數(1-100) */
+  pageSize?: number
 }
 
 /** 建立客戶請求 */
@@ -586,31 +576,11 @@ export interface CreateCustomerRequest {
   idNumber: string
   /** 居住地址 */
   residentialAddress: string
-  /** Line ID（可選） */
+  /** Line ID(可選) */
   lineId?: string
 }
 
-/** OCR 辨識身分證請求（使用 Base64 編碼） */
-export interface OcrIdCardRequest {
-  /** 身分證圖片 Base64 字串（不含 data:image/xxx;base64, 前綴） */
-  imageBase64: string
-  /** 圖片 MIME 類型（例如：image/jpeg, image/png） */
-  contentType: string
-  /** 原始檔案名稱（可選） */
-  fileName?: string
-}
-
-/** OCR 辨識身分證回應 */
-export interface OCRIDCardResponse {
-  /** 姓名 */
-  name: string
-  /** 身分證字號 */
-  idNumber: string
-  /** 辨識信心度（0-1） */
-  confidence: number
-  /** 是否為低信心度 */
-  isLowConfidence: boolean
-}
+/** 附件上傳狀態 */
 
 /** 上傳附件請求（multipart/form-data） */
 export interface UploadAttachmentRequest {

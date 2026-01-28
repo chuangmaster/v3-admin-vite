@@ -5,7 +5,7 @@
  */
 import type { FormInstance, FormRules } from "element-plus"
 import type { CreateCustomerRequest, Customer } from "../types"
-import { createCustomer } from "../apis/customer"
+import { customerApi } from "@/pages/customer-management/apis/customer"
 
 const emit = defineEmits<{
   /** 成功事件 */
@@ -93,7 +93,7 @@ async function handleSubmit() {
 
     loading.value = true
     try {
-      const response = await createCustomer(formData)
+      const response = await customerApi.create(formData)
       if (response.success && response.data) {
         ElMessage.success("新增客戶成功")
         emit("success", response.data)
@@ -133,9 +133,9 @@ function resetForm() {
 /**
  * 使用 OCR 辨識結果填入表單
  */
-function fillFromOCR(data: { name: string, idCardNumber: string }) {
+function fillFromOCR(data: { name: string, idNumber: string }) {
   formData.name = data.name
-  formData.idNumber = data.idCardNumber
+  formData.idNumber = data.idNumber
 }
 
 // 暴露方法供父元件使用

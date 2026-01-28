@@ -5,7 +5,7 @@
  */
 import type { UploadFile, UploadRawFile } from "element-plus"
 import { Camera, Delete, Star, Upload } from "@element-plus/icons-vue"
-import { recognizeIDCard } from "../apis/ocr"
+import { customerApi } from "@/pages/customer-management/apis/customer"
 
 interface Props {
   /** 是否要求正反面都上傳（線下流程為 true） */
@@ -21,13 +21,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   /** 辨識成功 */
-  "recognized": [data: { name: string, idCardNumber: string }]
+  "recognized": [data: { name: string, idNumber: string }]
   /** 更新上傳狀態（正面已上傳, 反面已上傳） */
   "update:modelValue": [value: { front: boolean, back: boolean }]
-  /** 正面圖片已上傳（傳遞 Base64 資料） */
-  "frontUploaded": [data: { base64: string, contentType: string, fileName: string }]
-  /** 反面圖片已上傳（傳遞 Base64 資料） */
-  "backUploaded": [data: { base64: string, contentType: string, fileName: string }]
 }>()
 
 const recognizing = ref(false)
@@ -78,19 +74,6 @@ async function handleFrontChange(file: UploadFile) {
       URL.revokeObjectURL(frontPreviewUrl.value)
     }
     frontPreviewUrl.value = URL.createObjectURL(file.raw)
-
-    // 轉換為 Base64 並通知父元件
-    try {
-      const base64 = await fileToBase64(file.raw)
-      emit("frontUploaded", {
-        base64,
-        contentType: file.raw.type || "image/jpeg",
-        fileName: file.name
-      })
-    } catch (error) {
-      ElMessage.error("圖片轉換失敗")
-      console.error(error)
-    }
   }
 
   // 重置重試計數
@@ -112,19 +95,6 @@ async function handleBackChange(file: UploadFile) {
       URL.revokeObjectURL(backPreviewUrl.value)
     }
     backPreviewUrl.value = URL.createObjectURL(file.raw)
-
-    // 轉換為 Base64 並通知父元件
-    try {
-      const base64 = await fileToBase64(file.raw)
-      emit("backUploaded", {
-        base64,
-        contentType: file.raw.type || "image/jpeg",
-        fileName: file.name
-      })
-    } catch (error) {
-      ElMessage.error("圖片轉換失敗")
-      console.error(error)
-    }
   }
 
   // 通知父元件上傳狀態
@@ -166,25 +136,10 @@ function handleRemoveBack() {
   emitUploadStatus()
 }
 
-/**
- * 將檔案轉換為 Base64
- */
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => {
-      const result = reader.result as string
-      // 移除 data:image/xxx;base64, 前綴
-      const base64 = result.split(",")[1]
-      resolve(base64)
-    }
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
-}
+// Base64 轉換已移除,統一使用 File 物件
 
 /**
- * 執行 AI 辨識（使用正面圖片）
+ * 執行 AI 辨識(使用正面圖片)
  */
 async function handleRecognize() {
   if (!frontFile.value?.raw) {
@@ -194,19 +149,21 @@ async function handleRecognize() {
 
   recognizing.value = true
   try {
-    // 將圖片轉換為 Base64
-    const base64 = await fileToBase64(frontFile.value.raw)
-    const contentType = frontFile.value.raw.type || "image/jpeg"
-    const fileName = frontFile.value.name
+    // 準備檔案陣列(正反面)
+    const files: File[] = [frontFile.value.raw]
+    if (backFile.value?.raw) {
+      files.push(backFile.value.raw)
+    }
 
-    const response = await recognizeIDCard(base64, contentType, fileName)
+    // 呼叫統一的 OCR API
+    const response = await customerApi.recognizeIdCard(files)
 
     if (response.success && response.data) {
       ElMessage.success("辨識成功")
-      // 後端回傳 idNumber，轉換為前端使用的 idCardNumber
+      // 發送辨識結果
       emit("recognized", {
-        name: response.data.name,
-        idCardNumber: response.data.idNumber
+        name: response.data.name || "",
+        idNumber: response.data.idNumber || ""
       })
       retryCount.value = 0
     } else {
@@ -217,7 +174,7 @@ async function handleRecognize() {
 
     if (retryCount.value < MAX_RETRY_COUNT) {
       ElMessageBox.confirm(
-        `辨識失敗，是否重試？（剩餘 ${MAX_RETRY_COUNT - retryCount.value} 次機會）`,
+        `辨識失敗，是否重試？(剩餘 ${MAX_RETRY_COUNT - retryCount.value} 次機會)`,
         "提示",
         {
           confirmButtonText: "重試",
@@ -232,7 +189,7 @@ async function handleRecognize() {
           ElMessage.info("已取消辨識")
         })
     } else {
-      ElMessage.error("已達最大重試次數，請檢查圖片是否清晰或手動輸入資料")
+      ElMessage.error("已達最大重試次數,請檢查圖片是否清晰或手動輸入資料")
       retryCount.value = 0
     }
   } finally {

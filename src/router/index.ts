@@ -138,6 +138,31 @@ export const dynamicRoutes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: "/customer-management",
+    component: Layouts,
+    redirect: "/customer-management/index",
+    name: "CustomerManagement",
+    meta: {
+      title: { zhCN: "客户管理", zhTW: "客戶管理", en: "Customer Management" },
+      titleKey: "customerManagement",
+      elIcon: "User",
+      permissions: ["customer.read"]
+    },
+    children: [
+      {
+        path: "index",
+        component: () => import("@/pages/customer-management/index.vue"),
+        name: "CustomerManagementPage",
+        meta: {
+          title: { zhCN: "客户列表", zhTW: "客戶列表", en: "Customer List" },
+          titleKey: "customerList",
+          keepAlive: true,
+          permissions: ["customer.read"]
+        }
+      }
+    ]
+  },
+  {
     path: "/service-order",
     component: Layouts,
     redirect: "/service-order/index",

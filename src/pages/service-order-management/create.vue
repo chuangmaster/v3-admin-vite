@@ -102,13 +102,13 @@ function handleCustomerCreated(customer: Customer) {
 /**
  * OCR 辨識成功
  */
-function handleOCRRecognized(data: { name: string, idCardNumber: string }) {
+function handleOCRRecognized(data: { name: string, idNumber: string }) {
   // 檢查是否已選擇客戶
   if (selectedCustomer.value) {
     // 比對身分證字號是否一致
-    if (selectedCustomer.value.idCardNumber !== data.idCardNumber) {
+    if (selectedCustomer.value.idNumber !== data.idNumber) {
       ElMessageBox.alert(
-        `辨識的身分證字號「${data.idCardNumber}」與已選客戶「${selectedCustomer.value.name}(${selectedCustomer.value.idCardNumber})」不符，請重新選擇客戶`,
+        `辨識的身分證字號「${data.idNumber}」與已選客戶「${selectedCustomer.value.name}(${selectedCustomer.value.idNumber})」不符，請重新選擇客戶`,
         "身分證字號不符",
         {
           confirmButtonText: "確定",
@@ -135,17 +135,17 @@ function handleOCRRecognized(data: { name: string, idCardNumber: string }) {
   customerFormRef.value?.fillFromOCR(data)
 
   // 自動使用身分證字號搜尋既有客戶
-  searchCustomerByIdCard(data.idCardNumber, data.name)
+  searchCustomerByIdCard(data.idNumber, data.name)
 }
 
 /**
  * 使用身分證字號搜尋客戶
  */
-async function searchCustomerByIdCard(idCardNumber: string, ocrName?: string) {
+async function searchCustomerByIdCard(idNumber: string, ocrName?: string) {
   try {
     // 這裡需要調用客戶搜尋 API
     const { searchCustomers } = await import("./apis/customer")
-    const response = await searchCustomers({ keyword: idCardNumber })
+    const response = await searchCustomers({ keyword: idNumber })
 
     if (response.success && response.data && response.data.length > 0) {
       // 找到客戶，自動選擇第一個
@@ -447,9 +447,10 @@ function handleIdCardBackUploaded(data: { base64: string, contentType: string, f
             <el-descriptions-item label="Email">
               {{ selectedCustomer.email || '未提供' }}
             </el-descriptions-item>
-            <el-descriptions-item label="身分證字號">
-              {{ selectedCustomer.idCardNumber }}
-            </el-descriptions-item>
+            <div class="info-item">
+              <span class="label">身分證字號:</span>
+              {{ selectedCustomer.idNumber }}
+            </div>
             <el-descriptions-item label="居住地址" :span="2">
               {{ selectedCustomer.residentialAddress }}
             </el-descriptions-item>

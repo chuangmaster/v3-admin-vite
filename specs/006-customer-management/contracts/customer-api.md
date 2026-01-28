@@ -447,8 +447,9 @@ Content-Type: multipart/form-data
 
 ```typescript
 const formData = new FormData()
-formData.append('images', frontFile)  // 身分證正面
-formData.append('images', backFile)   // 身分證背面
+files.forEach(file => {
+  formData.append('images', file)  // 身分證正反面照片
+})
 
 const response = await axios.post('/api/ocr/id-card-multi', formData, {
   headers: { 'Content-Type': 'multipart/form-data' },
