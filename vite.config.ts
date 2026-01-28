@@ -139,12 +139,20 @@ export default defineConfig(({ mode }) => {
           }
         ],
         dts: "types/auto/auto-imports.d.ts",
-        resolvers: [ElementPlusResolver()]
+        resolvers: [
+          ElementPlusResolver({
+            importStyle: "css" // 自動匯入組件樣式
+          })
+        ]
       }),
       // 自动按需导入组件
       Components({
         dts: "types/auto/components.d.ts",
-        resolvers: [ElementPlusResolver()]
+        resolvers: [
+          ElementPlusResolver({
+            importStyle: "css" // 自動匯入組件樣式
+          })
+        ]
       }),
       // 为项目开启 MCP Server
       VueMcp()
