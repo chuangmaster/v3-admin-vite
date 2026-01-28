@@ -7,7 +7,9 @@
 
 ## Summary
 
-實作客戶管理模組，提供客戶資料的 CRUD 操作，整合 AI 辨識技術（Gemini AI）從身分證照片提取資料，支援樂觀鎖定、權限控制、大量資料匯出和軟刪除功能。後端 API 已完成，前端需實作列表檢視、表單驗證、AI 辨識整合、並發控制和權限管理。
+實作客戶管理模組，提供客戶資料的 CRUD 操作，整合 AI 辨識技術（Gemini AI）從身分證照片提取資料，支援樂觀鎖定、權限控制、大量資料匯出（**原生 Web Worker + 專案現有 Notify 元件**）和軟刪除功能。後端 API 已完成，前端需實作列表檢視、表單驗證、AI 辨識整合、並發控制和權限管理。
+
+**背景處理技術棧**: 使用原生 `Worker` API 進行非阻塞式 Excel 生成，完成後透過專案現有的 `Notify` 元件（`src/common/components/Notify`）推送通知至使用者，無需額外引入第三方通知套件。
 
 ## Technical Context
 
@@ -82,11 +84,13 @@ src/pages/customer-management/
 │   ├── CustomerTable.vue          # 客戶列表表格元件
 │   ├── IdCardUpload.vue           # 身分證上傳元件
 │   └── OcrResultDisplay.vue       # OCR 辨識結果顯示元件
-└── composables/                   # 組合式函式
-    ├── useCustomerManagement.ts   # 客戶列表管理邏輯
-    ├── useCustomerForm.ts         # 客戶表單邏輯
-    ├── useIdCardOcr.ts            # AI 辨識邏輯
-    └── useExportExcel.ts          # Excel 匯出邏輯
+├── composables/                   # 組合式函式
+│   ├── useCustomerManagement.ts   # 客戶列表管理邏輯
+│   ├── useCustomerForm.ts         # 客戶表單邏輯
+│   ├── useIdCardOcr.ts            # AI 辨識邏輯
+│   └── useExportExcel.ts          # Excel 匯出邏輯
+└── workers/                       # Web Workers
+    └── excel-export.worker.ts     # Excel 背景匯出 Worker
 
 tests/pages/customer-management/   # 測試檔案（鏡像結構）
 ├── components/
@@ -133,7 +137,7 @@ src/common/                        # 通用目錄（若需共用邏輯）
 - 研究 AI OCR 整合策略（Gemini AI multipart/form-data）
 - 確立樂觀鎖定實作方式（version 欄位 + 409 Conflict 處理）
 - 定義權限控制模式（v-permission 指令 + CUSTOMER_PERMISSIONS 常數）
-- 規劃 Excel 匯出策略（前端 xlsx 套件 + 5000 筆警告）
+- 規劃 Excel 匯出策略（**原生 Worker API + 專案 Notify 元件** + xlsx 套件 + 5000 筆警告）
 - 制定檔案上傳驗證規則（JPG/PNG + 5MB 限制）
 - 實作台灣身分證檢查碼演算法
 - 建立錯誤處理對照表（HTTP Status + Business Code）
@@ -186,28 +190,59 @@ src/common/                        # 通用目錄（若需共用邏輯）
 
 | 檔案 | 狀態 | 說明 |
 |------|------|------|
-| spec.md | ✅ | 功能規格（使用者提供） |
-| plan.md | ✅ | 實作計畫（本檔案） |
-| research.md | ✅ | 技術研究文件（5,985 行，10 個決策主題） |
+| spec.md | ✅ | 功能規格（使用者提供，已移除 Azure OCR） |
+| plan.md | ✅ | 實作計畫（本檔案，已補充原生 Worker + Notify 元件） |
+| research.md | ✅ | 技術研究文件（706 行，11 個決策主題，含 Worker + Notify 整合） |
 | data-model.md | ✅ | 資料模型定義（8 個介面 + 驗證規則） |
-| contracts/customer-api.md | ✅ | API 合約文件（7 個端點 + 錯誤處理） |
+| contracts/customer-api.md | ✅ | API 合約文件（7 個端點 + 錯誤處理 + 權限驗證） |
+| contracts/notify-integration.md | ✅ | Notify 元件整合規格（Pinia store 方案） |
 | quickstart.md | ✅ | 快速入門指南（11 個章節） |
-| tasks.md | ⏳ | 待生成（需執行 /speckit.tasks 指令） |
+| tasks.md | ✅ | 任務清單（89 個任務，含 Worker 實作細節） |
 
 ### 關鍵指標
 
 - **Branch**: `006-customer-management`
-- **Complexity**: 中等（8 個元件 + 4 個 composables + 7 個 API 端點）
-- **Test Coverage Target**: 80%+ (關鍵邏輯：表單驗證、樂觀鎖定、AI 辨識)
+- **Complexity**: 中等（8 個元件 + 4 個 composables + 1 個 Worker + 7 個 API 端點）
+- **Test Coverage Target**: 80%+ (關鍵邏輯：表單驗證、樂觀鎖定、AI 辨識、Worker 匯出)
+- **Performance Targets**: 初始載入 < 3s, 路由轉換 < 500ms, 搜尋 < 1s, Excel 匯出 5000 筆 < 15s
+- **Constitution Violations**: 0
+
+### 技術亮點
+
+✨ **原生 Worker API**: 使用 Vite 支援的原生 Worker,無需第三方套件  
+✨ **Notify 元件整合**: 複用專案現有 Notify 元件,保持 UI 一致性  
+✨ **Transferable Objects**: 優化大數據傳輸效能  
+✨ **完整錯誤處理**: Worker onmessage/onerror + 分類通知推送
 - **Performance Targets**: 初始載入 < 3s, 路由轉換 < 500ms, 搜尋 < 1s, Excel 匯出 < 15s
 - **Constitution Violations**: 0
 
 ### 下一步行動
 
-1. **執行任務分解**: 使用 `/speckit.tasks` 指令生成 tasks.md
-2. **開始實作**: 按照 tasks.md 的任務順序進行開發
-3. **撰寫測試**: 同步撰寫單元測試（Vitest）
-4. **Code Review**: 提交 PR 前確認所有檢查清單項目
+1. **執行任務分解**: ✅ 已完成 - tasks.md 已生成（89 個任務）
+2. **檢視技術規格**: 
+   - 📖 [contracts/notify-integration.md](./contracts/notify-integration.md) - Notify 元件整合方案
+   - 📖 [research.md](./research.md) 第 10.4 節 - Worker 背景處理完整實作
+3. **開始實作**: 按照 tasks.md 的任務順序進行開發
+   - **Phase 1** (T001-T005): Setup - 建立目錄結構（含 workers/）
+   - **Phase 2** (T006-T022c): Foundational - 型別、API、工具、Audit Log ⚠️ **阻塞點**
+   - **Phase 3** (T023-T037): User Story 1 - 查看與搜尋（含背景匯出 T031a-T031c）
+   - **Phase 4** (T038-T049): User Story 2 - 新增客戶
+   - **Phase 5** (T050-T061): User Story 3 - AI 辨識
+   - **Phase 6** (T062-T069): User Story 4 - 更新客戶
+   - **Phase 7** (T070-T074): User Story 5 - 刪除客戶
+   - **Phase 8** (T075-T085): Polish - 最終優化
+4. **撰寫測試**: 同步撰寫單元測試（Vitest）
+5. **Code Review**: 提交 PR 前確認所有檢查清單項目
+
+**推薦 MVP 路徑** (52 tasks):
+```bash
+Phase 1 (Setup) → Phase 2 (Foundational) → Phase 3 (US1, 含完整背景匯出) → Phase 4 (US2)
+```
+
+**關鍵任務提醒**:
+- ⭐ **T031a-T031c**: Worker + Notify 整合（技術亮點）
+- ⭐ **T022a-T022b**: Audit Log 整合（業務需求）
+- ⭐ **T064-T065**: 樂觀鎖定（並發控制）
 
 ---
 

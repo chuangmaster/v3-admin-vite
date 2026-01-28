@@ -23,6 +23,34 @@ Authorization: Bearer <token>
 | 更新客戶 | `customer.update` | 修改客戶資料 |
 | 刪除客戶 | `customer.delete` | 軟刪除客戶 |
 
+### 權限驗證流程
+
+**前端（UI 控制）**:
+- 使用 `v-permission` 指令檢查權限並控制按鈕/功能顯示
+- 範例: `<el-button v-permission="CUSTOMER_PERMISSIONS.CREATE">新增客戶</el-button>`
+- 目的: 提升使用者體驗，隱藏無權限功能
+
+**後端（強制執行）**:
+- 每個 API 端點驗證 JWT Token 中的權限宣告
+- 無權限時回傳 `403 Forbidden` 與錯誤訊息
+- 目的: 確保資料安全，防止繞過前端檢查
+
+**錯誤處理**:
+```json
+{
+  "success": false,
+  "message": "您沒有權限執行此操作",
+  "data": null,
+  "traceId": "trace-xyz-123",
+  "code": 403
+}
+```
+
+前端收到 403 錯誤時應:
+1. 顯示 `ElMessage.warning(response.message)`
+2. 不重試請求（權限不足無法透過重試解決）
+3. 記錄錯誤日誌（console.warn + traceId）
+
 ---
 
 ## Response Format

@@ -675,9 +675,174 @@ watch(searchKeyword, () => {
 - 上傳前壓縮大圖至適當尺寸（如 1920x1080），減少傳輸時間
 - 使用 `browser-image-compression` 套件
 
+#### 10.4 大量資料匯出背景處理
+
+**Decision**: 當匯出超過 5000 筆資料時,使用**原生 Web Worker API** 進行背景處理,完成後透過**專案現有 Notify 元件**推送通知
+
+**Implementation Strategy**:
+
+1. **Worker 建立** (原生 API,無需第三方套件):
+   ```typescript
+   // composables/useExportExcel.ts
+   import { useNotifyStore } from '@/common/components/Notify/store' // 假設需要建立 store
+   
+   async function exportInBackground(data: Customer[]): Promise<void> {
+     // Vite 支援的 Worker 建立方式
+     const worker = new Worker(
+       new URL('../workers/excel-export.worker.ts', import.meta.url),
+       { type: 'module' }
+     )
+     
+     // 發送資料至 Worker
+     worker.postMessage({ customers: data })
+     
+     worker.onmessage = (e: MessageEvent) => {
+       const { type, data } = e.data
+       
+       if (type === 'progress') {
+         // 可選：顯示進度（如有需要）
+         console.log(`匯出進度: ${data.percent}%`)
+       }
+       
+       if (type === 'complete') {
+         const blob = new Blob([data.buffer], { 
+           type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+         })
+         const url = URL.createObjectURL(blob)
+         
+         // 使用專案現有 Notify 元件推送通知
+         addNotification({
+           title: '客戶資料匯出完成',
+           description: `已成功匯出 ${data.count} 筆客戶資料`,
+           datetime: new Date().toLocaleString('zh-TW'),
+           status: 'success',
+           extra: '點擊下載',
+           // 自訂屬性：下載連結
+           downloadUrl: url,
+           filename: `customers_${new Date().getTime()}.xlsx`
+         })
+         
+         // 自動觸發下載
+         const a = document.createElement('a')
+         a.href = url
+         a.download = `customers_${new Date().getTime()}.xlsx`
+         a.click()
+         
+         URL.revokeObjectURL(url)
+         worker.terminate()
+       }
+       
+       if (type === 'error') {
+         addNotification({
+           title: '匯出失敗',
+           description: data.message || '處理過程中發生錯誤',
+           datetime: new Date().toLocaleString('zh-TW'),
+           status: 'danger'
+         })
+         worker.terminate()
+       }
+     }
+     
+     worker.onerror = (error) => {
+       console.error('Worker error:', error)
+       addNotification({
+         title: '匯出失敗',
+         description: 'Worker 執行過程中發生錯誤',
+         datetime: new Date().toLocaleString('zh-TW'),
+         status: 'danger'
+       })
+       worker.terminate()
+     }
+   }
+   
+   // 整合專案 Notify 元件
+   function addNotification(item: NotifyItem): void {
+     // 方案 A: 若 Notify 使用 Pinia store
+     const notifyStore = useNotifyStore()
+     notifyStore.addNotification(item)
+     
+     // 方案 B: 若 Notify 使用 provide/inject
+     // const { addNotification } = inject('notify')
+     // addNotification(item)
+     
+     // 方案 C: 若 Notify 使用全域事件
+     // window.dispatchEvent(new CustomEvent('notify:add', { detail: item }))
+   }
+   ```
+
+2. **Worker 實作** (workers/excel-export.worker.ts):
+   ```typescript
+   import * as XLSX from 'xlsx'
+   import type { Customer } from '../types'
+   
+   self.onmessage = (e: MessageEvent) => {
+     const { customers } = e.data
+     
+     try {
+       // 模擬進度更新
+       self.postMessage({ type: 'progress', data: { percent: 0 } })
+       
+       // 準備資料
+       const worksheetData = customers.map((customer: Customer, index: number) => {
+         // 每處理 1000 筆回報進度
+         if (index % 1000 === 0) {
+           self.postMessage({ 
+             type: 'progress', 
+             data: { percent: Math.round((index / customers.length) * 100) } 
+           })
+         }
+         
+         return {
+           '姓名': customer.name,
+           '電話': customer.phoneNumber,
+           'Email': customer.email || '',
+           '身分證字號': customer.idNumber,
+           '地址': customer.residentialAddress,
+           'LINE ID': customer.lineId || '',
+           '建立時間': new Date(customer.createdAt).toLocaleString('zh-TW')
+         }
+       })
+       
+       // 生成 Excel
+       const worksheet = XLSX.utils.json_to_sheet(worksheetData)
+       const workbook = XLSX.utils.book_new()
+       XLSX.utils.book_append_sheet(workbook, worksheet, '客戶資料')
+       
+       // 轉為 ArrayBuffer
+       const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+       
+       // 回傳結果
+       self.postMessage({ 
+         type: 'complete', 
+         data: { buffer, count: customers.length } 
+       }, [buffer]) // 使用 Transferable Objects 提升效能
+       
+     } catch (error) {
+       self.postMessage({ 
+         type: 'error', 
+         data: { message: error instanceof Error ? error.message : '未知錯誤' } 
+       })
+     }
+   }
+   ```
+
+3. **Notify 元件整合方案**:
+   - **檢視現有實作**: `src/common/components/Notify/index.vue` 使用 `ref` 管理資料
+   - **建議**: 建立 Pinia store (`src/common/components/Notify/store.ts`) 管理通知狀態
+   - **優點**: 任何地方都可透過 `useNotifyStore()` 新增通知
+   - **替代方案**: 使用 `provide/inject` 或全域事件匯流排
+
+**Rationale**: 
+- ✅ 使用原生 Worker API,無需額外依賴 (符合 Constitution 原則「簡化架構」)
+- ✅ 整合專案現有 Notify 元件,保持 UI 一致性
+- ✅ Transferable Objects 提升大數據傳輸效能
+- ✅ 進度回報提升使用者體驗
+- ✅ 完整錯誤處理機制
+
 **Alternatives Considered**:
 - ❌ 無限滾動（Infinite Scroll）→ 規格使用分頁模式
 - ❌ 前端快取整個列表 → 可能顯示過時資料
+- ❌ 後端處理匯出 → 規格明確要求前端套件處理
 
 **Decision rationale**: 平衡效能與複雜度，遵循 Constitution 原則「避免過度工程」。
 
@@ -689,14 +854,15 @@ watch(searchKeyword, () => {
 |------|------|------|
 | API 整合 | 統一 `ApiResponseModel<T>` 格式 | 遵循後端規格，簡化錯誤處理 |
 | 資料模型 | 從 OpenAPI Schema 提取型別 | 確保型別安全與前後端一致性 |
-| AI 辨識 | 支援 Gemini AI | 遵循規格要求，使用者主動觸發 |
+| AI 辨識 | 支援 Gemini AI（不使用 Azure OCR） | 遵循規格要求，使用者主動觸發 |
 | 樂觀鎖定 | 使用 `version` 欄位 + 友善衝突提示 | 避免資料遺失，清楚告知使用者 |
-| 權限控制 | `v-permission` 指令 | 遵循專案現有模式 |
-| 資料匯出 | `xlsx` 套件 + 大量資料警告 | 平衡效能與 UX |
+| 權限控制 | `v-permission` 指令（前端檢查） + 後端 API 強制執行 | 遵循專案現有模式，雙重保障 |
+| 資料匯出 | **原生 Worker API + 專案 Notify 元件** + xlsx 套件 + 大量資料警告 | 平衡效能與 UX，不阻塞 UI，無需第三方通知套件 |
 | 檔案上傳 | 前端驗證 + FormData/Base64 | 即時回饋，支援兩種 API 格式 |
 | 身分證驗證 | 實作檢查碼演算法 | 即時驗證，符合台灣標準 |
-| 錯誤處理 | Element Plus 元件 + 分類處理 | 統一風格，友善訊息 |
+| 錯誤處理 | Element Plus 元件 + 分類處理（422=重複客戶） | 統一風格，友善訊息 |
 | 效能優化 | 搜尋防抖 + 必要優化 | 避免過度工程 |
+| Audit Log | 非阻塞式記錄（失敗不影響主流程） | 確保使用者操作流暢度 |
 
 ---
 

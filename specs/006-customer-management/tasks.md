@@ -26,6 +26,7 @@
 - [ ] T002 [P] 建立子目錄 src/pages/customer-management/apis/
 - [ ] T003 [P] 建立子目錄 src/pages/customer-management/components/
 - [ ] T004 [P] 建立子目錄 src/pages/customer-management/composables/
+- [ ] T004a [P] 建立子目錄 src/pages/customer-management/workers/
 - [ ] T005 [P] 建立測試目錄 tests/pages/customer-management/
 
 ---
@@ -50,8 +51,6 @@
 - [ ] T012 [P] 在 types.ts 新增 IdCardRecognitionResponse interface（3 個欄位：name, idNumber, address，皆為 string | null）
 - [ ] T013 [P] 在 types.ts 匯出 FormRules 型別與表單驗證規則物件 createCustomerRules
 
-### 工具函式
-
 - [ ] T014 建立或更新 src/common/utils/id-number-validator.ts，實作 validateTaiwanIdNumber 函式（執行台灣身分證檢查碼演算法）
 - [ ] T015 [P] 在 id-number-validator.ts 新增單元測試 tests/utils/id-number-validator.test.ts（驗證正確/錯誤身分證字號）
 
@@ -62,8 +61,13 @@
 - [ ] T018 [P] 在 customer.ts 實作 create 方法（POST /api/customers，接收 CreateCustomerRequest，回傳 ApiResponseModel\<Customer\>）
 - [ ] T019 [P] 在 customer.ts 實作 getById 方法（GET /api/customers/{id}，接收 id: string，回傳 ApiResponseModel\<Customer\>）
 - [ ] T020 [P] 在 customer.ts 實作 update 方法（PUT /api/customers/{id}，接收 id: string 和 UpdateCustomerRequest，回傳 ApiResponseModel\<Customer\>）
-- [ ] T021 [P] 在 customer.ts 實作 delete 方法（DELETE /api/customers/{id}，接收 id: string，回傳 ApiResponseModel\<null\>）
-- [ ] T022 [P] 在 customer.ts 實作 recognizeIdCard 方法（POST /api/ocr/id-card-multi，接收 frontImage: File, backImage: File，使用 FormData，設定 30 秒逾時，回傳 ApiResponseModel\<IdCardRecognitionResponse\>）
+- [ ] T021 [P] 在 customer.ts 實作 delete 方法（DELETE /api/customers/{id}，接收 id: string，回傳 ApiResponseModel<null>）
+- [ ] T022 [P] 在 customer.ts 實作 recognizeIdCard 方法（POST /api/ocr/id-card-multi，接收 frontImage: File, backImage: File，使用 FormData，設定 30 秒逾時，回傳 ApiResponseModel<IdCardRecognitionResponse>）
+
+### Audit Log 整合
+
+- [ ] T022a 在 customer.ts 或建立 auditLog.ts，實作 sendAuditLog 函式（POST /api/audit-logs，接收 customerId, action: 'create'|'update'|'delete', operatorId）
+- [ ] T022b 在 create/update/delete 方法成功後呼叫 sendAuditLog 記錄操作日誌（非阻塞式，失敗不影響主流程）
 
 **Checkpoint**: 基礎設施就緒 - user story 實作可以開始
 
@@ -90,7 +94,10 @@
 - [ ] T028 [US1] 在 useCustomerManagement.ts 實作搜尋防抖（debounce 500ms，使用 lodash-es debounce）
 - [ ] T029 [US1] 在 useCustomerManagement.ts 實作分頁變更處理函式（handlePageChange, handleSizeChange）
 - [ ] T030 [P] [US1] 建立 src/pages/customer-management/composables/useExportExcel.ts，實作 exportCustomers 函式
-- [ ] T031 [US1] 在 useExportExcel.ts 實作大量資料警告邏輯（超過 5000 筆顯示 ElMessageBox.confirm，提供立即匯出/取消選項）
+- [ ] T031 [US1] 在 useExportExcel.ts 實作大量資料警告邏輯（超過 5000 筆顯示 ElMessageBox.confirm，提供立即匯出/背景處理/取消選項）
+- [ ] T031a [US1] 在 src/pages/customer-management/workers/ 建立 excel-export.worker.ts，實作 Worker 邏輯（接收 customers 資料、使用 xlsx 套件生成 Excel、回傳 ArrayBuffer 使用 Transferable Objects、支援進度回報、錯誤處理）
+- [ ] T031b [US1] 在 useExportExcel.ts 實作背景處理邏輯（使用原生 Worker API 建立 worker、postMessage 傳遞資料、監聽 onmessage 處理 progress/complete/error 事件、完成後透過專案 Notify 元件推送通知、自動觸發下載、terminate worker）
+- [ ] T031c [US1] 建立或更新 src/common/components/Notify/store.ts （若不存在），使用 Pinia 建立 useNotifyStore，提供 addNotification 方法以便 useExportExcel 呼叫（或使用現有機制如 provide/inject）
 - [ ] T032 [US1] 在 useExportExcel.ts 使用 xlsx 套件生成 Excel 檔案（columns: 姓名、電話、Email、身分證字號、地址、LINE ID、建立時間）
 - [ ] T033 [US1] 建立 src/pages/customer-management/index.vue 主頁面，整合 CustomerTable 與 useCustomerManagement
 - [ ] T034 [US1] 在 index.vue 實作搜尋欄位（ElInput with prefix-icon，綁定 searchKeyword，@input 觸發搜尋）
@@ -222,7 +229,7 @@
 - [ ] T079 驗證所有 API 呼叫包含 try-catch 錯誤處理
 - [ ] T080 [P] 執行 ESLint 檢查並修正 src/pages/customer-management/ 下所有檔案
 - [ ] T081 [P] 執行 TypeScript 型別檢查（pnpm type-check）並修正所有錯誤
-- [ ] T082 驗證 quickstart.md 中的開發流程（啟動 dev server、導航至客戶管理、執行基本操作）
+- [ ] T082 驗證 quickstart.md 中的開發流程：① 啟動 dev server 無錯誤 ② 導航至客戶管理頁面載入 < 3秒 ③ 搜尋功能回應 < 1秒 ④ 新增客戶表單驗證正確 ⑤ AI 辨識成功/失敗情境正常 ⑥ 樂觀鎖定衝突提示正確 ⑦ 軟刪除後列表不顯示該客戶
 - [ ] T083 [P] 效能檢查：驗證搜尋防抖生效、分頁正常、Excel 匯出 < 15 秒（5000 筆）
 - [ ] T084 [P] UX 檢查：確認所有成功/失敗操作都有明確訊息回饋、loading 狀態正確顯示
 - [ ] T085 最終整合測試：完整執行所有 user story 流程（依序測試查看、新增、AI 辨識、編輯、刪除）
@@ -336,11 +343,18 @@ Task T033-T037: index.vue 整合所有元件與 composables
 
 ---
 
-**Total Tasks**: 85  
-**Estimated MVP Tasks (US1+US2)**: 49 (Setup + Foundational + US1 + US2)  
+**Total Tasks**: 89 (+4 from original: T004a workers 目錄, T031a Worker 實作, T031b Worker 整合, T031c Notify store)  
+**Estimated MVP Tasks (US1+US2)**: 52 (Setup + Foundational + US1 + US2, 含背景處理完整實作)  
 **Constitution Violations**: 0
+
+**New in this update**:
+- ✅ 使用原生 Worker API（無需第三方套件）
+- ✅ 整合專案現有 Notify 元件（保持 UI 一致性）
+- ✅ Transferable Objects 優化大數據傳輸
+- ✅ 完整進度回報與錯誤處理
 
 ---
 
 **Generated**: 2026-01-28 by `/speckit.tasks` command  
+**Updated**: 2026-01-28 by `/speckit.plan` - 補充原生 Worker + Notify 元件整合  
 **Ready for Implementation**: ✅ All tasks follow strict checklist format with IDs, labels, and file paths
