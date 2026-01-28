@@ -10,7 +10,7 @@
 <script lang="ts" setup>
 import type { Customer } from "../types"
 import { Delete, Edit } from "@element-plus/icons-vue"
-import { ElButton, ElTable, ElTableColumn, ElTag } from "element-plus"
+import { ElButton } from "element-plus"
 import { maskIdNumber } from "@/common/utils/id-number-validator"
 
 interface Props {
@@ -57,45 +57,43 @@ function handleDelete(customer: Customer) {
 </script>
 
 <template>
-  <ElTable
+  <el-table
+    v-loading="props.loading"
     :data="props.data"
-    :loading="props.loading"
-    stripe
     border
-    style="width: 100%"
+    stripe
   >
-    <ElTableColumn prop="name" label="姓名" width="120" />
+    <el-table-column prop="name" label="姓名" width="100" fixed="left" />
 
-    <ElTableColumn prop="idNumber" label="身分證字號" width="150">
+    <el-table-column prop="idNumber" label="身分證字號" width="140">
       <template #default="{ row }">
         {{ maskIdNumber(row.idNumber) }}
       </template>
-    </ElTableColumn>
+    </el-table-column>
 
-    <ElTableColumn prop="phoneNumber" label="電話" width="130" />
+    <el-table-column prop="phoneNumber" label="電話" width="120" />
 
-    <ElTableColumn prop="email" label="電子郵件" min-width="180" />
-
-    <ElTableColumn prop="residentialAddress" label="地址" min-width="200" show-overflow-tooltip />
-
-    <ElTableColumn prop="status" label="狀態" width="80" align="center">
+    <el-table-column prop="email" label="電子郵件" width="200" show-overflow-tooltip>
       <template #default="{ row }">
-        <ElTag v-if="row.isDeleted" type="danger" size="small">
-          已刪除
-        </ElTag>
-        <ElTag v-else type="success" size="small">
-          正常
-        </ElTag>
+        {{ row.email || '-' }}
       </template>
-    </ElTableColumn>
+    </el-table-column>
 
-    <ElTableColumn prop="createdAt" label="建立時間" width="160">
+    <el-table-column prop="lineId" label="LINE ID" width="120" show-overflow-tooltip>
+      <template #default="{ row }">
+        {{ row.lineId || '-' }}
+      </template>
+    </el-table-column>
+
+    <el-table-column prop="residentialAddress" label="地址" min-width="250" show-overflow-tooltip />
+
+    <el-table-column prop="createdAt" label="建立時間" width="180">
       <template #default="{ row }">
         {{ formatDateTime(row.createdAt) }}
       </template>
-    </ElTableColumn>
+    </el-table-column>
 
-    <ElTableColumn label="操作" width="150" align="center" fixed="right">
+    <el-table-column label="操作" width="150" fixed="right">
       <template #default="{ row }">
         <ElButton
           v-permission="['customer.update']"
@@ -119,6 +117,6 @@ function handleDelete(customer: Customer) {
           刪除
         </ElButton>
       </template>
-    </ElTableColumn>
-  </ElTable>
+    </el-table-column>
+  </el-table>
 </template>

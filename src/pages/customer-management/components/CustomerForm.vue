@@ -9,7 +9,7 @@
   - Email 格式驗證
 -->
 <script lang="ts" setup>
-import type { FormInstance } from "element-plus"
+import type { CollapseModelValue, FormInstance } from "element-plus"
 import type { CreateCustomerRequest, Customer, UpdateCustomerRequest } from "../types"
 import { Cpu } from "@element-plus/icons-vue"
 import { ElButton, ElCollapse, ElCollapseItem, ElForm, ElFormItem, ElIcon, ElInput, ElMessage } from "element-plus"
@@ -44,7 +44,7 @@ const emit = defineEmits<Emits>()
 const formRef = ref<FormInstance>()
 
 /** AI 辨識區塊展開狀態 */
-const aiCollapseActive = ref<string[]>([])
+const aiCollapseActive = ref<CollapseModelValue>([])
 
 /** 上傳元件實例 */
 const uploadRef = ref<InstanceType<typeof IdCardUpload>>()

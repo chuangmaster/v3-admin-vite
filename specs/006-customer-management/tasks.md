@@ -60,28 +60,28 @@
 
 ### 路由與權限
 
-- [ ] T006 在 src/router/ 中新增客戶管理路由，路徑 /customer-management，元件指向 src/pages/customer-management/index.vue
-- [ ] T007 在 src/common/constants/permissions.ts 新增 CUSTOMER_PERMISSIONS 常數物件，包含 READ, CREATE, UPDATE, DELETE 權限字串
+- [X] T006 在 src/router/ 中新增客戶管理路由，路徑 /customer-management，元件指向 src/pages/customer-management/index.vue
+- [X] T007 在 src/common/constants/permissions.ts 新增 CUSTOMER_PERMISSIONS 常數物件，包含 READ, CREATE, UPDATE, DELETE 權限字串
 
 ### 型別定義
 
-- [ ] T008 [P] 建立 src/pages/customer-management/types.ts，定義 Customer interface（10 個欄位：id, name, phoneNumber, email, idNumber, residentialAddress, lineId, createdAt, updatedAt, version）
-- [ ] T009 [P] 在 types.ts 新增 CreateCustomerRequest interface（6 個欄位：name, phoneNumber, email?, idNumber, residentialAddress, lineId?）
-- [ ] T010 [P] 在 types.ts 新增 UpdateCustomerRequest interface（6 個欄位 + version）
-- [ ] T011 [P] 在 types.ts 新增 CustomerListParams interface（3 個欄位：pageNumber, pageSize, keyword?）
-- [ ] T012 [P] 在 types.ts 新增 IdCardRecognitionResponse interface（3 個欄位：name, idNumber, address，皆為 string | null）
-- [ ] T013 [P] 在 types.ts 匯出 FormRules 型別與表單驗證規則物件 createCustomerRules
+- [X] T008 [P] 建立 src/pages/customer-management/types.ts，定義 Customer interface（10 個欄位：id, name, phoneNumber, email, idNumber, residentialAddress, lineId, createdAt, updatedAt, version）
+- [X] T009 [P] 在 types.ts 新增 CreateCustomerRequest interface（6 個欄位：name, phoneNumber, email?, idNumber, residentialAddress, lineId?）
+- [X] T010 [P] 在 types.ts 新增 UpdateCustomerRequest interface（6 個欄位 + version）
+- [X] T011 [P] 在 types.ts 新增 CustomerListParams interface（3 個欄位：pageNumber, pageSize, keyword?）
+- [X] T012 [P] 在 types.ts 新增 IdCardRecognitionResponse interface（3 個欄位：name, idNumber, address，皆為 string | null）
+- [X] T013 [P] 在 types.ts 匯出 FormRules 型別與表單驗證規則物件 createCustomerRules
 
-- [ ] T014 建立或更新 src/common/utils/id-number-validator.ts，實作 validateTaiwanIdNumber 函式（執行台灣身分證檢查碼演算法）
+- [X] T014 建立或更新 src/common/utils/id-number-validator.ts，實作 validateTaiwanIdNumber 函式（執行台灣身分證檢查碼演算法）
 - [ ] T015 [P] 在 id-number-validator.ts 新增單元測試 tests/utils/id-number-validator.test.ts（驗證正確/錯誤身分證字號）
 
 ### API 服務層
 
-- [ ] T016 建立 src/pages/customer-management/apis/customer.ts，匯出 customerApi 物件
-- [ ] T017 在 customer.ts 實作 search 方法（GET /api/customers/search，接收 CustomerListParams，回傳 ApiResponseModel\<Customer[]\>）
-- [ ] T018 [P] 在 customer.ts 實作 create 方法（POST /api/customers，接收 CreateCustomerRequest，回傳 ApiResponseModel\<Customer\>）
-- [ ] T019 [P] 在 customer.ts 實作 getById 方法（GET /api/customers/{id}，接收 id: string，回傳 ApiResponseModel\<Customer\>）
-- [ ] T020 [P] 在 customer.ts 實作 update 方法（PUT /api/customers/{id}，接收 id: string 和 UpdateCustomerRequest，回傳 ApiResponseModel\<Customer\>）
+- [X] T016 建立 src/pages/customer-management/apis/customer.ts，匯出 customerApi 物件
+- [X] T017 在 customer.ts 實作 search 方法（GET /api/customers/search，接收 CustomerListParams，回傳 ApiResponseModel\<Customer[]\>）
+- [X] T018 [P] 在 customer.ts 實作 create 方法（POST /api/customers，接收 CreateCustomerRequest，回傳 ApiResponseModel\<Customer\>）
+- [X] T019 [P] 在 customer.ts 實作 getById 方法（GET /api/customers/{id}，接收 id: string，回傳 ApiResponseModel\<Customer\>）
+- [X] T020 [P] 在 customer.ts 實作 update 方法（PUT /api/customers/{id}，接收 id: string 和 UpdateCustomerRequest，回傳 ApiResponseModel\<Customer\>）
 - [X] T021 [P] 在 customer.ts 實作 delete 方法（DELETE /api/customers/{id}，接收 id: string，回傳 ApiResponse<null>）
 - [X] T022 [P] 在 customer.ts 實作 recognizeIdCard 方法（POST /api/ocr/id-card-multi，接收 files: File[]，使用 FormData，設定 30 秒逾時，回傳 ApiResponse<IdCardRecognitionResponse>）
 
@@ -102,24 +102,24 @@
 
 ### 實作 User Story 1
 
-- [ ] T023 [P] [US1] 建立 src/pages/customer-management/components/CustomerTable.vue，接收 customers prop（Customer[]）和 @row-click 事件，使用 ElTable 顯示列表欄位
-- [ ] T024 [US1] 在 CustomerTable.vue 實作身分證遮罩邏輯（顯示前4碼+\*\*\*\*\*\*）
-- [ ] T025 [US1] 在 CustomerTable.vue 加入操作欄，根據權限顯示編輯/刪除按鈕（使用 v-permission 指令）
-- [ ] T026 [P] [US1] 建立 src/pages/customer-management/composables/useCustomerManagement.ts，管理分頁狀態（pageNumber, pageSize, total）與搜尋關鍵字（searchKeyword）
-- [ ] T027 [US1] 在 useCustomerManagement.ts 實作 fetchCustomers 函式（呼叫 customerApi.search，處理 loading 與錯誤）  
+- [X] T023 [P] [US1] 建立 src/pages/customer-management/components/CustomerTable.vue，接收 customers prop（Customer[]）和 @row-click 事件，使用 ElTable 顯示列表欄位
+- [X] T024 [US1] 在 CustomerTable.vue 實作身分證遮罩邏輯（顯示前4碼+\*\*\*\*\*\*）
+- [X] T025 [US1] 在 CustomerTable.vue 加入操作欄，根據權限顯示編輯/刪除按鈕（使用 v-permission 指令）
+- [X] T026 [P] [US1] 建立 src/pages/customer-management/composables/useCustomerManagement.ts，管理分頁狀態（pageNumber, pageSize, total）與搜尋關鍵字（searchKeyword）
+- [X] T027 [US1] 在 useCustomerManagement.ts 實作 fetchCustomers 函式（呼叫 customerApi.search，處理 loading 與錯誤）  
 - [ ] T028 [US1] 在 useCustomerManagement.ts 實作搜尋防抖（debounce 500ms，使用 lodash-es debounce）
-- [ ] T029 [US1] 在 useCustomerManagement.ts 實作分頁變更處理函式（handlePageChange, handleSizeChange）
-- [ ] T030 [P] [US1] 建立 src/pages/customer-management/composables/useExportExcel.ts，實作 exportCustomers 函式
+- [X] T029 [US1] 在 useCustomerManagement.ts 實作分頁變更處理函式（handlePageChange, handleSizeChange）
+- [X] T030 [P] [US1] 建立 src/pages/customer-management/composables/useExportExcel.ts，實作 exportCustomers 函式
 - [ ] T031 [US1] 在 useExportExcel.ts 實作大量資料警告邏輯（超過 5000 筆顯示 ElMessageBox.confirm，提供立即匯出/背景處理/取消選項）
-- [ ] T031a [US1] 在 src/pages/customer-management/workers/ 建立 excel-export.worker.ts，實作 Worker 邏輯（接收 customers 資料、使用 xlsx 套件生成 Excel、回傳 ArrayBuffer 使用 Transferable Objects、支援進度回報、錯誤處理）
-- [ ] T031b [US1] 在 useExportExcel.ts 實作背景處理邏輯（使用原生 Worker API 建立 worker、postMessage 傳遞資料、監聽 onmessage 處理 progress/complete/error 事件、完成後透過專案 Notify 元件推送通知、自動觸發下載、terminate worker）
-- [ ] T031c [US1] 建立或更新 src/common/components/Notify/store.ts （若不存在），使用 Pinia 建立 useNotifyStore，提供 addNotification 方法以便 useExportExcel 呼叫（或使用現有機制如 provide/inject）
-- [ ] T032 [US1] 在 useExportExcel.ts 使用 xlsx 套件生成 Excel 檔案（columns: 姓名、電話、Email、身分證字號、地址、LINE ID、建立時間）
-- [ ] T033 [US1] 建立 src/pages/customer-management/index.vue 主頁面，整合 CustomerTable 與 useCustomerManagement
-- [ ] T034 [US1] 在 index.vue 實作搜尋欄位（ElInput with prefix-icon，綁定 searchKeyword，@input 觸發搜尋）
-- [ ] T035 [US1] 在 index.vue 加入分頁元件（ElPagination，綁定 pageNumber, pageSize, total）
-- [ ] T036 [US1] 在 index.vue 加入匯出按鈕（v-permission="CUSTOMER_PERMISSIONS.READ"，@click 呼叫 exportCustomers）
-- [ ] T037 [US1] 在 index.vue 實作 onMounted 生命週期，載入初始客戶列表
+- [X] T031a [US1] 在 src/pages/customer-management/workers/ 建立 excel-export.worker.ts，實作 Worker 邏輯（接收 customers 資料、使用 xlsx 套件生成 Excel、回傳 ArrayBuffer 使用 Transferable Objects、支援進度回報、錯誤處理）
+- [X] T031b [US1] 在 useExportExcel.ts 實作背景處理邏輯（使用原生 Worker API 建立 worker、postMessage 傳遞資料、監聽 onmessage 處理 progress/complete/error 事件、完成後透過專案 Notify 元件推送通知、自動觸發下載、terminate worker）
+- [X] T031c [US1] 建立或更新 src/common/components/Notify/store.ts （若不存在），使用 Pinia 建立 useNotifyStore，提供 addNotification 方法以便 useExportExcel 呼叫（或使用現有機制如 provide/inject）
+- [X] T032 [US1] 在 useExportExcel.ts 使用 xlsx 套件生成 Excel 檔案（columns: 姓名、電話、Email、身分證字號、地址、LINE ID、建立時間）
+- [X] T033 [US1] 建立 src/pages/customer-management/index.vue 主頁面，整合 CustomerTable 與 useCustomerManagement
+- [X] T034 [US1] 在 index.vue 實作搜尋欄位（ElInput with prefix-icon，綁定 searchKeyword，@input 觸發搜尋）
+- [X] T035 [US1] 在 index.vue 加入分頁元件（ElPagination，綁定 pageNumber, pageSize, total）
+- [X] T036 [US1] 在 index.vue 加入匯出按鈕（v-permission="CUSTOMER_PERMISSIONS.READ"，@click 呼叫 exportCustomers）
+- [X] T037 [US1] 在 index.vue 實作 onMounted 生命週期，載入初始客戶列表
 
 **Checkpoint**: User Story 1 完成 - 可獨立驗證列表、搜尋、匯出功能
 
@@ -138,18 +138,18 @@
 
 ### 實作 User Story 2
 
-- [ ] T038 [P] [US2] 建立 src/pages/customer-management/components/CustomerForm.vue，包含新增/編輯模式切換邏輯
-- [ ] T039 [US2] 在 CustomerForm.vue 定義表單欄位（ElForm with ElFormItem: name, phoneNumber, email, idNumber, residentialAddress, lineId）
-- [ ] T040 [US2] 在 CustomerForm.vue 綁定表單驗證規則（使用 createCustomerRules from types.ts）
-- [ ] T041 [US2] 在 CustomerForm.vue 實作表單提交邏輯（區分新增/編輯模式，emit success 事件）
-- [ ] T042 [US2] 在 CustomerForm.vue 加入取消按鈕（emit cancel 事件，重置表單）
-- [ ] T043 [P] [US2] 建立 src/pages/customer-management/composables/useCustomerForm.ts，管理表單狀態（formData, formMode: 'create' | 'edit'）
-- [ ] T044 [US2] 在 useCustomerForm.ts 實作 submitForm 函式（呼叫 customerApi.create 或 update，處理 loading 與錯誤）
-- [ ] T045 [US2] 在 useCustomerForm.ts 實作重複身分證字號處理（捕捉 422 錯誤，顯示 ElMessageBox.confirm「此身分證字號已存在，是否繼續新增？」）
-- [ ] T046 [US2] 在 useCustomerForm.ts 實作表單重置函式（resetForm）
-- [ ] T047 [US2] 在 index.vue 加入「新增客戶」按鈕（v-permission="CUSTOMER_PERMISSIONS.CREATE"，@click 開啟 CustomerForm 對話框）
-- [ ] T048 [US2] 在 index.vue 整合 CustomerForm 元件（使用 ElDialog，綁定 visible, mode, @success 重新載入列表）
-- [ ] T049 [US2] 在 index.vue 實作新增成功後的處理（關閉對話框、顯示成功訊息、重新載入列表）
+- [X] T038 [P] [US2] 建立 src/pages/customer-management/components/CustomerForm.vue，包含新增/編輯模式切換邏輯
+- [X] T039 [US2] 在 CustomerForm.vue 定義表單欄位（ElForm with ElFormItem: name, phoneNumber, email, idNumber, residentialAddress, lineId）
+- [X] T040 [US2] 在 CustomerForm.vue 綁定表單驗證規則（使用 createCustomerRules from types.ts）
+- [X] T041 [US2] 在 CustomerForm.vue 實作表單提交邏輯（區分新增/編輯模式，emit success 事件）
+- [X] T042 [US2] 在 CustomerForm.vue 加入取消按鈕（emit cancel 事件，重置表單）
+- [X] T043 [P] [US2] 建立 src/pages/customer-management/composables/useCustomerForm.ts，管理表單狀態（formData, formMode: 'create' | 'edit'）
+- [X] T044 [US2] 在 useCustomerForm.ts 實作 submitForm 函式（呼叫 customerApi.create 或 update，處理 loading 與錯誤）
+- [X] T045 [US2] 在 useCustomerForm.ts 實作重複身分證字號處理（捕捉 422 錯誤，顯示 ElMessageBox.confirm「此身分證字號已存在，是否繼續新增？」）
+- [X] T046 [US2] 在 useCustomerForm.ts 實作表單重置函式（resetForm）
+- [X] T047 [US2] 在 index.vue 加入「新增客戶」按鈕（v-permission="CUSTOMER_PERMISSIONS.CREATE"，@click 開啟 CustomerForm 對話框）
+- [X] T048 [US2] 在 index.vue 整合 CustomerForm 元件（使用 ElDialog，綁定 visible, mode, @success 重新載入列表）
+- [X] T049 [US2] 在 index.vue 實作新增成功後的處理（關閉對話框、顯示成功訊息、重新載入列表）
 
 **Checkpoint**: User Story 2 完成 - 可獨立驗證新增客戶流程（含表單驗證、重複檢查）
 
@@ -169,18 +169,18 @@
 
 ### 實作 User Story 3
 
-- [ ] T050 [P] [US3] 建立 src/pages/customer-management/components/IdCardUpload.vue，包含正反面圖片上傳（ElUpload，限制 JPG/PNG，單檔 ≤5MB）
-- [ ] T051 [US3] 在 IdCardUpload.vue 實作檔案驗證邏輯（before-upload hook，檢查格式、大小，超過限制顯示 ElMessage.error）
-- [ ] T052 [US3] 在 IdCardUpload.vue 加入辨識按鈕（disabled when < 2 張圖片，@click emit recognize 事件）
-- [ ] T053 [US3] 在 IdCardUpload.vue 顯示上傳進度與預覽（ElImage preview）
-- [ ] T054 [P] [US3] 建立 src/pages/customer-management/composables/useIdCardOcr.ts，管理 loading 狀態與辨識結果
-- [ ] T055 [US3] 在 useIdCardOcr.ts 實作 recognizeIdCard 函式（呼叫 customerApi.recognizeIdCard，30 秒逾時處理）
-- [ ] T056 [US3] 在 useIdCardOcr.ts 實作辨識結果處理（區分全部成功/部分成功/失敗，emit fill-form 事件）
-- [ ] T057 [US3] 在 useIdCardOcr.ts 實作逾時處理（捕捉 504 錯誤或 timeout，顯示 ElMessage.warning「辨識逾時，請重試或手動輸入」）
-- [ ] T058 [US3] 在 useIdCardOcr.ts 實作錯誤處理（捕捉 500/400 錯誤，顯示友善錯誤訊息）
-- [ ] T059 [US3] 在 CustomerForm.vue 整合 IdCardUpload 元件（僅新增模式顯示，position 在表單上方）
-- [ ] T060 [US3] 在 CustomerForm.vue 實作 AI 辨識結果填入邏輯（@fill-form 事件，自動填入 name, idNumber, residentialAddress）
-- [ ] T061 [US3] 在 CustomerForm.vue 實作部分辨識提示（未辨識欄位旁顯示「AI 無法辨識此欄位，請手動輸入」）
+- [X] T050 [P] [US3] 建立 src/pages/customer-management/components/IdCardUpload.vue，包含正反面圖片上傳（ElUpload，限制 JPG/PNG，單檔 ≤5MB）
+- [X] T051 [US3] 在 IdCardUpload.vue 實作檔案驗證邏輯（before-upload hook，檢查格式、大小，超過限制顯示 ElMessage.error）
+- [X] T052 [US3] 在 IdCardUpload.vue 加入辨識按鈕（disabled when < 2 張圖片，@click emit recognize 事件）
+- [X] T053 [US3] 在 IdCardUpload.vue 顯示上傳進度與預覽（ElImage preview）
+- [X] T054 [P] [US3] IdCardUpload.vue 內部實作 AI 辨識邏輯，管理 loading 狀態與辨識結果（不使用單獨的 composable）
+- [X] T055 [US3] 在 IdCardUpload.vue 實作 recognizeIdCard 函式（呼叫 customerApi.recognizeIdCard，30 秒逾時處理）
+- [X] T056 [US3] 在 IdCardUpload.vue 實作辨識結果處理（區分全部成功/部分成功/失敗，emit fill-form 事件）
+- [X] T057 [US3] 在 IdCardUpload.vue 實作逾時處理（捕捉 504 錯誤或 timeout，顯示 ElMessage.warning「辨識逾時，請重試或手動輸入」）
+- [X] T058 [US3] 在 IdCardUpload.vue 實作錯誤處理（捕捉 500/400 錯誤，顯示友善錯誤訊息）
+- [X] T059 [US3] 在 CustomerForm.vue 整合 IdCardUpload 元件（僅新增模式顯示，position 在表單上方）
+- [X] T060 [US3] 在 CustomerForm.vue 實作 AI 辨識結果填入邏輯（@fill-form 事件，自動填入 name, idNumber, residentialAddress）
+- [X] T061 [US3] 在 CustomerForm.vue 實作部分辨識提示（未辨識欄位旁顯示「AI 無法辨識此欄位，請手動輸入」）
 
 **Checkpoint**: User Story 3 完成 - 可獨立驗證 AI 辨識流程（含成功/部分成功/失敗/逾時）
 
@@ -199,14 +199,14 @@
 
 ### 實作 User Story 4
 
-- [ ] T062 [US4] 在 useCustomerForm.ts 實作 setupEdit 函式（接收 customer: Customer，設定 formMode='edit'，載入 formData 包含 version）
-- [ ] T063 [US4] 在 useCustomerForm.ts 更新 submitForm 函式，區分 create/edit 模式呼叫不同 API
-- [ ] T064 [US4] 在 useCustomerForm.ts 實作樂觀鎖定衝突處理（捕捉 409 錯誤，顯示 ElMessageBox.alert「此客戶資料已被其他使用者修改，請重新載入最新資料後再試」，confirmButtonText='重新載入'）
-- [ ] T065 [US4] 在 useCustomerForm.ts 實作重新載入邏輯（409 衝突時呼叫 customerApi.getById 取得最新資料，更新 formData 與 version）
-- [ ] T066 [US4] 在 CustomerForm.vue 加入編輯模式邏輯（idNumber 欄位設為 disabled，隱藏 IdCardUpload 元件）
-- [ ] T067 [US4] 在 CustomerForm.vue 實作表單標題切換（新增模式：「新增客戶」，編輯模式：「編輯客戶 - {name}」）
-- [ ] T068 [US4] 在 index.vue 實作編輯按鈕點擊處理（@row-click 或 action column，呼叫 setupEdit，開啟對話框）
-- [ ] T069 [US4] 在 index.vue 綁定編輯按鈕權限（v-permission="CUSTOMER_PERMISSIONS.UPDATE"）
+- [X] T062 [US4] 在 useCustomerForm.ts 實作 setupEdit 函式（接收 customer: Customer，設定 formMode='edit'，載入 formData 包含 version）
+- [X] T063 [US4] 在 useCustomerForm.ts 更新 submitForm 函式，區分 create/edit 模式呼叫不同 API
+- [X] T064 [US4] 在 useCustomerForm.ts 實作樂觀鎖定衝突處理（捕捉 409 錯誤，顯示 ElMessageBox.alert「此客戶資料已被其他使用者修改，請重新載入最新資料後再試」，confirmButtonText='重新載入'）
+- [X] T065 [US4] 在 useCustomerForm.ts 實作重新載入邏輯（409 衝突時呼叫 customerApi.getById 取得最新資料，更新 formData 與 version）
+- [X] T066 [US4] 在 CustomerForm.vue 加入編輯模式邏輯（idNumber 欄位設為 disabled，隱藏 IdCardUpload 元件）
+- [X] T067 [US4] 在 CustomerForm.vue 實作表單標題切換（新增模式：「新增客戶」，編輯模式：「編輯客戶 - {name}」）
+- [X] T068 [US4] 在 index.vue 實作編輯按鈕點擊處理（@row-click 或 action column，呼叫 setupEdit，開啟對話框）
+- [X] T069 [US4] 在 index.vue 綁定編輯按鈕權限（v-permission="CUSTOMER_PERMISSIONS.UPDATE"）
 
 **Checkpoint**: User Story 4 完成 - 可獨立驗證編輯流程（含樂觀鎖定衝突處理）
 
@@ -224,11 +224,11 @@
 
 ### 實作 User Story 5
 
-- [ ] T070 [P] [US5] 在 useCustomerManagement.ts 實作 deleteCustomer 函式（呼叫 customerApi.delete，處理 loading 與錯誤）
-- [ ] T071 [US5] 在 useCustomerManagement.ts 實作刪除確認邏輯（使用 ElMessageBox.confirm，標題「確認刪除」，message「刪除後資料將無法恢復，此操作執行軟刪除。是否繼續？」，type='warning'）
-- [ ] T072 [US5] 在 useCustomerManagement.ts 實作刪除成功處理（顯示 ElMessage.success「刪除成功」，重新載入列表）
-- [ ] T073 [US5] 在 CustomerTable.vue 加入刪除按鈕（action column，v-permission="CUSTOMER_PERMISSIONS.DELETE"，@click emit delete-customer 事件）
-- [ ] T074 [US5] 在 index.vue 綁定刪除事件處理（@delete-customer 呼叫 deleteCustomer）
+- [X] T070 [P] [US5] 在 index.vue 實作 deleteCustomer 函式（呼叫 customerApi.delete，處理 loading 與錯誤）
+- [X] T071 [US5] 在 index.vue 實作刪除確認邏輯（使用 ElMessageBox.confirm，標題「確認刪除」，message「刪除後資料將無法恢復，此操作執行軟刪除。是否繼續？」，type='warning'）
+- [X] T072 [US5] 在 index.vue 實作刪除成功處理（顯示 ElMessage.success「刪除成功」，重新載入列表）
+- [X] T073 [US5] 在 CustomerTable.vue 加入刪除按鈕（action column，v-permission="CUSTOMER_PERMISSIONS.DELETE"，@click emit delete-customer 事件）
+- [X] T074 [US5] 在 index.vue 綁定刪除事件處理（@delete-customer 呼叫 deleteCustomer）
 
 **Checkpoint**: User Story 5 完成 - 可獨立驗證刪除流程（含確認對話框）
 
@@ -238,13 +238,13 @@
 
 **Purpose**: 影響多個 user story 的改進與最終檢查
 
-- [ ] T075 [P] 在各元件加入 JSDoc 註解（CustomerForm.vue, CustomerTable.vue, IdCardUpload.vue 的 props, emits, 主要函式）
-- [ ] T076 [P] 在各 composables 加入 JSDoc 註解（useCustomerManagement.ts, useCustomerForm.ts, useIdCardOcr.ts, useExportExcel.ts 的函式與回傳值）
+- [X] T075 [P] 在各元件加入 JSDoc 註解（CustomerForm.vue, CustomerTable.vue, IdCardUpload.vue 的 props, emits, 主要函式）
+- [X] T076 [P] 在各 composables 加入 JSDoc 註解（useCustomerManagement.ts, useCustomerForm.ts, useExportExcel.ts 的函式與回傳值）
 - [ ] T077 檢查所有錯誤處理是否包含 traceId 顯示（ElMessage.error 訊息應包含 traceId 以便除錯）
-- [ ] T078 [P] 驗證所有 v-permission 指令正確使用 CUSTOMER_PERMISSIONS 常數
-- [ ] T079 驗證所有 API 呼叫包含 try-catch 錯誤處理
-- [ ] T080 [P] 執行 ESLint 檢查並修正 src/pages/customer-management/ 下所有檔案
-- [ ] T081 [P] 執行 TypeScript 型別檢查（pnpm type-check）並修正所有錯誤
+- [X] T078 [P] 驗證所有 v-permission 指令正確使用 CUSTOMER_PERMISSIONS 常數
+- [X] T079 驗證所有 API 呼叫包含 try-catch 錯誤處理
+- [X] T080 [P] 執行 ESLint 檢查並修正 src/pages/customer-management/ 下所有檔案
+- [X] T081 [P] 執行 TypeScript 型別檢查（pnpm type-check）並修正所有錯誤
 - [ ] T082 驗證 quickstart.md 中的開發流程：① 啟動 dev server 無錯誤 ② 導航至客戶管理頁面載入 < 3秒 ③ 搜尋功能回應 < 1秒 ④ 新增客戶表單驗證正確 ⑤ AI 辨識成功/失敗情境正常 ⑥ 樂觀鎖定衝突提示正確 ⑦ 軟刪除後列表不顯示該客戶
 - [ ] T083 [P] 效能檢查：驗證搜尋防抖生效、分頁正常、Excel 匯出 < 15 秒（5000 筆）
 - [ ] T084 [P] UX 檢查：確認所有成功/失敗操作都有明確訊息回饋、loading 狀態正確顯示

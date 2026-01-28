@@ -7,15 +7,18 @@
  */
 
 import type { CreateCustomerRequest, Customer, UpdateCustomerRequest } from "./types"
-import { Plus } from "@element-plus/icons-vue"
-import { ElButton, ElCard, ElMessage, ElMessageBox, ElPagination } from "element-plus"
+import { Download, Plus, Refresh, Search } from "@element-plus/icons-vue"
+import { ElButton, ElCard, ElMessage, ElMessageBox } from "element-plus"
 import { customerApi } from "./apis/customer"
 import CustomerDialog from "./components/CustomerDialog.vue"
 import CustomerTable from "./components/CustomerTable.vue"
-import SearchBar from "./components/SearchBar.vue"
 import { useCustomerForm } from "./composables/useCustomerForm"
 import { useCustomerManagement } from "./composables/useCustomerManagement"
 import { useExportExcel } from "./composables/useExportExcel"
+
+defineOptions({
+  name: "CustomerManagement"
+})
 
 // 客戶管理邏輯
 const {
@@ -104,33 +107,63 @@ function handleFormSubmit(data: CreateCustomerRequest | UpdateCustomerRequest) {
 </script>
 
 <template>
-  <div class="customer-management">
-    <!-- 頂部操作列 -->
-    <ElCard shadow="never" class="header-card">
-      <div class="header-actions">
-        <h2>客戶管理</h2>
-        <ElButton
-          v-permission="['customer.create']"
-          type="primary"
-          :icon="Plus"
-          @click="handleCreate"
-        >
-          新增客戶
-        </ElButton>
+  <div class="app-container">
+    <ElCard shadow="never">
+      <template #header>
+        <div class="card-header">
+          <span class="title">客戶管理</span>
+          <div>
+            <ElButton
+              v-permission="['customer.create']"
+              type="primary"
+              :icon="Plus"
+              @click="handleCreate"
+            >
+              新增客戶
+            </ElButton>
+          </div>
+        </div>
+      </template>
+
+      <!-- 查詢條件 -->
+      <div class="filter-container">
+        <el-form inline>
+          <el-form-item label="關鍵字">
+            <el-input
+              v-model="searchParams.keyword"
+              placeholder="姓名/電話/電子郵件"
+              clearable
+              style="width: 240px"
+              @keyup.enter="handleSearch"
+              @clear="refresh"
+            />
+          </el-form-item>
+
+          <el-form-item>
+            <ElButton
+              v-permission="['customer.read']"
+              type="primary"
+              :icon="Search"
+              @click="refresh"
+            >
+              查詢
+            </ElButton>
+            <ElButton :icon="Refresh" @click="handleReset">
+              重置
+            </ElButton>
+            <ElButton
+              v-permission="['customer.read']"
+              :icon="Download"
+              :loading="exporting"
+              @click="handleExport"
+            >
+              匯出 Excel
+            </ElButton>
+          </el-form-item>
+        </el-form>
       </div>
-    </ElCard>
 
-    <!-- 搜尋列 -->
-    <ElCard shadow="never" class="search-card">
-      <SearchBar
-        @search="handleSearch"
-        @reset="handleReset"
-        @export="handleExport"
-      />
-    </ElCard>
-
-    <!-- 客戶列表 -->
-    <ElCard shadow="never" class="table-card">
+      <!-- 客戶列表 -->
       <CustomerTable
         :data="customers"
         :loading="loading || exporting || deleting"
@@ -139,17 +172,15 @@ function handleFormSubmit(data: CreateCustomerRequest | UpdateCustomerRequest) {
       />
 
       <!-- 分頁 -->
-      <div class="pagination-wrapper">
-        <ElPagination
-          v-model:current-page="searchParams.pageNumber"
-          v-model:page-size="searchParams.pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @current-change="handlePageChange"
-          @size-change="handlePageSizeChange"
-        />
-      </div>
+      <el-pagination
+        v-model:current-page="searchParams.pageNumber"
+        v-model:page-size="searchParams.pageSize"
+        :total="total"
+        :page-sizes="[10, 20, 50, 100]"
+        layout="total, sizes, prev, pager, next, jumper"
+        @current-change="handlePageChange"
+        @size-change="handlePageSizeChange"
+      />
     </ElCard>
 
     <!-- 客戶表單對話框 -->
@@ -163,37 +194,28 @@ function handleFormSubmit(data: CreateCustomerRequest | UpdateCustomerRequest) {
   </div>
 </template>
 
-<style lang="scss" scoped>
-.customer-management {
+<style scoped lang="scss">
+.app-container {
   padding: 20px;
 
-  .header-card {
-    margin-bottom: 20px;
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-    .header-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      h2 {
-        margin: 0;
-        font-size: 20px;
-        font-weight: 600;
-        color: var(--el-text-color-primary);
-      }
+    .title {
+      font-size: 18px;
+      font-weight: 600;
     }
   }
 
-  .search-card {
+  .filter-container {
     margin-bottom: 20px;
   }
 
-  .table-card {
-    .pagination-wrapper {
-      margin-top: 20px;
-      display: flex;
-      justify-content: flex-end;
-    }
+  .el-pagination {
+    margin-top: 20px;
+    justify-content: flex-end;
   }
 }
 </style>

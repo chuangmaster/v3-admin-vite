@@ -25,7 +25,7 @@ export const customerApi = {
    */
   async search(params: CustomerListParams): Promise<PagedApiResponse<Customer[]>> {
     return request<PagedApiResponse<Customer[]>>({
-      url: "/api/customers/search",
+      url: "/customers/search",
       method: "get",
       params
     })
@@ -38,7 +38,7 @@ export const customerApi = {
    */
   async getById(id: string): Promise<ApiResponse<Customer>> {
     return request<ApiResponse<Customer>>({
-      url: `/api/customers/${id}`,
+      url: `/customers/${id}`,
       method: "get"
     })
   },
@@ -50,7 +50,7 @@ export const customerApi = {
    */
   async create(data: CreateCustomerRequest): Promise<ApiResponse<Customer>> {
     return request<ApiResponse<Customer>>({
-      url: "/api/customers",
+      url: "/customers",
       method: "post",
       data
     })
@@ -65,7 +65,7 @@ export const customerApi = {
    */
   async update(id: string, data: UpdateCustomerRequest): Promise<ApiResponse<Customer>> {
     return request<ApiResponse<Customer>>({
-      url: `/api/customers/${id}`,
+      url: `/customers/${id}`,
       method: "put",
       data
     })
@@ -78,7 +78,7 @@ export const customerApi = {
    */
   async delete(id: string): Promise<ApiResponse<null>> {
     return request<ApiResponse<null>>({
-      url: `/api/customers/${id}`,
+      url: `/customers/${id}`,
       method: "delete"
     })
   },
@@ -96,7 +96,7 @@ export const customerApi = {
     })
 
     return request<ApiResponse<IdCardRecognitionResponse>>({
-      url: "/api/ocr/id-card-multi",
+      url: "/ocr/id-card-multi",
       method: "post",
       data: formData,
       headers: {
