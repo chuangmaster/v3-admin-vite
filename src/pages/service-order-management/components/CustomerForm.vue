@@ -7,6 +7,15 @@ import type { FormInstance, FormRules } from "element-plus"
 import type { CreateCustomerRequest, Customer } from "../types"
 import { customerApi } from "@/pages/customer-management/apis/customer"
 
+interface Props {
+  /** 是否為線上訂單（線上訂單 email 為必填） */
+  isOnlineOrder?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  isOnlineOrder: false
+})
+
 const emit = defineEmits<{
   /** 成功事件 */
   success: [customer: Customer]
@@ -28,7 +37,7 @@ const formData = reactive<CreateCustomerRequest>({
 })
 
 /** 表單驗證規則 */
-const rules: FormRules = {
+const rules = computed<FormRules>(() => ({
   name: [
     { required: true, message: "請輸入客戶姓名", trigger: "blur" },
     { min: 1, max: 50, message: "姓名長度為 1-50 字元", trigger: "blur" }
@@ -42,8 +51,9 @@ const rules: FormRules = {
     }
   ],
   email: [
+    ...(props.isOnlineOrder ? [{ required: true, message: "線上服務需要 Email 以便發送簽章連結", trigger: "blur" }] : []),
     {
-      type: "email",
+      type: "email" as const,
       message: "請輸入有效的 Email 地址",
       trigger: "blur"
     }
@@ -78,7 +88,7 @@ const rules: FormRules = {
   lineId: [
     { min: 0, max: 50, message: "Line ID 長度不可超過 50 字元", trigger: "blur" }
   ]
-}
+}))
 
 /**
  * 提交表單
@@ -133,9 +143,12 @@ function resetForm() {
 /**
  * 使用 OCR 辨識結果填入表單
  */
-function fillFromOCR(data: { name: string, idNumber: string }) {
+function fillFromOCR(data: { name: string, idNumber: string, address?: string }) {
   formData.name = data.name
   formData.idNumber = data.idNumber
+  if (data.address) {
+    formData.residentialAddress = data.address
+  }
 }
 
 // 暴露方法供父元件使用
@@ -170,11 +183,11 @@ defineExpose({
       />
     </el-form-item>
 
-    <el-form-item label="Email" prop="email">
+    <el-form-item label="Email" prop="email" :required="isOnlineOrder">
       <el-input
         v-model="formData.email"
         type="email"
-        placeholder="請輸入 Email（選填）"
+        :placeholder="isOnlineOrder ? '請輸入 Email（線上服務必填）' : '請輸入 Email（選填）'"
         maxlength="100"
       />
     </el-form-item>

@@ -316,14 +316,14 @@ defineExpose({
     margin-bottom: 24px;
     border: 1px solid var(--el-border-color);
     border-radius: 4px;
+  }
 
-    .collapse-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 500;
-    }
+  .collapse-title {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
   }
 
   .form-tip {

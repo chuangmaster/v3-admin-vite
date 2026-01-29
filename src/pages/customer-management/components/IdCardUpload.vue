@@ -30,26 +30,21 @@ const fileList = ref<UploadUserFile[]>([])
 /** 辨識中狀態 */
 const recognizing = ref(false)
 
-/** 圖片預覽 URL */
-const previewUrl = computed(() => {
-  if (fileList.value.length > 0 && fileList.value[0].url) {
-    return fileList.value[0].url
-  }
-  return ""
-})
-
 /** 是否已上傳圖片 */
 const hasImage = computed(() => fileList.value.length > 0)
+
+/** 是否已上傳足夠的圖片(至少 1 張) */
+const hasEnoughImages = computed(() => fileList.value.length >= 1)
 
 /**
  * 處理檔案變更
  */
-const handleChange: UploadProps["onChange"] = (uploadFile) => {
-  // 只保留最新的一個檔案
-  fileList.value = [uploadFile]
+const handleChange: UploadProps["onChange"] = (uploadFile, uploadFiles) => {
+  // 保留所有上傳的檔案(最多 2 個)
+  fileList.value = uploadFiles
 
   // 建立預覽 URL
-  if (uploadFile.raw) {
+  if (uploadFile.raw && !uploadFile.url) {
     uploadFile.url = URL.createObjectURL(uploadFile.raw)
   }
 }
@@ -57,12 +52,12 @@ const handleChange: UploadProps["onChange"] = (uploadFile) => {
 /**
  * 處理檔案移除
  */
-const handleRemove: UploadProps["onRemove"] = () => {
+const handleRemove: UploadProps["onRemove"] = (uploadFile, uploadFiles) => {
   // 釋放 URL
-  if (previewUrl.value) {
-    URL.revokeObjectURL(previewUrl.value)
+  if (uploadFile.url) {
+    URL.revokeObjectURL(uploadFile.url)
   }
-  fileList.value = []
+  fileList.value = uploadFiles
 }
 
 /**
@@ -90,8 +85,8 @@ const beforeUpload: UploadProps["beforeUpload"] = (rawFile) => {
  * 處理 AI 辨識
  */
 async function handleRecognize() {
-  if (!hasImage.value || !fileList.value[0].raw) {
-    ElMessage.warning("請先上傳身分證圖片")
+  if (!hasEnoughImages.value) {
+    ElMessage.warning("請至少上傳 1 張身分證圖片")
     return
   }
 
@@ -140,9 +135,12 @@ async function handleRecognize() {
  * 清空上傳
  */
 function clear() {
-  if (previewUrl.value) {
-    URL.revokeObjectURL(previewUrl.value)
-  }
+  // 釋放所有 URL
+  fileList.value.forEach((file) => {
+    if (file.url) {
+      URL.revokeObjectURL(file.url)
+    }
+  })
   fileList.value = []
 }
 
@@ -157,22 +155,22 @@ defineExpose({
       <ElUpload
         v-model:file-list="fileList"
         :auto-upload="false"
-        :limit="1"
+        :limit="2"
         accept="image/jpeg,image/png,image/jpg"
         :before-upload="beforeUpload"
         :on-change="handleChange"
         :on-remove="handleRemove"
+        :show-file-list="false"
         drag
-        list-type="picture"
       >
         <div class="upload-content">
           <el-icon :size="50" color="#409eff">
             <Upload />
           </el-icon>
           <div class="upload-text">
-            <p>將身分證圖片拖曳到此處</p>
+            <p>將身分證正反面圖片拖曳到此處</p>
             <p class="upload-hint">
-              或點擊選擇檔案
+              或點擊選擇檔案(最多 2 張)
             </p>
           </div>
         </div>
@@ -181,20 +179,35 @@ defineExpose({
 
     <!-- 圖片預覽 -->
     <div v-if="hasImage" class="preview-area">
-      <ElImage
-        :src="previewUrl"
-        fit="contain"
-        style="width: 100%; max-height: 300px"
-      >
-        <template #error>
-          <div class="image-error">
-            <el-icon :size="50">
-              <Picture />
-            </el-icon>
-            <p>圖片載入失敗</p>
+      <div class="preview-title">
+        已上傳 {{ fileList.length }} 張圖片:
+      </div>
+      <div class="preview-grid">
+        <div
+          v-for="(file, index) in fileList"
+          :key="file.uid"
+          class="preview-item"
+        >
+          <ElImage
+            :src="file.url"
+            fit="contain"
+            :preview-src-list="fileList.map(f => f.url || '')"
+            :initial-index="index"
+          >
+            <template #error>
+              <div class="image-error">
+                <el-icon :size="30">
+                  <Picture />
+                </el-icon>
+                <p>載入失敗</p>
+              </div>
+            </template>
+          </ElImage>
+          <div class="preview-label">
+            {{ index === 0 ? '正面' : '反面' }}
           </div>
-        </template>
-      </ElImage>
+        </div>
+      </div>
     </div>
 
     <!-- 辨識按鈕 -->
@@ -203,7 +216,7 @@ defineExpose({
         type="primary"
         :icon="Check"
         :loading="recognizing"
-        :disabled="recognizing"
+        :disabled="recognizing || !hasEnoughImages"
         @click="handleRecognize"
       >
         {{ recognizing ? 'AI 辨識中...' : '開始 AI 辨識' }}
@@ -217,7 +230,7 @@ defineExpose({
     <div class="tips">
       <p>📸 上傳提示:</p>
       <ul>
-        <li>支援 JPG、PNG 格式,大小不超過 5MB</li>
+        <li>支援上傳 1-2 張照片(身分證正反面),JPG、PNG 格式,單檔不超過 5MB</li>
         <li>請確保身分證圖片清晰、光線充足</li>
         <li>AI 辨識由 Google Gemini 提供,準確率約 95%</li>
         <li>辨識結果僅供參考,請務必核對後再提交</li>
@@ -262,6 +275,41 @@ defineExpose({
     border-radius: 4px;
     background: var(--el-fill-color-lighter);
 
+    .preview-title {
+      margin-bottom: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--el-text-color-primary);
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .preview-item {
+      position: relative;
+      border: 1px solid var(--el-border-color);
+      border-radius: 4px;
+      overflow: hidden;
+      background: white;
+
+      .el-image {
+        width: 100%;
+        height: 200px;
+        display: block;
+      }
+
+      .preview-label {
+        padding: 8px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--el-text-color-secondary);
+        background: var(--el-fill-color-light);
+      }
+    }
+
     .image-error {
       display: flex;
       flex-direction: column;
@@ -272,6 +320,7 @@ defineExpose({
 
       p {
         margin-top: 10px;
+        font-size: 12px;
       }
     }
   }
