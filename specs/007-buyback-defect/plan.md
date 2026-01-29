@@ -116,11 +116,11 @@ src/
 ├── pages/
 │   └── service-order-management/    # 服務單管理模組
 │       ├── types.ts                  # [修改] 型別定義 - 新增/確認 ProductItem.defects
-│       ├── constants.ts              # [修改] 常數定義 - 確認 DEFECT_OPTIONS
+│       ├── create.vue                # [驗證] 建立頁面 - 確認 getDefectLabel() 函式運作正常
+│       ├── detail.vue                # [驗證] 詳細頁面 - 確認瑕疵資訊顯示正常
 │       ├── components/
-│       │   ├── BuybackForm.vue       # [修改] 收購單表單 - 新增瑕疵欄位 UI
-│       │   ├── ProductItemForm.vue   # [修改] 商品項目表單 - 新增瑕疵 Checkbox 群組
-│       │   └── OrderDetail.vue       # [修改] 訂單詳細頁面 - 顯示瑕疵資訊
+│       │   ├── ProductItemForm.vue   # [修改] 商品項目表單 - 移除瑕疵欄位的寄賣單條件判斷
+│       │   └── DefectsSelector.vue   # [既有] 瑕疵選擇器元件 - 無需修改
 │       ├── composables/
 │       │   └── useDefectOptions.ts   # [新增] 瑕疵選項處理邏輯（代碼/顯示名稱轉換）
 │       └── utils/
@@ -142,8 +142,10 @@ tests/
 - 採用 Web application 單一前端專案結構
 - 所有變更集中在 `src/pages/service-order-management/` 模組內
 - 瑕疵選項常數已存在於 `types.ts`（DEFECT_OPTIONS），無需新增檔案
-- 建立 composable 處理瑕疵代碼與顯示名稱轉換邏輯
-- 修改既有元件（表單、詳細頁面、Excel 匯出）以支援瑕疵欄位
+- 瑕疵代碼轉換函式 `getDefectLabel()` 已存在於 `create.vue` 和 `detail.vue`，無需新增 composable
+- 瑕疵選擇 UI 元件 `DefectsSelector.vue` 已存在，由 `ProductItemForm.vue` 使用
+- 主要修改：移除 `ProductItemForm.vue` 中瑕疵欄位的條件判斷（從僅寄賣單擴展至收購單）
+- 次要修改：Excel 匯出功能新增瑕疵欄位
 
 ## Complexity Tracking
 
