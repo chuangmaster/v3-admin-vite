@@ -59,6 +59,25 @@ const pendingIdCardFiles = ref<{ front: File | null, back: File | null }>({ fron
  * 選擇客戶
  */
 function handleCustomerSelect(customer: Customer) {
+  // 如果是線上服務，檢查客戶是否有 email
+  if (formData.orderSource === ServiceOrderSource.ONLINE && !customer.email) {
+    ElMessageBox.alert(
+      `客戶「${customer.name}」尚未填寫 Email，線上服務需要 Email 以便發送簽章連結。請先前往客戶管理頁面更新該客戶的 Email 資料。`,
+      "缺少 Email 資訊",
+      {
+        confirmButtonText: "前往客戶管理",
+        cancelButtonText: "取消",
+        showCancelButton: true,
+        type: "warning",
+        callback: (action: string) => {
+          if (action === "confirm") {
+            router.push({ name: "CustomerManagement" })
+          }
+        }
+      }
+    )
+    return
+  }
   setCustomer(customer)
   ElMessage.success(`已選擇客戶：${customer.name}`)
 }
@@ -655,6 +674,7 @@ function handleIdCardBackUploaded(data: { base64: string, contentType: string, f
         <el-tab-pane label="手動輸入" name="manual">
           <CustomerForm
             ref="customerFormRef"
+            :is-online-order="formData.orderSource === ServiceOrderSource.ONLINE"
             @success="handleCustomerCreated"
             @cancel="showCustomerDialog = false"
           />

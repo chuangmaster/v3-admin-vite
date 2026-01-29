@@ -160,8 +160,8 @@ defineExpose({
         :before-upload="beforeUpload"
         :on-change="handleChange"
         :on-remove="handleRemove"
+        :show-file-list="false"
         drag
-        list-type="picture"
       >
         <div class="upload-content">
           <el-icon :size="50" color="#409eff">
