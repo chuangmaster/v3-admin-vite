@@ -1,8 +1,8 @@
 # Tasks: 收購單瑕疵欄位
 
-**Branch**: `007-buyback-defect`  
-**Feature**: 為收購單新增瑕疵欄位，完全仿效寄賣單實作  
-**Input**: Design documents from `/specs/007-buyback-defect/`  
+**Branch**: `007-buyback-defect`
+**Feature**: 為收購單新增瑕疵欄位，完全仿效寄賣單實作
+**Input**: Design documents from `/specs/007-buyback-defect/`
 **Prerequisites**: plan.md, spec.md, data-model.md, contracts/api-updates.md, research.md, quickstart.md
 
 **Tests**: 此功能包含可選的單元測試任務。單元測試為選填項目，如有需要可執行。
@@ -23,10 +23,10 @@
 
 **Purpose**: 確認開發環境與專案結構準備就緒
 
-- [ ] T001 確認 Node.js 18+ 與 pnpm 8+ 已安裝
-- [ ] T002 執行 `pnpm install` 確認所有依賴正常安裝
-- [ ] T003 執行 `pnpm dev` 確認開發伺服器可正常啟動
-- [ ] T004 確認專案結構符合 plan.md 定義
+- [X] T001 確認 Node.js 18+ 與 pnpm 8+ 已安裝
+- [X] T002 執行 `pnpm install` 確認所有依賴正常安裝
+- [X] T003 執行 `pnpm dev` 確認開發伺服器可正常啟動
+- [X] T004 確認專案結構符合 plan.md 定義
 
 **Checkpoint**: 開發環境就緒，可開始實作
 
@@ -38,10 +38,10 @@
 
 **⚠️ CRITICAL**: 此階段必須完成後，所有 user story 才能開始實作
 
-- [ ] T005 更新 `CreateBuybackProductItemRequest` 介面新增 `defects?: string[]` 屬性 in `src/pages/service-order-management/types.ts`
-- [ ] T006 確認 `DEFECT_OPTIONS` 常數定義正確且包含所有四種瑕疵選項 in `src/pages/service-order-management/types.ts`
-- [ ] T007 確認 `ProductItem` 介面的 `defects?: string[]` 屬性註釋移除「僅寄賣單」限制 in `src/pages/service-order-management/types.ts`
-- [ ] T008 執行 `pnpm type-check` 確認 TypeScript 編譯無錯誤
+- [X] T005 更新 `CreateBuybackProductItemRequest` 介面新增 `defects?: string[]` 屬性 in `src/pages/service-order-management/types.ts`
+- [X] T006 確認 `DEFECT_OPTIONS` 常數定義正確且包含所有四種瑕疵選項 in `src/pages/service-order-management/types.ts`
+- [X] T007 確認 `ProductItem` 介面的 `defects?: string[]` 屬性註釋移除「僅寄賣單」限制 in `src/pages/service-order-management/types.ts`
+- [X] T008 執行 `pnpm type-check` 確認 TypeScript 編譯無錯誤
 
 **Checkpoint**: 型別定義更新完成，user story 實作可開始
 
@@ -57,16 +57,16 @@
 
 **Note**: `DefectsSelector.vue` 元件與 `getDefectLabel()` 函式已存在，無需新增。主要工作是移除 `ProductItemForm.vue` 中限制瑕疵欄位僅用於寄賣單的條件判斷。
 
-- [ ] T009 [P] [US1] 修改 `ProductItemForm.vue` 移除瑕疵欄位的 `v-if="isConsignment"` 條件判斷（約 Line 135-145）in `src/pages/service-order-management/components/ProductItemForm.vue`
-- [ ] T010 [P] [US1] 修改 `ProductItemForm.vue` 的提交邏輯，移除瑕疵欄位的條件包裹（Line 140-142：將 `...(isConsignment.value && { defects: ... })` 改為直接包含 defects）in `src/pages/service-order-management/components/ProductItemForm.vue`
-- [ ] T011 [US1] 更新 `useServiceOrderForm.ts` 收購單請求映射，新增 `defects: item.defects` 欄位（約 Line 223-240）in `src/pages/service-order-management/composables/useServiceOrderForm.ts`
+- [X] T009 [P] [US1] 修改 `ProductItemForm.vue` 移除瑕疵欄位的 `v-if="isConsignment"` 條件判斷（約 Line 135-145）in `src/pages/service-order-management/components/ProductItemForm.vue`
+- [X] T010 [P] [US1] 修改 `ProductItemForm.vue` 的提交邏輯，移除瑕疵欄位的條件包裹（Line 140-142：將 `...(isConsignment.value && { defects: ... })` 改為直接包含 defects）in `src/pages/service-order-management/components/ProductItemForm.vue`
+- [X] T011 [US1] 更新 `useServiceOrderForm.ts` 收購單請求映射，新增 `defects: item.defects` 欄位（約 Line 223-240）in `src/pages/service-order-management/composables/useServiceOrderForm.ts`
 - [ ] T011a [P] [US1] 實作前端瑕疵欄位驗證邏輯：確保 defects 為陣列、項目為有效代碼（hardwareRustScratchLoss/leatherWearScratchDent/liningDirty/cornerWear），格式不符時顯示錯誤訊息 in `src/pages/service-order-management/components/ProductItemForm.vue` 或相關驗證檔案
 - [ ] T012 [US1] 驗證表單元件：開啟建立收購單頁面，確認瑕疵欄位 Checkbox 群組正確顯示，包含「不勾選任何瑕疵」的空白提交情境
 - [ ] T013 [US1] 驗證表單互動：勾選/取消勾選瑕疵選項，確認表單資料即時更新
 - [ ] T014 [US1] 驗證 API 請求：提交收購單表單，檢查 Network 請求 payload 包含 `defects` 欄位且格式正確（陣列格式，代碼值有效）
 - [ ] T015 [US1] 驗證後端整合：確認後端 API 成功接收並儲存瑕疵資訊，測試後端拒絕無效瑕疵代碼的情境（如非預期選項值、超長字串），確認錯誤訊息格式符合 ApiResponseModel 規範
-- [ ] T016 [US1] 驗證 `create.vue` 的 `getDefectLabel()` 函式（Line 294）能正確轉換收購單瑕疵代碼為顯示名稱 in `src/pages/service-order-management/create.vue`
-- [ ] T017 [US1] 驗證 `detail.vue` 的瑕疵顯示邏輯（Line 407）在收購單詳細頁面正確顯示瑕疵 Tag in `src/pages/service-order-management/detail.vue`
+- [X] T016 [US1] 驗證 `create.vue` 的 `getDefectLabel()` 函式（Line 294）能正確轉換收購單瑕疵代碼為顯示名稱 in `src/pages/service-order-management/create.vue`
+- [X] T017 [US1] 驗證 `detail.vue` 的瑕疵顯示邏輯（Line 407）在收購單詳細頁面正確顯示瑕疵 Tag in `src/pages/service-order-management/detail.vue`
 
 **Checkpoint**: User Story 1 完成，收購單可記錄與顯示瑕疵資訊
 
@@ -103,7 +103,7 @@
 
 ### Prerequisite Check for User Story 3
 
-- [ ] T025 [US3] 確認系統是否支援收購單編輯功能（查看是否有編輯按鈕、編輯路由、編輯 API）
+- [X] T025 [US3] 確認系統是否支援收購單編輯功能（查看是否有編輯按鈕、編輯路由、編輯 API）→ **結果：不支援**
 
 ### Implementation for User Story 3 (條件性：僅當系統支援編輯時)
 
@@ -126,16 +126,16 @@
 **Note**: 單元測試為可選項目，專案已有足夠的整合測試覆蓋（T012-T024 驗證任務）。若需要更嚴格的測試覆蓋，可執行以下單元測試任務。
 
 - [ ] T031 [P] 建立 `formatDefectsForExcel()` 單元測試 in `tests/pages/service-order-management/utils/export-excel.test.ts`
-- [ ] T032 [P] 建立 `getDefectLabel()` 單元測試（瑕疵代碼轉換） in `tests/pages/service-order-management/composables/defect-utils.test.ts` (或相關測試檔案)
+- [X] T032 [P] 建立 `getDefectLabel()` 單元測試（瑕疵代碼轉換） in `tests/pages/service-order-management/utils/defect-utils.test.ts`
 - [ ] T033 [P] 建立瑕疵欄位驗證邏輯單元測試 in `tests/pages/service-order-management/validation/defects.test.ts` (若有獨立驗證邏輯)
 
 ### Code Quality & Documentation
 
-- [ ] T034 [P] 執行 `pnpm lint` 確認程式碼符合 ESLint 規範，修正所有錯誤與警告
-- [ ] T035 [P] 執行 `pnpm type-check` 確認 TypeScript 編譯無錯誤
-- [ ] T036 [P] 執行 `pnpm build` 確認生產建置成功
-- [ ] T037 [P] 審查所有修改的檔案，確認程式碼註解完整且為繁體中文
-- [ ] T038 [P] 審查程式碼可讀性，移除冗餘或調試用程式碼
+- [X] T034 [P] 執行 `pnpm lint` 確認程式碼符合 ESLint 規範，修正所有錯誤與警告
+- [X] T035 [P] 執行 `pnpm type-check` 確認 TypeScript 編譯無錯誤
+- [X] T036 [P] 執行 `pnpm build` 確認生產建置成功
+- [X] T037 [P] 審查所有修改的檔案，確認程式碼註解完整且為繁體中文
+- [X] T038 [P] 審查程式碼可讀性，移除冗餘或調試用程式碼
 - [ ] T039 執行 quickstart.md 中的完整測試檢查清單，確認所有功能正常運作
 - [ ] T040 更新專案 CHANGELOG 或相關文件，記錄此功能變更
 
@@ -186,16 +186,16 @@ Phase 6 (Polish)
 
 ### User Story Dependencies
 
-- **User Story 1 (P1)**: 
+- **User Story 1 (P1)**:
   - **依賴**: Phase 2 (Foundational) 完成
   - **阻塞**: 無（可獨立運作）
   - **建議**: 優先完成，作為 MVP 基線
-  
+
 - **User Story 2 (P2)**:
   - **依賴**: Phase 2 完成，US1 實作（需要瑕疵資料可查詢與顯示）
   - **阻塞**: 無（可獨立測試查詢與匯出）
   - **建議**: US1 完成並驗證後開始
-  
+
 - **User Story 3 (P3)**:
   - **依賴**: Phase 2 完成，US1 實作（需要瑕疵欄位已存在）
   - **阻塞**: 無（可獨立測試編輯功能）
@@ -267,14 +267,14 @@ T037 + T038         # 程式碼審查（可平行）
 **目標**: 最快交付核心價值，User Story 1 即為完整可用的 MVP
 
 ```
-Phase 1 (Setup) 
-  → 
+Phase 1 (Setup)
+  →
 Phase 2 (Foundational) ⚠️ Critical
-  → 
+  →
 Phase 3 (User Story 1 - P1) 🎯 MVP
-  → 
+  →
 Phase 6 (Basic Polish: T034-T036, T039)
-  → 
+  →
 ✅ Deploy MVP & Validate
 ```
 
@@ -310,7 +310,7 @@ Phase 6 (Polish) → ✅ Final Release
 - 降低單次部署風險
 - 使用者可逐步適應新功能
 
-**時間估算**: 
+**時間估算**:
 - MVP (US1): 2-3 天
 - v1.1 (US1+US2): +1-2 天
 - v1.2 (US1+US2+US3): +1 天（若適用）
@@ -497,10 +497,10 @@ T001-T004 (Setup) → T005-T008 (Foundational) → T009-T017 (US1 MVP) → T040a
 
 ---
 
-**Tasks Status**: ✅ Complete  
-**Total Tasks**: 49  
-**MVP Tasks (Phase 1-3)**: 18  
-**Ready for Implementation**: ✅ Yes  
+**Tasks Status**: ✅ Complete
+**Total Tasks**: 49
+**MVP Tasks (Phase 1-3)**: 18
+**Ready for Implementation**: ✅ Yes
 
-**Generated**: 2026-01-30 by `/speckit.tasks` command  
+**Generated**: 2026-01-30 by `/speckit.tasks` command
 **Last Updated**: 2026-01-30 (Added validation, performance, and error handling tasks)

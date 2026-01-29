@@ -237,7 +237,8 @@ export function useServiceOrderForm() {
             internalCode: item.internalCode,
             grade: item.grade,
             amount: item.amount,
-            accessories: item.accessories
+            accessories: item.accessories,
+            defects: item.defects
           })),
           totalAmount: formData.totalAmount!,
           // 身分證圖片（如果有上傳）

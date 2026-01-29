@@ -136,10 +136,8 @@ async function handleSubmit() {
       amount: formData.amount,
       // 配件欄位收購單和寄賣單都有
       accessories: formData.accessories.length > 0 ? formData.accessories.map(String) : undefined,
-      // 瑡疵欄位只有寄賣單才有
-      ...(isConsignment.value && {
-        defects: formData.defects.length > 0 ? formData.defects.map(String) : undefined
-      })
+      // 瑕疵欄位收購單和寄賣單都有
+      defects: formData.defects.length > 0 ? formData.defects.map(String) : undefined
     }
 
     emit("submit", item)
@@ -239,16 +237,14 @@ defineExpose({
       </el-checkbox-group>
     </el-form-item>
 
-    <!-- 寄賣單額外欄位：瑕疵處 -->
-    <template v-if="isConsignment">
-      <el-form-item label="瑕疵處" prop="defects">
-        <el-checkbox-group v-model="formData.defects">
-          <el-checkbox v-for="option in DEFECT_OPTIONS" :key="option.value" :value="option.value">
-            {{ option.label }}
-          </el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
-    </template>
+    <!-- 瑕疵處（收購單與寄賣單共用） -->
+    <el-form-item label="瑕疵處" prop="defects">
+      <el-checkbox-group v-model="formData.defects">
+        <el-checkbox v-for="option in DEFECT_OPTIONS" :key="option.value" :value="option.value">
+          {{ option.label }}
+        </el-checkbox>
+      </el-checkbox-group>
+    </el-form-item>
 
     <el-form-item>
       <el-button @click="handleCancel">
