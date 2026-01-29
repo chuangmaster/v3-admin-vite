@@ -3,8 +3,10 @@
  * 身分證上傳元件
  * 支援正反面檔案上傳、拍照、預覽、AI OCR 辨識功能
  */
-import type { UploadFile, UploadRawFile } from "element-plus"
-import { Camera, Delete, Star, Upload } from "@element-plus/icons-vue"
+import type { UploadProps, UploadUserFile } from "element-plus"
+import { Camera, Check, Picture, Upload } from "@element-plus/icons-vue"
+import { ElButton, ElImage, ElLoading, ElMessage, ElMessageBox, ElUpload } from "element-plus"
+import { computed, onBeforeUnmount, ref } from "vue"
 import { customerApi } from "@/pages/customer-management/apis/customer"
 
 interface Props {
@@ -21,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   /** 辨識成功 */
-  "recognized": [data: { name: string, idNumber: string }]
+  "recognized": [data: { name: string, idNumber: string, address?: string }]
   /** 更新上傳狀態（正面已上傳, 反面已上傳） */
   "update:modelValue": [value: { front: boolean, back: boolean }]
 }>()
@@ -30,50 +32,30 @@ const recognizing = ref(false)
 const retryCount = ref(0)
 const MAX_RETRY_COUNT = 3
 
-/** 正面檔案 */
-const frontFile = ref<UploadFile>()
-/** 正面預覽圖片 URL */
-const frontPreviewUrl = ref<string>("")
+/** 上傳的檔案列表 */
+const fileList = ref<UploadUserFile[]>([])
 
-/** 反面檔案 */
-const backFile = ref<UploadFile>()
-/** 反面預覽圖片 URL */
-const backPreviewUrl = ref<string>("")
+/** 是否已上傳圖片 */
+const hasImage = computed(() => fileList.value.length > 0)
 
-/** 當前上傳類型 */
-type UploadSide = "front" | "back"
+/** 是否已上傳足夠的圖片 */
+const hasEnoughImages = computed(() => {
+  if (props.requireBothSides) {
+    return fileList.value.length >= 2
+  }
+  return fileList.value.length >= 1
+})
 
 /**
- * 檔案上傳前檢查
+ * 處理檔案變更
  */
-function beforeUpload(file: UploadRawFile) {
-  const isImage = file.type.startsWith("image/")
-  const isLt5M = file.size / 1024 / 1024 < 5
+const handleChange: UploadProps["onChange"] = (uploadFile, uploadFiles) => {
+  // 保留所有上傳的檔案(最多 2 個)
+  fileList.value = uploadFiles
 
-  if (!isImage) {
-    ElMessage.error("請上傳圖片檔案")
-    return false
-  }
-  if (!isLt5M) {
-    ElMessage.error("圖片大小不能超過 5MB")
-    return false
-  }
-
-  return true
-}
-
-/**
- * 正面檔案變更處理
- */
-async function handleFrontChange(file: UploadFile) {
-  frontFile.value = file
-
-  // 生成預覽 URL
-  if (file.raw) {
-    if (frontPreviewUrl.value) {
-      URL.revokeObjectURL(frontPreviewUrl.value)
-    }
-    frontPreviewUrl.value = URL.createObjectURL(file.raw)
+  // 建立預覽 URL
+  if (uploadFile.raw && !uploadFile.url) {
+    uploadFile.url = URL.createObjectURL(uploadFile.raw)
   }
 
   // 重置重試計數
@@ -84,21 +66,36 @@ async function handleFrontChange(file: UploadFile) {
 }
 
 /**
- * 反面檔案變更處理
+ * 處理檔案移除
  */
-async function handleBackChange(file: UploadFile) {
-  backFile.value = file
+const handleRemove: UploadProps["onRemove"] = (uploadFile, uploadFiles) => {
+  // 釋放 URL
+  if (uploadFile.url) {
+    URL.revokeObjectURL(uploadFile.url)
+  }
+  fileList.value = uploadFiles
+  emitUploadStatus()
+}
 
-  // 生成預覽 URL
-  if (file.raw) {
-    if (backPreviewUrl.value) {
-      URL.revokeObjectURL(backPreviewUrl.value)
-    }
-    backPreviewUrl.value = URL.createObjectURL(file.raw)
+/**
+ * 上傳前驗證
+ */
+const beforeUpload: UploadProps["beforeUpload"] = (rawFile) => {
+  // 驗證檔案類型
+  const validTypes = ["image/jpeg", "image/png", "image/jpg"]
+  if (!validTypes.includes(rawFile.type)) {
+    ElMessage.error("只能上傳 JPG/PNG 格式的圖片")
+    return false
   }
 
-  // 通知父元件上傳狀態
-  emitUploadStatus()
+  // 驗證檔案大小 (最大 5MB)
+  const maxSize = 5 * 1024 * 1024
+  if (rawFile.size > maxSize) {
+    ElMessage.error("圖片大小不能超過 5MB")
+    return false
+  }
+
+  return true
 }
 
 /**
@@ -106,66 +103,52 @@ async function handleBackChange(file: UploadFile) {
  */
 function emitUploadStatus() {
   emit("update:modelValue", {
-    front: !!frontFile.value,
-    back: !!backFile.value
+    front: fileList.value.length >= 1,
+    back: fileList.value.length >= 2
   })
 }
 
 /**
- * 移除正面檔案
- */
-function handleRemoveFront() {
-  frontFile.value = undefined
-  if (frontPreviewUrl.value) {
-    URL.revokeObjectURL(frontPreviewUrl.value)
-    frontPreviewUrl.value = ""
-  }
-  retryCount.value = 0
-  emitUploadStatus()
-}
-
-/**
- * 移除反面檔案
- */
-function handleRemoveBack() {
-  backFile.value = undefined
-  if (backPreviewUrl.value) {
-    URL.revokeObjectURL(backPreviewUrl.value)
-    backPreviewUrl.value = ""
-  }
-  emitUploadStatus()
-}
-
-// Base64 轉換已移除,統一使用 File 物件
-
-/**
- * 執行 AI 辨識(使用正面圖片)
+ * 執行 AI 辨識
  */
 async function handleRecognize() {
-  if (!frontFile.value?.raw) {
-    ElMessage.warning("請先上傳身分證正面圖片")
+  if (!hasEnoughImages.value) {
+    const message = props.requireBothSides
+      ? "請上傳身分證正反面圖片"
+      : "請至少上傳 1 張身分證圖片"
+    ElMessage.warning(message)
     return
   }
 
   recognizing.value = true
-  try {
-    // 準備檔案陣列(正反面)
-    const files: File[] = [frontFile.value.raw]
-    if (backFile.value?.raw) {
-      files.push(backFile.value.raw)
-    }
+  const loading = ElLoading.service({
+    lock: true,
+    text: "AI 辨識中,請稍候...",
+    background: "rgba(0, 0, 0, 0.7)"
+  })
 
-    // 呼叫統一的 OCR API
+  try {
+    // 呼叫辨識 API (傳遞所有照片的原始 File 物件陣列)
+    const files = fileList.value
+      .map(file => file.raw)
+      .filter(raw => raw !== undefined) as File[]
     const response = await customerApi.recognizeIdCard(files)
 
     if (response.success && response.data) {
-      ElMessage.success("辨識成功")
-      // 發送辨識結果
-      emit("recognized", {
-        name: response.data.name || "",
-        idNumber: response.data.idNumber || ""
-      })
-      retryCount.value = 0
+      const result = response.data
+
+      // 檢查辨識結果
+      if (!result.name && !result.idNumber && !result.address) {
+        ElMessage.warning("辨識失敗,請確認圖片清晰度或手動輸入")
+      } else {
+        ElMessage.success("辨識成功")
+        emit("recognized", {
+          name: result.name || "",
+          idNumber: result.idNumber || "",
+          address: result.address || ""
+        })
+        retryCount.value = 0
+      }
     } else {
       throw new Error(response.message || "辨識失敗")
     }
@@ -194,51 +177,81 @@ async function handleRecognize() {
     }
   } finally {
     recognizing.value = false
+    loading.close()
   }
 }
 
 /**
  * 拍照功能（使用瀏覽器相機 API）
  */
-function handleCapture(side: UploadSide) {
+function handleCapture() {
   // 創建 file input 元素並設定為相機模式
   const input = document.createElement("input")
   input.type = "file"
   input.accept = "image/*"
   input.capture = "environment" // 使用後置相機
+  input.multiple = props.requireBothSides // 如果需要兩張，允許多選
 
   input.onchange = (e: Event) => {
     const target = e.target as HTMLInputElement
-    const file = target.files?.[0]
-    if (file) {
-      // 轉換為 UploadFile 格式
-      const uploadFile: UploadFile = {
+    const files = Array.from(target.files || [])
+
+    files.forEach((file, index) => {
+      // 檢查是否超過限制
+      if (fileList.value.length >= 2) {
+        ElMessage.warning("最多只能上傳 2 張圖片")
+        return
+      }
+
+      // 先驗證檔案
+      if (!beforeUpload(file as any)) {
+        return
+      }
+
+      // 轉換為 UploadUserFile 格式
+      const uploadFile: UploadUserFile = {
         name: file.name,
         size: file.size,
-        raw: file as UploadRawFile,
+        raw: file as any,
         status: "ready",
-        uid: Date.now()
+        uid: Date.now() + index,
+        url: URL.createObjectURL(file)
       }
-      if (side === "front") {
-        handleFrontChange(uploadFile)
-      } else {
-        handleBackChange(uploadFile)
-      }
-    }
+
+      fileList.value.push(uploadFile)
+    })
+
+    emitUploadStatus()
   }
 
   input.click()
 }
 
 /**
+ * 清空上傳
+ */
+function clear() {
+  // 釋放所有 URL
+  fileList.value.forEach((file) => {
+    if (file.url) {
+      URL.revokeObjectURL(file.url)
+    }
+  })
+  fileList.value = []
+  retryCount.value = 0
+  emitUploadStatus()
+}
+
+/**
  * 取得當前上傳的圖片資料
  */
 function getUploadedFiles() {
+  const files = fileList.value.map(f => f.raw).filter(Boolean) as File[]
   return {
-    front: frontFile.value?.raw || null,
-    back: backFile.value?.raw || null,
-    frontPreviewUrl: frontPreviewUrl.value,
-    backPreviewUrl: backPreviewUrl.value
+    front: files[0] || null,
+    back: files[1] || null,
+    frontPreviewUrl: fileList.value[0]?.url || "",
+    backPreviewUrl: fileList.value[1]?.url || ""
   }
 }
 
@@ -246,182 +259,144 @@ function getUploadedFiles() {
  * 設定圖片（從外部傳入）
  */
 function setFiles(data: { front?: File | null, back?: File | null }) {
-  if (data.front) {
-    const uploadFile: UploadFile = {
-      name: data.front.name,
-      size: data.front.size,
-      raw: data.front as UploadRawFile,
+  clear()
+
+  const files: File[] = []
+  if (data.front) files.push(data.front)
+  if (data.back) files.push(data.back)
+
+  files.forEach((file, index) => {
+    const uploadFile: UploadUserFile = {
+      name: file.name,
+      size: file.size,
+      raw: file as any,
       status: "ready",
-      uid: Date.now()
+      uid: Date.now() + index,
+      url: URL.createObjectURL(file)
     }
-    handleFrontChange(uploadFile)
-  }
-  if (data.back) {
-    const uploadFile: UploadFile = {
-      name: data.back.name,
-      size: data.back.size,
-      raw: data.back as UploadRawFile,
-      status: "ready",
-      uid: Date.now() + 1
-    }
-    handleBackChange(uploadFile)
-  }
+    fileList.value.push(uploadFile)
+  })
+
+  emitUploadStatus()
 }
 
 // 組件卸載時釋放 URL
 onBeforeUnmount(() => {
-  if (frontPreviewUrl.value) {
-    URL.revokeObjectURL(frontPreviewUrl.value)
-  }
-  if (backPreviewUrl.value) {
-    URL.revokeObjectURL(backPreviewUrl.value)
-  }
+  fileList.value.forEach((file) => {
+    if (file.url) {
+      URL.revokeObjectURL(file.url)
+    }
+  })
 })
 
 // 暴露方法供父元件使用
 defineExpose({
   getUploadedFiles,
-  setFiles
+  setFiles,
+  clear
 })
 </script>
 
 <template>
   <div class="id-card-uploader">
-    <!-- 正面上傳區 -->
-    <div class="upload-section">
-      <div class="section-header">
-        <span class="section-title">身分證正面</span>
-        <el-tag v-if="props.requireBothSides" type="danger" size="small">
-          必填
-        </el-tag>
-      </div>
-      <div class="upload-area">
-        <el-upload
-          :auto-upload="false"
-          :show-file-list="false"
-          accept="image/*"
-          :before-upload="beforeUpload"
-          :on-change="handleFrontChange"
-          drag
-        >
-          <div v-if="!frontFile" class="upload-placeholder">
-            <el-icon class="upload-icon">
-              <Upload />
-            </el-icon>
-            <div class="upload-text">
-              將身分證<strong>正面</strong>圖片拖曳至此，或<em>點擊上傳</em>
-            </div>
-            <div class="upload-hint">
-              支援 JPG、PNG 格式，檔案大小不超過 5MB
-            </div>
+    <div class="upload-area">
+      <ElUpload
+        v-model:file-list="fileList"
+        :auto-upload="false"
+        :limit="2"
+        accept="image/jpeg,image/png,image/jpg"
+        :before-upload="beforeUpload"
+        :on-change="handleChange"
+        :on-remove="handleRemove"
+        drag
+        list-type="picture"
+      >
+        <div class="upload-content">
+          <el-icon :size="50" color="#409eff">
+            <Upload />
+          </el-icon>
+          <div class="upload-text">
+            <p>將身分證正反面圖片拖曳到此處</p>
+            <p class="upload-hint">
+              或點擊選擇檔案(最多 2 張)
+            </p>
           </div>
+        </div>
+      </ElUpload>
+    </div>
 
-          <div v-else class="preview-container">
-            <el-image
-              :src="frontPreviewUrl"
-              fit="contain"
-              class="preview-image"
-              :preview-src-list="[frontPreviewUrl]"
-            />
-            <div class="file-info">
-              <span>{{ frontFile.name }}</span>
-              <el-button
-                text
-                type="danger"
-                size="small"
-                :icon="Delete"
-                @click.stop="handleRemoveFront"
-              >
-                移除
-              </el-button>
-            </div>
-          </div>
-        </el-upload>
+    <!-- 圖片預覽 -->
+    <div v-if="hasImage" class="preview-area">
+      <div class="preview-title">
+        已上傳 {{ fileList.length }} 張圖片:
       </div>
-
-      <div class="action-buttons">
-        <el-button
-          size="small"
-          :icon="Camera"
-          @click="handleCapture('front')"
+      <div class="preview-grid">
+        <div
+          v-for="(file, index) in fileList"
+          :key="file.uid"
+          class="preview-item"
         >
-          拍照
-        </el-button>
-
-        <el-button
-          v-if="frontFile && props.showRecognize"
-          type="success"
-          size="small"
-          :icon="Star"
-          :loading="recognizing"
-          @click="handleRecognize"
-        >
-          AI 辨識
-        </el-button>
+          <ElImage
+            :src="file.url"
+            fit="contain"
+            :preview-src-list="fileList.map(f => f.url || '')"
+            :initial-index="index"
+          >
+            <template #error>
+              <div class="image-error">
+                <el-icon :size="30">
+                  <Picture />
+                </el-icon>
+                <p>載入失敗</p>
+              </div>
+            </template>
+          </ElImage>
+          <div class="preview-label">
+            {{ index === 0 ? '正面' : '反面' }}
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- 反面上傳區（線下流程必填） -->
-    <div v-if="props.requireBothSides" class="upload-section">
-      <div class="section-header">
-        <span class="section-title">身分證反面</span>
-        <el-tag type="danger" size="small">
-          必填
-        </el-tag>
-      </div>
-      <div class="upload-area">
-        <el-upload
-          :auto-upload="false"
-          :show-file-list="false"
-          accept="image/*"
-          :before-upload="beforeUpload"
-          :on-change="handleBackChange"
-          drag
-        >
-          <div v-if="!backFile" class="upload-placeholder">
-            <el-icon class="upload-icon">
-              <Upload />
-            </el-icon>
-            <div class="upload-text">
-              將身分證<strong>反面</strong>圖片拖曳至此，或<em>點擊上傳</em>
-            </div>
-            <div class="upload-hint">
-              支援 JPG、PNG 格式，檔案大小不超過 5MB
-            </div>
-          </div>
+    <!-- 操作按鈕 -->
+    <div v-if="hasImage" class="actions">
+      <ElButton
+        type="primary"
+        :icon="Check"
+        :loading="recognizing"
+        :disabled="recognizing || !hasEnoughImages"
+        @click="handleRecognize"
+      >
+        {{ recognizing ? 'AI 辨識中...' : '開始 AI 辨識' }}
+      </ElButton>
+      <ElButton :icon="Camera" @click="handleCapture">
+        拍照
+      </ElButton>
+      <ElButton @click="clear">
+        清空重選
+      </ElButton>
+    </div>
 
-          <div v-else class="preview-container">
-            <el-image
-              :src="backPreviewUrl"
-              fit="contain"
-              class="preview-image"
-              :preview-src-list="[backPreviewUrl]"
-            />
-            <div class="file-info">
-              <span>{{ backFile.name }}</span>
-              <el-button
-                text
-                type="danger"
-                size="small"
-                :icon="Delete"
-                @click.stop="handleRemoveBack"
-              >
-                移除
-              </el-button>
-            </div>
-          </div>
-        </el-upload>
-      </div>
+    <div v-else class="empty-actions">
+      <ElButton :icon="Camera" @click="handleCapture">
+        拍照
+      </ElButton>
+    </div>
 
-      <div class="action-buttons">
-        <el-button
-          size="small"
-          :icon="Camera"
-          @click="handleCapture('back')"
-        >
-          拍照
-        </el-button>
-      </div>
+    <!-- 提示文字 -->
+    <div class="tips">
+      <p>📸 上傳提示:</p>
+      <ul>
+        <li v-if="props.requireBothSides">
+          支援上傳 2 張照片(身分證正反面),JPG、PNG 格式,單檔不超過 5MB
+        </li>
+        <li v-else>
+          支援上傳 1-2 張照片(身分證正反面),JPG、PNG 格式,單檔不超過 5MB
+        </li>
+        <li>請確保身分證圖片清晰、光線充足</li>
+        <li>AI 辨識由 Google Gemini 提供,準確率約 95%</li>
+        <li>辨識結果僅供參考,請務必核對後再提交</li>
+      </ul>
     </div>
 
     <el-alert
@@ -440,114 +415,125 @@ defineExpose({
 
 <style scoped lang="scss">
 .id-card-uploader {
-  width: 100%;
-  position: relative;
-  z-index: 0;
-}
+  .upload-area {
+    margin-bottom: 20px;
 
-.upload-section {
-  margin-bottom: 24px;
-  position: relative;
-  z-index: 1;
+    :deep(.el-upload-dragger) {
+      padding: 40px 20px;
+    }
 
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
+    .upload-content {
+      text-align: center;
 
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
+      .upload-text {
+        margin-top: 16px;
 
-  .section-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--el-text-color-primary);
-  }
-}
+        p {
+          margin: 8px 0;
+          font-size: 14px;
+          color: var(--el-text-color-primary);
+        }
 
-.upload-area {
-  margin-bottom: 12px;
-
-  :deep(.el-upload) {
-    width: 100%;
-    display: block;
+        .upload-hint {
+          font-size: 12px;
+          color: var(--el-text-color-secondary);
+        }
+      }
+    }
   }
 
-  :deep(.el-upload-dragger) {
-    width: 100%;
+  .preview-area {
+    margin-bottom: 20px;
     padding: 20px;
-  }
-}
+    border: 1px solid var(--el-border-color);
+    border-radius: 4px;
+    background: var(--el-fill-color-lighter);
 
-.upload-placeholder {
-  text-align: center;
-
-  .upload-icon {
-    font-size: 48px;
-    color: var(--el-color-primary);
-    margin-bottom: 16px;
-  }
-
-  .upload-text {
-    font-size: 14px;
-    color: var(--el-text-color-regular);
-    margin-bottom: 8px;
-
-    strong {
-      color: var(--el-color-primary);
-    }
-
-    em {
-      color: var(--el-color-primary);
-      font-style: normal;
-    }
-  }
-
-  .upload-hint {
-    font-size: 12px;
-    color: var(--el-text-color-secondary);
-  }
-}
-
-.preview-container {
-  .preview-image {
-    max-width: 100%;
-    max-height: 300px;
-    margin-bottom: 12px;
-
-    :deep(img) {
-      max-width: 100%;
-      max-height: 300px;
-      object-fit: contain;
-    }
-  }
-
-  .file-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    border-top: 1px solid var(--el-border-color-light);
-
-    span {
+    .preview-title {
+      margin-bottom: 16px;
       font-size: 14px;
-      color: var(--el-text-color-regular);
+      font-weight: 600;
+      color: var(--el-text-color-primary);
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .preview-item {
+      position: relative;
+      border: 1px solid var(--el-border-color);
+      border-radius: 4px;
       overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      background: white;
+
+      .el-image {
+        width: 100%;
+        height: 200px;
+        display: block;
+      }
+
+      .preview-label {
+        padding: 8px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--el-text-color-secondary);
+        background: var(--el-fill-color-light);
+      }
+    }
+
+    .image-error {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+      color: var(--el-text-color-secondary);
+
+      p {
+        margin-top: 10px;
+        font-size: 12px;
+      }
     }
   }
-}
 
-.action-buttons {
-  display: flex;
-  gap: 12px;
-}
+  .actions,
+  .empty-actions {
+    margin-bottom: 20px;
+    text-align: center;
 
-.retry-alert {
-  margin-top: 12px;
+    .el-button {
+      margin: 0 8px;
+    }
+  }
+
+  .tips {
+    padding: 16px;
+    background: var(--el-fill-color-light);
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--el-text-color-regular);
+
+    p {
+      margin: 0 0 8px 0;
+      font-weight: 600;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+
+      li {
+        margin: 4px 0;
+        line-height: 1.6;
+      }
+    }
+  }
+
+  .retry-alert {
+    margin-top: 16px;
+  }
 }
 </style>

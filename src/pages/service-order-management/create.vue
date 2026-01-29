@@ -102,7 +102,7 @@ function handleCustomerCreated(customer: Customer) {
 /**
  * OCR 辨識成功
  */
-function handleOCRRecognized(data: { name: string, idNumber: string }) {
+function handleOCRRecognized(data: { name: string, idNumber: string, address?: string }) {
   // 檢查是否已選擇客戶
   if (selectedCustomer.value) {
     // 比對身分證字號是否一致

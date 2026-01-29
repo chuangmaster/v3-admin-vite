@@ -133,9 +133,12 @@ function resetForm() {
 /**
  * 使用 OCR 辨識結果填入表單
  */
-function fillFromOCR(data: { name: string, idNumber: string }) {
+function fillFromOCR(data: { name: string, idNumber: string, address?: string }) {
   formData.name = data.name
   formData.idNumber = data.idNumber
+  if (data.address) {
+    formData.residentialAddress = data.address
+  }
 }
 
 // 暴露方法供父元件使用
