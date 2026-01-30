@@ -179,9 +179,9 @@ export interface ProductItem {
   sequence?: number
   /** 商品項目序號（API 使用） */
   sequenceNumber?: number
-  /** 商品配件（僅寄賣單） */
+  /** 商品配件 */
   accessories?: string[]
-  /** 商品瑕疵處（僅寄賣單） */
+  /** 商品瑕疵處 */
   defects?: string[]
   /** 金額（寄賣單為實拿金額，收購單為收購金額） */
   amount?: number
@@ -395,6 +395,8 @@ export interface CreateBuybackProductItemRequest {
   internalCode?: string
   /** 配件列表 */
   accessories?: string[]
+  /** 瑕疵列表 */
+  defects?: string[]
 }
 
 /** 建立寄賣單商品項目請求 */

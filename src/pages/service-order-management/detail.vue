@@ -576,7 +576,6 @@ function getRenewalOptionText(option: string) {
               </template>
             </el-table-column>
             <el-table-column
-              v-if="serviceOrder.orderType === ServiceOrderType.CONSIGNMENT"
               label="商品瑕疵處"
               min-width="150"
             >

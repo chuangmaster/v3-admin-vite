@@ -590,7 +590,6 @@ function handleIdCardBackUploaded(data: { base64: string, contentType: string, f
             </template>
           </el-table-column>
           <el-table-column
-            v-if="formData.orderType === ServiceOrderType.CONSIGNMENT"
             label="商品瑕疵處"
             min-width="150"
           >
