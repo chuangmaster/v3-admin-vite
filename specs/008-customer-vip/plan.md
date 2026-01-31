@@ -28,7 +28,7 @@
 - Element Plus (UI 元件庫)
 - Pinia (狀態管理)
 - Axios (HTTP 請求)
-- date-fns 或 dayjs (日期時間處理，用於本地時區 <-> UTC 轉換)
+- dayjs (日期時間處理,專案現有工具 `src/common/utils/datetime.ts` 已提供時區轉換功能)
 
 **Storage**: N/A (後端處理，前端僅呼叫 API)  
 **Testing**: Vitest (單元測試)  
@@ -43,8 +43,7 @@
 - 必須遵循專案開發規範（見 `.github/instructions/copilot-instructions.md`）
 - 統一使用 UTC 時間與後端互動
 - 日期選擇器顯示使用者本地時區，送出前轉換為 UTC
-- 權限控制使用 `v-permission` 指令
-
+- 權限控制使用 `v-permission` 指令- 稽核日誌(FR-017)由後端 API 自動處理,前端無需額外實作
 **Scale/Scope**: 
 - 客戶數量：中小型企業規模（1-10 萬客戶）
 - VIP 紀錄：平均每客戶 1-3 筆效期紀錄

@@ -66,39 +66,24 @@ const utcStartOfDay = dayjs.tz(localDate, 'Asia/Taipei').utc().format()
 
 **實作建議**:
 ```typescript
-// src/pages/customer-management/composables/useDateConversion.ts
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-import timezone from 'dayjs/plugin/timezone'
+// 使用專案現有工具: src/common/utils/datetime.ts
+import { toUTC0ISOString } from '@@/utils/datetime'
 
-dayjs.extend(utc)
-dayjs.extend(timezone)
-
-export function useDateConversion() {
-  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-
-  // 本地日期 00:00:00 → UTC ISO 8601
-  const toUTCStartOfDay = (localDate: Date): string => {
-    return dayjs.tz(localDate, userTimezone).startOf('day').utc().toISOString()
-  }
-
-  // 本地日期 23:59:59 → UTC ISO 8601
-  const toUTCEndOfDay = (localDate: Date): string => {
-    return dayjs.tz(localDate, userTimezone).endOf('day').utc().toISOString()
-  }
-
-  // UTC ISO 8601 → 本地 Date 物件（供 el-date-picker 使用）
-  const fromUTCToLocal = (isoString: string): Date => {
-    return dayjs.utc(isoString).tz(userTimezone).toDate()
-  }
-
-  return {
-    toUTCStartOfDay,
-    toUTCEndOfDay,
-    fromUTCToLocal
-  }
+// VIP 設定表單提交時的日期轉換
+const formData = {
+  level: form.level,
+  startDate: toUTC0ISOString(form.startDate, false), // 當日 00:00:00 UTC
+  endDate: toUTC0ISOString(form.endDate, true)       // 當日 23:59:59 UTC
 }
+
+// 若需要 UTC → 本地時區轉換(顯示歷程記錄),可使用 datetime.ts 的 formatDateTime
+import { formatDateTime } from '@@/utils/datetime'
+
+// 顯示日期(自動轉換為本地時區)
+const displayDate = formatDateTime(isoString, 'YYYY-MM-DD')
 ```
+
+**注意**: 專案已有 `src/common/utils/datetime.ts` 提供 `toUTC0ISOString(dateString, endOfDay)` 函式,可直接使用,無需重新實作日期轉換邏輯。
 
 ---
 

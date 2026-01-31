@@ -31,8 +31,8 @@
 **⚠️ CRITICAL**: 此階段完成前，無法開始任何用戶故事的實作
 
 - [ ] T005 [P] 在 src/pages/customer-management/types.ts 新增 VIP 相關型別定義（CustomerLevelPeriodResponse, CreateLevelRequest, UpdateLevelRequest, CustomerLevelStatus, CustomerLevel）
-- [ ] T006 建立日期時區轉換工具函式 src/common/utils/date-conversion.ts（toUTCStartOfDay, toUTCEndOfDay, fromUTCToLocal）
-- [ ] T007 建立 VIP 等級 API 服務 src/pages/customer-management/apis/customer-level.ts（封裝所有 HTTP 請求：createLevel, getLevelHistory, getActiveLevel, updateLevel, terminateLevel）
+- [ ] T006 驗證並擴展專案現有日期工具 src/common/utils/datetime.ts (確認 toUTC0ISOString 函式可滿足需求,若需要可新增 fromUTCToLocal 輔助函式)
+- [ ] T007 建立 VIP 等級 API 服務 src/pages/customer-management/apis/customer-level.ts (封裝所有 HTTP 請求:createLevel, getLevelHistory, getActiveLevel, updateLevel, terminateLevel,使用 datetime.ts 的 toUTC0ISOString 處理日期轉換)
 
 **Checkpoint**: 基礎設施就緒 - 用戶故事實作現在可以並行開始
 
@@ -48,7 +48,7 @@
 
 - [ ] T008 [P] [US1] 建立 VIP 管理組合式函式 src/pages/customer-management/composables/useCustomerLevel.ts（響應式狀態：levelList, activeLevel, loading, error；方法：createLevel, fetchLevelHistory, fetchActiveLevel）
 - [ ] T009 [US1] 建立 VIP 設定彈窗元件 src/pages/customer-management/components/CustomerLevelDialog.vue（支援新增模式，包含等級選擇、日期選擇器、表單驗證、v-permission="customer.level.create"）
-- [ ] T010 [US1] 在 CustomerLevelDialog.vue 整合日期時區轉換邏輯（使用 toUTCStartOfDay/toUTCEndOfDay，el-date-picker 綁定本地時區，提交時轉換為 UTC ISO 8601）
+- [ ] T010 [US1] 在 CustomerLevelDialog.vue 整合日期時區轉換邏輯 (使用 datetime.ts 的 toUTC0ISOString,el-date-picker 綁定本地時區,提交時轉換為 UTC ISO 8601)
 - [ ] T011 [US1] 在 CustomerLevelDialog.vue 實作表單驗證規則（必填欄位、startDate < endDate、等級名稱長度 <= 50）
 - [ ] T012 [US1] 在 CustomerLevelDialog.vue 實作錯誤處理（顯示 400 Bad Request、409 Conflict 錯誤訊息）
 - [ ] T013 [US1] 修改客戶管理主頁面 src/pages/customer-management/index.vue（引用 CustomerLevelDialog 元件，新增「設定會員等級」按鈕）
