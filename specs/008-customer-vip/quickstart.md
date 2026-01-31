@@ -127,8 +127,6 @@ src/pages/customer-management/
 ```typescript
 export enum CustomerLevel {
   VIP = 'VIP',
-  VVIP = 'VVIP',
-  SVIP = 'SVIP' // 新增
 }
 ```
 
@@ -136,8 +134,6 @@ export enum CustomerLevel {
 ```vue
 <el-select v-model="form.level" placeholder="請選擇 VIP 等級">
   <el-option label="VIP" value="VIP" />
-  <el-option label="VVIP" value="VVIP" />
-  <el-option label="SVIP" value="SVIP" /> <!-- 新增 -->
 </el-select>
 ```
 
@@ -294,13 +290,36 @@ const isoString = toUTCStartOfDay(new Date('2026-01-31')) // "2026-01-31T00:00:0
 **現象**: 客戶明明有 Active VIP，但列表未顯示徽章。
 
 **檢查步驟**:
-1. 確認後端 API `/api/customers/{customerId}/levels/active` 回傳 200（不是 404）
-2. 確認後端回應包含 `status: "Active"` 欄位
-3. 確認 `CustomerTable.vue` 的判定邏輯正確：
+1. 確認後端 API `/api/customers/search` 回傳的客戶資料包含 `activePeriod` 欄位
+2. 確認 `isCurrentlyAtLevel === true` 或 `activePeriod.status === "Active"` （而非 `Expired` 或 `Upcoming`）
+3. 確認 `CustomerTable.vue` 的判定邏輯正確（優先使用 `isCurrentlyAtLevel`）：
 ```vue
-<el-tag v-if="row.activeLevel?.status === 'Active'" ...>
-  VIP
+<!-- 推薦寫法：直接使用後端計算好的 boolean -->
+<el-tag v-if="row.isCurrentlyAtLevel" ...>
+  {{ row.activePeriod?.level }}
 </el-tag>
+
+<!-- 或使用 status 判斷 -->
+<el-tag v-if="row.activePeriod?.status === 'Active'" ...>
+  {{ row.activePeriod?.level }}
+</el-tag>
+```
+
+**後端 API 回傳範例**:
+```json
+{
+  "id": "fa2d8c89-643c-4113-9841-39833aee7186",
+  "name": "詹滋嫦",
+  "isCurrentlyAtLevel": true,
+  "currentLevel": "VIP",
+  "activePeriod": {
+    "id": "f81d17a6-f659-459c-838f-8af5ac47f59e",
+    "level": "VIP",
+    "status": "Active",
+    "startDate": "2026-01-29T17:01:12.156Z",
+    "endDate": "2027-01-29T17:01:12.156Z"
+  }
+}
 ```
 
 ### 問題 3: 權限按鈕仍然顯示

@@ -17,10 +17,10 @@
 
 **Purpose**: 確保開發環境與相依套件就緒
 
-- [ ] T001 驗證 Node.js 18+ 和 pnpm 8+ 已安裝
-- [ ] T002 [P] 安裝 dayjs 套件: `pnpm add dayjs`
-- [ ] T003 [P] 驗證 Element Plus 與 @element-plus/icons-vue 已安裝
-- [ ] T004 [P] 驗證後端 API 可存取: http://localhost:5176/swagger
+- [X] T001 驗證 Node.js 18+ 和 pnpm 8+ 已安裝
+- [X] T002 [P] 安裝 dayjs 套件: `pnpm add dayjs`
+- [X] T003 [P] 驗證 Element Plus 與 @element-plus/icons-vue 已安裝
+- [X] T004 [P] 驗證後端 API 可存取: http://localhost:5176/swagger
 
 ---
 
@@ -30,9 +30,9 @@
 
 **⚠️ CRITICAL**: 此階段完成前，無法開始任何用戶故事的實作
 
-- [ ] T005 [P] 在 src/pages/customer-management/types.ts 新增 VIP 相關型別定義（CustomerLevelPeriodResponse, CreateLevelRequest, UpdateLevelRequest, CustomerLevelStatus, CustomerLevel）
-- [ ] T006 驗證並擴展專案現有日期工具 src/common/utils/datetime.ts (確認 toUTC0ISOString 函式可滿足需求,若需要可新增 fromUTCToLocal 輔助函式)
-- [ ] T007 建立 VIP 等級 API 服務 src/pages/customer-management/apis/customer-level.ts (封裝所有 HTTP 請求:createLevel, getLevelHistory, getActiveLevel, updateLevel, terminateLevel,使用 datetime.ts 的 toUTC0ISOString 處理日期轉換)
+- [X] T005 [P] 在 src/pages/customer-management/types.ts 新增 VIP 相關型別定義（CustomerLevelPeriodResponse, CreateLevelRequest, UpdateLevelRequest, CustomerLevelStatus, CustomerLevel）
+- [X] T006 驗證並擴展專案現有日期工具 src/common/utils/datetime.ts (確認 toUTC0ISOString 函式可滿足需求,若需要可新增 fromUTCToLocal 輔助函式)
+- [X] T007 建立 VIP 等級 API 服務 src/pages/customer-management/apis/customer-level.ts (封裝所有 HTTP 請求:createLevel, getLevelHistory, getActiveLevel, updateLevel, terminateLevel,使用 datetime.ts 的 toUTC0ISOString 處理日期轉換)
 
 **Checkpoint**: 基礎設施就緒 - 用戶故事實作現在可以並行開始
 
@@ -46,12 +46,12 @@
 
 ### Implementation for User Story 1
 
-- [ ] T008 [P] [US1] 建立 VIP 管理組合式函式 src/pages/customer-management/composables/useCustomerLevel.ts（響應式狀態：levelList, activeLevel, loading, error；方法：createLevel, fetchLevelHistory, fetchActiveLevel）
-- [ ] T009 [US1] 建立 VIP 設定彈窗元件 src/pages/customer-management/components/CustomerLevelDialog.vue（支援新增模式，包含等級選擇、日期選擇器、表單驗證、v-permission="customer.level.create"）
-- [ ] T010 [US1] 在 CustomerLevelDialog.vue 整合日期時區轉換邏輯 (使用 datetime.ts 的 toUTC0ISOString,el-date-picker 綁定本地時區,提交時轉換為 UTC ISO 8601)
-- [ ] T011 [US1] 在 CustomerLevelDialog.vue 實作表單驗證規則（必填欄位、startDate < endDate、等級名稱長度 <= 50）
-- [ ] T012 [US1] 在 CustomerLevelDialog.vue 實作錯誤處理（顯示 400 Bad Request、409 Conflict 錯誤訊息）
-- [ ] T013 [US1] 修改客戶管理主頁面 src/pages/customer-management/index.vue（引用 CustomerLevelDialog 元件，新增「設定會員等級」按鈕）
+- [X] T008 [P] [US1] 建立 VIP 管理組合式函式 src/pages/customer-management/composables/useCustomerLevel.ts（響應式狀態：levelList, activeLevel, loading, error；方法：createLevel, fetchLevelHistory, fetchActiveLevel）
+- [X] T009 [US1] 建立 VIP 設定彈窗元件 src/pages/customer-management/components/CustomerLevelDialog.vue（支援新增模式，包含等級選擇、日期選擇器、表單驗證、v-permission="customer.level.create"）
+- [X] T010 [US1] 在 CustomerLevelDialog.vue 整合日期時區轉換邏輯 (使用 datetime.ts 的 toUTC0ISOString,el-date-picker 綁定本地時區,提交時轉換為 UTC ISO 8601)
+- [X] T011 [US1] 在 CustomerLevelDialog.vue 實作表單驗證規則（必填欄位、startDate < endDate、等級名稱長度 <= 50）
+- [X] T012 [US1] 在 CustomerLevelDialog.vue 實作錯誤處理（顯示 400 Bad Request、409 Conflict 錯誤訊息）
+- [X] T013 [US1] 修改客戶管理主頁面 src/pages/customer-management/index.vue（引用 CustomerLevelDialog 元件，新增「設定會員等級」按鈕）
 
 **Checkpoint**: 此時應可完整測試 US1 - 管理員能成功設定客戶 VIP 等級與效期
 
@@ -65,11 +65,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T014 [P] [US2] 在 useCustomerLevel.ts 新增 fetchActiveLevel 方法（呼叫 GET /api/customers/{customerId}/levels/active，更新 activeLevel 狀態）
-- [ ] T015 [US2] 修改客戶列表元件 src/pages/customer-management/components/CustomerTable.vue（新增「VIP 狀態」el-table-column，使用 el-tag 顯示 VIP 徽章，條件：row.activeLevel?.status === 'Active'）
-- [ ] T016 [US2] 在 CustomerTable.vue 整合 Element Plus Icon（引用 Crown 圖示，設定 el-tag 的 :icon 屬性）
-- [ ] T017 [US2] 修改客戶管理主頁面 src/pages/customer-management/index.vue（在載入客戶列表時同時查詢每位客戶的 activeLevel，儲存至客戶物件的 activeLevel 屬性）
-- [ ] T018 [US2] 在客戶詳細頁面區塊顯示當前 VIP 狀態與有效期間（若 activeLevel 存在，顯示「當前 VIP：{level}，有效期至 {endDate}」）
+- [X] T014 [P] [US2] ~~在 useCustomerLevel.ts 新增 fetchActiveLevel 方法（呼叫 GET /api/customers/{customerId}/levels/active，更新 activeLevel 狀態）~~ **已廢棄**：後端 /customers/search API 已直接回傳 activeLevel 欄位，前端無需額外查詢
+- [X] T015 [US2] 修改客戶列表元件 src/pages/customer-management/components/CustomerTable.vue（新增「等級狀態」el-table-column，使用 el-tag 顯示等級徽章，條件：row.activeLevel?.status === 'Active'）
+- [X] T016 [US2] 在 CustomerTable.vue 整合 Element Plus Icon（引用 Star 圖示，設定 el-tag 的 :icon 屬性）
+- [X] T017 [US2] 修改客戶管理主頁面 src/pages/customer-management/index.vue（移除 customerLevelMap 與額外查詢邏輯，Customer 介面新增 activeLevel 欄位，直接從列表 API 取得）
+- [X] T018 [US2] 在客戶詳細頁面區塊顯示當前等級狀態與有效期間（若 customer.activeLevel 存在，顯示「當前等級：{level}，有效期至 {endDate}」）
 
 **Checkpoint**: 此時 US1 和 US2 應同時運作 - 設定 VIP 後立即在列表與詳細頁面顯示徽章
 
@@ -83,11 +83,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T019 [P] [US3] 在 useCustomerLevel.ts 新增 terminateLevel 方法（呼叫 POST /api/customers/{customerId}/levels/terminate，處理 404 Not Found 錯誤）
-- [ ] T020 [US3] 修改 CustomerLevelDialog.vue 支援終止模式（mode prop 新增 'terminate'，顯示確認對話框而非表單，v-permission="customer.level.terminate"）
-- [ ] T021 [US3] 在 CustomerLevelDialog.vue 實作終止確認對話框（顯示警告訊息「此操作將立即終止 VIP 資格」，提供確認與取消按鈕）
-- [ ] T022 [US3] 在 CustomerLevelDialog.vue 實作終止成功後的 UI 更新（顯示成功訊息，重新載入客戶 VIP 狀態，關閉彈窗）
-- [ ] T023 [US3] 在客戶管理主頁面或詳細頁面新增「終止會員」按鈕（v-permission="customer.level.terminate"，:disabled="!activeLevel || activeLevel.status !== 'Active'"）
+- [X] T019 [P] [US3] 在 useCustomerLevel.ts 新增 terminateLevel 方法（呼叫 POST /api/customers/{customerId}/levels/terminate，處理 404 Not Found 錯誤）
+- [X] T020 [US3] 修改 CustomerLevelDialog.vue 支援終止模式（mode prop 新增 'terminate'，顯示確認對話框而非表單，v-permission="customer.level.terminate"）
+- [X] T021 [US3] 在 CustomerLevelDialog.vue 實作終止確認對話框（顯示警告訊息「此操作將立即終止 VIP 資格」，提供確認與取消按鈕）
+- [X] T022 [US3] 在 CustomerLevelDialog.vue 實作終止成功後的 UI 更新（顯示成功訊息，重新載入客戶 VIP 狀態，關閉彈窗）
+- [X] T023 [US3] 在客戶管理主頁面或詳細頁面新增「終止會員」按鈕（v-permission="customer.level.terminate"，:disabled="!activeLevel || activeLevel.status !== 'Active'"）
 
 **Checkpoint**: 此時 US1、US2、US3 應同時運作 - 可設定、顯示、終止 VIP 會籍
 
@@ -101,17 +101,17 @@
 
 ### Implementation for User Story 4
 
-- [ ] T024 [P] [US4] 在 useCustomerLevel.ts 新增 fetchLevelHistory 方法（呼叫 GET /api/customers/{customerId}/levels?includeExpired=true，更新 levelList 狀態）
-- [ ] T025 [US4] 建立 VIP 歷程表格元件 src/pages/customer-management/components/CustomerLevelTable.vue（使用 el-table 展示 levelList，欄位：等級、開始日期、結束日期、狀態、建立時間、操作）
-- [ ] T026 [US4] 在 CustomerLevelTable.vue 實作日期格式化顯示（使用 formatDate 將 ISO 8601 UTC 轉換為本地時區日期）
-- [ ] T027 [US4] 在 CustomerLevelTable.vue 實作狀態標籤顯示（根據 status 欄位使用不同顏色的 el-tag：Active=success, Expired=info, Upcoming=warning）
-- [ ] T028 [US4] 在 CustomerLevelTable.vue 實作預設排序（:default-sort="{ prop: 'startDate', order: 'descending' }"）
-- [ ] T029 [US4] 在 CustomerLevelTable.vue 新增操作欄（編輯按鈕：v-permission="customer.level.update"，:disabled="row.status === 'Expired'"；終止按鈕：v-permission="customer.level.terminate"，:disabled="row.status !== 'Active'"）
-- [ ] T030 [US4] 修改 CustomerLevelDialog.vue 支援編輯模式（mode prop 新增 'edit'，表單預填 data prop 的值，提交時呼叫 updateLevel 並傳遞 version 欄位）
-- [ ] T031 [US4] 在 useCustomerLevel.ts 新增 updateLevel 方法（呼叫 PUT /api/customers/{customerId}/levels/{levelId}，處理 409 Conflict 樂觀鎖錯誤）
-- [ ] T032 [US4] 在 useCustomerLevel.ts 實作樂觀鎖衝突處理（409 錯誤時顯示警告訊息「資料已被其他使用者更新，請重新載入後再試」，自動呼叫 fetchLevelHistory 重新載入）
-- [ ] T033 [US4] 在客戶詳細頁面新增「VIP 歷程」區塊（整合 CustomerLevelTable 元件，v-permission="customer.level.view"，載入時呼叫 fetchLevelHistory）
-- [ ] T034 [US4] 在 CustomerLevelTable.vue 處理空資料狀態（若 levelList 為空陣列，顯示「尚無 VIP 會員記錄」）
+- [X] T024 [P] [US4] 在 useCustomerLevel.ts 新增 fetchLevelHistory 方法（呼叫 GET /api/customers/{customerId}/levels?includeExpired=true，更新 levelList 狀態）
+- [X] T025 [US4] 建立 VIP 歷程表格元件 src/pages/customer-management/components/CustomerLevelTable.vue（使用 el-table 展示 levelList，欄位：等級、開始日期、結束日期、狀態、建立時間、操作）
+- [X] T026 [US4] 在 CustomerLevelTable.vue 實作日期格式化顯示（使用 formatDate 將 ISO 8601 UTC 轉換為本地時區日期）
+- [X] T027 [US4] 在 CustomerLevelTable.vue 實作狀態標籤顯示（根據 status 欄位使用不同顏色的 el-tag：Active=success, Expired=info, Upcoming=warning）
+- [X] T028 [US4] 在 CustomerLevelTable.vue 實作預設排序（:default-sort="{ prop: 'startDate', order: 'descending' }"）
+- [X] T029 [US4] 在 CustomerLevelTable.vue 新增操作欄（編輯按鈕：v-permission="customer.level.update"，:disabled="row.status === 'Expired'"；終止按鈕：v-permission="customer.level.terminate"，:disabled="row.status !== 'Active'"）
+- [X] T030 [US4] 修改 CustomerLevelDialog.vue 支援編輯模式（mode prop 新增 'edit'，表單預填 data prop 的值，提交時呼叫 updateLevel 並傳遞 version 欄位）
+- [X] T031 [US4] 在 useCustomerLevel.ts 新增 updateLevel 方法（呼叫 PUT /api/customers/{customerId}/levels/{levelId}，處理 409 Conflict 樂觀鎖錯誤）
+- [X] T032 [US4] 在 useCustomerLevel.ts 實作樂觀鎖衝突處理（409 錯誤時顯示警告訊息「資料已被其他使用者更新，請重新載入後再試」，自動呼叫 fetchLevelHistory 重新載入）
+- [X] T033 [US4] 在客戶詳細頁面新增「VIP 歷程」區塊（整合 CustomerLevelTable 元件，v-permission="customer.level.view"，載入時呼叫 fetchLevelHistory）
+- [X] T034 [US4] 在 CustomerLevelTable.vue 處理空資料狀態（若 levelList 為空陣列，顯示「尚無 VIP 會員記錄」）
 
 **Checkpoint**: 所有 4 個用戶故事應獨立運作 - 完整的 VIP 會員管理功能
 
@@ -121,12 +121,12 @@
 
 **Purpose**: 跨多個用戶故事的改進與優化
 
-- [ ] T035 [P] 新增 JSDoc 註解至所有 API 服務函式（src/pages/customer-management/apis/customer-level.ts）
-- [ ] T036 [P] 新增 JSDoc 註解至所有組合式函式方法（src/pages/customer-management/composables/useCustomerLevel.ts）
-- [ ] T037 驗證所有元件符合 Vue 3 開發規範（PascalCase 命名、Composition API、`<script setup lang="ts">`）
-- [ ] T038 驗證所有檔案符合命名規範（kebab-case for pages/apis, PascalCase for components）
-- [ ] T039 [P] 執行 ESLint 檢查並修正所有錯誤：`pnpm lint`
-- [ ] T040 [P] 驗證無 TypeScript 型別錯誤：`pnpm type-check`
+- [X] T035 [P] 新增 JSDoc 註解至所有 API 服務函式（src/pages/customer-management/apis/customer-level.ts）
+- [X] T036 [P] 新增 JSDoc 註解至所有組合式函式方法（src/pages/customer-management/composables/useCustomerLevel.ts）
+- [X] T037 驗證所有元件符合 Vue 3 開發規範（PascalCase 命名、Composition API、`<script setup lang="ts">`）
+- [X] T038 驗證所有檔案符合命名規範（kebab-case for pages/apis, PascalCase for components）
+- [X] T039 [P] 執行 ESLint 檢查並修正所有錯誤：`pnpm lint`
+- [X] T040 [P] 驗證無 TypeScript 型別錯誤：`pnpm type-check`
 - [ ] T041 效能優化：驗證客戶列表載入時間 < 2 秒（包含 VIP 狀態查詢）
 - [ ] T042 驗證 quickstart.md 中的所有範例可執行
 - [ ] T043 更新 README.md（若需要），記錄 VIP 功能的使用方式

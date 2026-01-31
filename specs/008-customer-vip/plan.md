@@ -151,9 +151,9 @@ tests/pages/customer-management/
    - v-permission 權限控制（customer.level.view）
 
 4. **components/CustomerTable.vue（修改）**：
-   - 增加「VIP 狀態」欄位
-   - 使用 `<el-tag>` 顯示 VIP 徽章（皇冠圖示 + "VIP" 文字）
-   - 根據客戶的 activeLevel 狀態動態顯示
+   - 增加「等級狀態」欄位
+   - 使用 `<el-tag>` 顯示等級徽章（Star 圖示 + 等級名稱）
+   - 根據客戶的 activePeriod 狀態動態顯示（後端列表 API 直接回傳，無需額外查詢）
 
 5. **composables/useCustomerLevel.ts**：
    - 封裝 VIP 等級管理的所有業務邏輯
@@ -406,8 +406,9 @@ paths:
 
 **Task 2.3.3**: 修改客戶列表元件
 - 檔案: `src/pages/customer-management/components/CustomerTable.vue`
-- 修改: 新增 VIP 狀態欄位（el-tag 顯示）
-- 整合: 根據 activeLevel 狀態顯示徽章
+- 修改: 新增等級狀態欄位（el-tag 顯示）
+- 整合: 根據 customer.activePeriod 狀態顯示徽章（後端列表 API 直接回傳）
+- 效能優化: 避免 N+1 查詢問題
 - 預估: 1.5 小時
 
 **Task 2.3.4**: 修改客戶管理主頁面

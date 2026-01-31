@@ -77,7 +77,10 @@ describe("customerSearch.vue", () => {
       lineId: null,
       createdAt: "2025-01-01T00:00:00Z",
       updatedAt: null,
-      version: 1
+      version: 1,
+      isCurrentlyAtLevel: false,
+      currentLevel: null,
+      activePeriod: null
     }
 
     wrapper = mount(CustomerSearch, {

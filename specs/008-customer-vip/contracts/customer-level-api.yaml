@@ -27,51 +27,51 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/CustomerIdPath'
+        - $ref: "#/components/parameters/CustomerIdPath"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateLevelRequest'
+              $ref: "#/components/schemas/CreateLevelRequest"
             examples:
               vip_example:
                 summary: 新增 VIP 會員（一年效期）
                 value:
                   level: VIP
-                  startDate: '2026-01-31T00:00:00Z'
-                  endDate: '2026-12-31T23:59:59Z'
+                  startDate: "2026-01-31T00:00:00Z"
+                  endDate: "2026-12-31T23:59:59Z"
               vvip_example:
                 summary: 新增 VVIP 會員（兩年效期）
                 value:
                   level: VVIP
-                  startDate: '2026-01-01T00:00:00Z'
-                  endDate: '2027-12-31T23:59:59Z'
+                  startDate: "2026-01-01T00:00:00Z"
+                  endDate: "2027-12-31T23:59:59Z"
       responses:
-        '201':
+        "201":
           description: VIP 會員效期建立成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerLevelPeriodResponse'
+                $ref: "#/components/schemas/CustomerLevelPeriodResponse"
               example:
                 id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
                 customerId: c1d2e3f4-a5b6-7890-cdef-ab1234567890
                 level: VIP
-                startDate: '2026-01-31T00:00:00Z'
-                endDate: '2026-12-31T23:59:59Z'
+                startDate: "2026-01-31T00:00:00Z"
+                endDate: "2026-12-31T23:59:59Z"
                 status: Active
-                createdAt: '2026-01-31T08:30:00Z'
+                createdAt: "2026-01-31T08:30:00Z"
                 updatedAt: null
                 version: 1
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '409':
-          $ref: '#/components/responses/Conflict'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
 
     get:
       tags:
@@ -82,7 +82,7 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/CustomerIdPath'
+        - $ref: "#/components/parameters/CustomerIdPath"
         - name: includeExpired
           in: query
           description: 是否包含已過期的記錄
@@ -91,37 +91,37 @@ paths:
             type: boolean
             default: true
       responses:
-        '200':
+        "200":
           description: 查詢成功
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CustomerLevelPeriodResponse'
+                  $ref: "#/components/schemas/CustomerLevelPeriodResponse"
               example:
                 - id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
                   customerId: c1d2e3f4-a5b6-7890-cdef-ab1234567890
                   level: VIP
-                  startDate: '2026-01-01T00:00:00Z'
-                  endDate: '2026-12-31T23:59:59Z'
+                  startDate: "2026-01-01T00:00:00Z"
+                  endDate: "2026-12-31T23:59:59Z"
                   status: Active
-                  createdAt: '2026-01-01T08:30:00Z'
+                  createdAt: "2026-01-01T08:30:00Z"
                   updatedAt: null
                   version: 1
                 - id: b2c3d4e5-f6a7-8901-bcde-f12345678901
                   customerId: c1d2e3f4-a5b6-7890-cdef-ab1234567890
                   level: VIP
-                  startDate: '2025-01-01T00:00:00Z'
-                  endDate: '2025-12-31T23:59:59Z'
+                  startDate: "2025-01-01T00:00:00Z"
+                  endDate: "2025-12-31T23:59:59Z"
                   status: Expired
-                  createdAt: '2025-01-01T09:00:00Z'
-                  updatedAt: '2025-12-31T23:59:59Z'
+                  createdAt: "2025-01-01T09:00:00Z"
+                  updatedAt: "2025-12-31T23:59:59Z"
                   version: 1
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /customers/{customerId}/levels/active:
     get:
@@ -133,37 +133,37 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/CustomerIdPath'
+        - $ref: "#/components/parameters/CustomerIdPath"
       responses:
-        '200':
+        "200":
           description: 當前有效 VIP 會籍
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerLevelPeriodResponse'
+                $ref: "#/components/schemas/CustomerLevelPeriodResponse"
               example:
                 id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
                 customerId: c1d2e3f4-a5b6-7890-cdef-ab1234567890
                 level: VIP
-                startDate: '2026-01-01T00:00:00Z'
-                endDate: '2026-12-31T23:59:59Z'
+                startDate: "2026-01-01T00:00:00Z"
+                endDate: "2026-12-31T23:59:59Z"
                 status: Active
-                createdAt: '2026-01-01T08:30:00Z'
+                createdAt: "2026-01-01T08:30:00Z"
                 updatedAt: null
                 version: 1
-        '404':
+        "404":
           description: 查無有效的 VIP 會籍
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 error: NotFound
                 message: 該客戶目前無有效的 VIP 會籍
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
   /customers/{customerId}/levels/{levelId}:
     put:
@@ -175,7 +175,7 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/CustomerIdPath'
+        - $ref: "#/components/parameters/CustomerIdPath"
         - name: levelId
           in: path
           description: VIP 效期記錄 ID
@@ -188,46 +188,46 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateLevelRequest'
+              $ref: "#/components/schemas/UpdateLevelRequest"
             example:
               level: VVIP
-              startDate: '2026-02-01T00:00:00Z'
-              endDate: '2027-01-31T23:59:59Z'
+              startDate: "2026-02-01T00:00:00Z"
+              endDate: "2027-01-31T23:59:59Z"
               version: 2
       responses:
-        '200':
+        "200":
           description: 更新成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerLevelPeriodResponse'
+                $ref: "#/components/schemas/CustomerLevelPeriodResponse"
               example:
                 id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
                 customerId: c1d2e3f4-a5b6-7890-cdef-ab1234567890
                 level: VVIP
-                startDate: '2026-02-01T00:00:00Z'
-                endDate: '2027-01-31T23:59:59Z'
+                startDate: "2026-02-01T00:00:00Z"
+                endDate: "2027-01-31T23:59:59Z"
                 status: Active
-                createdAt: '2026-01-01T08:30:00Z'
-                updatedAt: '2026-01-31T15:20:30Z'
+                createdAt: "2026-01-01T08:30:00Z"
+                updatedAt: "2026-01-31T15:20:30Z"
                 version: 3
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
-        '404':
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
           description: VIP 效期記錄不存在
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 error: NotFound
                 message: 找不到指定的 VIP 效期記錄
-        '409':
-          $ref: '#/components/responses/Conflict'
+        "409":
+          $ref: "#/components/responses/Conflict"
 
   /customers/{customerId}/levels/terminate:
     post:
@@ -239,37 +239,37 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: '#/components/parameters/CustomerIdPath'
+        - $ref: "#/components/parameters/CustomerIdPath"
       responses:
-        '200':
+        "200":
           description: 終止成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerLevelPeriodResponse'
+                $ref: "#/components/schemas/CustomerLevelPeriodResponse"
               example:
                 id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
                 customerId: c1d2e3f4-a5b6-7890-cdef-ab1234567890
                 level: VIP
-                startDate: '2026-01-01T00:00:00Z'
-                endDate: '2026-01-31T09:59:59Z'
+                startDate: "2026-01-01T00:00:00Z"
+                endDate: "2026-01-31T09:59:59Z"
                 status: Expired
-                createdAt: '2026-01-01T08:30:00Z'
-                updatedAt: '2026-01-31T10:00:00Z'
+                createdAt: "2026-01-01T08:30:00Z"
+                updatedAt: "2026-01-31T10:00:00Z"
                 version: 2
-        '404':
+        "404":
           description: 無有效的 VIP 會籍可終止
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
               example:
                 error: NotFound
                 message: 該客戶目前無有效的 VIP 會籍可終止
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '403':
-          $ref: '#/components/responses/Forbidden'
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
 
 components:
   securitySchemes:
@@ -309,12 +309,12 @@ components:
           type: string
           format: date-time
           description: 效期開始日期（UTC ISO 8601，必須為該日 00:00:00Z）
-          example: '2026-01-31T00:00:00Z'
+          example: "2026-01-31T00:00:00Z"
         endDate:
           type: string
           format: date-time
           description: 效期結束日期（UTC ISO 8601，必須為該日 23:59:59Z）
-          example: '2026-12-31T23:59:59Z'
+          example: "2026-12-31T23:59:59Z"
 
     UpdateLevelRequest:
       type: object
@@ -335,12 +335,12 @@ components:
           type: string
           format: date-time
           description: 效期開始日期（UTC ISO 8601）
-          example: '2026-02-01T00:00:00Z'
+          example: "2026-02-01T00:00:00Z"
         endDate:
           type: string
           format: date-time
           description: 效期結束日期（UTC ISO 8601）
-          example: '2027-01-31T23:59:59Z'
+          example: "2027-01-31T23:59:59Z"
         version:
           type: integer
           description: 樂觀鎖版本號（必須與當前資料庫版本一致）
@@ -379,12 +379,12 @@ components:
           type: string
           format: date-time
           description: 效期開始日期（UTC ISO 8601）
-          example: '2026-01-01T00:00:00Z'
+          example: "2026-01-01T00:00:00Z"
         endDate:
           type: string
           format: date-time
           description: 效期結束日期（UTC ISO 8601）
-          example: '2026-12-31T23:59:59Z'
+          example: "2026-12-31T23:59:59Z"
         status:
           type: string
           description: 當前狀態（後端自動計算）
@@ -397,13 +397,13 @@ components:
           type: string
           format: date-time
           description: 建立時間（UTC ISO 8601）
-          example: '2026-01-01T08:30:00Z'
+          example: "2026-01-01T08:30:00Z"
         updatedAt:
           type: string
           format: date-time
           nullable: true
           description: 最後更新時間（UTC ISO 8601，若無更新則為 null）
-          example: '2026-01-31T15:20:30Z'
+          example: "2026-01-31T15:20:30Z"
         version:
           type: integer
           description: 樂觀鎖版本號
@@ -434,7 +434,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           examples:
             invalid_date_range:
               summary: 無效的日期範圍
@@ -452,7 +452,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             error: Unauthorized
             message: 缺少有效的驗證憑證
@@ -462,7 +462,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           example:
             error: Forbidden
             message: 您沒有權限執行此操作（需要 customer.level.create 權限）
@@ -472,7 +472,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
           examples:
             version_conflict:
               summary: 樂觀鎖版本衝突
@@ -490,8 +490,8 @@ components:
                 details:
                   existingPeriod:
                     id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
-                    startDate: '2026-01-01T00:00:00Z'
-                    endDate: '2026-12-31T23:59:59Z'
+                    startDate: "2026-01-01T00:00:00Z"
+                    endDate: "2026-12-31T23:59:59Z"
 
 security:
   - BearerAuth: []

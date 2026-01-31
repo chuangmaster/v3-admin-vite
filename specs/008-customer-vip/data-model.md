@@ -1,7 +1,7 @@
 # Data Model: 客戶 VIP 會員管理
 
-**Feature**: 008-customer-vip  
-**Date**: 2026-01-31  
+**Feature**: 008-customer-vip
+**Date**: 2026-01-31
 **Phase**: Phase 1 - Design & Contracts
 
 ---
@@ -35,28 +35,28 @@ VIP 會員效期記錄，表示客戶在特定時間區間內的 VIP 等級。
 interface CustomerLevelPeriodResponse {
   /** 唯一識別碼 (UUID) */
   id: string
-  
+
   /** 所屬客戶 ID (UUID) */
   customerId: string
-  
+
   /** VIP 等級（例如: "VIP", "VVIP"） */
   level: string
-  
+
   /** 效期開始日期（UTC ISO 8601 格式） */
   startDate: string
-  
+
   /** 效期結束日期（UTC ISO 8601 格式） */
   endDate: string
-  
+
   /** 當前狀態 */
   status: CustomerLevelStatus
-  
+
   /** 建立時間（UTC ISO 8601 格式） */
   createdAt: string
-  
+
   /** 最後更新時間（UTC ISO 8601 格式，可為 null） */
   updatedAt: string | null
-  
+
   /** 樂觀鎖版本號 */
   version: number
 }
@@ -67,10 +67,10 @@ interface CustomerLevelPeriodResponse {
 enum CustomerLevelStatus {
   /** 進行中（當前時間在 startDate 與 endDate 之間） */
   Active = 'Active',
-  
+
   /** 已過期（當前時間 >= endDate） */
   Expired = 'Expired',
-  
+
   /** 即將生效（當前時間 < startDate） */
   Upcoming = 'Upcoming'
 }
@@ -124,7 +124,7 @@ interface ValidationRule {
   level: { required: true, message: '請選擇 VIP 等級' }
   startDate: { required: true, message: '請選擇開始日期' }
   endDate: { required: true, message: '請選擇結束日期' }
-  
+
   // 日期範圍驗證
   dateRange: {
     validator: (value: any, callback: Function) => {
@@ -160,10 +160,10 @@ interface ValidationRule {
 interface CreateLevelRequest {
   /** VIP 等級 */
   level: string
-  
+
   /** 效期開始日期（UTC ISO 8601，必須為該日 00:00:00Z） */
   startDate: string
-  
+
   /** 效期結束日期（UTC ISO 8601，必須為該日 23:59:59Z） */
   endDate: string
 }
@@ -206,13 +206,13 @@ const request: CreateLevelRequest = {
 interface UpdateLevelRequest {
   /** VIP 等級 */
   level: string
-  
+
   /** 效期開始日期（UTC ISO 8601） */
   startDate: string
-  
+
   /** 效期結束日期（UTC ISO 8601） */
   endDate: string
-  
+
   /** 樂觀鎖版本號（必須與當前資料庫版本一致） */
   version: number
 }
@@ -260,6 +260,123 @@ try {
   }
 }
 ```
+
+---
+
+## 擴展實體
+
+### 2. Customer (客戶實體擴展)
+
+客戶實體擴展以支援 VIP 會員等級功能。後端在回傳客戶列表時會自動附加當前有效的 VIP 資訊。
+
+#### 新增屬性
+
+| 欄位名稱 | 型別 | 必填 | 說明 | 約束 |
+|---------|------|------|------|------|
+| `isCurrentlyAtLevel` | `boolean` | ✅ | 是否當前有有效等級 | 由後端計算並回傳 |
+| `currentLevel` | `string \| null` | - | 當前等級名稱 | 若無有效等級則為 null |
+| `activePeriod` | `CustomerLevelPeriodResponse \| null` | - | 當前有效的會員等級詳細資訊 | 若無有效等級則為 null |
+
+#### TypeScript 定義
+
+```typescript
+/**
+ * 客戶實體（擴展 VIP 會員等級支援）
+ * 對應後端 API: GET /api/customers/search
+ */
+interface Customer {
+  /** 客戶唯一識別碼（UUID） */
+  id: string
+
+  /** 客戶姓名（必填，1-100 字元） */
+  name: string
+
+  /** 聯絡電話（必填，台灣手機格式：10 字元） */
+  phoneNumber: string
+
+  /** 電子郵件（選填，最多 100 字元，需符合 email 格式） */
+  email: string | null
+
+  /** 身分證字號/外籍人士格式（必填，10 字元） */
+  idNumber: string
+
+  /** 居住地址（必填，1-200 字元） */
+  residentialAddress: string
+
+  /** LINE ID（選填，最多 50 字元） */
+  lineId: string | null
+
+  /** 建立時間（ISO 8601 格式，UTC） */
+  createdAt: string
+
+  /** 最後更新時間（ISO 8601 格式，UTC，可為 null） */
+  updatedAt: string | null
+
+  /** 資料版本號（用於樂觀鎖定，從 1 開始） */
+  version: number
+
+  /** 是否當前有有效等級（由後端 API 回傳） */
+  isCurrentlyAtLevel: boolean
+
+  /** 當前等級名稱（由後端 API 回傳，若無有效等級則為 null） */
+  currentLevel: string | null
+
+  /** 當前有效的會員等級詳細資訊（由後端 API 回傳，若無有效等級則為 null） */
+  activePeriod: CustomerLevelPeriodResponse | null
+}
+```
+
+#### 後端 API 回應範例
+
+```json
+{
+  "id": "fa2d8c89-643c-4113-9841-39833aee7186",
+  "name": "詹滋嫺",
+  "phoneNumber": "0912345678",
+  "email": "example@gmail.com",
+  "idNumber": "U223456789",
+  "residentialAddress": "高雄市鳳山區王生明路26號",
+  "lineId": "example_line",
+  "createdAt": "2026-01-03T10:26:05.141Z",
+  "updatedAt": "2026-01-28T16:19:50.507Z",
+  "version": 3,
+  "isCurrentlyAtLevel": true,
+  "currentLevel": "VIP",
+  "activePeriod": {
+    "id": "f81d17a6-f659-459c-838f-8af5ac47f59e",
+    "customerId": "fa2d8c89-643c-4113-9841-39833aee7186",
+    "level": "VIP",
+    "startDate": "2026-01-29T17:01:12.156Z",
+    "endDate": "2027-01-29T17:01:12.156Z",
+    "status": "Active",
+    "createdAt": "2026-01-29T17:04:30.630Z",
+    "version": 1
+  }
+}
+```
+
+**前端使用範例**:
+```typescript
+// 在客戶列表顯示等級徽章（推薦：直接使用後端計算好的 boolean）
+const hasActiveLevel = (customer: Customer) => {
+  return customer.isCurrentlyAtLevel
+}
+
+// 或使用 activePeriod.status 判斷（較冗長）
+const hasActiveLevelAlt = (customer: Customer) => {
+  return customer.activePeriod?.status === CustomerLevelStatus.Active
+}
+
+// 取得當前等級名稱
+const getLevelName = (customer: Customer) => {
+  return customer.currentLevel || '-'
+}
+```
+
+**效能優化**:
+- ✅ 前端無需額外查詢每位客戶的 VIP 狀態
+- ✅ 後端在列表 API 一次回傳所有資料（避免 N+1 查詢問題）
+- ✅ `isCurrentlyAtLevel` 提供快速判斷，無需檢查 `activePeriod` 是否為 null
 
 ---
 
@@ -327,13 +444,13 @@ import type { CustomerLevelPeriodResponse } from '@/pages/customer-management/ty
 export const useCustomerLevelStore = defineStore('customerLevel', () => {
   // 當前客戶的 VIP 歷程
   const levelHistory = ref<CustomerLevelPeriodResponse[]>([])
-  
+
   // 當前有效的 VIP
   const activeLevel = ref<CustomerLevelPeriodResponse | null>(null)
-  
+
   // 是否正在載入
   const loading = ref(false)
-  
+
   return {
     levelHistory,
     activeLevel,
@@ -427,8 +544,9 @@ const ERROR_MESSAGES = {
 | 版本 | 日期 | 變更內容 |
 |------|------|---------|
 | 1.0 | 2026-01-31 | 初始版本：定義 CustomerLevelPeriod 實體與相關模型 |
+| 1.1 | 2026-02-01 | 擴展 Customer 實體：新增 `isCurrentlyAtLevel`、`currentLevel`、`activePeriod` 欄位支援前端直接取得 VIP 狀態（避免 N+1 查詢） |
 
 ---
 
-**完成日期**: 2026-01-31  
-**下一步**: 產生 API 合約規格（`contracts/customer-level-api.yaml`）
+**完成日期**: 2026-02-01
+**最後更新**: 2026-02-01

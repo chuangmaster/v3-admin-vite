@@ -4,13 +4,15 @@
   功能:
   - 顯示客戶列表資料
   - 支援身分證字號遮罩顯示
-  - 提供編輯、刪除操作按鈕
+  - 顯示等級狀態徽章
+  - 提供編輯、刪除、等級管理操作按鈕
   - 權限控制
 -->
 <script lang="ts" setup>
 import type { Customer } from "../types"
-import { Delete, Edit } from "@element-plus/icons-vue"
-import { ElButton } from "element-plus"
+
+import { Delete, Edit, Medal, Star } from "@element-plus/icons-vue"
+import { ElButton, ElTag } from "element-plus"
 import { maskIdNumber } from "@/common/utils/id-number-validator"
 
 interface Props {
@@ -25,6 +27,8 @@ interface Emits {
   (e: "edit", customer: Customer): void
   /** 刪除客戶 */
   (e: "delete", customer: Customer): void
+  /** 開啟等級設定 */
+  (e: "setLevel", customer: Customer): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,6 +36,15 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<Emits>()
+
+/**
+ * 判斷客戶是否有有效等級
+ * @param customer - 客戶資料
+ * @returns 是否有有效等級（後端已計算）
+ */
+function hasActiveLevel(customer: Customer): boolean {
+  return customer.isCurrentlyAtLevel
+}
 
 /** 格式化日期時間 */
 function formatDateTime(dateStr: string | undefined): string {
@@ -54,6 +67,11 @@ function handleEdit(customer: Customer) {
 function handleDelete(customer: Customer) {
   emit("delete", customer)
 }
+
+/** 處理等級設定 */
+function handleSetLevel(customer: Customer) {
+  emit("setLevel", customer)
+}
 </script>
 
 <template>
@@ -64,6 +82,23 @@ function handleDelete(customer: Customer) {
     stripe
   >
     <el-table-column prop="name" label="姓名" width="100" fixed="left" />
+
+    <el-table-column label="等級狀態" width="100">
+      <template #default="{ row }">
+        <ElTag
+          v-if="hasActiveLevel(row)"
+          type="warning"
+          effect="dark"
+          size="small"
+        >
+          <el-icon class="mr-1">
+            <Star />
+          </el-icon>
+          {{ row.activePeriod?.level }}
+        </ElTag>
+        <span v-else class="text-gray-400">-</span>
+      </template>
+    </el-table-column>
 
     <el-table-column prop="idNumber" label="身分證字號" width="140">
       <template #default="{ row }">
@@ -93,8 +128,18 @@ function handleDelete(customer: Customer) {
       </template>
     </el-table-column>
 
-    <el-table-column label="操作" width="150" fixed="right">
+    <el-table-column label="操作" width="220" fixed="right">
       <template #default="{ row }">
+        <ElButton
+          v-permission="['customer.level.create']"
+          :icon="Medal"
+          type="warning"
+          size="small"
+          link
+          @click="handleSetLevel(row)"
+        >
+          會員等級
+        </ElButton>
         <ElButton
           v-permission="['customer.update']"
           :icon="Edit"
@@ -120,3 +165,13 @@ function handleDelete(customer: Customer) {
     </el-table-column>
   </el-table>
 </template>
+
+<style lang="scss" scoped>
+.mr-1 {
+  margin-right: 4px;
+}
+
+.text-gray-400 {
+  color: #9ca3af;
+}
+</style>

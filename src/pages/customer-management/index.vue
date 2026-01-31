@@ -2,17 +2,19 @@
 /**
  * 客戶管理主頁面
  *
- * @description 提供客戶資料的查看、搜尋、新增、編輯、刪除功能
+ * @description 提供客戶資料的查看、搜尋、新增、編輯、刪除功能，以及會員等級管理
  * @module customer-management/index
  */
 
-import type { CreateCustomerRequest, Customer, UpdateCustomerRequest } from "./types"
+import type { CreateCustomerRequest, Customer, CustomerLevelFormData, UpdateCustomerRequest } from "./types"
 import { Download, Plus, Refresh, Search } from "@element-plus/icons-vue"
 import { ElButton, ElCard, ElMessage, ElMessageBox } from "element-plus"
 import { customerApi } from "./apis/customer"
 import CustomerDialog from "./components/CustomerDialog.vue"
+import CustomerLevelDialog from "./components/CustomerLevelDialog.vue"
 import CustomerTable from "./components/CustomerTable.vue"
 import { useCustomerForm } from "./composables/useCustomerForm"
+import { useCustomerLevel } from "./composables/useCustomerLevel"
 import { useCustomerManagement } from "./composables/useCustomerManagement"
 import { useExportExcel } from "./composables/useExportExcel"
 
@@ -47,8 +49,21 @@ const {
   handleSubmit
 } = useCustomerForm()
 
+// 等級管理邏輯
+const {
+  loading: levelLoading,
+  createLevel,
+  updateLevel,
+  terminateLevel
+} = useCustomerLevel()
+
 /** 刪除中狀態 */
 const deleting = ref(false)
+
+/** 等級對話框狀態 */
+const levelDialogVisible = ref(false)
+const levelDialogMode = ref<"create" | "edit" | "terminate">("create")
+const selectedCustomer = ref<Customer | null>(null)
 
 /** 處理新增客戶 */
 function handleCreate() {
@@ -98,6 +113,63 @@ async function handleDelete(customer: Customer) {
 /** 處理匯出 */
 function handleExport() {
   exportToExcel(customers.value)
+}
+
+/** 處理開啟等級設定對話框 */
+function handleSetLevel(customer: Customer) {
+  selectedCustomer.value = customer
+
+  if (customer.activePeriod) {
+    // 若已有等級，預設為編輯模式
+    levelDialogMode.value = "edit"
+  } else {
+    // 若無等級，為新增模式
+    levelDialogMode.value = "create"
+  }
+
+  levelDialogVisible.value = true
+}
+
+/** 處理等級對話框提交 */
+async function handleLevelSubmit(formData: CustomerLevelFormData, version?: number) {
+  if (!selectedCustomer.value) return
+
+  let success = false
+
+  if (levelDialogMode.value === "create") {
+    success = await createLevel(selectedCustomer.value.id, formData)
+  } else if (levelDialogMode.value === "edit" && selectedCustomer.value.activePeriod && version !== undefined) {
+    success = await updateLevel(
+      selectedCustomer.value.id,
+      selectedCustomer.value.activePeriod.id,
+      formData,
+      version
+    )
+  }
+
+  if (success) {
+    levelDialogVisible.value = false
+    // 重新載入客戶列表
+    refresh()
+  }
+}
+
+/** 處理終止等級 */
+async function handleTerminate() {
+  if (!selectedCustomer.value) return
+
+  const success = await terminateLevel(selectedCustomer.value.id)
+  if (success) {
+    levelDialogVisible.value = false
+    // 重新載入客戶列表
+    refresh()
+  }
+}
+
+/** 處理等級對話框取消 */
+function handleLevelCancel() {
+  levelDialogVisible.value = false
+  selectedCustomer.value = null
 }
 
 /** 處理表單提交 */
@@ -166,9 +238,10 @@ function handleFormSubmit(data: CreateCustomerRequest | UpdateCustomerRequest) {
       <!-- 客戶列表 -->
       <CustomerTable
         :data="customers"
-        :loading="loading || exporting || deleting"
+        :loading="loading || exporting || deleting || levelLoading"
         @edit="handleEdit"
         @delete="handleDelete"
+        @set-level="handleSetLevel"
       />
 
       <!-- 分頁 -->
@@ -190,6 +263,19 @@ function handleFormSubmit(data: CreateCustomerRequest | UpdateCustomerRequest) {
       :mode="formMode"
       :loading="submitting"
       @submit="handleFormSubmit"
+    />
+
+    <!-- 會員等級設定對話框 -->
+    <CustomerLevelDialog
+      v-model="levelDialogVisible"
+      :mode="levelDialogMode"
+      :data="selectedCustomer?.activePeriod"
+      :customer-id="selectedCustomer?.id || ''"
+      :customer-name="selectedCustomer?.name"
+      :loading="levelLoading"
+      @submit="handleLevelSubmit"
+      @terminate="handleTerminate"
+      @cancel="handleLevelCancel"
     />
   </div>
 </template>
