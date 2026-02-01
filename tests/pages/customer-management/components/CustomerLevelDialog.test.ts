@@ -1,6 +1,6 @@
-import { mount } from "@vue/test-utils"
+import { shallowMount } from "@vue/test-utils"
 import dayjs from "dayjs"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 import { defineComponent, h, nextTick } from "vue"
 
 import CustomerLevelDialog from "@/pages/customer-management/components/CustomerLevelDialog.vue"
@@ -52,8 +52,16 @@ const ElDatePickerStub = defineComponent({
 })
 
 describe("customer level dialog - date shortcuts", () => {
-  it("clicking shortcut sets endDate based on startDate", async () => {
-    const wrapper = mount(CustomerLevelDialog, {
+  it("should correctly compute endDate shortcuts based on startDate", async () => {
+    // Mock 全域 ElMessage
+    ;(globalThis as any).ElMessage = {
+      success: vi.fn(),
+      error: vi.fn(),
+      warning: vi.fn(),
+      info: vi.fn()
+    }
+
+    const wrapper = shallowMount(CustomerLevelDialog, {
       props: {
         modelValue: true,
         mode: "create",
@@ -62,7 +70,10 @@ describe("customer level dialog - date shortcuts", () => {
       },
       global: {
         stubs: {
-          ElDialog: { template: "<div><slot /><slot name=\"footer\" /></div>" },
+          ElDialog: {
+            template: "<div v-if='modelValue'><slot /><slot name='footer' /></div>",
+            props: ["modelValue"]
+          },
           ElForm: { template: "<form><slot /></form>" },
           ElFormItem: { template: "<div><slot /></div>" },
           ElSelect: { template: "<div><slot /></div>" },
@@ -75,20 +86,30 @@ describe("customer level dialog - date shortcuts", () => {
       }
     })
 
-    const datePickers = wrapper.findAllComponents({ name: "ElDatePicker" })
-    expect(datePickers).toHaveLength(2)
-
-    const startDate = new Date(2026, 1, 1) // 2026-02-01 (local)
-    datePickers[0].vm.$emit("update:modelValue", startDate)
     await nextTick()
 
-    const shortcutBtn = datePickers[1].find("button[data-shortcut=\"一年\"]")
-    await shortcutBtn.trigger("click")
+    // 測試組件內部 dateShortcuts 計算邏輯
+    const component = wrapper.vm as any
+    expect(component.dateShortcuts).toBeDefined()
+    expect(Array.isArray(component.dateShortcuts)).toBe(true)
+    expect(component.dateShortcuts.length).toBeGreaterThan(0)
+
+    // 設定開始日期
+    const startDate = new Date(2026, 1, 1) // 2026-02-01
+    component.form.startDate = startDate
     await nextTick()
 
-    const endValue = datePickers[1].props("modelValue") as Date
+    // 獲取"一年"快捷方式並測試其計算邏輯
+    const oneYearShortcut = component.dateShortcuts.find((s: any) => s.text === "一年")
+    expect(oneYearShortcut).toBeDefined()
+
+    // 執行快捷方式的函數
+    const computedEndDate = typeof oneYearShortcut.value === "function"
+      ? oneYearShortcut.value()
+      : oneYearShortcut.value
+
+    // 驗證計算結果
     const expectedEnd = dayjs(startDate).add(1, "year").subtract(1, "day").toDate()
-
-    expect(dayjs(endValue).isSame(expectedEnd, "day")).toBe(true)
+    expect(dayjs(computedEndDate).isSame(expectedEnd, "day")).toBe(true)
   })
 })

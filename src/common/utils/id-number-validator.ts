@@ -19,9 +19,12 @@
  * ```
  */
 export function validateTaiwanIdNumber(idNumber: string): boolean {
+  // 統一轉換為大寫以支援小寫字母
+  const normalizedId = idNumber.toUpperCase()
+
   // 1. 格式驗證：2碼英文 + 8碼數字，共10碼
   const format = /^[A-Z]{2}\d{8}$/
-  if (!format.test(idNumber)) {
+  if (!format.test(normalizedId)) {
     return false
   }
 
@@ -56,14 +59,14 @@ export function validateTaiwanIdNumber(idNumber: string): boolean {
   }
 
   // 3. 將第一碼英文轉換為數字
-  const firstLetter = idNumber[0]
+  const firstLetter = normalizedId[0]
   const firstNumber = letterMap[firstLetter]
   if (!firstNumber) {
     return false
   }
 
   // 4. 將第二碼英文轉換為數字（僅取個位數）
-  const secondLetter = idNumber[1]
+  const secondLetter = normalizedId[1]
   const secondNumber = letterMap[secondLetter] % 10
 
   // 5. 建立完整數字陣列
@@ -71,7 +74,7 @@ export function validateTaiwanIdNumber(idNumber: string): boolean {
     Math.floor(firstNumber / 10), // 第一碼英文的十位數
     firstNumber % 10, // 第一碼英文的個位數
     secondNumber, // 第二碼英文的個位數
-    ...idNumber.slice(2).split("").map(Number) // 後8碼數字
+    ...normalizedId.slice(2).split("").map(Number) // 後8碼數字
   ]
 
   // 6. 權重陣列
@@ -90,17 +93,26 @@ export function validateTaiwanIdNumber(idNumber: string): boolean {
  * 格式化身分證字號（顯示部分隱碼）
  *
  * @param idNumber - 身分證字號
- * @returns 格式化後的字號（前4碼 + ****** ）
+ * @returns 格式化後的字號（前3碼 + **** + 後3碼），短字串直接返回
  *
  * @example
  * ```ts
- * maskIdNumber('A123456789') // 'A123******'
+ * maskIdNumber('A123456789') // 'A12****789'
+ * maskIdNumber('ABC') // 'ABC'
+ * maskIdNumber('') // ''
  * ```
  */
 export function maskIdNumber(idNumber: string): string {
-  if (!idNumber || idNumber.length < 4) {
-    return "****"
+  // 處理 null、undefined 或空字串
+  if (!idNumber) {
+    return ""
   }
 
-  return `${idNumber.slice(0, 4)}******`
+  // 短字串直接返回
+  if (idNumber.length <= 6) {
+    return idNumber
+  }
+
+  // 前3碼 + 4個星號 + 後3碼
+  return `${idNumber.slice(0, 3)}****${idNumber.slice(-3)}`
 }
