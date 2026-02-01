@@ -10,6 +10,7 @@ import type {
   CustomerLevelPeriodResponse,
   UpdateLevelRequest
 } from "../types"
+import { API_CODE_SUCCESS } from "@@/constants/api-code"
 import { request } from "@/http/axios"
 
 /**
@@ -56,10 +57,15 @@ export const customerLevelApi = {
    */
   async getActiveLevel(customerId: string): Promise<ApiResponse<CustomerLevelPeriodResponse | null>> {
     try {
-      return await request<ApiResponse<CustomerLevelPeriodResponse>>({
+      const response = await request<ApiResponse<CustomerLevelPeriodResponse | null>>({
         url: `/customers/${customerId}/levels/active`,
         method: "get"
       })
+      const rawData = response.data
+      if (rawData === null) {
+        return { ...response, data: null }
+      }
+      return { ...response, data: rawData }
     } catch (error: unknown) {
       // 404 表示無有效等級，視為正常情況
       if (error && typeof error === "object" && "response" in error) {
@@ -67,7 +73,7 @@ export const customerLevelApi = {
         if (err.response?.status === 404) {
           return {
             success: true,
-            code: "0",
+            code: API_CODE_SUCCESS,
             message: "success",
             data: null,
             timestamp: new Date().toISOString(),

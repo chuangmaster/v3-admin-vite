@@ -160,17 +160,12 @@ function resetForm() {
 
 /** 處理關閉 */
 function handleClose() {
-  emit("update:modelValue", false)
-  // 延遲重設表單，避免關閉動畫時看到表單清空
-  setTimeout(() => {
-    resetForm()
-  }, 300)
+  emit("cancel")
 }
 
 /** 處理取消 */
 function handleCancel() {
   emit("cancel")
-  handleClose()
 }
 
 /** 處理提交 */
@@ -178,6 +173,7 @@ async function handleSubmit() {
   if (isTerminateMode.value) {
     // 終止模式
     emit("terminate")
+    emit("update:modelValue", false)
     return
   }
 
@@ -198,32 +194,35 @@ async function handleSubmit() {
   } else {
     emit("submit", formData)
   }
+
+  // 立即關閉 dialog
+  emit("update:modelValue", false)
 }
 
-/** 日期選擇器快捷選項 */
+/**
+ * 日期選擇器快捷選項（結束日期）
+ * 以開始日期為基準計算：結束日期 = 開始日期 + 期間 - 1 天
+ */
 const dateShortcuts = [
   {
     text: "一年",
     value: () => {
-      const start = new Date()
-      const end = dayjs(start).add(1, "year").subtract(1, "day").toDate()
-      return [start, end]
+      const base = form.startDate ?? new Date()
+      return dayjs(base).add(1, "year").subtract(1, "day").toDate()
     }
   },
   {
     text: "半年",
     value: () => {
-      const start = new Date()
-      const end = dayjs(start).add(6, "month").subtract(1, "day").toDate()
-      return [start, end]
+      const base = form.startDate ?? new Date()
+      return dayjs(base).add(6, "month").subtract(1, "day").toDate()
     }
   },
   {
     text: "三個月",
     value: () => {
-      const start = new Date()
-      const end = dayjs(start).add(3, "month").subtract(1, "day").toDate()
-      return [start, end]
+      const base = form.startDate ?? new Date()
+      return dayjs(base).add(3, "month").subtract(1, "day").toDate()
     }
   }
 ]
@@ -293,9 +292,7 @@ const dateShortcuts = [
             type="date"
             placeholder="請選擇開始日期"
             format="YYYY-MM-DD"
-            value-format="YYYY-MM-DD"
             class="w-full"
-            :shortcuts="dateShortcuts.map(s => ({ text: s.text, value: s.value()[0] }))"
           />
         </el-form-item>
 
@@ -305,8 +302,8 @@ const dateShortcuts = [
             type="date"
             placeholder="請選擇結束日期"
             format="YYYY-MM-DD"
-            value-format="YYYY-MM-DD"
             class="w-full"
+            :shortcuts="dateShortcuts"
           />
         </el-form-item>
       </el-form>

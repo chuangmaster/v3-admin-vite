@@ -29,6 +29,8 @@ interface Emits {
   (e: "delete", customer: Customer): void
   /** 開啟等級設定 */
   (e: "setLevel", customer: Customer): void
+  /** 查看等級歷程 */
+  (e: "viewHistory", customer: Customer): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -71,6 +73,11 @@ function handleDelete(customer: Customer) {
 /** 處理等級設定 */
 function handleSetLevel(customer: Customer) {
   emit("setLevel", customer)
+}
+
+/** 處理查看等級歷程 */
+function handleViewHistory(customer: Customer) {
+  emit("viewHistory", customer)
 }
 </script>
 
@@ -128,7 +135,7 @@ function handleSetLevel(customer: Customer) {
       </template>
     </el-table-column>
 
-    <el-table-column label="操作" width="220" fixed="right">
+    <el-table-column label="操作" width="280" fixed="right">
       <template #default="{ row }">
         <ElButton
           v-permission="['customer.level.create']"
@@ -139,6 +146,15 @@ function handleSetLevel(customer: Customer) {
           @click="handleSetLevel(row)"
         >
           會員等級
+        </ElButton>
+        <ElButton
+          v-permission="['customer.level.view']"
+          type="info"
+          size="small"
+          link
+          @click="handleViewHistory(row)"
+        >
+          VIP 歷程
         </ElButton>
         <ElButton
           v-permission="['customer.update']"

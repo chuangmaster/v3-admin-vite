@@ -66,8 +66,8 @@ export function useCustomerLevel() {
 
     try {
       const response = await customerLevelApi.getLevelHistory(customerId, includeExpired)
-      if (response.code === "0" && response.data) {
-        levelList.value = response.data
+      if (response.success) {
+        levelList.value = response.data ?? []
       } else {
         throw new Error(response.message || "查詢等級歷程失敗")
       }
@@ -91,7 +91,7 @@ export function useCustomerLevel() {
 
     try {
       const response = await customerLevelApi.getActiveLevel(customerId)
-      if (response.code === "0") {
+      if (response.success) {
         activeLevel.value = response.data
       } else {
         throw new Error(response.message || "查詢當前等級狀態失敗")
@@ -128,7 +128,8 @@ export function useCustomerLevel() {
       }
 
       const response = await customerLevelApi.createLevel(customerId, request)
-      if (response.code === "0" && response.data) {
+
+      if (response.success && response.data) {
         ElMessage.success("等級設定成功")
         // 重新載入資料
         await Promise.all([
@@ -137,6 +138,7 @@ export function useCustomerLevel() {
         ])
         return true
       } else {
+        console.error("❌ 未進入成功分支:", { success: response.success, data: response.data })
         throw new Error(response.message || "新增等級失敗")
       }
     } catch (err: unknown) {
@@ -178,7 +180,7 @@ export function useCustomerLevel() {
       }
 
       const response = await customerLevelApi.updateLevel(customerId, levelId, request)
-      if (response.code === "0" && response.data) {
+      if (response.success && response.data) {
         ElMessage.success("等級更新成功")
         // 重新載入資料
         await Promise.all([
@@ -192,11 +194,7 @@ export function useCustomerLevel() {
     } catch (err: unknown) {
       // 特別處理樂觀鎖衝突
       if (isConflictError(err)) {
-        ElMessage.warning({
-          message: "資料已被其他使用者更新，請重新載入後再試",
-          duration: 5000,
-          showClose: true
-        })
+        ElMessage.warning("資料已被其他使用者更新，請重新載入後再試")
         // 自動重新載入最新資料
         await fetchLevelHistory(customerId)
         return false
@@ -219,7 +217,7 @@ export function useCustomerLevel() {
 
     try {
       const response = await customerLevelApi.terminateLevel(customerId)
-      if (response.code === "0" && response.data) {
+      if (response.success && response.data) {
         ElMessage.success("會籍已終止")
         // 重新載入資料
         await Promise.all([

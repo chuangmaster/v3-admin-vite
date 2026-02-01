@@ -12,6 +12,7 @@ import { ElButton, ElCard, ElMessage, ElMessageBox } from "element-plus"
 import { customerApi } from "./apis/customer"
 import CustomerDialog from "./components/CustomerDialog.vue"
 import CustomerLevelDialog from "./components/CustomerLevelDialog.vue"
+import CustomerLevelTable from "./components/CustomerLevelTable.vue"
 import CustomerTable from "./components/CustomerTable.vue"
 import { useCustomerForm } from "./composables/useCustomerForm"
 import { useCustomerLevel } from "./composables/useCustomerLevel"
@@ -51,7 +52,9 @@ const {
 
 // 等級管理邏輯
 const {
+  levelList,
   loading: levelLoading,
+  fetchLevelHistory,
   createLevel,
   updateLevel,
   terminateLevel
@@ -64,6 +67,10 @@ const deleting = ref(false)
 const levelDialogVisible = ref(false)
 const levelDialogMode = ref<"create" | "edit" | "terminate">("create")
 const selectedCustomer = ref<Customer | null>(null)
+const selectedLevelRecord = ref<Customer["activePeriod"]>(null)
+
+/** 等級歷程對話框狀態 */
+const levelHistoryDialogVisible = ref(false)
 
 /** 處理新增客戶 */
 function handleCreate() {
@@ -118,6 +125,7 @@ function handleExport() {
 /** 處理開啟等級設定對話框 */
 function handleSetLevel(customer: Customer) {
   selectedCustomer.value = customer
+  selectedLevelRecord.value = customer.activePeriod
 
   if (customer.activePeriod) {
     // 若已有等級，預設為編輯模式
@@ -130,6 +138,31 @@ function handleSetLevel(customer: Customer) {
   levelDialogVisible.value = true
 }
 
+/** 開啟 VIP 歷程對話框 */
+async function handleViewHistory(customer: Customer) {
+  selectedCustomer.value = customer
+  levelHistoryDialogVisible.value = true
+  await fetchLevelHistory(customer.id)
+}
+
+/** 從歷程表格進入編輯 */
+function handleHistoryEdit(record: NonNullable<Customer["activePeriod"]>) {
+  if (!selectedCustomer.value) return
+  selectedLevelRecord.value = record
+  levelDialogMode.value = "edit"
+  levelHistoryDialogVisible.value = false
+  levelDialogVisible.value = true
+}
+
+/** 從歷程表格進入終止 */
+function handleHistoryTerminate(record: NonNullable<Customer["activePeriod"]>) {
+  if (!selectedCustomer.value) return
+  selectedLevelRecord.value = record
+  levelDialogMode.value = "terminate"
+  levelHistoryDialogVisible.value = false
+  levelDialogVisible.value = true
+}
+
 /** 處理等級對話框提交 */
 async function handleLevelSubmit(formData: CustomerLevelFormData, version?: number) {
   if (!selectedCustomer.value) return
@@ -138,17 +171,20 @@ async function handleLevelSubmit(formData: CustomerLevelFormData, version?: numb
 
   if (levelDialogMode.value === "create") {
     success = await createLevel(selectedCustomer.value.id, formData)
-  } else if (levelDialogMode.value === "edit" && selectedCustomer.value.activePeriod && version !== undefined) {
+  } else if (levelDialogMode.value === "edit" && selectedLevelRecord.value && version !== undefined) {
     success = await updateLevel(
       selectedCustomer.value.id,
-      selectedCustomer.value.activePeriod.id,
+      selectedLevelRecord.value.id,
       formData,
       version
     )
   }
 
   if (success) {
+    // 立即關閉 dialog
     levelDialogVisible.value = false
+    selectedCustomer.value = null
+    selectedLevelRecord.value = null
     // 重新載入客戶列表
     refresh()
   }
@@ -160,7 +196,10 @@ async function handleTerminate() {
 
   const success = await terminateLevel(selectedCustomer.value.id)
   if (success) {
+    // 立即關閉 dialog
     levelDialogVisible.value = false
+    selectedCustomer.value = null
+    selectedLevelRecord.value = null
     // 重新載入客戶列表
     refresh()
   }
@@ -170,6 +209,7 @@ async function handleTerminate() {
 function handleLevelCancel() {
   levelDialogVisible.value = false
   selectedCustomer.value = null
+  selectedLevelRecord.value = null
 }
 
 /** 處理表單提交 */
@@ -242,6 +282,7 @@ function handleFormSubmit(data: CreateCustomerRequest | UpdateCustomerRequest) {
         @edit="handleEdit"
         @delete="handleDelete"
         @set-level="handleSetLevel"
+        @view-history="handleViewHistory"
       />
 
       <!-- 分頁 -->
@@ -269,7 +310,7 @@ function handleFormSubmit(data: CreateCustomerRequest | UpdateCustomerRequest) {
     <CustomerLevelDialog
       v-model="levelDialogVisible"
       :mode="levelDialogMode"
-      :data="selectedCustomer?.activePeriod"
+      :data="selectedLevelRecord"
       :customer-id="selectedCustomer?.id || ''"
       :customer-name="selectedCustomer?.name"
       :loading="levelLoading"
@@ -277,6 +318,21 @@ function handleFormSubmit(data: CreateCustomerRequest | UpdateCustomerRequest) {
       @terminate="handleTerminate"
       @cancel="handleLevelCancel"
     />
+
+    <!-- VIP 歷程對話框 -->
+    <el-dialog
+      v-model="levelHistoryDialogVisible"
+      :title="selectedCustomer ? `會員等級歷程 - ${selectedCustomer.name}` : '等級歷程'"
+      width="900px"
+      destroy-on-close
+    >
+      <CustomerLevelTable
+        :data="levelList"
+        :loading="levelLoading"
+        @edit="handleHistoryEdit"
+        @terminate="handleHistoryTerminate"
+      />
+    </el-dialog>
   </div>
 </template>
 

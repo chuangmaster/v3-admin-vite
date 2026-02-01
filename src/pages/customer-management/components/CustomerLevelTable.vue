@@ -15,7 +15,6 @@
 import type { CustomerLevelPeriodResponse } from "../types"
 import { Edit, Remove } from "@element-plus/icons-vue"
 import { ElButton, ElEmpty, ElTable, ElTableColumn, ElTag } from "element-plus"
-import { computed } from "vue"
 import { formatDateTime } from "@/common/utils/datetime"
 import { CustomerLevelStatus } from "../types"
 
@@ -33,14 +32,11 @@ interface Emits {
   (e: "terminate", record: CustomerLevelPeriodResponse): void
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   loading: false
 })
 
 const emit = defineEmits<Emits>()
-
-/** 是否有資料 */
-const hasData = computed(() => props.data.length > 0)
 
 /**
  * 取得狀態標籤類型
@@ -118,9 +114,7 @@ function handleTerminate(record: CustomerLevelPeriodResponse) {
 
 <template>
   <div class="customer-level-table">
-    <!-- 有資料時顯示表格 -->
     <ElTable
-      v-if="hasData"
       v-loading="loading"
       :data="data"
       border
@@ -187,13 +181,11 @@ function handleTerminate(record: CustomerLevelPeriodResponse) {
           </ElButton>
         </template>
       </ElTableColumn>
-    </ElTable>
 
-    <!-- 無資料時顯示空狀態 -->
-    <ElEmpty
-      v-else-if="!loading"
-      description="尚無等級記錄"
-    />
+      <template #empty>
+        <ElEmpty description="尚無等級記錄" />
+      </template>
+    </ElTable>
   </div>
 </template>
 
