@@ -57,7 +57,11 @@ describe("useIdCardRecognition", () => {
 
     // Assert
     expect(recognizing.value).toBe(false)
-    expect(recognitionResult.value).toEqual(mockResult)
+    // useIdCardRecognition 只返回 name 和 idNumber，不包含 address
+    expect(recognitionResult.value).toEqual({
+      name: "王小明",
+      idNumber: "A123456789"
+    })
     expect(customerApi.recognizeIdCard).toHaveBeenCalled()
   })
 

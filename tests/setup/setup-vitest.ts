@@ -52,6 +52,8 @@ vi.mock("element-plus", () => {
     ElDescriptionsItem: (props: any, { slots }: any) => h("div", { "class": "el-descriptions-item", "data-label": props.label }, slots.default ? slots.default() : null),
     ElRow: makeWrapper("el-row"),
     ElCol: makeWrapper("el-col"),
+    ElAlert: makeWrapper("el-alert"),
+    ElDatePicker: makeWrapper("el-date-picker"),
 
     // loading / directives
     ElLoading: { name: "ElLoading" },
@@ -96,7 +98,9 @@ vi.mock("element-plus", () => {
           ElDescriptions: { name: "ElDescriptions" },
           ElDescriptionsItem: { name: "ElDescriptionsItem" },
           ElRow: { name: "ElRow" },
-          ElCol: { name: "ElCol" }
+          ElCol: { name: "ElCol" },
+          ElAlert: { name: "ElAlert" },
+          ElDatePicker: { name: "ElDatePicker" }
         }
         Object.entries(comps).forEach(([k, v]) => {
           try {

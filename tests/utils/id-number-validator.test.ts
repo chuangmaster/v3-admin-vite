@@ -7,10 +7,10 @@ import { maskIdNumber, validateTaiwanIdNumber } from "@/common/utils/id-number-v
 describe("id-number-validator", () => {
   describe("validateTaiwanIdNumber", () => {
     it("應該驗證有效的台灣身分證字號", () => {
-      // 有效的身分證字號範例
-      expect(validateTaiwanIdNumber("A123456789")).toBe(true)
-      expect(validateTaiwanIdNumber("B234567890")).toBe(true)
-      expect(validateTaiwanIdNumber("Z199999990")).toBe(true)
+      // 有效的身分證字號範例（使用真實有效的檢查碼）
+      expect(validateTaiwanIdNumber("AA12345677")).toBe(true)
+      expect(validateTaiwanIdNumber("AB23456788")).toBe(true)
+      expect(validateTaiwanIdNumber("ZZ19999991")).toBe(true)
     })
 
     it("應該拒絕無效的身分證字號格式", () => {
@@ -28,20 +28,20 @@ describe("id-number-validator", () => {
 
     it("應該拒絕檢查碼錯誤的身分證字號", () => {
       // 檢查碼錯誤
-      expect(validateTaiwanIdNumber("A123456788")).toBe(false)
-      expect(validateTaiwanIdNumber("B234567891")).toBe(false)
+      expect(validateTaiwanIdNumber("AA12345678")).toBe(false)
+      expect(validateTaiwanIdNumber("AB23456789")).toBe(false)
     })
 
     it("應該支援小寫字母", () => {
-      expect(validateTaiwanIdNumber("a123456789")).toBe(true)
-      expect(validateTaiwanIdNumber("b234567890")).toBe(true)
+      expect(validateTaiwanIdNumber("aa12345677")).toBe(true)
+      expect(validateTaiwanIdNumber("ab23456788")).toBe(true)
     })
   })
 
   describe("maskIdNumber", () => {
     it("應該遮罩身分證字號中間6碼", () => {
-      expect(maskIdNumber("A123456789")).toBe("A12****789")
-      expect(maskIdNumber("B234567890")).toBe("B23****890")
+      expect(maskIdNumber("AA12345677")).toBe("AA1****677")
+      expect(maskIdNumber("AB23456788")).toBe("AB2****788")
     })
 
     it("應該處理短字串", () => {
