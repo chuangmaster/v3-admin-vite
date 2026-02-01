@@ -26,6 +26,10 @@ const emit = defineEmits<{
   "recognized": [data: { name: string, idNumber: string, address?: string }]
   /** 更新上傳狀態（正面已上傳, 反面已上傳） */
   "update:modelValue": [value: { front: boolean, back: boolean }]
+  /** 正面圖片上傳成功 */
+  "frontUploaded": [data: { base64: string, contentType: string, fileName: string }]
+  /** 反面圖片上傳成功 */
+  "backUploaded": [data: { base64: string, contentType: string, fileName: string }]
 }>()
 
 const recognizing = ref(false)
@@ -49,7 +53,7 @@ const hasEnoughImages = computed(() => {
 /**
  * 處理檔案變更
  */
-const handleChange: UploadProps["onChange"] = (uploadFile, uploadFiles) => {
+const handleChange: UploadProps["onChange"] = async (uploadFile, uploadFiles) => {
   // 保留所有上傳的檔案(最多 2 個)
   fileList.value = uploadFiles
 
@@ -63,6 +67,13 @@ const handleChange: UploadProps["onChange"] = (uploadFile, uploadFiles) => {
 
   // 通知父元件上傳狀態
   emitUploadStatus()
+
+  // 發送 base64 資料給父元件（用於建立訂單）
+  if (uploadFile.raw) {
+    const fileIndex = uploadFiles.findIndex(f => f.uid === uploadFile.uid)
+    const side = fileIndex === 0 ? "front" : "back"
+    await emitFileUploaded(uploadFile.raw, side)
+  }
 }
 
 /**
@@ -99,6 +110,23 @@ const beforeUpload: UploadProps["beforeUpload"] = (rawFile) => {
 }
 
 /**
+ * 將 File 轉換為 base64 字串（移除 data URL 前綴）
+ */
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const result = reader.result as string
+      // 移除 "data:image/jpeg;base64," 前綴，只保留 base64 字串
+      const base64 = result.split(",")[1]
+      resolve(base64)
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+/**
  * 通知父元件上傳狀態
  */
 function emitUploadStatus() {
@@ -106,6 +134,32 @@ function emitUploadStatus() {
     front: fileList.value.length >= 1,
     back: fileList.value.length >= 2
   })
+}
+
+/**
+ * 發送圖片上傳事件給父元件（含 base64 資料）
+ */
+async function emitFileUploaded(file: File, side: "front" | "back") {
+  try {
+    const base64 = await fileToBase64(file)
+
+    if (side === "front") {
+      emit("frontUploaded", {
+        base64,
+        contentType: file.type,
+        fileName: file.name
+      })
+    } else {
+      emit("backUploaded", {
+        base64,
+        contentType: file.type,
+        fileName: file.name
+      })
+    }
+  } catch (error) {
+    ElMessage.error(`圖片轉換失敗: ${file.name}`)
+    console.error("File to base64 conversion error:", error)
+  }
 }
 
 /**
@@ -184,7 +238,7 @@ async function handleRecognize() {
 /**
  * 拍照功能（使用瀏覽器相機 API）
  */
-function handleCapture() {
+async function handleCapture() {
   // 創建 file input 元素並設定為相機模式
   const input = document.createElement("input")
   input.type = "file"
@@ -192,20 +246,22 @@ function handleCapture() {
   input.capture = "environment" // 使用後置相機
   input.multiple = props.requireBothSides // 如果需要兩張，允許多選
 
-  input.onchange = (e: Event) => {
+  input.onchange = async (e: Event) => {
     const target = e.target as HTMLInputElement
     const files = Array.from(target.files || [])
 
-    files.forEach((file, index) => {
+    for (let index = 0; index < files.length; index++) {
+      const file = files[index]
+
       // 檢查是否超過限制
       if (fileList.value.length >= 2) {
         ElMessage.warning("最多只能上傳 2 張圖片")
-        return
+        break
       }
 
       // 先驗證檔案
       if (!beforeUpload(file as any)) {
-        return
+        continue
       }
 
       // 轉換為 UploadUserFile 格式
@@ -219,7 +275,12 @@ function handleCapture() {
       }
 
       fileList.value.push(uploadFile)
-    })
+
+      // 發送 base64 資料給父元件
+      const currentFileIndex = fileList.value.length - 1
+      const side = currentFileIndex === 0 ? "front" : "back"
+      await emitFileUploaded(file, side)
+    }
 
     emitUploadStatus()
   }
@@ -258,14 +319,15 @@ function getUploadedFiles() {
 /**
  * 設定圖片（從外部傳入）
  */
-function setFiles(data: { front?: File | null, back?: File | null }) {
+async function setFiles(data: { front?: File | null, back?: File | null }) {
   clear()
 
   const files: File[] = []
   if (data.front) files.push(data.front)
   if (data.back) files.push(data.back)
 
-  files.forEach((file, index) => {
+  for (let index = 0; index < files.length; index++) {
+    const file = files[index]
     const uploadFile: UploadUserFile = {
       name: file.name,
       size: file.size,
@@ -275,7 +337,11 @@ function setFiles(data: { front?: File | null, back?: File | null }) {
       url: URL.createObjectURL(file)
     }
     fileList.value.push(uploadFile)
-  })
+
+    // 發送 base64 資料給父元件
+    const side = index === 0 ? "front" : "back"
+    await emitFileUploaded(file, side)
+  }
 
   emitUploadStatus()
 }
@@ -361,6 +427,7 @@ defineExpose({
     <!-- 操作按鈕 -->
     <div v-if="hasImage" class="actions">
       <ElButton
+        v-if="props.showRecognize"
         type="primary"
         :icon="Check"
         :loading="recognizing"
@@ -394,8 +461,12 @@ defineExpose({
           支援上傳 1-2 張照片(身分證正反面),JPG、PNG 格式,單檔不超過 5MB
         </li>
         <li>請確保身分證圖片清晰、光線充足</li>
-        <li>AI 辨識由 Google Gemini 提供,準確率約 95%</li>
-        <li>辨識結果僅供參考,請務必核對後再提交</li>
+        <li v-if="props.showRecognize">
+          AI 辨識由 Google Gemini 提供,準確率約 95%
+        </li>
+        <li v-if="props.showRecognize">
+          辨識結果僅供參考,請務必核對後再提交
+        </li>
       </ul>
     </div>
 
