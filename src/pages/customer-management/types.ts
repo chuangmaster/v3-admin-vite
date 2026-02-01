@@ -7,6 +7,111 @@
 
 import type { FormRules } from "element-plus"
 
+// ============================================================================
+// 客戶等級相關型別
+// ============================================================================
+
+/**
+ * 客戶等級狀態列舉
+ * @description 由後端自動計算，前端僅用於顯示
+ */
+export enum CustomerLevelStatus {
+  /** 進行中（當前時間在 startDate 與 endDate 之間） */
+  Active = "Active",
+  /** 已過期（當前時間 >= endDate） */
+  Expired = "Expired",
+  /** 即將生效（當前時間 < startDate） */
+  Upcoming = "Upcoming"
+}
+
+/**
+ * 客戶等級列舉
+ * @description 支援的等級選項
+ */
+export enum CustomerLevel {
+  VIP = "VIP"
+  // 未來可擴展其他等級
+}
+
+/**
+ * 客戶等級效期回應（從後端 API 取得）
+ * @description 對應後端 API: GET /api/customers/{customerId}/levels
+ */
+export interface CustomerLevelPeriodResponse {
+  /** 唯一識別碼 (UUID) */
+  id: string
+  /** 所屬客戶 ID (UUID) */
+  customerId: string
+  /** 等級（例如: "VIP", "VVIP"） */
+  level: string
+  /** 效期開始日期（UTC ISO 8601 格式） */
+  startDate: string
+  /** 效期結束日期（UTC ISO 8601 格式） */
+  endDate: string
+  /** 當前狀態（由後端計算） */
+  status: CustomerLevelStatus
+  /** 建立時間（UTC ISO 8601 格式） */
+  createdAt: string
+  /** 最後更新時間（UTC ISO 8601 格式，可為 null） */
+  updatedAt: string | null
+  /** 樂觀鎖版本號 */
+  version: number
+}
+
+/**
+ * 新增客戶等級效期請求
+ * @description 對應後端 API: POST /api/customers/{customerId}/levels
+ */
+export interface CreateLevelRequest {
+  /** 等級 */
+  level: string
+  /** 效期開始日期（UTC ISO 8601，必須為該日 00:00:00Z） */
+  startDate: string
+  /** 效期結束日期（UTC ISO 8601，必須為該日 23:59:59Z） */
+  endDate: string
+}
+
+/**
+ * 更新客戶等級效期請求
+ * @description 對應後端 API: PUT /api/customers/{customerId}/levels/{levelId}
+ */
+export interface UpdateLevelRequest extends CreateLevelRequest {
+  /** 樂觀鎖版本號（必須與當前資料庫版本一致） */
+  version: number
+}
+
+/**
+ * 等級設定表單資料（前端表單使用）
+ * @description 日期欄位使用 Date 物件，提交時再轉換為 ISO 8601
+ */
+export interface CustomerLevelFormData {
+  /** 等級 */
+  level: string
+  /** 效期開始日期（本地時區 Date） */
+  startDate: Date | null
+  /** 效期結束日期（本地時區 Date） */
+  endDate: Date | null
+}
+
+/**
+ * 等級設定表單驗證規則
+ */
+export const customerLevelFormRules: FormRules<CustomerLevelFormData> = {
+  level: [
+    { required: true, message: "請選擇等級", trigger: "change" }
+  ],
+  startDate: [
+    { required: true, message: "請選擇開始日期", trigger: "change" }
+  ],
+  endDate: [
+    { required: true, message: "請選擇結束日期", trigger: "change" }
+  ]
+}
+
+// ============================================================================
+// 客戶相關型別
+// ============================================================================
+
 /**
  * 客戶實體
  * 對應後端 API: GET /api/customers/:id
@@ -41,6 +146,15 @@ export interface Customer {
 
   /** 資料版本號（用於樂觀鎖定，從 1 開始） */
   version: number
+
+  /** 是否當前有有效等級（由後端 API 回傳） */
+  isCurrentlyAtLevel: boolean
+
+  /** 當前等級名稱（由後端 API 回傳，若無有效等級則為 null） */
+  currentLevel: string | null
+
+  /** 當前有效的會員等級詳細資訊（由後端 API 回傳，若無有效等級則為 null） */
+  activePeriod: CustomerLevelPeriodResponse | null
 }
 
 /**

@@ -48,7 +48,10 @@ describe("useServiceOrderForm", () => {
       lineId: null,
       createdAt: "2025-12-14T10:00:00Z",
       updatedAt: null,
-      version: 1
+      version: 1,
+      isCurrentlyAtLevel: false,
+      currentLevel: null,
+      activePeriod: null
     }
 
     setCustomer(mockCustomer)

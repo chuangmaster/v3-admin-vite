@@ -1,0 +1,497 @@
+openapi: 3.0.3
+info:
+  title: Customer Level Management API
+  description: VIP 客戶會員等級管理 API
+  version: 1.0.0
+  contact:
+    name: Real You Development Team
+
+servers:
+  - url: http://localhost:5176/api
+    description: 本地開發環境
+  - url: https://api.real-you.com/api
+    description: 生產環境
+
+tags:
+  - name: Customer Level
+    description: 客戶 VIP 會員等級管理相關操作
+
+paths:
+  /customers/{customerId}/levels:
+    post:
+      tags:
+        - Customer Level
+      summary: 建立 VIP 會員效期
+      description: 為指定客戶新增 VIP 會員等級與效期。系統會自動驗證日期範圍，並檢查是否與現有 Active 期間重疊。
+      operationId: createCustomerLevel
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/CustomerIdPath"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLevelRequest"
+            examples:
+              vip_example:
+                summary: 新增 VIP 會員（一年效期）
+                value:
+                  level: VIP
+                  startDate: "2026-01-31T00:00:00Z"
+                  endDate: "2026-12-31T23:59:59Z"
+              vvip_example:
+                summary: 新增 VVIP 會員（兩年效期）
+                value:
+                  level: VVIP
+                  startDate: "2026-01-01T00:00:00Z"
+                  endDate: "2027-12-31T23:59:59Z"
+      responses:
+        "201":
+          description: VIP 會員效期建立成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerLevelPeriodResponse"
+              example:
+                id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                customerId: c1d2e3f4-a5b6-7890-cdef-ab1234567890
+                level: VIP
+                startDate: "2026-01-31T00:00:00Z"
+                endDate: "2026-12-31T23:59:59Z"
+                status: Active
+                createdAt: "2026-01-31T08:30:00Z"
+                updatedAt: null
+                version: 1
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+    get:
+      tags:
+        - Customer Level
+      summary: 查詢 VIP 歷程記錄
+      description: 取得指定客戶的所有 VIP 會員效期記錄，可選擇是否包含已過期的記錄。
+      operationId: getCustomerLevelHistory
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/CustomerIdPath"
+        - name: includeExpired
+          in: query
+          description: 是否包含已過期的記錄
+          required: false
+          schema:
+            type: boolean
+            default: true
+      responses:
+        "200":
+          description: 查詢成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CustomerLevelPeriodResponse"
+              example:
+                - id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                  customerId: c1d2e3f4-a5b6-7890-cdef-ab1234567890
+                  level: VIP
+                  startDate: "2026-01-01T00:00:00Z"
+                  endDate: "2026-12-31T23:59:59Z"
+                  status: Active
+                  createdAt: "2026-01-01T08:30:00Z"
+                  updatedAt: null
+                  version: 1
+                - id: b2c3d4e5-f6a7-8901-bcde-f12345678901
+                  customerId: c1d2e3f4-a5b6-7890-cdef-ab1234567890
+                  level: VIP
+                  startDate: "2025-01-01T00:00:00Z"
+                  endDate: "2025-12-31T23:59:59Z"
+                  status: Expired
+                  createdAt: "2025-01-01T09:00:00Z"
+                  updatedAt: "2025-12-31T23:59:59Z"
+                  version: 1
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /customers/{customerId}/levels/active:
+    get:
+      tags:
+        - Customer Level
+      summary: 查詢當前有效 VIP 狀態
+      description: 取得指定客戶當前有效（Active）的 VIP 會員效期。若無有效會籍則回傳 404。
+      operationId: getActiveCustomerLevel
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/CustomerIdPath"
+      responses:
+        "200":
+          description: 當前有效 VIP 會籍
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerLevelPeriodResponse"
+              example:
+                id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                customerId: c1d2e3f4-a5b6-7890-cdef-ab1234567890
+                level: VIP
+                startDate: "2026-01-01T00:00:00Z"
+                endDate: "2026-12-31T23:59:59Z"
+                status: Active
+                createdAt: "2026-01-01T08:30:00Z"
+                updatedAt: null
+                version: 1
+        "404":
+          description: 查無有效的 VIP 會籍
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: NotFound
+                message: 該客戶目前無有效的 VIP 會籍
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /customers/{customerId}/levels/{levelId}:
+    put:
+      tags:
+        - Customer Level
+      summary: 更新 VIP 會員效期
+      description: 更新指定 VIP 會員效期的等級或日期範圍。需要提供樂觀鎖版本號（version），若版本號不一致則回傳 409 Conflict。
+      operationId: updateCustomerLevel
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/CustomerIdPath"
+        - name: levelId
+          in: path
+          description: VIP 效期記錄 ID
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLevelRequest"
+            example:
+              level: VVIP
+              startDate: "2026-02-01T00:00:00Z"
+              endDate: "2027-01-31T23:59:59Z"
+              version: 2
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerLevelPeriodResponse"
+              example:
+                id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                customerId: c1d2e3f4-a5b6-7890-cdef-ab1234567890
+                level: VVIP
+                startDate: "2026-02-01T00:00:00Z"
+                endDate: "2027-01-31T23:59:59Z"
+                status: Active
+                createdAt: "2026-01-01T08:30:00Z"
+                updatedAt: "2026-01-31T15:20:30Z"
+                version: 3
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          description: VIP 效期記錄不存在
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: NotFound
+                message: 找不到指定的 VIP 效期記錄
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /customers/{customerId}/levels/terminate:
+    post:
+      tags:
+        - Customer Level
+      summary: 終止當前 VIP 會籍
+      description: 終止指定客戶當前有效（Active）的 VIP 會籍。系統會將 endDate 設定為當前 UTC 時間減 1 秒，狀態自動變為 Expired。
+      operationId: terminateCustomerLevel
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/CustomerIdPath"
+      responses:
+        "200":
+          description: 終止成功
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomerLevelPeriodResponse"
+              example:
+                id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                customerId: c1d2e3f4-a5b6-7890-cdef-ab1234567890
+                level: VIP
+                startDate: "2026-01-01T00:00:00Z"
+                endDate: "2026-01-31T09:59:59Z"
+                status: Expired
+                createdAt: "2026-01-01T08:30:00Z"
+                updatedAt: "2026-01-31T10:00:00Z"
+                version: 2
+        "404":
+          description: 無有效的 VIP 會籍可終止
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: NotFound
+                message: 該客戶目前無有效的 VIP 會籍可終止
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Token 驗證（格式：Bearer {token}）
+
+  parameters:
+    CustomerIdPath:
+      name: customerId
+      in: path
+      description: 客戶唯一識別碼（UUID）
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: c1d2e3f4-a5b6-7890-cdef-ab1234567890
+
+  schemas:
+    CreateLevelRequest:
+      type: object
+      required:
+        - level
+        - startDate
+        - endDate
+      properties:
+        level:
+          type: string
+          description: VIP 等級
+          enum:
+            - VIP
+            - VVIP
+          example: VIP
+        startDate:
+          type: string
+          format: date-time
+          description: 效期開始日期（UTC ISO 8601，必須為該日 00:00:00Z）
+          example: "2026-01-31T00:00:00Z"
+        endDate:
+          type: string
+          format: date-time
+          description: 效期結束日期（UTC ISO 8601，必須為該日 23:59:59Z）
+          example: "2026-12-31T23:59:59Z"
+
+    UpdateLevelRequest:
+      type: object
+      required:
+        - level
+        - startDate
+        - endDate
+        - version
+      properties:
+        level:
+          type: string
+          description: VIP 等級
+          enum:
+            - VIP
+            - VVIP
+          example: VVIP
+        startDate:
+          type: string
+          format: date-time
+          description: 效期開始日期（UTC ISO 8601）
+          example: "2026-02-01T00:00:00Z"
+        endDate:
+          type: string
+          format: date-time
+          description: 效期結束日期（UTC ISO 8601）
+          example: "2027-01-31T23:59:59Z"
+        version:
+          type: integer
+          description: 樂觀鎖版本號（必須與當前資料庫版本一致）
+          example: 2
+
+    CustomerLevelPeriodResponse:
+      type: object
+      required:
+        - id
+        - customerId
+        - level
+        - startDate
+        - endDate
+        - status
+        - createdAt
+        - version
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: VIP 效期記錄唯一識別碼
+          example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+        customerId:
+          type: string
+          format: uuid
+          description: 所屬客戶 ID
+          example: c1d2e3f4-a5b6-7890-cdef-ab1234567890
+        level:
+          type: string
+          description: VIP 等級
+          enum:
+            - VIP
+            - VVIP
+          example: VIP
+        startDate:
+          type: string
+          format: date-time
+          description: 效期開始日期（UTC ISO 8601）
+          example: "2026-01-01T00:00:00Z"
+        endDate:
+          type: string
+          format: date-time
+          description: 效期結束日期（UTC ISO 8601）
+          example: "2026-12-31T23:59:59Z"
+        status:
+          type: string
+          description: 當前狀態（後端自動計算）
+          enum:
+            - Active
+            - Expired
+            - Upcoming
+          example: Active
+        createdAt:
+          type: string
+          format: date-time
+          description: 建立時間（UTC ISO 8601）
+          example: "2026-01-01T08:30:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: 最後更新時間（UTC ISO 8601，若無更新則為 null）
+          example: "2026-01-31T15:20:30Z"
+        version:
+          type: integer
+          description: 樂觀鎖版本號
+          example: 1
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: 錯誤類型
+          example: BadRequest
+        message:
+          type: string
+          description: 錯誤訊息（人類可讀）
+          example: 結束日期必須晚於開始日期
+        details:
+          type: object
+          description: 額外的錯誤細節（選填）
+          additionalProperties: true
+
+  responses:
+    BadRequest:
+      description: 請求參數錯誤
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            invalid_date_range:
+              summary: 無效的日期範圍
+              value:
+                error: BadRequest
+                message: 結束日期必須晚於開始日期
+            invalid_date_format:
+              summary: 無效的日期格式
+              value:
+                error: BadRequest
+                message: 日期格式必須為 ISO 8601（例如：2026-01-31T00:00:00Z）
+
+    Unauthorized:
+      description: 未授權（缺少或無效的 JWT Token）
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: Unauthorized
+            message: 缺少有效的驗證憑證
+
+    Forbidden:
+      description: 權限不足（無存取此資源的權限）
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          example:
+            error: Forbidden
+            message: 您沒有權限執行此操作（需要 customer.level.create 權限）
+
+    Conflict:
+      description: 衝突（樂觀鎖版本不一致或與現有期間重疊）
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+          examples:
+            version_conflict:
+              summary: 樂觀鎖版本衝突
+              value:
+                error: Conflict
+                message: 資料已被其他使用者更新，請重新載入後再試
+                details:
+                  currentVersion: 3
+                  providedVersion: 2
+            date_overlap:
+              summary: 日期區間重疊
+              value:
+                error: Conflict
+                message: 新增的 VIP 效期與現有 Active 期間重疊
+                details:
+                  existingPeriod:
+                    id: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+                    startDate: "2026-01-01T00:00:00Z"
+                    endDate: "2026-12-31T23:59:59Z"
+
+security:
+  - BearerAuth: []
