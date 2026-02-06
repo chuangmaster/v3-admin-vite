@@ -62,7 +62,15 @@ export default {
     duplicateRoleName: "角色名稱已存在",
     concurrentUpdateConflict: "資料已被其他使用者修改",
     internalError: "系統內部錯誤",
-    invalidInterface: "非本系統的介面"
+    invalidInterface: "非本系統的介面",
+    dailyOrderLimitReached: "當日訂單已達上限，請明日再試",
+    dailyOrderLimitWarning: "當日訂單數接近上限，請留意",
+    invalidCustomer: "客戶不存在或已刪除",
+    orderAlreadyCompleted: "訂單已完成，無法修改",
+    orderAlreadyCancelled: "訂單已取消，無法修改",
+    paymentExceedsTotal: "付款金額超過訂單總額",
+    paymentRecordNotFound: "付款記錄不存在",
+    cannotDeletePaidRecord: "無法刪除已付款記錄"
   },
   serviceOrder: {
     title: "服務單管理",
