@@ -189,7 +189,8 @@ defineExpose({
   <ElDialog
     :model-value="props.visible"
     :title="dialogTitle"
-    width="900px"
+    width="90%"
+    class="order-form-dialog"
     :close-on-click-modal="false"
     destroy-on-close
     @close="handleClose"
@@ -235,14 +236,12 @@ defineExpose({
         />
       </ElFormItem>
 
-      <!-- 商品項目 -->
-      <ElFormItem label=" " class="is-required">
-        <OrderItemsForm
-          :model-value="props.formData.orderItems"
-          :disabled="coreFieldsDisabled"
-          @update:model-value="(v) => updateFormField('orderItems', v)"
-        />
-      </ElFormItem>
+      <!-- 商品項目（獨立區塊,不包在 ElFormItem 內避免溢出） -->
+      <OrderItemsForm
+        :model-value="props.formData.orderItems"
+        :disabled="coreFieldsDisabled"
+        @update:model-value="(v) => updateFormField('orderItems', v)"
+      />
 
       <!-- 收件資訊 -->
       <DeliveryInfoForm
@@ -331,11 +330,19 @@ defineExpose({
   gap: 24px;
   align-items: center;
   font-size: 14px;
+  flex-wrap: wrap;
 
   .total-amount {
     font-weight: 700;
     font-size: 16px;
     color: var(--el-color-danger);
   }
+}
+</style>
+
+<style lang="scss">
+/** 非 scoped：覆寫 ElDialog 最大寬度 */
+.order-form-dialog {
+  max-width: 1100px;
 }
 </style>

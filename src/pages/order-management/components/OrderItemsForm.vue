@@ -3,19 +3,19 @@
  * 訂單項目表單元件
  *
  * @module order-management/components/OrderItemsForm
- * @description 提供動態新增/刪除訂單項目功能,含欄位驗證與小計計算
+ * @description 使用卡片式佈局提供動態新增/刪除訂單項目功能,含欄位驗證與小計計算
  */
 import type { OrderItemFormData } from "@/pages/order-management/types"
 import { Delete, Plus } from "@element-plus/icons-vue"
 import {
   ElButton,
+  ElCol,
   ElFormItem,
   ElInput,
   ElInputNumber,
   ElOption,
-  ElSelect,
-  ElTable,
-  ElTableColumn
+  ElRow,
+  ElSelect
 } from "element-plus"
 import { computed } from "vue"
 import {
@@ -112,7 +112,7 @@ function formatCurrency(amount: number): string {
 <template>
   <div class="order-items-form">
     <div class="items-header">
-      <span class="items-title">商品項目</span>
+      <span class="items-title"><span class="required-asterisk">*</span>商品項目</span>
       <ElButton
         type="primary"
         :icon="Plus"
@@ -124,103 +124,143 @@ function formatCurrency(amount: number): string {
       </ElButton>
     </div>
 
-    <ElTable
-      :data="props.modelValue"
-      border
-      size="small"
-      empty-text="請新增至少一個商品項目"
-      class="items-table"
+    <!-- 空狀態提示 -->
+    <div v-if="props.modelValue.length === 0" class="items-empty">
+      請新增至少一個商品項目
+    </div>
+
+    <!-- 卡片式訂單項目列表 -->
+    <div
+      v-for="(item, index) in props.modelValue"
+      :key="item.tempId || index"
+      class="item-card"
     >
-      <ElTableColumn label="商品名稱" min-width="140">
-        <template #default="{ row, $index }">
-          <ElFormItem :prop="`orderItems.${$index}.productName`" :rules="[{ required: true, message: '必填', trigger: 'blur' }]">
+      <div class="item-card-header">
+        <span class="item-card-index">項目 {{ index + 1 }}</span>
+        <div class="item-card-right">
+          <span class="item-card-subtotal">小計：{{ formatCurrency(getItemSubtotal(item)) }}</span>
+          <ElButton
+            v-if="!props.disabled"
+            type="danger"
+            :icon="Delete"
+            size="small"
+            link
+            @click="removeItem(index)"
+          />
+        </div>
+      </div>
+
+      <ElRow :gutter="12">
+        <!-- 商品名稱 -->
+        <ElCol :xs="24" :sm="12" :md="8">
+          <ElFormItem
+            label="商品名稱"
+            :prop="`orderItems.${index}.productName`"
+            :rules="[{ required: true, message: '請輸入商品名稱', trigger: 'blur' }]"
+          >
             <ElInput
-              :model-value="row.productName"
+              :model-value="item.productName"
               :disabled="props.disabled"
               placeholder="商品名稱"
               maxlength="200"
-              @update:model-value="(v: string) => updateItem($index, 'productName', v)"
+              @update:model-value="(v: string) => updateItem(index, 'productName', v)"
             />
           </ElFormItem>
-        </template>
-      </ElTableColumn>
+        </ElCol>
 
-      <ElTableColumn label="品牌" min-width="120">
-        <template #default="{ row, $index }">
-          <ElFormItem :prop="`orderItems.${$index}.brandName`" :rules="[{ required: true, message: '必填', trigger: 'blur' }]">
+        <!-- 品牌 -->
+        <ElCol :xs="24" :sm="12" :md="8">
+          <ElFormItem
+            label="品牌"
+            :prop="`orderItems.${index}.brandName`"
+            :rules="[{ required: true, message: '請輸入品牌', trigger: 'blur' }]"
+          >
             <ElInput
-              :model-value="row.brandName"
+              :model-value="item.brandName"
               :disabled="props.disabled"
               placeholder="品牌名稱"
               maxlength="100"
-              @update:model-value="(v: string) => updateItem($index, 'brandName', v)"
+              @update:model-value="(v: string) => updateItem(index, 'brandName', v)"
             />
           </ElFormItem>
-        </template>
-      </ElTableColumn>
+        </ElCol>
 
-      <ElTableColumn label="磐石編碼" min-width="120">
-        <template #default="{ row, $index }">
-          <ElFormItem :prop="`orderItems.${$index}.panshiCode`" :rules="[{ required: true, message: '必填', trigger: 'blur' }]">
+        <!-- 磐石編碼 -->
+        <ElCol :xs="24" :sm="12" :md="8">
+          <ElFormItem
+            label="磐石編碼"
+            :prop="`orderItems.${index}.panshiCode`"
+            :rules="[{ required: true, message: '請輸入磐石編碼', trigger: 'blur' }]"
+          >
             <ElInput
-              :model-value="row.panshiCode"
+              :model-value="item.panshiCode"
               :disabled="props.disabled"
               placeholder="磐石編碼"
               maxlength="50"
-              @update:model-value="(v: string) => updateItem($index, 'panshiCode', v)"
+              @update:model-value="(v: string) => updateItem(index, 'panshiCode', v)"
             />
           </ElFormItem>
-        </template>
-      </ElTableColumn>
+        </ElCol>
 
-      <ElTableColumn label="序號 ID" min-width="120">
-        <template #default="{ row, $index }">
-          <ElFormItem :prop="`orderItems.${$index}.serialId`" :rules="[{ required: true, message: '必填', trigger: 'blur' }]">
+        <!-- 序號 ID -->
+        <ElCol :xs="24" :sm="12" :md="8">
+          <ElFormItem
+            label="序號 ID"
+            :prop="`orderItems.${index}.serialId`"
+            :rules="[{ required: true, message: '請輸入序號 ID', trigger: 'blur' }]"
+          >
             <ElInput
-              :model-value="row.serialId"
+              :model-value="item.serialId"
               :disabled="props.disabled"
               placeholder="序號 ID"
               maxlength="100"
-              @update:model-value="(v: string) => updateItem($index, 'serialId', v)"
+              @update:model-value="(v: string) => updateItem(index, 'serialId', v)"
             />
           </ElFormItem>
-        </template>
-      </ElTableColumn>
+        </ElCol>
 
-      <ElTableColumn label="商品款式" min-width="120">
-        <template #default="{ row, $index }">
-          <ElFormItem :prop="`orderItems.${$index}.productStyle`" :rules="[{ required: true, message: '必填', trigger: 'blur' }]">
+        <!-- 商品款式 -->
+        <ElCol :xs="24" :sm="12" :md="8">
+          <ElFormItem
+            label="商品款式"
+            :prop="`orderItems.${index}.productStyle`"
+            :rules="[{ required: true, message: '請輸入商品款式', trigger: 'blur' }]"
+          >
             <ElInput
-              :model-value="row.productStyle"
+              :model-value="item.productStyle"
               :disabled="props.disabled"
               placeholder="商品款式"
               maxlength="100"
-              @update:model-value="(v: string) => updateItem($index, 'productStyle', v)"
+              @update:model-value="(v: string) => updateItem(index, 'productStyle', v)"
             />
           </ElFormItem>
-        </template>
-      </ElTableColumn>
+        </ElCol>
 
-      <ElTableColumn label="配件" min-width="100">
-        <template #default="{ row, $index }">
-          <ElInput
-            :model-value="row.accessories"
-            :disabled="props.disabled"
-            placeholder="選填"
-            maxlength="200"
-            @update:model-value="(v: string) => updateItem($index, 'accessories', v)"
-          />
-        </template>
-      </ElTableColumn>
+        <!-- 配件 -->
+        <ElCol :xs="24" :sm="12" :md="8">
+          <ElFormItem label="配件">
+            <ElInput
+              :model-value="item.accessories"
+              :disabled="props.disabled"
+              placeholder="選填"
+              maxlength="200"
+              @update:model-value="(v: string) => updateItem(index, 'accessories', v)"
+            />
+          </ElFormItem>
+        </ElCol>
 
-      <ElTableColumn label="商品來源" min-width="110">
-        <template #default="{ row, $index }">
-          <ElFormItem :prop="`orderItems.${$index}.productSource`" :rules="[{ required: true, message: '必選', trigger: 'change' }]">
+        <!-- 商品來源 -->
+        <ElCol :xs="24" :sm="12" :md="8">
+          <ElFormItem
+            label="商品來源"
+            :prop="`orderItems.${index}.productSource`"
+            :rules="[{ required: true, message: '請選擇商品來源', trigger: 'change' }]"
+          >
             <ElSelect
-              :model-value="row.productSource"
+              :model-value="item.productSource"
               :disabled="props.disabled"
               placeholder="選擇"
-              @update:model-value="(v: ProductSource) => updateItem($index, 'productSource', v)"
+              @update:model-value="(v: ProductSource) => updateItem(index, 'productSource', v)"
             >
               <ElOption
                 v-for="(label, key) in PRODUCT_SOURCE_LABELS"
@@ -230,61 +270,49 @@ function formatCurrency(amount: number): string {
               />
             </ElSelect>
           </ElFormItem>
-        </template>
-      </ElTableColumn>
+        </ElCol>
 
-      <ElTableColumn label="單價" min-width="120">
-        <template #default="{ row, $index }">
-          <ElFormItem :prop="`orderItems.${$index}.unitPrice`" :rules="[{ required: true, message: '必填', trigger: 'blur' }, { type: 'number', min: 0.01, message: '> 0', trigger: 'blur' }]">
+        <!-- 單價 -->
+        <ElCol :xs="12" :sm="12" :md="8">
+          <ElFormItem
+            label="單價"
+            :prop="`orderItems.${index}.unitPrice`"
+            :rules="[{ required: true, message: '請輸入單價', trigger: 'blur' }, { type: 'number', min: 0.01, message: '單價須大於 0', trigger: 'blur' }]"
+          >
             <ElInputNumber
-              :model-value="row.unitPrice"
+              :model-value="item.unitPrice"
               :disabled="props.disabled"
               :min="0"
               :precision="0"
               :controls="false"
               placeholder="單價"
               style="width: 100%"
-              @update:model-value="(v: number | undefined) => updateItem($index, 'unitPrice', v ?? 0)"
+              @update:model-value="(v: number | undefined) => updateItem(index, 'unitPrice', v ?? 0)"
             />
           </ElFormItem>
-        </template>
-      </ElTableColumn>
+        </ElCol>
 
-      <ElTableColumn label="數量" min-width="90">
-        <template #default="{ row, $index }">
-          <ElFormItem :prop="`orderItems.${$index}.quantity`" :rules="[{ required: true, message: '必填', trigger: 'blur' }, { type: 'number', min: 1, message: '≥ 1', trigger: 'blur' }]">
+        <!-- 數量 -->
+        <ElCol :xs="12" :sm="12" :md="8">
+          <ElFormItem
+            label="數量"
+            :prop="`orderItems.${index}.quantity`"
+            :rules="[{ required: true, message: '請輸入數量', trigger: 'blur' }, { type: 'number', min: 1, message: '數量至少為 1', trigger: 'blur' }]"
+          >
             <ElInputNumber
-              :model-value="row.quantity"
+              :model-value="item.quantity"
               :disabled="props.disabled"
               :min="1"
               :precision="0"
               :controls="false"
               placeholder="數量"
               style="width: 100%"
-              @update:model-value="(v: number | undefined) => updateItem($index, 'quantity', v ?? 1)"
+              @update:model-value="(v: number | undefined) => updateItem(index, 'quantity', v ?? 1)"
             />
           </ElFormItem>
-        </template>
-      </ElTableColumn>
-
-      <ElTableColumn label="小計" min-width="100" align="right">
-        <template #default="{ row }">
-          <span class="item-subtotal">{{ formatCurrency(getItemSubtotal(row)) }}</span>
-        </template>
-      </ElTableColumn>
-
-      <ElTableColumn v-if="!props.disabled" label="操作" width="60" align="center" fixed="right">
-        <template #default="{ $index }">
-          <ElButton
-            type="danger"
-            :icon="Delete"
-            size="small"
-            link
-            @click="removeItem($index)"
-          />
-        </template>
-      </ElTableColumn>
-    </ElTable>
+        </ElCol>
+      </ElRow>
+    </div>
 
     <div class="items-footer">
       <span class="subtotal-label">商品小計：</span>
@@ -295,6 +323,7 @@ function formatCurrency(amount: number): string {
 
 <style scoped lang="scss">
 .order-items-form {
+  width: 100%;
   margin-bottom: 16px;
 }
 
@@ -310,10 +339,66 @@ function formatCurrency(amount: number): string {
   font-size: 14px;
 }
 
-.items-table {
-  :deep(.el-form-item) {
-    margin-bottom: 0;
+.required-asterisk {
+  color: var(--el-color-danger);
+  margin-right: 4px;
+}
+
+.items-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--el-text-color-secondary);
+  font-size: 14px;
+  background-color: var(--el-fill-color-lighter);
+  border: 1px dashed var(--el-border-color);
+  border-radius: 4px;
+}
+
+.item-card {
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 6px;
+  background-color: var(--el-fill-color-blank);
+
+  &:hover {
+    border-color: var(--el-color-primary-light-5);
   }
+
+  :deep(.el-form-item) {
+    margin-bottom: 22px;
+  }
+
+  :deep(.el-form-item__label) {
+    font-size: 13px;
+  }
+}
+
+.item-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.item-card-index {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--el-text-color-primary);
+}
+
+.item-card-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.item-card-subtotal {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--el-color-primary);
 }
 
 .items-footer {
@@ -335,9 +420,5 @@ function formatCurrency(amount: number): string {
   font-weight: 700;
   font-size: 16px;
   color: var(--el-color-primary);
-}
-
-.item-subtotal {
-  font-weight: 500;
 }
 </style>
