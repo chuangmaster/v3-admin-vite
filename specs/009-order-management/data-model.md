@@ -644,7 +644,11 @@ export interface SearchFilters {
 ### ShippingFeeConfig (運費配置)
 
 ```typescript
-/** 運費配置(預設值) */
+/** 
+ * 運費配置(前端預設值)
+ * 所有收件方式預設運費皆為 0,實際運費由使用者手動輸入
+ * 系統不強制自動計算運費以保持彈性,可依業務規則調整
+ */
 export const SHIPPING_FEE_CONFIG: Record<DeliveryMethod, number> = {
   [DeliveryMethod.PICKUP]: 0,
   [DeliveryMethod.HOME_DELIVERY]: 0,
