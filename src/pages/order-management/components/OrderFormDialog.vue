@@ -22,6 +22,7 @@ import {
   ElSelect
 } from "element-plus"
 import { computed, nextTick, ref, watch } from "vue"
+import { customerApi } from "@/pages/customer-management/apis/customer"
 import {
   ORDER_TYPE_LABELS,
   OrderStatus,
@@ -66,6 +67,9 @@ interface Emits {
 
 /** 表單實例參考 */
 const formRef = ref<FormInstance>()
+
+/** 客戶選擇器參考 */
+const customerSelectorRef = ref<InstanceType<typeof CustomerSelector>>()
 
 /** 對話框標題 */
 const dialogTitle = computed(() => {
@@ -171,9 +175,19 @@ function handleClose() {
  */
 watch(() => props.visible, (newVal) => {
   if (newVal && props.mode === "edit" && props.currentOrder) {
-    // 編輯模式：等待 DOM 更新後清除驗證狀態
-    nextTick(() => {
+    nextTick(async () => {
       formRef.value?.clearValidate()
+      // 編輯模式：載入客戶資訊並設定到 CustomerSelector
+      if (props.currentOrder?.customerId) {
+        try {
+          const response = await customerApi.getById(props.currentOrder.customerId)
+          if (response.success && response.data) {
+            customerSelectorRef.value?.setSelectedCustomer(response.data)
+          }
+        } catch {
+          console.error("載入客戶資訊失敗")
+        }
+      }
     })
   }
 })
@@ -229,6 +243,7 @@ defineExpose({
         :rules="[{ required: true, message: '請選擇客戶', trigger: 'change' }]"
       >
         <CustomerSelector
+          ref="customerSelectorRef"
           :model-value="props.formData.customerId"
           :disabled="props.mode === 'edit' || coreFieldsDisabled"
           @update:model-value="(v: string) => updateFormField('customerId', v)"

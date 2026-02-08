@@ -49,6 +49,10 @@ export const customerApi = {
    * @returns 新建的客戶資料(包含 id, createdAt 等系統欄位)
    */
   async create(data: CreateCustomerRequest): Promise<ApiResponse<Customer>> {
+    // 後端 API 要求 email 欄位為 optional，如果前端傳空字串則轉為 undefined
+    if (data.email === "") {
+      data.email = undefined
+    }
     return request<ApiResponse<Customer>>({
       url: "/customers",
       method: "post",

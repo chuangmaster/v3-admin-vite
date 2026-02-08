@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { FormInstance } from "element-plus"
 /**
  * 客戶選擇器元件
  *
  * @module order-management/components/CustomerSelector
- * @description 提供客戶搜尋下拉選單與快速新增客戶功能
+ * @description 整合客戶搜尋、身分證辨識與新增客戶功能,
+ *              選擇後顯示客戶資訊卡片（ElDescriptions）
  */
-import type { CreateCustomerRequest, Customer } from "@/pages/customer-management/types"
-import { Plus } from "@element-plus/icons-vue"
-import { ElButton, ElDialog, ElForm, ElFormItem, ElInput, ElOption, ElSelect } from "element-plus"
+import type { Customer } from "@/pages/customer-management/types"
+import CustomerForm from "@@/components/CustomerForm/index.vue"
+import CustomerSearch from "@@/components/CustomerSearch/index.vue"
+import IdCardUploader from "@@/components/IdCardUploader/index.vue"
 import { ref } from "vue"
-import { createCustomerRules } from "@/pages/customer-management/types"
-import { useCustomerSearch } from "@/pages/order-management/composables/useCustomerSearch"
+import { customerApi } from "@/pages/customer-management/apis/customer"
 
 defineOptions({ name: "CustomerSelector" })
 
@@ -34,165 +34,200 @@ interface Emits {
   (e: "customerChange", customer: Customer | null): void
 }
 
-const {
-  customerOptions,
-  searching,
-  searchCustomers,
-  handleCustomerChange,
-  quickAddCustomer,
-  selectedCustomer
-} = useCustomerSearch()
+/** 已選擇的客戶 */
+const selectedCustomer = ref<Customer | null>(null)
 
-/** 快速新增客戶對話框 */
-const quickAddVisible = ref(false)
-const quickAddFormRef = ref<FormInstance>()
-const quickAddLoading = ref(false)
-const quickAddForm = ref<CreateCustomerRequest>({
-  name: "",
-  phoneNumber: "",
-  idNumber: "",
-  residentialAddress: ""
-})
+/** 新增客戶對話框 */
+const showCustomerDialog = ref(false)
+const customerDialogTab = ref<string | number>("idcard")
+
+/** 元件 refs */
+const customerFormRef = ref<InstanceType<typeof CustomerForm>>()
 
 /**
- * 處理客戶搜尋
+ * 處理客戶搜尋選擇
  */
-function handleSearch(query: string) {
-  searchCustomers(query)
+function handleCustomerSelect(customer: Customer) {
+  selectedCustomer.value = customer
+  emit("update:modelValue", customer.id)
+  emit("customerChange", customer)
 }
 
 /**
- * 處理客戶選擇
+ * 重新選擇客戶
  */
-function handleSelect(customerId: string) {
-  handleCustomerChange(customerId)
-  emit("update:modelValue", customerId)
-  emit("customerChange", selectedCustomer.value)
+function handleReselect() {
+  selectedCustomer.value = null
+  emit("update:modelValue", "")
+  emit("customerChange", null)
 }
 
 /**
- * 開啟快速新增客戶對話框
+ * 開啟新增客戶對話框
  */
-function openQuickAdd() {
-  quickAddForm.value = {
-    name: "",
-    phoneNumber: "",
-    idNumber: "",
-    residentialAddress: ""
-  }
-  quickAddVisible.value = true
+function handleCreateCustomer() {
+  customerDialogTab.value = "idcard"
+  showCustomerDialog.value = true
 }
 
 /**
- * 提交快速新增客戶
+ * 客戶新增成功
  */
-async function handleQuickAddSubmit() {
-  if (!quickAddFormRef.value) return
+function handleCustomerCreated(customer: Customer) {
+  selectedCustomer.value = customer
+  showCustomerDialog.value = false
+  emit("update:modelValue", customer.id)
+  emit("customerChange", customer)
+  ElMessage.success("客戶新增成功")
+}
 
+/**
+ * OCR 辨識成功，先從資料庫搜尋是否有既有客戶
+ */
+async function handleOCRRecognized(data: { name: string, idNumber: string, address?: string }) {
   try {
-    await quickAddFormRef.value.validate()
-  } catch {
-    return
-  }
+    const response = await customerApi.search({
+      pageNumber: 1,
+      pageSize: 20,
+      keyword: data.idNumber
+    })
 
-  quickAddLoading.value = true
-  try {
-    const success = await quickAddCustomer(quickAddForm.value)
-    if (success) {
-      quickAddVisible.value = false
-      emit("update:modelValue", selectedCustomer.value?.id || "")
-      emit("customerChange", selectedCustomer.value)
+    if (response.success && response.data && response.data.length > 0) {
+      // 找到既有客戶，提示是否使用
+      const customer = response.data[0]
+
+      let nameWarning = ""
+      if (data.name && customer.name !== data.name) {
+        nameWarning = `\n注意：辨識姓名「${data.name}」與客戶資料「${customer.name}」不一致，請確認`
+      }
+
+      ElMessageBox.confirm(
+        `找到既有客戶「${customer.name}」，是否使用此客戶資料？${nameWarning}`,
+        "找到既有客戶",
+        {
+          confirmButtonText: "使用既有客戶",
+          cancelButtonText: "新增為新客戶",
+          type: nameWarning ? "warning" : "info"
+        }
+      ).then(() => {
+        // 使用既有客戶：直接帶入資料並關閉對話框
+        selectedCustomer.value = customer
+        showCustomerDialog.value = false
+        emit("update:modelValue", customer.id)
+        emit("customerChange", customer)
+        ElMessage.success(`已選擇客戶：${customer.name}`)
+      }).catch(() => {
+        // 新增為新客戶：將 OCR 資料填入表單
+        customerFormRef.value?.fillFromOCR(data)
+        customerDialogTab.value = "manual"
+        ElMessage.info("請確認客戶資料後提交")
+      })
+    } else {
+      // 未找到既有客戶，填入表單供新增
+      customerFormRef.value?.fillFromOCR(data)
+      customerDialogTab.value = "manual"
+      ElMessage.info("未找到既有客戶，請確認辨識資料後新增")
     }
-  } finally {
-    quickAddLoading.value = false
+  } catch {
+    // 搜尋失敗，不阻擋流程，填入表單
+    customerFormRef.value?.fillFromOCR(data)
+    customerDialogTab.value = "manual"
+    ElMessage.warning("搜尋客戶失敗，請手動確認客戶資料")
   }
 }
 
 /**
- * 關閉快速新增對話框
+ * 設定已選擇的客戶（供外部呼叫,例如編輯模式還原）
  */
-function handleQuickAddClose() {
-  quickAddVisible.value = false
-  quickAddFormRef.value?.resetFields()
+function setSelectedCustomer(customer: Customer) {
+  selectedCustomer.value = customer
 }
+
+defineExpose({
+  selectedCustomer,
+  setSelectedCustomer
+})
 </script>
 
 <template>
   <div class="customer-selector">
-    <div class="selector-row">
-      <ElSelect
-        :model-value="props.modelValue"
-        filterable
-        remote
-        reserve-keyword
-        clearable
-        :remote-method="handleSearch"
-        :loading="searching"
-        :disabled="props.disabled"
-        placeholder="請輸入客戶名稱或電話搜尋"
-        style="flex: 1"
-        @change="handleSelect"
-      >
-        <ElOption
-          v-for="customer in customerOptions"
-          :key="customer.id"
-          :label="`${customer.name} (${customer.phoneNumber})`"
-          :value="customer.id"
-        >
-          <span>{{ customer.name }}</span>
-          <span style="float: right; color: var(--el-text-color-secondary); font-size: 13px">
-            {{ customer.phoneNumber }}
-          </span>
-        </ElOption>
-      </ElSelect>
-
-      <ElButton
-        :icon="Plus"
-        :disabled="props.disabled"
-        style="margin-left: 8px"
-        @click="openQuickAdd"
-      >
-        快速新增
-      </ElButton>
+    <!-- 未選擇客戶：搜尋與新增 -->
+    <div v-if="!selectedCustomer">
+      <CustomerSearch
+        @select="handleCustomerSelect"
+        @create="handleCreateCustomer"
+      />
     </div>
 
-    <!-- 快速新增客戶對話框 -->
-    <ElDialog
-      v-model="quickAddVisible"
-      title="快速新增客戶"
-      width="500px"
-      :close-on-click-modal="false"
-      @close="handleQuickAddClose"
-    >
-      <ElForm
-        ref="quickAddFormRef"
-        :model="quickAddForm"
-        :rules="createCustomerRules"
-        label-width="100px"
-      >
-        <ElFormItem label="客戶姓名" prop="name">
-          <ElInput v-model="quickAddForm.name" placeholder="請輸入客戶姓名" maxlength="100" />
-        </ElFormItem>
-        <ElFormItem label="聯絡電話" prop="phoneNumber">
-          <ElInput v-model="quickAddForm.phoneNumber" placeholder="請輸入手機號碼" maxlength="10" />
-        </ElFormItem>
-        <ElFormItem label="身分證字號" prop="idNumber">
-          <ElInput v-model="quickAddForm.idNumber" placeholder="請輸入身分證字號" maxlength="10" />
-        </ElFormItem>
-        <ElFormItem label="居住地址" prop="residentialAddress">
-          <ElInput v-model="quickAddForm.residentialAddress" placeholder="請輸入居住地址" maxlength="200" />
-        </ElFormItem>
-      </ElForm>
+    <!-- 已選擇客戶：顯示客戶資訊卡片 -->
+    <div v-else class="customer-info">
+      <el-descriptions :column="2" border>
+        <el-descriptions-item label="客戶姓名">
+          {{ selectedCustomer.name }}
+        </el-descriptions-item>
+        <el-descriptions-item label="電話號碼">
+          {{ selectedCustomer.phoneNumber }}
+        </el-descriptions-item>
+        <el-descriptions-item label="Email">
+          {{ selectedCustomer.email || '未提供' }}
+        </el-descriptions-item>
+        <el-descriptions-item label="身分證字號">
+          {{ selectedCustomer.idNumber }}
+        </el-descriptions-item>
+        <el-descriptions-item label="居住地址" :span="2">
+          {{ selectedCustomer.residentialAddress }}
+        </el-descriptions-item>
+        <el-descriptions-item label="Line ID">
+          {{ selectedCustomer.lineId || '未提供' }}
+        </el-descriptions-item>
+      </el-descriptions>
 
-      <template #footer>
-        <ElButton @click="handleQuickAddClose">
-          取消
-        </ElButton>
-        <ElButton type="primary" :loading="quickAddLoading" @click="handleQuickAddSubmit">
-          新增
-        </ElButton>
-      </template>
-    </ElDialog>
+      <el-button
+        v-if="!props.disabled"
+        type="primary"
+        link
+        class="reselect-customer-btn"
+        @click="handleReselect"
+      >
+        重新選擇客戶
+      </el-button>
+    </div>
+
+    <!-- 新增客戶對話框 -->
+    <el-dialog
+      v-model="showCustomerDialog"
+      title="新增客戶"
+      width="90%"
+      class="customer-dialog"
+      :close-on-click-modal="false"
+    >
+      <el-tabs v-model="customerDialogTab">
+        <el-tab-pane label="身分證辨識" name="idcard">
+          <el-alert
+            type="info"
+            :closable="false"
+            show-icon
+            style="margin-bottom: 16px"
+          >
+            上傳或拍攝身分證照片，系統將自動辨識並搜尋既有客戶
+          </el-alert>
+          <IdCardUploader
+            :show-recognize="true"
+            @recognized="handleOCRRecognized"
+          />
+          <div class="dialog-hint">
+            辨識後請至「手動輸入」頁籤確認資料
+          </div>
+        </el-tab-pane>
+        <el-tab-pane label="手動輸入" name="manual">
+          <CustomerForm
+            ref="customerFormRef"
+            @success="handleCustomerCreated"
+            @cancel="showCustomerDialog = false"
+          />
+        </el-tab-pane>
+      </el-tabs>
+    </el-dialog>
   </div>
 </template>
 
@@ -201,8 +236,50 @@ function handleQuickAddClose() {
   width: 100%;
 }
 
-.selector-row {
-  display: flex;
-  align-items: center;
+.customer-info {
+  width: 100%;
+
+  .el-button {
+    margin-top: 12px;
+  }
+
+  .reselect-customer-btn {
+    position: relative;
+    z-index: 10;
+    margin-bottom: 16px;
+  }
+}
+
+.dialog-hint {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
+}
+</style>
+
+<!-- 新增客戶對話框 RWD -->
+<style lang="scss">
+.customer-dialog {
+  max-width: 700px;
+
+  @media (max-width: 768px) {
+    width: 95% !important;
+    margin: 20px auto;
+  }
+
+  @media (max-width: 480px) {
+    width: 100% !important;
+    margin: 0;
+    border-radius: 0;
+
+    .el-dialog__header {
+      padding: 16px;
+    }
+
+    .el-dialog__body {
+      padding: 16px;
+    }
+  }
 }
 </style>
