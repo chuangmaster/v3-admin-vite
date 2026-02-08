@@ -120,6 +120,10 @@ function updateFormField<K extends keyof OrderFormData>(field: K, value: OrderFo
 function handleCustomerChange(customer: Customer | null) {
   if (customer) {
     updateFormField("customerId", customer.id)
+    // 清除表單驗證錯誤
+    nextTick(() => {
+      formRef.value?.clearValidate("customerId")
+    })
   }
 }
 

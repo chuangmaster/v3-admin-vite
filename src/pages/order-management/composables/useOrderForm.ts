@@ -79,7 +79,7 @@ export function useOrderForm() {
         panshiCode: item.panshiCode,
         serialId: item.serialId,
         productStyle: item.productStyle,
-        accessories: item.accessories || "",
+        accessories: item.accessories || [],
         productSource: item.productSource,
         unitPrice: item.unitPrice,
         quantity: item.quantity
@@ -116,7 +116,7 @@ export function useOrderForm() {
         panshiCode: item.panshiCode,
         serialId: item.serialId,
         productStyle: item.productStyle,
-        accessories: item.accessories || undefined,
+        accessories: item.accessories.length > 0 ? item.accessories : undefined,
         productSource: item.productSource,
         unitPrice: item.unitPrice,
         quantity: item.quantity
@@ -139,7 +139,7 @@ export function useOrderForm() {
         panshiCode: item.panshiCode,
         serialId: item.serialId,
         productStyle: item.productStyle,
-        accessories: item.accessories || undefined,
+        accessories: item.accessories.length > 0 ? item.accessories : undefined,
         productSource: item.productSource,
         unitPrice: item.unitPrice,
         quantity: item.quantity

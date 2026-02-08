@@ -10,6 +10,7 @@ import type { Customer } from "@/pages/customer-management/types"
 import CustomerForm from "@@/components/CustomerForm/index.vue"
 import CustomerSearch from "@@/components/CustomerSearch/index.vue"
 import IdCardUploader from "@@/components/IdCardUploader/index.vue"
+import { ElMessage, ElMessageBox } from "element-plus"
 import { ref } from "vue"
 import { customerApi } from "@/pages/customer-management/apis/customer"
 

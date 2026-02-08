@@ -100,11 +100,11 @@ function handleCreate() {
   top: calc(100% + 4px);
   left: 0;
   right: 0;
-  z-index: 2000;
+  z-index: 9999;
   background: var(--el-bg-color);
   border: 1px solid var(--el-border-color);
   border-radius: var(--el-border-radius-base);
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.15);
   max-height: 300px;
   min-height: 120px;
   overflow-y: auto;

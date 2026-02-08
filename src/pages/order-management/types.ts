@@ -189,8 +189,8 @@ export interface OrderItem {
   serialId: string
   /** 商品款式（必填） */
   productStyle: string
-  /** 配件（選填） */
-  accessories: string | null
+  /** 配件（選填,字串陣列） */
+  accessories: string[] | null
   /** 商品來源（必填） */
   productSource: ProductSource
   /** 單價（必填,大於 0） */
@@ -296,8 +296,8 @@ export interface CreateOrderItemRequest {
   serialId: string
   /** 商品款式 */
   productStyle: string
-  /** 配件（選填） */
-  accessories?: string
+  /** 配件（選填,字串陣列） */
+  accessories?: string[]
   /** 商品來源 */
   productSource: ProductSource
   /** 單價（必須大於 0） */
@@ -486,8 +486,8 @@ export interface OrderItemFormData {
   serialId: string
   /** 商品款式 */
   productStyle: string
-  /** 配件 */
-  accessories: string
+  /** 配件（字串陣列） */
+  accessories: string[]
   /** 商品來源 */
   productSource: ProductSource
   /** 單價 */
@@ -554,6 +554,22 @@ export const SHIPPING_FEE_CONFIG: Record<DeliveryMethod, number> = {
   [DeliveryMethod.STORE_PICKUP]: 0,
   [DeliveryMethod.PLATFORM]: 0
 }
+
+/** 商品配件選項 */
+export const ACCESSORY_OPTIONS = [
+  { label: "盒子", value: "box" },
+  { label: "防塵袋", value: "dustBag" },
+  { label: "購證", value: "purchaseProof" },
+  { label: "提袋", value: "shoppingBag" },
+  { label: "肩帶", value: "shoulderStrap" },
+  { label: "羊毛氈", value: "felt" },
+  { label: "枕頭", value: "pillow" },
+  { label: "保卡", value: "card" },
+  { label: "鎖頭/鑰匙", value: "lockKey" },
+  { label: "緞帶/花", value: "ribbon" },
+  { label: "品牌小卡", value: "brandCard" },
+  { label: "雨衣", value: "raincoat" }
+] as const
 
 /** 訂單類型標籤 */
 export const ORDER_TYPE_LABELS: Record<OrderType, string> = {

@@ -8,6 +8,7 @@
 import type { OrderItemFormData } from "@/pages/order-management/types"
 import { Delete, Plus } from "@element-plus/icons-vue"
 import {
+  ElAutocomplete,
   ElButton,
   ElCol,
   ElFormItem,
@@ -19,6 +20,7 @@ import {
 } from "element-plus"
 import { computed } from "vue"
 import {
+  ACCESSORY_OPTIONS,
   PRODUCT_SOURCE_LABELS,
   ProductSource
 } from "@/pages/order-management/types"
@@ -42,6 +44,55 @@ interface Emits {
   (e: "update:modelValue", value: OrderItemFormData[]): void
 }
 
+/** 品牌清單 */
+const BRAND_OPTIONS = [
+  "Hermès (愛馬仕)",
+  "Chanel (香奈兒)",
+  "Louis Vuitton (LV)",
+  "Celine",
+  "Dior (迪奧)",
+  "Goyard",
+  "Loewe",
+  "Balenciaga (巴黎世家)",
+  "Bottega Veneta (BV)",
+  "Burberry",
+  "Fendi",
+  "Miu Miu",
+  "Chloé",
+  "Valentino",
+  "Saint Laurent (YSL)",
+  "Gucci",
+  "Prada",
+  "Rolex (勞力士)",
+  "Cartier (卡地亞)",
+  "Chrome Hearts",
+  "Jacquemus",
+  "Ami Paris",
+  "Thom Browne",
+  "Maison Margiela",
+  "Van Cleef & Arpels (VCA)",
+  "Loro Piana",
+  "Golden Goose",
+  "Autry",
+  "Givenchy",
+  "Rimowa",
+  "Longchamp",
+  "Vivienne Westwood",
+  "Polène"
+]
+
+/**
+ * 品牌自動完成查詢
+ */
+function queryBrandSearch(queryString: string, cb: (results: Array<{ value: string }>) => void) {
+  const results = queryString
+    ? BRAND_OPTIONS.filter(brand =>
+        brand.toLowerCase().includes(queryString.toLowerCase())
+      ).map(brand => ({ value: brand }))
+    : BRAND_OPTIONS.map(brand => ({ value: brand }))
+  cb(results)
+}
+
 /** 商品小計 */
 const subtotal = computed(() => {
   return props.modelValue.reduce((sum, item) => {
@@ -60,7 +111,7 @@ function addItem() {
     panshiCode: "",
     serialId: "",
     productStyle: "",
-    accessories: "",
+    accessories: [],
     productSource: ProductSource.BUYBACK,
     unitPrice: 0,
     quantity: 1
@@ -175,12 +226,16 @@ function formatCurrency(amount: number): string {
             :prop="`orderItems.${index}.brandName`"
             :rules="[{ required: true, message: '請輸入品牌', trigger: 'blur' }]"
           >
-            <ElInput
+            <ElAutocomplete
               :model-value="item.brandName"
+              :fetch-suggestions="queryBrandSearch"
               :disabled="props.disabled"
-              placeholder="品牌名稱"
+              placeholder="請輸入或選擇品牌名稱"
               maxlength="100"
-              @update:model-value="(v: string) => updateItem(index, 'brandName', v)"
+              clearable
+              :trigger-on-focus="true"
+              style="width: 100%;"
+              @update:model-value="(v: string | number) => updateItem(index, 'brandName', String(v))"
             />
           </ElFormItem>
         </ElCol>
@@ -239,13 +294,23 @@ function formatCurrency(amount: number): string {
         <!-- 配件 -->
         <ElCol :xs="24" :sm="12" :md="8">
           <ElFormItem label="配件">
-            <ElInput
+            <ElSelect
               :model-value="item.accessories"
               :disabled="props.disabled"
-              placeholder="選填"
-              maxlength="200"
-              @update:model-value="(v: string) => updateItem(index, 'accessories', v)"
-            />
+              multiple
+              collapse-tags
+              collapse-tags-tooltip
+              placeholder="請選擇配件"
+              style="width: 100%;"
+              @update:model-value="(v: string[]) => updateItem(index, 'accessories', v)"
+            >
+              <ElOption
+                v-for="option in ACCESSORY_OPTIONS"
+                :key="option.value"
+                :label="option.label"
+                :value="option.value"
+              />
+            </ElSelect>
           </ElFormItem>
         </ElCol>
 
