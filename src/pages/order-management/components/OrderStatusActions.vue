@@ -14,7 +14,7 @@ import type {
   UpdatePaymentStatusRequest,
   UpdateShippingStatusRequest
 } from "@/pages/order-management/types"
-import { ElDescriptions, ElDescriptionsItem, ElMessage, ElOption, ElSelect, ElTag } from "element-plus"
+import { ElDescriptions, ElDescriptionsItem, ElMessage, ElMessageBox, ElOption, ElSelect, ElTag } from "element-plus"
 import { ref } from "vue"
 import { orderApi } from "@/pages/order-management/apis/order"
 import {
@@ -49,13 +49,26 @@ const updating = ref(false)
  * @param status - 新訂單狀態
  */
 async function handleOrderStatusChange(status: OrderStatus) {
+  const currentLabel = ORDER_STATUS_LABELS[props.order.orderStatus]
+  const newLabel = ORDER_STATUS_LABELS[status]
+
+  try {
+    await ElMessageBox.confirm(
+      `確定要將訂單狀態從「${currentLabel}」變更為「${newLabel}」嗎？`,
+      "變更訂單狀態",
+      { confirmButtonText: "確定", cancelButtonText: "取消", type: "warning" }
+    )
+  } catch {
+    return
+  }
+
   updating.value = true
   try {
     const request: UpdateOrderStatusRequest = { orderStatus: status }
     const response = await orderApi.updateOrderStatus(props.order.id, request)
 
     if (response.success && response.data) {
-      ElMessage.success(`訂單狀態已更新為「${ORDER_STATUS_LABELS[status]}」`)
+      ElMessage.success(`訂單狀態已更新為「${newLabel}」`)
       emit("update", response.data)
     } else {
       handleStatusError(response)
@@ -72,13 +85,26 @@ async function handleOrderStatusChange(status: OrderStatus) {
  * @param status - 新付款狀態
  */
 async function handlePaymentStatusChange(status: PaymentStatus) {
+  const currentLabel = PAYMENT_STATUS_LABELS[props.order.paymentStatus]
+  const newLabel = PAYMENT_STATUS_LABELS[status]
+
+  try {
+    await ElMessageBox.confirm(
+      `確定要將付款狀態從「${currentLabel}」變更為「${newLabel}」嗎？`,
+      "變更付款狀態",
+      { confirmButtonText: "確定", cancelButtonText: "取消", type: "warning" }
+    )
+  } catch {
+    return
+  }
+
   updating.value = true
   try {
     const request: UpdatePaymentStatusRequest = { paymentStatus: status }
     const response = await orderApi.updatePaymentStatus(props.order.id, request)
 
     if (response.success && response.data) {
-      ElMessage.success(`付款狀態已更新為「${PAYMENT_STATUS_LABELS[status]}」`)
+      ElMessage.success(`付款狀態已更新為「${newLabel}」`)
       emit("update", response.data)
     } else {
       ElMessage.error(response.message || "更新付款狀態失敗")
@@ -95,13 +121,26 @@ async function handlePaymentStatusChange(status: PaymentStatus) {
  * @param status - 新出貨狀態
  */
 async function handleShippingStatusChange(status: ShippingStatus) {
+  const currentLabel = SHIPPING_STATUS_LABELS[props.order.shippingStatus]
+  const newLabel = SHIPPING_STATUS_LABELS[status]
+
+  try {
+    await ElMessageBox.confirm(
+      `確定要將出貨狀態從「${currentLabel}」變更為「${newLabel}」嗎？`,
+      "變更出貨狀態",
+      { confirmButtonText: "確定", cancelButtonText: "取消", type: "warning" }
+    )
+  } catch {
+    return
+  }
+
   updating.value = true
   try {
     const request: UpdateShippingStatusRequest = { shippingStatus: status }
     const response = await orderApi.updateShippingStatus(props.order.id, request)
 
     if (response.success && response.data) {
-      ElMessage.success(`出貨狀態已更新為「${SHIPPING_STATUS_LABELS[status]}」`)
+      ElMessage.success(`出貨狀態已更新為「${newLabel}」`)
       emit("update", response.data)
     } else {
       ElMessage.error(response.message || "更新出貨狀態失敗")
