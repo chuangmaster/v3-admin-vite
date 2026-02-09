@@ -27,7 +27,8 @@ import { orderApi } from "@/pages/order-management/apis/order"
 import {
   ORDER_TYPE_LABELS,
   OrderStatus,
-  SHIPPING_FEE_CONFIG
+  SHIPPING_FEE_CONFIG,
+  ShippingStatus
 } from "@/pages/order-management/types"
 import CustomerSelector from "./CustomerSelector.vue"
 import DeliveryInfoForm from "./DeliveryInfoForm.vue"
@@ -86,6 +87,12 @@ const isTerminalState = computed(() => {
 /** 核心欄位是否禁用（已完成/已取消的訂單禁用核心資訊） */
 const coreFieldsDisabled = computed(() => {
   return isTerminalState.value
+})
+
+/** 是否已出貨（出貨後禁止修改收件資訊） */
+const isShipped = computed(() => {
+  if (!props.currentOrder) return false
+  return props.currentOrder.shippingStatus === ShippingStatus.SHIPPED
 })
 
 /** 商品小計 */
@@ -271,7 +278,8 @@ defineExpose({
       <!-- 商品項目（獨立區塊,不包在 ElFormItem 內避免溢出） -->
       <OrderItemsForm
         :model-value="props.formData.orderItems"
-        :disabled="coreFieldsDisabled"
+        :disabled="coreFieldsDisabled || props.mode === 'edit'"
+        :readonly="props.mode === 'edit'"
         @update:model-value="(v) => updateFormField('orderItems', v)"
       />
 
@@ -279,7 +287,7 @@ defineExpose({
       <DeliveryInfoForm
         :delivery-method="props.formData.deliveryMethod"
         :delivery-info="props.formData.deliveryInfo"
-        :disabled="coreFieldsDisabled"
+        :disabled="coreFieldsDisabled || isShipped"
         @update:delivery-method="handleDeliveryMethodChange"
         @update:delivery-info="(v) => updateFormField('deliveryInfo', v)"
       />
@@ -288,7 +296,7 @@ defineExpose({
       <ElFormItem label="運費" prop="shippingFee">
         <ElInputNumber
           :model-value="props.formData.shippingFee"
-          :disabled="coreFieldsDisabled"
+          :disabled="coreFieldsDisabled || props.mode === 'edit'"
           :min="0"
           :precision="0"
           :controls="false"

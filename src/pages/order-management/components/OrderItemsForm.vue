@@ -28,7 +28,8 @@ import {
 defineOptions({ name: "OrderItemsForm" })
 
 const props = withDefaults(defineProps<Props>(), {
-  disabled: false
+  disabled: false,
+  readonly: false
 })
 
 const emit = defineEmits<Emits>()
@@ -36,8 +37,10 @@ const emit = defineEmits<Emits>()
 interface Props {
   /** 訂單項目列表 */
   modelValue: OrderItemFormData[]
-  /** 是否禁用 */
+  /** 是否禁用所有欄位（終結狀態） */
   disabled?: boolean
+  /** 是否禁止新增/刪除項目（編輯模式） */
+  readonly?: boolean
 }
 
 interface Emits {
@@ -165,6 +168,7 @@ function formatCurrency(amount: number): string {
     <div class="items-header">
       <span class="items-title"><span class="required-asterisk">*</span>商品項目</span>
       <ElButton
+        v-if="!props.readonly"
         type="primary"
         :icon="Plus"
         size="small"
@@ -191,7 +195,7 @@ function formatCurrency(amount: number): string {
         <div class="item-card-right">
           <span class="item-card-subtotal">小計：{{ formatCurrency(getItemSubtotal(item)) }}</span>
           <ElButton
-            v-if="!props.disabled"
+            v-if="!props.disabled && !props.readonly"
             type="danger"
             :icon="Delete"
             size="small"
