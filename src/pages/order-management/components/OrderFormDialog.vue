@@ -103,8 +103,11 @@ const totalAmount = computed(() => {
  * 處理收件方式變更並更新運費預設值
  */
 function handleDeliveryMethodChange(method: DeliveryMethod) {
-  updateFormField("deliveryMethod", method)
-  updateFormField("shippingFee", SHIPPING_FEE_CONFIG[method] ?? 0)
+  emit("update:formData", {
+    ...props.formData,
+    deliveryMethod: method,
+    shippingFee: SHIPPING_FEE_CONFIG[method] ?? 0
+  })
 }
 
 /**

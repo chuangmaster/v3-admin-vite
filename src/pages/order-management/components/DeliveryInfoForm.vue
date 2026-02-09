@@ -27,6 +27,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<Emits>()
 
+/** 收件方式選項列表 */
+const deliveryMethodOptions = [
+  { value: DeliveryMethod.PICKUP, label: DELIVERY_METHOD_LABELS[DeliveryMethod.PICKUP] },
+  { value: DeliveryMethod.HOME_DELIVERY, label: DELIVERY_METHOD_LABELS[DeliveryMethod.HOME_DELIVERY] },
+  { value: DeliveryMethod.STORE_PICKUP, label: DELIVERY_METHOD_LABELS[DeliveryMethod.STORE_PICKUP] },
+  { value: DeliveryMethod.PLATFORM, label: DELIVERY_METHOD_LABELS[DeliveryMethod.PLATFORM] }
+]
+
 interface Props {
   /** 收件方式 */
   deliveryMethod: DeliveryMethod
@@ -103,10 +111,10 @@ function handleMethodChange(method: DeliveryMethod) {
         @update:model-value="handleMethodChange"
       >
         <ElOption
-          v-for="(label, key) in DELIVERY_METHOD_LABELS"
-          :key="key"
-          :label="label"
-          :value="key"
+          v-for="option in deliveryMethodOptions"
+          :key="option.value"
+          :label="option.label"
+          :value="option.value"
         />
       </ElSelect>
     </ElFormItem>
