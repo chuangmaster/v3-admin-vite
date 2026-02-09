@@ -344,6 +344,7 @@ defineExpose({
         :total-amount="props.currentOrder.totalAmount"
         :payment-status="props.currentOrder.paymentStatus"
         :payment-records="props.currentOrder.paymentRecords"
+        :disabled="isTerminalState"
         @update="handlePaymentUpdate"
       />
     </template>

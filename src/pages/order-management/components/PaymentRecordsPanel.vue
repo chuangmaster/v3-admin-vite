@@ -49,6 +49,8 @@ interface Props {
   paymentStatus: PaymentStatus
   /** 付款記錄列表 */
   paymentRecords: import("@/pages/order-management/types").PaymentRecord[]
+  /** 是否禁用所有操作（訂單已取消/已完成） */
+  disabled?: boolean
 }
 
 interface Emits {
@@ -188,7 +190,7 @@ function formatCurrency(amount: number): string {
         type="primary"
         :icon="Plus"
         size="small"
-        :disabled="isFullyPaid"
+        :disabled="isFullyPaid || props.disabled"
         @click="openAddDialog"
       >
         新增付款
@@ -251,9 +253,11 @@ function formatCurrency(amount: number): string {
       <ElTableColumn label="操作" width="100" align="center" fixed="right">
         <template #default="{ row }">
           <ElButton
+            v-if="row.paymentMethod === PaymentMethod.BANK_TRANSFER"
             :icon="Edit"
             size="small"
             link
+            :disabled="props.disabled"
             @click="handleOpenEdit(row)"
           />
           <ElButton
@@ -261,6 +265,7 @@ function formatCurrency(amount: number): string {
             size="small"
             type="danger"
             link
+            :disabled="props.disabled"
             @click="handleDeleteRecord(row.id)"
           />
         </template>
