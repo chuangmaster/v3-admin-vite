@@ -146,7 +146,7 @@ export const orderApi = {
   async updatePaymentStatus(id: string, data: UpdatePaymentStatusRequest): Promise<ApiResponse<null>> {
     return request<ApiResponse<null>>({
       url: `/sales-orders/${id}/payment-status`,
-      method: "patch",
+      method: "put",
       data
     })
   },
@@ -160,7 +160,7 @@ export const orderApi = {
   async updateOrderStatus(id: string, data: UpdateOrderStatusRequest): Promise<ApiResponse<null>> {
     return request<ApiResponse<null>>({
       url: `/sales-orders/${id}/order-status`,
-      method: "patch",
+      method: "put",
       data
     })
   },
@@ -174,7 +174,7 @@ export const orderApi = {
   async updateShippingStatus(id: string, data: UpdateShippingStatusRequest): Promise<ApiResponse<null>> {
     return request<ApiResponse<null>>({
       url: `/sales-orders/${id}/shipping-status`,
-      method: "patch",
+      method: "put",
       data
     })
   },
