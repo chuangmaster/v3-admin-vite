@@ -88,6 +88,8 @@ function handleClose() {
     :model-value="props.visible"
     title="訂單明細列印"
     width="900px"
+    class="order-detail-print-dialog"
+    append-to-body
     :close-on-click-modal="false"
     @close="handleClose"
   >
@@ -271,19 +273,72 @@ function handleClose() {
   color: var(--el-color-danger);
   font-size: 16px;
 }
+</style>
 
+<!-- 非 scoped 樣式：用於對話框本體及列印 -->
+<style lang="scss">
+/* 對話框響應式寬度（平板適配） */
+.order-detail-print-dialog {
+  max-width: 95vw;
+}
+
+/* A4 列印樣式 */
 @media print {
-  .el-dialog__footer,
-  .el-dialog__headerbtn {
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+
+  body > *:not(.el-overlay) {
     display: none !important;
   }
 
+  body > .el-overlay:not(:has(.order-detail-print-dialog)) {
+    display: none !important;
+  }
+
+  body > .el-overlay:has(.order-detail-print-dialog) {
+    position: static !important;
+    background: none !important;
+    overflow: visible !important;
+  }
+
+  .el-overlay-dialog {
+    position: static !important;
+    overflow: visible !important;
+  }
+
+  .order-detail-print-dialog {
+    position: static !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    transform: none !important;
+
+    .el-dialog__header {
+      display: none !important;
+    }
+
+    .el-dialog__footer {
+      display: none !important;
+    }
+
+    .el-dialog__body {
+      padding: 0 !important;
+      overflow: visible !important;
+    }
+  }
+
   .order-detail-print {
-    padding: 0;
+    padding: 0 !important;
+    width: 100% !important;
   }
 
   .print-title {
-    font-size: 24px;
+    font-size: 24px !important;
   }
 }
 </style>
