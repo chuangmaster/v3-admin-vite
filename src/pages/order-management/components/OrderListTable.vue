@@ -149,44 +149,55 @@ function formatCurrency(amount: number): string {
 
     <ElTableColumn label="操作" width="200" align="center" fixed="right">
       <template #default="{ row }">
-        <ElButton
-          :icon="View"
-          size="small"
-          link
-          @click="emit('view', row)"
-        >
-          查看
-        </ElButton>
-        <ElButton
-          :icon="Delete"
-          size="small"
-          type="danger"
-          link
-          @click="emit('delete', row)"
-        >
-          刪除
-        </ElButton>
-        <ElDropdown
-          trigger="click" @command="(cmd: string) => {
-            if (cmd === 'printShipping') emit('printShipping', row)
-            if (cmd === 'printOrder') emit('printOrder', row)
-          }"
-        >
-          <ElButton :icon="Printer" size="small" link>
-            列印
+        <div class="action-buttons">
+          <ElButton
+            :icon="View"
+            size="small"
+            link
+            @click="emit('view', row)"
+          >
+            查看
           </ElButton>
-          <template #dropdown>
-            <ElDropdownMenu>
-              <ElDropdownItem command="printShipping">
-                出貨單
-              </ElDropdownItem>
-              <ElDropdownItem command="printOrder">
-                訂單明細
-              </ElDropdownItem>
-            </ElDropdownMenu>
-          </template>
-        </ElDropdown>
+          <ElButton
+            :icon="Delete"
+            size="small"
+            type="danger"
+            link
+            @click="emit('delete', row)"
+          >
+            刪除
+          </ElButton>
+          <ElDropdown
+            trigger="click" @command="(cmd: string) => {
+              if (cmd === 'printShipping') emit('printShipping', row)
+              if (cmd === 'printOrder') emit('printOrder', row)
+            }"
+          >
+            <ElButton :icon="Printer" size="small" link>
+              列印
+            </ElButton>
+            <template #dropdown>
+              <ElDropdownMenu>
+                <ElDropdownItem command="printShipping">
+                  出貨單
+                </ElDropdownItem>
+                <ElDropdownItem command="printOrder">
+                  訂單明細
+                </ElDropdownItem>
+              </ElDropdownMenu>
+            </template>
+          </ElDropdown>
+        </div>
       </template>
     </ElTableColumn>
   </ElTable>
 </template>
+
+<style scoped lang="scss">
+.action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+</style>
