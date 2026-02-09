@@ -23,6 +23,7 @@ import {
 } from "element-plus"
 import { computed, nextTick, ref, watch } from "vue"
 import { customerApi } from "@/pages/customer-management/apis/customer"
+import { orderApi } from "@/pages/order-management/apis/order"
 import {
   ORDER_TYPE_LABELS,
   OrderStatus,
@@ -161,9 +162,18 @@ function handleOrderUpdate(updatedOrder: SalesOrder) {
 
 /**
  * 處理付款記錄更新（來自 PaymentRecordsPanel）
+ * 重新取得訂單明細以刷新付款記錄
  */
-function handlePaymentUpdate() {
-  emit("orderUpdate", props.currentOrder!)
+async function handlePaymentUpdate() {
+  if (!props.currentOrder) return
+  try {
+    const response = await orderApi.getDetail(props.currentOrder.id)
+    if (response.success && response.data) {
+      emit("orderUpdate", response.data)
+    }
+  } catch {
+    console.error("重新取得訂單付款資料失敗")
+  }
 }
 
 /**

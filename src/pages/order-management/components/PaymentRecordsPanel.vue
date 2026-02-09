@@ -295,7 +295,6 @@ function formatCurrency(amount: number): string {
             type="date"
             placeholder="請選擇付款日期"
             format="YYYY-MM-DD"
-            value-format="YYYY-MM-DDT00:00:00.000Z"
             style="width: 100%"
           />
         </ElFormItem>

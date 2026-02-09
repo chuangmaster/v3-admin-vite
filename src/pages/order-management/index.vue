@@ -98,7 +98,8 @@ async function handleDeleteOrder(order: SalesOrderListItem) {
 /**
  * 處理訂單狀態更新後重新整理
  */
-function handleOrderUpdate(_order: SalesOrder) {
+function handleOrderUpdate(order: SalesOrder) {
+  currentOrder.value = order
   refresh()
 }
 

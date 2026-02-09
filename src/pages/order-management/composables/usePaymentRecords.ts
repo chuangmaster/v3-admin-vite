@@ -101,11 +101,7 @@ export function usePaymentRecords() {
 
       const response = await orderApi.addPaymentRecord(orderId, request)
 
-      if (response.success && response.data) {
-        // 使用回傳的完整訂單資料更新本地狀態
-        paymentRecords.value = response.data.paymentRecords
-        paymentStatus.value = response.data.paymentStatus
-
+      if (response.success) {
         ElMessage.success("付款記錄新增成功")
         addDialogVisible.value = false
         onSuccess?.()
