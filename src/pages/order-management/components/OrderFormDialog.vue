@@ -288,6 +288,7 @@ defineExpose({
         :delivery-method="props.formData.deliveryMethod"
         :delivery-info="props.formData.deliveryInfo"
         :disabled="coreFieldsDisabled || isShipped"
+        :customer-info="customerSelectorRef?.selectedCustomer ? { name: customerSelectorRef.selectedCustomer.name, phone: customerSelectorRef.selectedCustomer.phoneNumber, address: customerSelectorRef.selectedCustomer.residentialAddress } : null"
         @update:delivery-method="handleDeliveryMethodChange"
         @update:delivery-info="(v) => updateFormField('deliveryInfo', v)"
       />

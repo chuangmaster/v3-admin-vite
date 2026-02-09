@@ -189,9 +189,7 @@ export function usePaymentRecords() {
     try {
       const response = await orderApi.deletePaymentRecord(orderId, recordId)
 
-      if (response.success && response.data) {
-        paymentRecords.value = response.data.paymentRecords
-        paymentStatus.value = response.data.paymentStatus
+      if (response.success) {
         ElMessage.success("付款記錄已刪除")
         onSuccess?.()
         return true

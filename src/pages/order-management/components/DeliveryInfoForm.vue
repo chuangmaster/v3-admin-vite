@@ -7,6 +7,7 @@
  */
 import type { DeliveryInfo } from "@/pages/order-management/types"
 import {
+  ElButton,
   ElDatePicker,
   ElFormItem,
   ElInput,
@@ -42,6 +43,8 @@ interface Props {
   deliveryInfo: Partial<DeliveryInfo>
   /** 是否禁用 */
   disabled?: boolean
+  /** 購買人資料（用於「同購買人資料」帶入） */
+  customerInfo?: { name: string, phone: string, address: string } | null
 }
 
 interface Emits {
@@ -98,6 +101,18 @@ function updateField(field: string, value: string) {
  */
 function handleMethodChange(method: DeliveryMethod) {
   emit("update:deliveryMethod", method)
+}
+/**
+ * 帶入購買人資料至宅配收件資訊
+ */
+function fillFromCustomer() {
+  if (!props.customerInfo) return
+  emit("update:deliveryInfo", {
+    ...props.deliveryInfo,
+    recipientName: props.customerInfo.name,
+    recipientPhone: props.customerInfo.phone,
+    recipientAddress: props.customerInfo.address
+  })
 }
 </script>
 
@@ -157,6 +172,16 @@ function handleMethodChange(method: DeliveryMethod) {
 
     <!-- 宅配 -->
     <template v-if="isHomeDelivery">
+      <div class="copy-customer-row">
+        <ElButton
+          size="small"
+          :disabled="props.disabled || !props.customerInfo"
+          @click="fillFromCustomer"
+        >
+          同購買人資料
+        </ElButton>
+      </div>
+
       <ElFormItem
         label="收件人姓名"
         prop="deliveryInfo.recipientName"
@@ -284,5 +309,11 @@ function handleMethodChange(method: DeliveryMethod) {
   background-color: var(--el-fill-color-light);
   border-radius: 4px;
   margin-bottom: 16px;
+}
+
+.copy-customer-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
 }
 </style>
