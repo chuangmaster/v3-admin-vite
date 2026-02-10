@@ -14,8 +14,6 @@ import {
   ElDescriptions,
   ElDescriptionsItem,
   ElDialog,
-  ElTable,
-  ElTableColumn,
   ElTag
 } from "element-plus"
 import {
@@ -146,30 +144,52 @@ function handleClose() {
         <h3 class="section-title">
           商品明細
         </h3>
-        <ElTable :data="props.order.orderItems" border size="small">
-          <ElTableColumn type="index" label="#" width="50" />
-          <ElTableColumn prop="productName" label="商品名稱" min-width="140" />
-          <ElTableColumn prop="brandName" label="品牌" min-width="90" />
-          <ElTableColumn prop="panshiCode" label="磐石編碼" min-width="90" />
-          <ElTableColumn prop="serialId" label="序號 ID" min-width="90" />
-          <ElTableColumn prop="productStyle" label="款式" min-width="90" />
-          <ElTableColumn label="來源" min-width="70">
-            <template #default="{ row }">
-              {{ PRODUCT_SOURCE_LABELS[row.productSource as keyof typeof PRODUCT_SOURCE_LABELS] || row.productSource }}
-            </template>
-          </ElTableColumn>
-          <ElTableColumn label="單價" min-width="100" align="right">
-            <template #default="{ row }">
-              {{ formatCurrency(row.unitPrice) }}
-            </template>
-          </ElTableColumn>
-          <ElTableColumn prop="quantity" label="數量" min-width="60" align="center" />
-          <ElTableColumn label="小計" min-width="100" align="right">
-            <template #default="{ row }">
-              {{ formatCurrency(row.unitPrice * row.quantity) }}
-            </template>
-          </ElTableColumn>
-        </ElTable>
+        <div class="product-cards">
+          <div
+            v-for="(item, index) in props.order.orderItems"
+            :key="item.id"
+            class="product-card"
+          >
+            <div class="product-card-header">
+              <span class="product-index">#{{ index + 1 }}</span>
+              <span class="product-name">{{ item.productName }}</span>
+            </div>
+            <div class="product-card-body">
+              <div class="product-field">
+                <span class="field-label">品牌</span>
+                <span class="field-value">{{ item.brandName }}</span>
+              </div>
+              <div class="product-field">
+                <span class="field-label">磐石編碼</span>
+                <span class="field-value">{{ item.panshiCode }}</span>
+              </div>
+              <div class="product-field">
+                <span class="field-label">序號 ID</span>
+                <span class="field-value">{{ item.serialId }}</span>
+              </div>
+              <div class="product-field">
+                <span class="field-label">款式</span>
+                <span class="field-value">{{ item.productStyle }}</span>
+              </div>
+              <div class="product-field">
+                <span class="field-label">來源</span>
+                <span class="field-value">{{ PRODUCT_SOURCE_LABELS[item.productSource as keyof typeof PRODUCT_SOURCE_LABELS] || item.productSource }}</span>
+              </div>
+              <div class="product-field">
+                <span class="field-label">單價</span>
+                <span class="field-value">{{ formatCurrency(item.unitPrice) }}</span>
+              </div>
+              <div class="product-field">
+                <span class="field-label">數量</span>
+                <span class="field-value">{{ item.quantity }}</span>
+              </div>
+              <div class="product-field">
+                <span class="field-label">小計</span>
+                <span class="field-value price">{{ formatCurrency(item.unitPrice * item.quantity) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 金額明細 -->
@@ -273,6 +293,108 @@ function handleClose() {
   color: var(--el-color-danger);
   font-size: 16px;
 }
+
+/* 商品卡片 */
+.product-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.product-card {
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.product-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--el-fill-color-light);
+  border-bottom: 1px solid var(--el-border-color-lighter);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.product-index {
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+  min-width: 20px;
+}
+
+.product-name {
+  color: var(--el-text-color-primary);
+}
+
+.product-card-body {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+}
+
+.product-field {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--el-border-color-extra-light);
+  border-right: 1px solid var(--el-border-color-extra-light);
+
+  &:nth-child(4n) {
+    border-right: none;
+  }
+
+  &:nth-last-child(-n + 4) {
+    border-bottom: none;
+  }
+}
+
+.field-label {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  margin-bottom: 2px;
+}
+
+.field-value {
+  font-size: 13px;
+  color: var(--el-text-color-primary);
+  word-break: break-all;
+
+  &.price {
+    font-weight: 600;
+    color: var(--el-color-danger);
+  }
+}
+
+/* 平板響應式 */
+@media (max-width: 860px) {
+  .order-detail-print {
+    padding: 0 8px;
+  }
+
+  .product-card-body {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .product-field {
+    &:nth-child(4n) {
+      border-right: 1px solid var(--el-border-color-extra-light);
+    }
+
+    &:nth-child(2n) {
+      border-right: none;
+    }
+
+    &:nth-last-child(-n + 4) {
+      border-bottom: 1px solid var(--el-border-color-extra-light);
+    }
+
+    &:nth-last-child(-n + 2) {
+      border-bottom: none;
+    }
+  }
+}
 </style>
 
 <!-- 非 scoped 樣式：用於對話框本體及列印 -->
@@ -289,21 +411,29 @@ function handleClose() {
     margin: 15mm;
   }
 
+  /* 隱藏頁面所有內容（#app 及其他非 overlay 元素） */
   body > *:not(.el-overlay) {
     display: none !important;
   }
 
-  body > .el-overlay:not(:has(.order-detail-print-dialog)) {
+  /* 隱藏所有 overlay */
+  body > .el-overlay {
     display: none !important;
   }
 
-  body > .el-overlay:has(.order-detail-print-dialog) {
+  /**
+   * 顯示訂單明細 overlay（僅當對話框為開啟狀態）
+   * :not([style*="display: none"]) 確保只匹配實際可見的 overlay，
+   * 避免關閉但仍殘留在 DOM 中的 overlay 干擾其他列印對話框
+   */
+  body > .el-overlay:not([style*="display: none"]):has(.order-detail-print-dialog) {
+    display: block !important;
     position: static !important;
     background: none !important;
     overflow: visible !important;
   }
 
-  .el-overlay-dialog {
+  body > .el-overlay:not([style*="display: none"]):has(.order-detail-print-dialog) .el-overlay-dialog {
     position: static !important;
     overflow: visible !important;
   }
@@ -339,6 +469,22 @@ function handleClose() {
 
   .print-title {
     font-size: 24px !important;
+  }
+
+  /* 列印時卡片樣式 */
+  .product-card {
+    break-inside: avoid;
+    border-color: #ddd !important;
+  }
+
+  .product-card-header {
+    background-color: #f5f5f5 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .product-card-body {
+    grid-template-columns: repeat(4, 1fr) !important;
   }
 }
 </style>

@@ -361,19 +361,24 @@ function handleClose() {
     display: none !important;
   }
 
-  /* 隱藏不相關的 overlay（非出貨單預覽的對話框） */
-  body > .el-overlay:not(:has(.shipping-label-dialog)) {
+  /* 隱藏所有 overlay */
+  body > .el-overlay {
     display: none !important;
   }
 
-  /* 顯示出貨單 overlay 並移除遮罩背景 */
-  body > .el-overlay:has(.shipping-label-dialog) {
+  /**
+   * 顯示出貨單 overlay（僅當對話框為開啟狀態）
+   * :not([style*="display: none"]) 確保只匹配實際可見的 overlay，
+   * 避免關閉但仍殘留在 DOM 中的 overlay 干擾其他列印對話框
+   */
+  body > .el-overlay:not([style*="display: none"]):has(.shipping-label-dialog) {
+    display: block !important;
     position: static !important;
     background: none !important;
     overflow: visible !important;
   }
 
-  .el-overlay-dialog {
+  body > .el-overlay:not([style*="display: none"]):has(.shipping-label-dialog) .el-overlay-dialog {
     position: static !important;
     overflow: visible !important;
   }
