@@ -182,7 +182,7 @@ function formatCurrency(amount: number): string {
                   出貨單
                 </ElDropdownItem>
                 <ElDropdownItem command="printOrder">
-                  訂單明細
+                  保證書
                 </ElDropdownItem>
               </ElDropdownMenu>
             </template>

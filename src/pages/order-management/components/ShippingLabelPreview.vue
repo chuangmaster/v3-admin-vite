@@ -12,11 +12,22 @@ import {
   ElButton,
   ElDescriptions,
   ElDescriptionsItem,
-  ElDialog
+  ElDialog,
+  ElTag
 } from "element-plus"
 import {
+  ACCESSORY_OPTIONS,
   DELIVERY_METHOD_LABELS,
-  DeliveryMethod
+  DeliveryMethod,
+  ORDER_STATUS_COLORS,
+  ORDER_STATUS_LABELS,
+  ORDER_TYPE_LABELS,
+  PAYMENT_METHOD_LABELS,
+  PAYMENT_STATUS_COLORS,
+  PAYMENT_STATUS_LABELS,
+  PRODUCT_SOURCE_LABELS,
+  SHIPPING_STATUS_COLORS,
+  SHIPPING_STATUS_LABELS
 } from "@/pages/order-management/types"
 
 defineOptions({ name: "ShippingLabelPreview" })
@@ -53,8 +64,22 @@ function formatDate(dateStr: string): string {
 /**
  * 格式化金額
  */
-function formatCurrency(amount: number): string {
+function formatCurrency(amount: number | undefined | null): string {
+  if (amount == null) return "NT$ 0"
   return `NT$ ${amount.toLocaleString()}`
+}
+
+/**
+ * 將配件值轉換為中文標籤
+ */
+function formatAccessories(accessories: string[] | null): string {
+  if (!accessories || accessories.length === 0) return "無"
+  return accessories
+    .map((accessory) => {
+      const option = ACCESSORY_OPTIONS.find(opt => opt.value === accessory)
+      return option ? option.label : accessory
+    })
+    .join("、")
 }
 
 /**
@@ -105,24 +130,63 @@ function handleClose() {
   >
     <div v-if="props.data" class="shipping-label-content">
       <div class="label-header">
+        <div class="brand-banner">
+          <p class="brand-logo-text">
+            REAL YOU
+          </p>
+          <p class="brand-slogan">
+            無懼追求&emsp;唯真世代
+          </p>
+          <p class="brand-subtitle">
+            — LVMH集團授權鑑定中心 —
+          </p>
+        </div>
         <h2 class="label-title">
           出貨單
         </h2>
       </div>
 
       <!-- 訂單基本資訊 -->
-      <ElDescriptions :column="2" border size="small" class="label-info">
+      <ElDescriptions :column="3" border size="small" class="label-info">
         <ElDescriptionsItem label="訂單編號">
           {{ props.data.orderNumber }}
         </ElDescriptionsItem>
         <ElDescriptionsItem label="訂單日期">
           {{ formatDate(props.data.orderDate) }}
         </ElDescriptionsItem>
+        <ElDescriptionsItem v-if="props.data.orderType" label="訂單類型">
+          {{ ORDER_TYPE_LABELS[props.data.orderType] }}
+        </ElDescriptionsItem>
         <ElDescriptionsItem label="客戶名稱">
           {{ props.data.customerName }}
         </ElDescriptionsItem>
+        <ElDescriptionsItem v-if="props.data.customerPhone" label="客戶電話">
+          {{ props.data.customerPhone }}
+        </ElDescriptionsItem>
         <ElDescriptionsItem label="收件方式">
           {{ DELIVERY_METHOD_LABELS[props.data.deliveryMethod] }}
+        </ElDescriptionsItem>
+      </ElDescriptions>
+
+      <!-- 狀態資訊 -->
+      <ElDescriptions v-if="props.data.orderStatus || props.data.paymentStatus || props.data.shippingStatus" :column="3" border size="small" title="狀態資訊" class="label-info">
+        <ElDescriptionsItem label="訂單狀態">
+          <ElTag v-if="props.data.orderStatus" :type="ORDER_STATUS_COLORS[props.data.orderStatus]" size="small">
+            {{ ORDER_STATUS_LABELS[props.data.orderStatus] }}
+          </ElTag>
+          <span v-else>—</span>
+        </ElDescriptionsItem>
+        <ElDescriptionsItem label="付款狀態">
+          <ElTag v-if="props.data.paymentStatus" :type="PAYMENT_STATUS_COLORS[props.data.paymentStatus]" size="small">
+            {{ PAYMENT_STATUS_LABELS[props.data.paymentStatus] }}
+          </ElTag>
+          <span v-else>—</span>
+        </ElDescriptionsItem>
+        <ElDescriptionsItem label="出貨狀態">
+          <ElTag v-if="props.data.shippingStatus" :type="SHIPPING_STATUS_COLORS[props.data.shippingStatus]" size="small">
+            {{ SHIPPING_STATUS_LABELS[props.data.shippingStatus] }}
+          </ElTag>
+          <span v-else>—</span>
         </ElDescriptionsItem>
       </ElDescriptions>
 
@@ -167,6 +231,14 @@ function handleClose() {
                 <span class="field-value">{{ item.productStyle }}</span>
               </div>
               <div class="product-field">
+                <span class="field-label">商品來源</span>
+                <span class="field-value">{{ PRODUCT_SOURCE_LABELS[item.productSource] }}</span>
+              </div>
+              <div class="product-field">
+                <span class="field-label">配件</span>
+                <span class="field-value">{{ formatAccessories(item.accessories) }}</span>
+              </div>
+              <div class="product-field">
                 <span class="field-label">數量</span>
                 <span class="field-value">{{ item.quantity }}</span>
               </div>
@@ -178,6 +250,55 @@ function handleClose() {
           </div>
         </div>
       </div>
+
+      <!-- 金額明細 -->
+      <ElDescriptions v-if="props.data.subtotalAmount != null || props.data.shippingFee != null || props.data.totalAmount != null" :column="3" border size="small" title="金額明細" class="label-info">
+        <ElDescriptionsItem label="商品小計">
+          {{ formatCurrency(props.data.subtotalAmount) }}
+        </ElDescriptionsItem>
+        <ElDescriptionsItem label="運費">
+          {{ formatCurrency(props.data.shippingFee) }}
+        </ElDescriptionsItem>
+        <ElDescriptionsItem label="總金額">
+          <span class="total-amount">{{ formatCurrency(props.data.totalAmount) }}</span>
+        </ElDescriptionsItem>
+      </ElDescriptions>
+
+      <!-- 付款記錄 -->
+      <div v-if="props.data.paymentRecords?.length" class="items-section">
+        <h3 class="section-title">
+          付款記錄
+        </h3>
+        <ElDescriptions
+          v-for="(record, index) in props.data.paymentRecords"
+          :key="record.id"
+          :column="3"
+          border
+          size="small"
+          class="payment-record"
+          :title="`第 ${index + 1} 筆`"
+        >
+          <ElDescriptionsItem label="付款日期">
+            {{ formatDate(record.paymentDate) }}
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="付款金額">
+            <span class="total-amount">{{ formatCurrency(record.paymentAmount) }}</span>
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="付款方式">
+            {{ PAYMENT_METHOD_LABELS[record.paymentMethod] }}
+          </ElDescriptionsItem>
+        </ElDescriptions>
+      </div>
+
+      <!-- 其他資訊 -->
+      <ElDescriptions v-if="props.data.createdByName || props.data.remarks" :column="2" border size="small" title="其他資訊" class="label-info">
+        <ElDescriptionsItem label="建立者">
+          {{ props.data.createdByName }}
+        </ElDescriptionsItem>
+        <ElDescriptionsItem label="備註">
+          {{ props.data.remarks || '無' }}
+        </ElDescriptionsItem>
+      </ElDescriptions>
     </div>
 
     <template #footer>
@@ -201,6 +322,39 @@ function handleClose() {
   margin-bottom: 20px;
 }
 
+.brand-banner {
+  padding: 16px 12px 10px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.brand-logo-text {
+  font-family: Jost, sans-serif;
+  font-size: 45px;
+  font-weight: 700;
+  letter-spacing: 6px;
+  margin: 0 0 8px;
+  color: var(--el-text-color-primary);
+  line-height: 1;
+}
+
+.brand-slogan {
+  font-size: 19px;
+  letter-spacing: 8px;
+  margin: 4px 0 6px;
+  font-weight: 400;
+  color: var(--el-text-color-primary);
+}
+
+.brand-subtitle {
+  font-size: 15px;
+  letter-spacing: 3px;
+  margin: 0;
+  color: var(--el-text-color-secondary);
+}
+
 .label-title {
   font-size: 22px;
   font-weight: 700;
@@ -214,6 +368,16 @@ function handleClose() {
 .delivery-section,
 .items-section {
   margin-bottom: 16px;
+}
+
+.total-amount {
+  font-weight: 700;
+  color: var(--el-color-danger);
+  font-size: 15px;
+}
+
+.payment-record {
+  margin-bottom: 8px;
 }
 
 .section-title {
@@ -271,7 +435,7 @@ function handleClose() {
 
 .product-card-body {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0;
 }
 
@@ -282,11 +446,11 @@ function handleClose() {
   border-bottom: 1px solid var(--el-border-color-extra-light);
   border-right: 1px solid var(--el-border-color-extra-light);
 
-  &:nth-child(3n) {
+  &:nth-child(4n) {
     border-right: none;
   }
 
-  &:nth-last-child(-n + 3) {
+  &:nth-last-child(-n + 4) {
     border-bottom: none;
   }
 }
@@ -319,7 +483,7 @@ function handleClose() {
   }
 
   .product-field {
-    &:nth-child(3n) {
+    &:nth-child(4n) {
       border-right: 1px solid var(--el-border-color-extra-light);
     }
 
@@ -327,7 +491,7 @@ function handleClose() {
       border-right: none;
     }
 
-    &:nth-last-child(-n + 3) {
+    &:nth-last-child(-n + 4) {
       border-bottom: 1px solid var(--el-border-color-extra-light);
     }
 
@@ -340,6 +504,7 @@ function handleClose() {
 
 <!-- 非 scoped 樣式：用於對話框本體及列印 -->
 <style lang="scss">
+@import url("https://fonts.googleapis.com/css2?family=Jost:wght@400;700&family=Noto+Sans:wght@400;600&display=swap");
 /* 對話框響應式寬度（平板適配） */
 .shipping-label-dialog {
   max-width: 95vw;

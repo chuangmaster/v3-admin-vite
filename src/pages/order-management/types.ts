@@ -368,14 +368,36 @@ export interface ShippingLabelResponse {
   orderNumber: string
   /** 訂單日期 */
   orderDate: string
+  /** 訂單類型（後端可能未提供） */
+  orderType?: OrderType
   /** 客戶名稱 */
   customerName: string
+  /** 客戶電話（後端可能未提供） */
+  customerPhone?: string
+  /** 商品小計（後端可能未提供） */
+  subtotalAmount?: number
+  /** 運費（後端可能未提供） */
+  shippingFee?: number
+  /** 總金額（後端可能未提供） */
+  totalAmount?: number
+  /** 付款狀態（後端可能未提供） */
+  paymentStatus?: PaymentStatus
+  /** 訂單狀態（後端可能未提供） */
+  orderStatus?: OrderStatus
+  /** 出貨狀態（後端可能未提供） */
+  shippingStatus?: ShippingStatus
   /** 收件方式 */
   deliveryMethod: DeliveryMethod
   /** 收件資訊（依 deliveryMethod 而異） */
   deliveryInfo: DeliveryInfo
   /** 訂單項目清單 */
   orderItems: OrderItem[]
+  /** 付款記錄清單（後端可能未提供） */
+  paymentRecords?: PaymentRecord[]
+  /** 訂單備註（後端可能未提供） */
+  remarks?: string | null
+  /** 建立者名稱（後端可能未提供） */
+  createdByName?: string
 }
 
 /** 銷售訂單匯出資料 DTO */

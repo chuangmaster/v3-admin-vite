@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /**
- * 訂單明細列印元件
+ * 保證書列印元件
  *
  * @module order-management/components/OrderDetailPrint
- * @description 供內部使用的訂單明細列印,包含完整資訊:
+ * @description 供內部使用的保證書列印,包含完整資訊:
  *              訂單編號、客戶資訊、商品詳情、金額明細、付款狀態、
  *              訂單狀態、出貨狀態、操作者等
  */
@@ -17,6 +17,7 @@ import {
   ElTag
 } from "element-plus"
 import {
+  ACCESSORY_OPTIONS,
   DELIVERY_METHOD_LABELS,
   ORDER_STATUS_COLORS,
   ORDER_STATUS_LABELS,
@@ -42,6 +43,19 @@ interface Props {
 
 interface Emits {
   (e: "update:visible", value: boolean): void
+}
+
+/**
+ * 將配件值轉換為中文標籤
+ */
+function formatAccessories(accessories: string[]): string {
+  if (!accessories || accessories.length === 0) return ""
+  return accessories
+    .map((accessory) => {
+      const option = ACCESSORY_OPTIONS.find(opt => opt.value === accessory)
+      return option ? option.label : accessory
+    })
+    .join("、")
 }
 
 /**
@@ -75,7 +89,7 @@ function handleClose() {
 <template>
   <ElDialog
     :model-value="props.visible"
-    title="訂單明細列印"
+    title="保證書列印"
     width="900px"
     class="order-detail-print-dialog"
     append-to-body
@@ -96,7 +110,7 @@ function handleClose() {
           </p>
         </div>
         <h2 class="print-title">
-          訂單明細
+          保證書
         </h2>
       </div>
 
@@ -173,6 +187,10 @@ function handleClose() {
                 <span class="field-label">款式</span>
                 <span class="field-value">{{ item.productStyle }}</span>
               </div>
+              <div v-if="item.accessories && item.accessories.length > 0" class="product-field product-field-full">
+                <span class="field-label">配件</span>
+                <span class="field-value">{{ formatAccessories(item.accessories) }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -214,8 +232,8 @@ function handleClose() {
 }
 
 .brand-banner {
-  padding: 24px 20px 16px;
-  margin-bottom: 16px;
+  padding: 16px 12px 10px;
+  margin-bottom: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -223,10 +241,10 @@ function handleClose() {
 
 .brand-logo-text {
   font-family: Jost, sans-serif;
-  font-size: 64px;
+  font-size: 45px;
   font-weight: 700;
-  letter-spacing: 8px;
-  margin: 0 0 12px;
+  letter-spacing: 6px;
+  margin: 0 0 8px;
   color: var(--el-text-color-primary);
   line-height: 1;
 }
@@ -238,16 +256,16 @@ function handleClose() {
 }
 
 .brand-slogan {
-  font-size: 27px;
-  letter-spacing: 12px;
-  margin: 8px 0 10px;
+  font-size: 19px;
+  letter-spacing: 8px;
+  margin: 4px 0 6px;
   font-weight: 400;
   color: var(--el-text-color-primary);
 }
 
 .brand-subtitle {
-  font-size: 21px;
-  letter-spacing: 4px;
+  font-size: 15px;
+  letter-spacing: 3px;
   margin: 0;
   color: var(--el-text-color-secondary);
 }
@@ -332,6 +350,11 @@ function handleClose() {
   }
 }
 
+.product-field-full {
+  grid-column: 1 / -1;
+  border-right: none !important;
+}
+
 .field-label {
   font-size: 12px;
   color: var(--el-text-color-secondary);
@@ -406,7 +429,7 @@ function handleClose() {
   }
 
   /**
-   * 顯示訂單明細 overlay（僅當對話框為開啟狀態）
+   * 顯示保證書 overlay（僅當對話框為開啟狀態）
    * :not([style*="display: none"]) 確保只匹配實際可見的 overlay，
    * 避免關閉但仍殘留在 DOM 中的 overlay 干擾其他列印對話框
    */

@@ -64,7 +64,7 @@ const {
   handlePrint: handleShippingPrint
 } = useShippingLabel()
 
-/** 訂單明細列印對話框狀態 */
+/** 保證書列印對話框狀態 */
 const printVisible = ref(false)
 /** 當前列印的訂單資料 */
 const printOrder = ref<SalesOrder | null>(null)
@@ -130,7 +130,7 @@ function handlePrintShippingLabel(order: SalesOrderListItem) {
 }
 
 /**
- * 處理列印訂單明細
+ * 處理列印保證書
  * @param order - 訂單列表項目
  */
 async function handlePrintOrder(order: SalesOrderListItem) {
@@ -217,7 +217,7 @@ async function handlePrintOrder(order: SalesOrderListItem) {
       @print="handleShippingPrint"
     />
 
-    <!-- 訂單明細列印 -->
+    <!-- 保證書列印 -->
     <OrderDetailPrint
       v-model:visible="printVisible"
       :order="printOrder"
