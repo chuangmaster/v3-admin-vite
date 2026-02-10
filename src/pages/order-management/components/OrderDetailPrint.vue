@@ -21,10 +21,8 @@ import {
   ORDER_STATUS_COLORS,
   ORDER_STATUS_LABELS,
   ORDER_TYPE_LABELS,
-  PAYMENT_METHOD_LABELS,
   PAYMENT_STATUS_COLORS,
   PAYMENT_STATUS_LABELS,
-  PRODUCT_SOURCE_LABELS,
   SHIPPING_STATUS_COLORS,
   SHIPPING_STATUS_LABELS
 } from "@/pages/order-management/types"
@@ -60,13 +58,6 @@ function formatDate(dateStr: string): string {
 }
 
 /**
- * 格式化金額
- */
-function formatCurrency(amount: number): string {
-  return `NT$ ${amount.toLocaleString()}`
-}
-
-/**
  * 處理列印
  */
 function handlePrint() {
@@ -93,6 +84,17 @@ function handleClose() {
   >
     <div v-if="props.order" class="order-detail-print">
       <div class="print-header">
+        <div class="brand-banner">
+          <p class="brand-logo-text">
+            REAL YOU
+          </p>
+          <p class="brand-slogan">
+            無懼追求&emsp;唯真世代
+          </p>
+          <p class="brand-subtitle">
+            — LVMH集團授權鑑定中心 —
+          </p>
+        </div>
         <h2 class="print-title">
           訂單明細
         </h2>
@@ -171,68 +173,9 @@ function handleClose() {
                 <span class="field-label">款式</span>
                 <span class="field-value">{{ item.productStyle }}</span>
               </div>
-              <div class="product-field">
-                <span class="field-label">來源</span>
-                <span class="field-value">{{ PRODUCT_SOURCE_LABELS[item.productSource as keyof typeof PRODUCT_SOURCE_LABELS] || item.productSource }}</span>
-              </div>
-              <div class="product-field">
-                <span class="field-label">單價</span>
-                <span class="field-value">{{ formatCurrency(item.unitPrice) }}</span>
-              </div>
-              <div class="product-field">
-                <span class="field-label">數量</span>
-                <span class="field-value">{{ item.quantity }}</span>
-              </div>
-              <div class="product-field">
-                <span class="field-label">小計</span>
-                <span class="field-value price">{{ formatCurrency(item.unitPrice * item.quantity) }}</span>
-              </div>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- 金額明細 -->
-      <ElDescriptions :column="3" border size="small" title="金額明細" class="section">
-        <ElDescriptionsItem label="商品小計">
-          {{ formatCurrency(props.order.subtotalAmount) }}
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="運費">
-          {{ formatCurrency(props.order.shippingFee) }}
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="總金額">
-          <span class="total-amount">{{ formatCurrency(props.order.totalAmount) }}</span>
-        </ElDescriptionsItem>
-      </ElDescriptions>
-
-      <!-- 付款記錄 -->
-      <div v-if="props.order.paymentRecords.length > 0" class="section">
-        <h3 class="section-title">
-          付款記錄
-        </h3>
-        <ElTable :data="props.order.paymentRecords" border size="small">
-          <ElTableColumn type="index" label="#" width="50" />
-          <ElTableColumn label="付款日期" min-width="110">
-            <template #default="{ row }">
-              {{ formatDate(row.paymentDate) }}
-            </template>
-          </ElTableColumn>
-          <ElTableColumn label="付款金額" min-width="120" align="right">
-            <template #default="{ row }">
-              {{ formatCurrency(row.paymentAmount) }}
-            </template>
-          </ElTableColumn>
-          <ElTableColumn label="付款方式" min-width="100">
-            <template #default="{ row }">
-              {{ PAYMENT_METHOD_LABELS[row.paymentMethod as keyof typeof PAYMENT_METHOD_LABELS] || row.paymentMethod }}
-            </template>
-          </ElTableColumn>
-          <ElTableColumn label="銀行末五碼" min-width="100">
-            <template #default="{ row }">
-              {{ row.bankAccountLastFive || "-" }}
-            </template>
-          </ElTableColumn>
-        </ElTable>
       </div>
 
       <!-- 其他資訊 -->
@@ -268,6 +211,45 @@ function handleClose() {
 .print-header {
   text-align: center;
   margin-bottom: 20px;
+}
+
+.brand-banner {
+  padding: 24px 20px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.brand-logo-text {
+  font-family: Jost, sans-serif;
+  font-size: 64px;
+  font-weight: 700;
+  letter-spacing: 8px;
+  margin: 0 0 12px;
+  color: var(--el-text-color-primary);
+  line-height: 1;
+}
+
+.brand-logo {
+  height: 194px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
+.brand-slogan {
+  font-size: 27px;
+  letter-spacing: 12px;
+  margin: 8px 0 10px;
+  font-weight: 400;
+  color: var(--el-text-color-primary);
+}
+
+.brand-subtitle {
+  font-size: 21px;
+  letter-spacing: 4px;
+  margin: 0;
+  color: var(--el-text-color-secondary);
 }
 
 .print-title {
@@ -399,6 +381,8 @@ function handleClose() {
 
 <!-- 非 scoped 樣式：用於對話框本體及列印 -->
 <style lang="scss">
+@import url("https://fonts.googleapis.com/css2?family=Jost:wght@400;700&family=Noto+Sans:wght@400;600&display=swap");
+
 /* 對話框響應式寬度（平板適配） */
 .order-detail-print-dialog {
   max-width: 95vw;
