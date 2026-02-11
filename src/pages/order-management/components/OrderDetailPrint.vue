@@ -10,6 +10,7 @@
 -->
 <script setup lang="ts">
 import type { SalesOrder } from "@/pages/order-management/types"
+import qrcodeImg from "@@/assets/images/qrcode.png"
 import { Printer } from "@element-plus/icons-vue"
 import {
   ElButton,
@@ -101,6 +102,9 @@ function handleClose() {
   >
     <div v-if="props.order" class="order-detail-print">
       <div class="print-header">
+        <div class="order-number-badge">
+          {{ props.order.orderNumber }}
+        </div>
         <div class="brand-banner">
           <h2 class="brand-logo-text">
             REAL YOU
@@ -114,6 +118,25 @@ function handleClose() {
         </div>
       </div>
 
+      <!-- 門市資訊 -->
+      <div class="store-info-section">
+        <div class="store-info-text">
+          <div class="store-info-item">
+            <span class="store-info-label">門市地址：</span>
+            <span>新北市新莊區立信三街7號3樓</span>
+          </div>
+          <div class="store-info-item">
+            <span class="store-info-label">聯絡電話：</span>
+            <span>0971-877-030</span>
+          </div>
+          <div class="store-info-item">
+            <span class="store-info-label">官方LINE：</span>
+            <span>@realyou</span>
+          </div>
+        </div>
+        <img :src="qrcodeImg" alt="QR Code" class="store-info-qrcode">
+      </div>
+
       <!-- 訂單基本資訊 -->
       <ElDescriptions
         :column="3"
@@ -122,9 +145,6 @@ function handleClose() {
         title="訂單資訊"
         class="section"
       >
-        <ElDescriptionsItem label="訂單編號">
-          {{ props.order.orderNumber }}
-        </ElDescriptionsItem>
         <ElDescriptionsItem label="訂單日期">
           {{ formatDate(props.order.orderDate) }}
         </ElDescriptionsItem>
@@ -137,7 +157,7 @@ function handleClose() {
         <ElDescriptionsItem label="客戶電話">
           {{ props.order.customerPhone }}
         </ElDescriptionsItem>
-        <ElDescriptionsItem label="收件方式">
+        <ElDescriptionsItem label="收件方式" :span="2">
           {{ DELIVERY_METHOD_LABELS[props.order.deliveryMethod] }}
         </ElDescriptionsItem>
       </ElDescriptions>
@@ -261,6 +281,17 @@ function handleClose() {
 .print-header {
   text-align: center;
   margin-bottom: 20px;
+  position: relative;
+}
+
+.order-number-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--el-color-danger);
+  letter-spacing: 0.5px;
 }
 
 .brand-banner {
@@ -305,6 +336,45 @@ function handleClose() {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.store-info-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 4px;
+  background-color: var(--el-fill-color-lighter);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.store-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.store-info-item {
+  display: flex;
+  align-items: center;
+}
+
+.store-info-label {
+  color: var(--el-text-color-secondary);
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.store-info-qrcode {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .label-title {
