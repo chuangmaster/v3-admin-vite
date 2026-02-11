@@ -133,10 +133,13 @@ function handleClose() {
       <div class="label-header">
         <div class="brand-banner">
           <h2 class="brand-logo-text">
-            REAL YOU 出貨單
+            REAL YOU
           </h2>
+          <p class="brand-slogan">
+            無 懼 追 求 唯 真 世 代
+          </p>
           <p class="brand-subtitle">
-            — LVMH集團授權鑑定中心 —
+            — L V M H 集 團 授 權 鑑 定 中 心 —
           </p>
         </div>
       </div>
@@ -323,31 +326,42 @@ function handleClose() {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: fit-content;
+  margin-inline: auto;
 }
 
 .brand-logo-text {
   font-family: "AFuturaOrto", sans-serif;
-  font-size: 45px;
+  font-size: 48px;
   font-weight: 700;
   letter-spacing: 6px;
   margin: 0 0 8px;
   color: var(--el-text-color-primary);
   line-height: 1;
+  white-space: nowrap;
 }
 
 .brand-slogan {
-  font-size: 19px;
+  font-size: 15px;
   letter-spacing: 8px;
-  margin: 4px 0 6px;
+  margin: 0 0 6px;
   font-weight: 400;
   color: var(--el-text-color-primary);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .brand-subtitle {
-  font-size: 15px;
+  font-size: 9px;
   letter-spacing: 3px;
-  margin: 0;
-  color: var(--el-text-color-secondary);
+  margin: 16px 0 0;
+  color: var(--el-text-color-primary);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .label-info {
