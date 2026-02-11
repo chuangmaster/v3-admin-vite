@@ -138,63 +138,69 @@ function handleClose() {
       </div>
 
       <!-- 訂單基本資訊 -->
-      <ElDescriptions
-        :column="3"
-        border
-        size="small"
-        title="訂單資訊"
-        class="section"
-      >
-        <ElDescriptionsItem label="訂單日期">
-          {{ formatDate(props.order.orderDate) }}
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="訂單類型">
-          {{ ORDER_TYPE_LABELS[props.order.orderType] }}
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="客戶名稱">
-          {{ props.order.customerName }}
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="客戶電話">
-          {{ props.order.customerPhone }}
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="收件方式" :span="2">
-          {{ DELIVERY_METHOD_LABELS[props.order.deliveryMethod] }}
-        </ElDescriptionsItem>
-      </ElDescriptions>
+      <div class="section">
+        <h3 class="section-title">
+          訂單資訊
+        </h3>
+        <ElDescriptions
+          :column="3"
+          border
+          size="small"
+        >
+          <ElDescriptionsItem label="訂單日期">
+            {{ formatDate(props.order.orderDate) }}
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="訂單類型">
+            {{ ORDER_TYPE_LABELS[props.order.orderType] }}
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="收件方式">
+            {{ DELIVERY_METHOD_LABELS[props.order.deliveryMethod] }}
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="客戶名稱">
+            {{ props.order.customerName }}
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="客戶電話">
+            {{ props.order.customerPhone }}
+          </ElDescriptionsItem>
+        </ElDescriptions>
+      </div>
 
       <!-- 狀態資訊 -->
-      <ElDescriptions
-        :column="3"
-        border
-        size="small"
-        title="狀態資訊"
-        class="section"
-      >
-        <ElDescriptionsItem label="訂單狀態">
-          <ElTag
-            :type="ORDER_STATUS_COLORS[props.order.orderStatus]"
-            size="small"
-          >
-            {{ ORDER_STATUS_LABELS[props.order.orderStatus] }}
-          </ElTag>
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="付款狀態">
-          <ElTag
-            :type="PAYMENT_STATUS_COLORS[props.order.paymentStatus]"
-            size="small"
-          >
-            {{ PAYMENT_STATUS_LABELS[props.order.paymentStatus] }}
-          </ElTag>
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="出貨狀態">
-          <ElTag
-            :type="SHIPPING_STATUS_COLORS[props.order.shippingStatus]"
-            size="small"
-          >
-            {{ SHIPPING_STATUS_LABELS[props.order.shippingStatus] }}
-          </ElTag>
-        </ElDescriptionsItem>
-      </ElDescriptions>
+      <div class="section">
+        <h3 class="section-title">
+          狀態資訊
+        </h3>
+        <ElDescriptions
+          :column="3"
+          border
+          size="small"
+        >
+          <ElDescriptionsItem label="訂單狀態">
+            <ElTag
+              :type="ORDER_STATUS_COLORS[props.order.orderStatus]"
+              size="small"
+            >
+              {{ ORDER_STATUS_LABELS[props.order.orderStatus] }}
+            </ElTag>
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="付款狀態">
+            <ElTag
+              :type="PAYMENT_STATUS_COLORS[props.order.paymentStatus]"
+              size="small"
+            >
+              {{ PAYMENT_STATUS_LABELS[props.order.paymentStatus] }}
+            </ElTag>
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="出貨狀態">
+            <ElTag
+              :type="SHIPPING_STATUS_COLORS[props.order.shippingStatus]"
+              size="small"
+            >
+              {{ SHIPPING_STATUS_LABELS[props.order.shippingStatus] }}
+            </ElTag>
+          </ElDescriptionsItem>
+        </ElDescriptions>
+      </div>
 
       <!-- 商品明細 -->
       <div class="section">
@@ -221,7 +227,7 @@ function handleClose() {
                 <span class="field-value">{{ item.panshiCode }}</span>
               </div>
               <div class="product-field">
-                <span class="field-label">序號 ID</span>
+                <span class="field-label">Serial ID</span>
                 <span class="field-value">{{ item.serialId }}</span>
               </div>
               <div class="product-field">
@@ -243,28 +249,36 @@ function handleClose() {
       </div>
 
       <!-- 其他資訊 -->
-      <ElDescriptions
-        :column="2"
-        border
-        size="small"
-        title="其他資訊"
-        class="section"
-      >
-        <ElDescriptionsItem label="建立者">
-          {{ props.order.createdByName }}
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="建立時間">
-          {{ formatDate(props.order.createdAt) }}
-        </ElDescriptionsItem>
-        <ElDescriptionsItem v-if="props.order.remarks" label="備註" :span="2">
-          {{ props.order.remarks }}
-        </ElDescriptionsItem>
-      </ElDescriptions>
-
+      <div class="section">
+        <h3 class="section-title">
+          其他資訊
+        </h3>
+        <ElDescriptions
+          :column="2"
+          border
+          size="small"
+        >
+          <ElDescriptionsItem label="承辦人員">
+            {{ props.order.createdByName }}
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="承辦日期">
+            {{ formatDate(props.order.createdAt) }}
+          </ElDescriptionsItem>
+          <ElDescriptionsItem v-if="props.order.remarks" label="備註" :span="2">
+            {{ props.order.remarks }}
+          </ElDescriptionsItem>
+        </ElDescriptions>
+      </div>
+      <!-- 保證書標題 -->
+      <div class="warranty-title-section">
+        <h2 class="warranty-title">
+          保 證 書
+        </h2>
+      </div>
       <!-- 銷貨說明 -->
       <div class="section sales-notice-section">
         <h3 class="section-title">
-          銷貨說明：
+          銷貨說明
         </h3>
         <ol class="sales-notice-list">
           <li>本公司售出之商品皆由專業人員鑑定完成，保證正品，特立此證為憑。</li>
@@ -276,15 +290,8 @@ function handleClose() {
           </li>
           <li>商品售出不接受退換貨，經雙方前對談價評估。</li>
           <li>因這貨品非品牌對接，故商品保固及維修問題，請洽品牌專櫃或由進貨代換。</li>
-          <li>收到商品7天內有任何問題請聯繫官方 Line：@realyou</li>
+          <li>收到商品7天內有任何問題請聯繫官方 LINE@realyou</li>
         </ol>
-      </div>
-
-      <!-- 保證書標題 -->
-      <div class="warranty-title-section">
-        <h2 class="warranty-title">
-          保 證 書
-        </h2>
       </div>
     </div>
 
@@ -513,6 +520,39 @@ function handleClose() {
     font-weight: 600;
     color: var(--el-color-danger);
   }
+}
+
+/* 銷貨說明 */
+.sales-notice-section {
+  margin-top: 24px;
+}
+
+.sales-notice-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 2;
+  color: var(--el-text-color-primary);
+
+  li {
+    padding-left: 4px;
+  }
+}
+
+/* 保證書標題 */
+.warranty-title-section {
+  text-align: center;
+  margin-top: 26px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--el-border-color);
+}
+
+.warranty-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 12px;
+  margin: 0;
+  color: var(--el-text-color-primary);
 }
 
 /* 平板響應式 */
