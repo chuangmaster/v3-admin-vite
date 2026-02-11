@@ -261,17 +261,17 @@ function formatCurrency(amount: number): string {
           </ElFormItem>
         </ElCol>
 
-        <!-- 序號 ID -->
+        <!-- Serial ID -->
         <ElCol :xs="24" :sm="12" :md="8">
           <ElFormItem
-            label="序號 ID"
+            label="Serial ID"
             :prop="`orderItems.${index}.serialId`"
-            :rules="[{ required: true, message: '請輸入序號 ID', trigger: 'blur' }]"
+            :rules="[{ required: true, message: '請輸入Serial ID', trigger: 'blur' }]"
           >
             <ElInput
               :model-value="item.serialId"
               :disabled="props.disabled"
-              placeholder="序號 ID"
+              placeholder="Serial ID"
               maxlength="100"
               @update:model-value="(v: string) => updateItem(index, 'serialId', v)"
             />

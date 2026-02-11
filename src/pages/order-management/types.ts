@@ -408,6 +408,16 @@ export interface SalesOrderExportDto {
   customerName: string
   /** 商品名稱（多項以逗號分隔） */
   productName: string
+  /** 磐石ID（多項以逗號分隔） */
+  panshiCode: string
+  /** 序號ID（多項以逗號分隔） */
+  serialId: string
+  /** 商品來源（多項以逗號分隔） */
+  productSource: string
+  /** 訂單類型 */
+  orderType: string
+  /** 收件方式 */
+  deliveryMethod: string
   /** 售出金額（總金額） */
   totalAmount: number
   /** 付款狀態 */

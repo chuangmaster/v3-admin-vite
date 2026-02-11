@@ -6,13 +6,16 @@
  *              欄寬設定、檔案下載
  */
 
-import type { OrderExportParams, OrderStatus, PaymentStatus, SalesOrderExportDto, ShippingStatus } from "@/pages/order-management/types"
+import type { DeliveryMethod, OrderExportParams, OrderStatus, OrderType, PaymentStatus, ProductSource, SalesOrderExportDto, ShippingStatus } from "@/pages/order-management/types"
 import { ElMessage } from "element-plus"
 import { ref } from "vue"
 import { orderApi } from "@/pages/order-management/apis/order"
 import {
+  DELIVERY_METHOD_LABELS,
   ORDER_STATUS_LABELS,
+  ORDER_TYPE_LABELS,
   PAYMENT_STATUS_LABELS,
+  PRODUCT_SOURCE_LABELS,
   SHIPPING_STATUS_LABELS
 } from "@/pages/order-management/types"
 
@@ -39,6 +42,27 @@ export function useOrderExport() {
    */
   function formatShippingStatus(status: string): string {
     return SHIPPING_STATUS_LABELS[status as ShippingStatus] || status
+  }
+
+  /**
+   * 格式化訂單類型為中文
+   */
+  function formatOrderType(type: string): string {
+    return ORDER_TYPE_LABELS[type as OrderType] || type
+  }
+
+  /**
+   * 格式化收件方式為中文
+   */
+  function formatDeliveryMethod(method: string): string {
+    return DELIVERY_METHOD_LABELS[method as DeliveryMethod] || method
+  }
+
+  /**
+   * 格式化商品來源為中文
+   */
+  function formatProductSource(source: string): string {
+    return PRODUCT_SOURCE_LABELS[source as ProductSource] || source
   }
 
   /**
@@ -87,6 +111,11 @@ export function useOrderExport() {
         訂單編號: item.orderNumber,
         客戶名稱: item.customerName,
         商品名稱: item.productName,
+        磐石ID: item.panshiCode,
+        序號ID: item.serialId,
+        商品來源: item.productSource,
+        訂單類型: formatOrderType(item.orderType),
+        收件方式: formatDeliveryMethod(item.deliveryMethod),
         售出金額: item.totalAmount,
         付款狀態: formatPaymentStatus(item.paymentStatus),
         訂單狀態: formatOrderStatus(item.orderStatus),
@@ -103,6 +132,11 @@ export function useOrderExport() {
         { wch: 20 }, // 訂單編號
         { wch: 15 }, // 客戶名稱
         { wch: 30 }, // 商品名稱
+        { wch: 20 }, // 磐石ID
+        { wch: 20 }, // 序號ID
+        { wch: 15 }, // 商品來源
+        { wch: 12 }, // 訂單類型
+        { wch: 12 }, // 收件方式
         { wch: 12 }, // 售出金額
         { wch: 10 }, // 付款狀態
         { wch: 10 }, // 訂單狀態
@@ -137,6 +171,9 @@ export function useOrderExport() {
     formatPaymentStatus,
     formatOrderStatus,
     formatShippingStatus,
+    formatOrderType,
+    formatDeliveryMethod,
+    formatProductSource,
     formatDate
   }
 }
