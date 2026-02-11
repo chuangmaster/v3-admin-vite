@@ -1,0 +1,36 @@
+/**
+ * 字體定義
+ * A Futura Orto 本地字體
+ */
+
+@font-face {
+  font-family: "AFuturaOrto";
+  src: url("./afuturaorto.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "AFuturaOrto";
+  src: url("./afuturaortobold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "AFuturaOrto";
+  src: url("./afuturaortoitalic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "AFuturaOrto";
+  src: url("./afuturaortobolditalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}

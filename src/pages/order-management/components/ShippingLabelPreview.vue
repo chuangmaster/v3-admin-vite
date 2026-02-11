@@ -29,6 +29,7 @@ import {
   SHIPPING_STATUS_COLORS,
   SHIPPING_STATUS_LABELS
 } from "@/pages/order-management/types"
+import "@/common/assets/fonts/fonts.css"
 
 defineOptions({ name: "ShippingLabelPreview" })
 
@@ -131,19 +132,13 @@ function handleClose() {
     <div v-if="props.data" class="shipping-label-content">
       <div class="label-header">
         <div class="brand-banner">
-          <p class="brand-logo-text">
-            REAL YOU
-          </p>
-          <p class="brand-slogan">
-            無懼追求&emsp;唯真世代
-          </p>
+          <h2 class="brand-logo-text">
+            REAL YOU 出貨單
+          </h2>
           <p class="brand-subtitle">
             — LVMH集團授權鑑定中心 —
           </p>
         </div>
-        <h2 class="label-title">
-          出貨單
-        </h2>
       </div>
 
       <!-- 訂單基本資訊 -->
@@ -331,7 +326,7 @@ function handleClose() {
 }
 
 .brand-logo-text {
-  font-family: Jost, sans-serif;
+  font-family: "AFuturaOrto", sans-serif;
   font-size: 45px;
   font-weight: 700;
   letter-spacing: 6px;
@@ -353,12 +348,6 @@ function handleClose() {
   letter-spacing: 3px;
   margin: 0;
   color: var(--el-text-color-secondary);
-}
-
-.label-title {
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0;
 }
 
 .label-info {
@@ -504,7 +493,6 @@ function handleClose() {
 
 <!-- 非 scoped 樣式：用於對話框本體及列印 -->
 <style lang="scss">
-@import url("https://fonts.googleapis.com/css2?family=Jost:wght@400;700&family=Noto+Sans:wght@400;600&display=swap");
 /* 對話框響應式寬度（平板適配） */
 .shipping-label-dialog {
   max-width: 95vw;
@@ -575,10 +563,6 @@ function handleClose() {
   .shipping-label-content {
     padding: 0 !important;
     width: 100% !important;
-  }
-
-  .label-title {
-    font-size: 24px !important;
   }
 
   /* 列印時卡片樣式 */

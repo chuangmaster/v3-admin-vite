@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<!--
 /**
  * 保證書列印元件
  *
@@ -7,6 +7,8 @@
  *              訂單編號、客戶資訊、商品詳情、金額明細、付款狀態、
  *              訂單狀態、出貨狀態、操作者等
  */
+-->
+<script setup lang="ts">
 import type { SalesOrder } from "@/pages/order-management/types"
 import { Printer } from "@element-plus/icons-vue"
 import {
@@ -27,6 +29,7 @@ import {
   SHIPPING_STATUS_COLORS,
   SHIPPING_STATUS_LABELS
 } from "@/pages/order-management/types"
+import "@/common/assets/fonts/fonts.css"
 
 defineOptions({ name: "OrderDetailPrint" })
 
@@ -99,23 +102,23 @@ function handleClose() {
     <div v-if="props.order" class="order-detail-print">
       <div class="print-header">
         <div class="brand-banner">
-          <p class="brand-logo-text">
-            REAL YOU
-          </p>
-          <p class="brand-slogan">
-            無懼追求&emsp;唯真世代
-          </p>
+          <h2 class="brand-logo-text">
+            REAL YOU 保證書
+          </h2>
           <p class="brand-subtitle">
             — LVMH集團授權鑑定中心 —
           </p>
         </div>
-        <h2 class="print-title">
-          保證書
-        </h2>
       </div>
 
       <!-- 訂單基本資訊 -->
-      <ElDescriptions :column="3" border size="small" title="訂單資訊" class="section">
+      <ElDescriptions
+        :column="3"
+        border
+        size="small"
+        title="訂單資訊"
+        class="section"
+      >
         <ElDescriptionsItem label="訂單編號">
           {{ props.order.orderNumber }}
         </ElDescriptionsItem>
@@ -137,19 +140,34 @@ function handleClose() {
       </ElDescriptions>
 
       <!-- 狀態資訊 -->
-      <ElDescriptions :column="3" border size="small" title="狀態資訊" class="section">
+      <ElDescriptions
+        :column="3"
+        border
+        size="small"
+        title="狀態資訊"
+        class="section"
+      >
         <ElDescriptionsItem label="訂單狀態">
-          <ElTag :type="ORDER_STATUS_COLORS[props.order.orderStatus]" size="small">
+          <ElTag
+            :type="ORDER_STATUS_COLORS[props.order.orderStatus]"
+            size="small"
+          >
             {{ ORDER_STATUS_LABELS[props.order.orderStatus] }}
           </ElTag>
         </ElDescriptionsItem>
         <ElDescriptionsItem label="付款狀態">
-          <ElTag :type="PAYMENT_STATUS_COLORS[props.order.paymentStatus]" size="small">
+          <ElTag
+            :type="PAYMENT_STATUS_COLORS[props.order.paymentStatus]"
+            size="small"
+          >
             {{ PAYMENT_STATUS_LABELS[props.order.paymentStatus] }}
           </ElTag>
         </ElDescriptionsItem>
         <ElDescriptionsItem label="出貨狀態">
-          <ElTag :type="SHIPPING_STATUS_COLORS[props.order.shippingStatus]" size="small">
+          <ElTag
+            :type="SHIPPING_STATUS_COLORS[props.order.shippingStatus]"
+            size="small"
+          >
             {{ SHIPPING_STATUS_LABELS[props.order.shippingStatus] }}
           </ElTag>
         </ElDescriptionsItem>
@@ -187,9 +205,14 @@ function handleClose() {
                 <span class="field-label">款式</span>
                 <span class="field-value">{{ item.productStyle }}</span>
               </div>
-              <div v-if="item.accessories && item.accessories.length > 0" class="product-field product-field-full">
+              <div
+                v-if="item.accessories && item.accessories.length > 0"
+                class="product-field product-field-full"
+              >
                 <span class="field-label">配件</span>
-                <span class="field-value">{{ formatAccessories(item.accessories) }}</span>
+                <span class="field-value">{{
+                  formatAccessories(item.accessories)
+                }}</span>
               </div>
             </div>
           </div>
@@ -197,7 +220,13 @@ function handleClose() {
       </div>
 
       <!-- 其他資訊 -->
-      <ElDescriptions :column="2" border size="small" title="其他資訊" class="section">
+      <ElDescriptions
+        :column="2"
+        border
+        size="small"
+        title="其他資訊"
+        class="section"
+      >
         <ElDescriptionsItem label="建立者">
           {{ props.order.createdByName }}
         </ElDescriptionsItem>
@@ -240,7 +269,7 @@ function handleClose() {
 }
 
 .brand-logo-text {
-  font-family: Jost, sans-serif;
+  font-family: "AFuturaOrto", sans-serif;
   font-size: 45px;
   font-weight: 700;
   letter-spacing: 6px;
@@ -404,8 +433,6 @@ function handleClose() {
 
 <!-- 非 scoped 樣式：用於對話框本體及列印 -->
 <style lang="scss">
-@import url("https://fonts.googleapis.com/css2?family=Jost:wght@400;700&family=Noto+Sans:wght@400;600&display=swap");
-
 /* 對話框響應式寬度（平板適配） */
 .order-detail-print-dialog {
   max-width: 95vw;
