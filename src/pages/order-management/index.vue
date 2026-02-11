@@ -15,11 +15,11 @@ import { useOrderExport } from "@/pages/order-management/composables/useOrderExp
 import { useOrderForm } from "@/pages/order-management/composables/useOrderForm"
 import { useOrderList } from "@/pages/order-management/composables/useOrderList"
 import { useShippingLabel } from "@/pages/order-management/composables/useShippingLabel"
-import OrderDetailPrint from "./components/OrderDetailPrint.vue"
 import OrderFormDialog from "./components/OrderFormDialog.vue"
 import OrderListTable from "./components/OrderListTable.vue"
 import OrderSearchForm from "./components/OrderSearchForm.vue"
 import ShippingLabelPreview from "./components/ShippingLabelPreview.vue"
+import WarrantyPrint from "./components/WarrantyPrint.vue"
 
 defineOptions({ name: "OrderManagement" })
 
@@ -218,7 +218,7 @@ async function handlePrintOrder(order: SalesOrderListItem) {
     />
 
     <!-- 保證書列印 -->
-    <OrderDetailPrint
+    <WarrantyPrint
       v-model:visible="printVisible"
       :order="printOrder"
     />

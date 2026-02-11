@@ -95,12 +95,12 @@ function handleClose() {
     :model-value="props.visible"
     title="保證書列印"
     width="900px"
-    class="order-detail-print-dialog"
+    class="warranty-print-dialog"
     append-to-body
     :close-on-click-modal="false"
     @close="handleClose"
   >
-    <div v-if="props.order" class="order-detail-print">
+    <div v-if="props.order" class="warranty-print">
       <div class="print-header">
         <div class="order-number-badge">
           {{ props.order.orderNumber }}
@@ -307,7 +307,7 @@ function handleClose() {
 </template>
 
 <style scoped lang="scss">
-.order-detail-print {
+.warranty-print {
   padding: 0 16px;
 }
 
@@ -557,7 +557,7 @@ function handleClose() {
 
 /* 平板響應式 */
 @media (max-width: 860px) {
-  .order-detail-print {
+  .warranty-print {
     padding: 0 8px;
   }
 
@@ -588,7 +588,7 @@ function handleClose() {
 <!-- 非 scoped 樣式：用於對話框本體及列印 -->
 <style lang="scss">
 /* 對話框響應式寬度（平板適配） */
-.order-detail-print-dialog {
+.warranty-print-dialog {
   max-width: 95vw;
 }
 
@@ -614,19 +614,19 @@ function handleClose() {
    * :not([style*="display: none"]) 確保只匹配實際可見的 overlay，
    * 避免關閉但仍殘留在 DOM 中的 overlay 干擾其他列印對話框
    */
-  body > .el-overlay:not([style*="display: none"]):has(.order-detail-print-dialog) {
+  body > .el-overlay:not([style*="display: none"]):has(.warranty-print-dialog) {
     display: block !important;
     position: static !important;
     background: none !important;
     overflow: visible !important;
   }
 
-  body > .el-overlay:not([style*="display: none"]):has(.order-detail-print-dialog) .el-overlay-dialog {
+  body > .el-overlay:not([style*="display: none"]):has(.warranty-print-dialog) .el-overlay-dialog {
     position: static !important;
     overflow: visible !important;
   }
 
-  .order-detail-print-dialog {
+  .warranty-print-dialog {
     position: static !important;
     width: 100% !important;
     max-width: none !important;
@@ -650,7 +650,7 @@ function handleClose() {
     }
   }
 
-  .order-detail-print {
+  .warranty-print {
     padding: 0 !important;
     width: 100% !important;
   }

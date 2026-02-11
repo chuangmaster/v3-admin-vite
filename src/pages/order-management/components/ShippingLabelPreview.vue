@@ -155,38 +155,43 @@ function handleClose() {
         <ElDescriptionsItem v-if="props.data.orderType" label="訂單類型">
           {{ ORDER_TYPE_LABELS[props.data.orderType] }}
         </ElDescriptionsItem>
+        <ElDescriptionsItem label="收件方式">
+          {{ DELIVERY_METHOD_LABELS[props.data.deliveryMethod] }}
+        </ElDescriptionsItem>
         <ElDescriptionsItem label="客戶名稱">
           {{ props.data.customerName }}
         </ElDescriptionsItem>
-        <ElDescriptionsItem v-if="props.data.customerPhone" label="客戶電話">
+        <ElDescriptionsItem label="客戶電話">
           {{ props.data.customerPhone }}
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="收件方式">
-          {{ DELIVERY_METHOD_LABELS[props.data.deliveryMethod] }}
         </ElDescriptionsItem>
       </ElDescriptions>
 
       <!-- 狀態資訊 -->
-      <ElDescriptions v-if="props.data.orderStatus || props.data.paymentStatus || props.data.shippingStatus" :column="3" border size="small" title="狀態資訊" class="label-info">
-        <ElDescriptionsItem label="訂單狀態">
-          <ElTag v-if="props.data.orderStatus" :type="ORDER_STATUS_COLORS[props.data.orderStatus]" size="small">
-            {{ ORDER_STATUS_LABELS[props.data.orderStatus] }}
-          </ElTag>
-          <span v-else>—</span>
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="付款狀態">
-          <ElTag v-if="props.data.paymentStatus" :type="PAYMENT_STATUS_COLORS[props.data.paymentStatus]" size="small">
-            {{ PAYMENT_STATUS_LABELS[props.data.paymentStatus] }}
-          </ElTag>
-          <span v-else>—</span>
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="出貨狀態">
-          <ElTag v-if="props.data.shippingStatus" :type="SHIPPING_STATUS_COLORS[props.data.shippingStatus]" size="small">
-            {{ SHIPPING_STATUS_LABELS[props.data.shippingStatus] }}
-          </ElTag>
-          <span v-else>—</span>
-        </ElDescriptionsItem>
-      </ElDescriptions>
+      <div v-if="props.data.orderStatus || props.data.paymentStatus || props.data.shippingStatus" class="label-info">
+        <h3 class="section-title">
+          狀態資訊
+        </h3>
+        <ElDescriptions :column="3" border size="small">
+          <ElDescriptionsItem label="訂單狀態">
+            <ElTag v-if="props.data.orderStatus" :type="ORDER_STATUS_COLORS[props.data.orderStatus]" size="small">
+              {{ ORDER_STATUS_LABELS[props.data.orderStatus] }}
+            </ElTag>
+            <span v-else>—</span>
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="付款狀態">
+            <ElTag v-if="props.data.paymentStatus" :type="PAYMENT_STATUS_COLORS[props.data.paymentStatus]" size="small">
+              {{ PAYMENT_STATUS_LABELS[props.data.paymentStatus] }}
+            </ElTag>
+            <span v-else>—</span>
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="出貨狀態">
+            <ElTag v-if="props.data.shippingStatus" :type="SHIPPING_STATUS_COLORS[props.data.shippingStatus]" size="small">
+              {{ SHIPPING_STATUS_LABELS[props.data.shippingStatus] }}
+            </ElTag>
+            <span v-else>—</span>
+          </ElDescriptionsItem>
+        </ElDescriptions>
+      </div>
 
       <!-- 收件資訊 -->
       <div class="delivery-section">
@@ -221,7 +226,7 @@ function handleClose() {
                 <span class="field-value">{{ item.panshiCode }}</span>
               </div>
               <div class="product-field">
-                <span class="field-label">序號 ID</span>
+                <span class="field-label">Serial ID</span>
                 <span class="field-value">{{ item.serialId }}</span>
               </div>
               <div class="product-field">
@@ -250,17 +255,22 @@ function handleClose() {
       </div>
 
       <!-- 金額明細 -->
-      <ElDescriptions v-if="props.data.subtotalAmount != null || props.data.shippingFee != null || props.data.totalAmount != null" :column="3" border size="small" title="金額明細" class="label-info">
-        <ElDescriptionsItem label="商品小計">
-          {{ formatCurrency(props.data.subtotalAmount) }}
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="運費">
-          {{ formatCurrency(props.data.shippingFee) }}
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="總金額">
-          <span class="total-amount">{{ formatCurrency(props.data.totalAmount) }}</span>
-        </ElDescriptionsItem>
-      </ElDescriptions>
+      <div v-if="props.data.subtotalAmount != null || props.data.shippingFee != null || props.data.totalAmount != null" class="label-info">
+        <h3 class="section-title">
+          金額明細
+        </h3>
+        <ElDescriptions :column="3" border size="small">
+          <ElDescriptionsItem label="商品小計">
+            {{ formatCurrency(props.data.subtotalAmount) }}
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="運費">
+            {{ formatCurrency(props.data.shippingFee) }}
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="總金額">
+            <span class="total-amount">{{ formatCurrency(props.data.totalAmount) }}</span>
+          </ElDescriptionsItem>
+        </ElDescriptions>
+      </div>
 
       <!-- 付款記錄 -->
       <div v-if="props.data.paymentRecords?.length" class="items-section">
@@ -289,14 +299,48 @@ function handleClose() {
       </div>
 
       <!-- 其他資訊 -->
-      <ElDescriptions v-if="props.data.createdByName || props.data.remarks" :column="2" border size="small" title="其他資訊" class="label-info">
-        <ElDescriptionsItem label="建立者">
-          {{ props.data.createdByName }}
-        </ElDescriptionsItem>
-        <ElDescriptionsItem label="備註">
-          {{ props.data.remarks || '無' }}
-        </ElDescriptionsItem>
-      </ElDescriptions>
+      <div v-if="props.data.createdByName || props.data.remarks" class="label-info">
+        <h3 class="section-title">
+          其他資訊
+        </h3>
+        <ElDescriptions :column="2" border size="small">
+          <ElDescriptionsItem label="建立者">
+            {{ props.data.createdByName }}
+          </ElDescriptionsItem>
+          <ElDescriptionsItem label="備註">
+            {{ props.data.remarks || '無' }}
+          </ElDescriptionsItem>
+        </ElDescriptions>
+      </div>
+
+      <!-- 簽名檢核欄位 -->
+      <div class="signature-section">
+        <h3 class="section-title">
+          簽名檢核
+        </h3>
+        <div class="signature-fields">
+          <div class="signature-field">
+            <div class="signature-label">
+              精品養護人員：
+            </div>
+            <div class="signature-line" />
+            <div class="signature-date-label">
+              日期：
+            </div>
+            <div class="signature-date-line" />
+          </div>
+          <div class="signature-field">
+            <div class="signature-label">
+              質檢發貨人員：
+            </div>
+            <div class="signature-line" />
+            <div class="signature-date-label">
+              日期：
+            </div>
+            <div class="signature-date-line" />
+          </div>
+        </div>
+      </div>
     </div>
 
     <template #footer>
@@ -458,6 +502,13 @@ function handleClose() {
   }
 }
 
+.product-field-full {
+  grid-column: 1 / -1;
+  border-right: none !important;
+  border-top: 1px solid var(--el-border-color-extra-light);
+  border-bottom: none;
+}
+
 .field-label {
   font-size: 12px;
   color: var(--el-text-color-secondary);
@@ -475,10 +526,59 @@ function handleClose() {
   }
 }
 
+/* 簽名檢核 */
+.signature-section {
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.signature-fields {
+  display: flex;
+  gap: 32px;
+  margin-top: 16px;
+}
+
+.signature-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.signature-label {
+  font-size: 14px;
+  color: var(--el-text-color-primary);
+  white-space: nowrap;
+}
+
+.signature-line {
+  flex: 1;
+  min-width: 120px;
+  border-bottom: 1px solid var(--el-text-color-secondary);
+  height: 32px;
+}
+
+.signature-date-label {
+  font-size: 14px;
+  color: var(--el-text-color-primary);
+  white-space: nowrap;
+}
+
+.signature-date-line {
+  width: 100px;
+  border-bottom: 1px solid var(--el-text-color-secondary);
+  height: 32px;
+}
+
 /* 平板響應式 */
 @media (max-width: 860px) {
   .shipping-label-content {
     padding: 0 8px;
+  }
+
+  .signature-fields {
+    flex-direction: column;
+    gap: 16px;
   }
 
   .product-card-body {
@@ -595,6 +695,12 @@ function handleClose() {
     background-color: #f5f5f5 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  /* 列印時簽名欄位 */
+  .signature-line,
+  .signature-date-line {
+    border-bottom-color: #333 !important;
   }
 }
 </style>
