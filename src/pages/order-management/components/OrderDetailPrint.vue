@@ -260,6 +260,32 @@ function handleClose() {
           {{ props.order.remarks }}
         </ElDescriptionsItem>
       </ElDescriptions>
+
+      <!-- 銷貨說明 -->
+      <div class="section sales-notice-section">
+        <h3 class="section-title">
+          銷貨說明：
+        </h3>
+        <ol class="sales-notice-list">
+          <li>本公司售出之商品皆由專業人員鑑定完成，保證正品，特立此證為憑。</li>
+          <li>本公司設有專業鑑定團隊，各縣市皆可上門收購。</li>
+          <li>
+            收到商品後，半年內依合況，最高收購價格為買入價格7折，代購商品除外。
+            <br>
+            （商品收購價格會因品牌、市場流通而有差異）
+          </li>
+          <li>商品售出不接受退換貨，經雙方前對談價評估。</li>
+          <li>因這貨品非品牌對接，故商品保固及維修問題，請洽品牌專櫃或由進貨代換。</li>
+          <li>收到商品7天內有任何問題請聯繫官方 Line：@realyou</li>
+        </ol>
+      </div>
+
+      <!-- 保證書標題 -->
+      <div class="warranty-title-section">
+        <h2 class="warranty-title">
+          保 證 書
+        </h2>
+      </div>
     </div>
 
     <template #footer>
@@ -468,6 +494,8 @@ function handleClose() {
 .product-field-full {
   grid-column: 1 / -1;
   border-right: none !important;
+  border-top: 1px solid var(--el-border-color-extra-light);
+  border-bottom: none;
 }
 
 .field-label {
