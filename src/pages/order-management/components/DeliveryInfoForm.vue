@@ -14,7 +14,7 @@ import {
   ElOption,
   ElSelect
 } from "element-plus"
-import { computed, watch } from "vue"
+import { computed, nextTick, watch } from "vue"
 import {
   DELIVERY_METHOD_LABELS,
   DeliveryMethod
@@ -30,10 +30,22 @@ const emit = defineEmits<Emits>()
 
 /** 收件方式選項列表 */
 const deliveryMethodOptions = [
-  { value: DeliveryMethod.PICKUP, label: DELIVERY_METHOD_LABELS[DeliveryMethod.PICKUP] },
-  { value: DeliveryMethod.HOME_DELIVERY, label: DELIVERY_METHOD_LABELS[DeliveryMethod.HOME_DELIVERY] },
-  { value: DeliveryMethod.STORE_PICKUP, label: DELIVERY_METHOD_LABELS[DeliveryMethod.STORE_PICKUP] },
-  { value: DeliveryMethod.PLATFORM, label: DELIVERY_METHOD_LABELS[DeliveryMethod.PLATFORM] }
+  {
+    value: DeliveryMethod.PICKUP,
+    label: DELIVERY_METHOD_LABELS[DeliveryMethod.PICKUP]
+  },
+  {
+    value: DeliveryMethod.HOME_DELIVERY,
+    label: DELIVERY_METHOD_LABELS[DeliveryMethod.HOME_DELIVERY]
+  },
+  {
+    value: DeliveryMethod.STORE_PICKUP,
+    label: DELIVERY_METHOD_LABELS[DeliveryMethod.STORE_PICKUP]
+  },
+  {
+    value: DeliveryMethod.PLATFORM,
+    label: DELIVERY_METHOD_LABELS[DeliveryMethod.PLATFORM]
+  }
 ]
 
 interface Props {
@@ -50,39 +62,63 @@ interface Props {
 interface Emits {
   (e: "update:deliveryMethod", value: DeliveryMethod): void
   (e: "update:deliveryInfo", value: Partial<DeliveryInfo>): void
+  (e: "validateDeliveryFields"): void
 }
 
 /** 是否為自取 */
 const isPickup = computed(() => props.deliveryMethod === DeliveryMethod.PICKUP)
 
 /** 是否為宅配 */
-const isHomeDelivery = computed(() => props.deliveryMethod === DeliveryMethod.HOME_DELIVERY)
+const isHomeDelivery = computed(
+  () => props.deliveryMethod === DeliveryMethod.HOME_DELIVERY
+)
 
 /** 是否為超商取貨 */
-const isStorePickup = computed(() => props.deliveryMethod === DeliveryMethod.STORE_PICKUP)
+const isStorePickup = computed(
+  () => props.deliveryMethod === DeliveryMethod.STORE_PICKUP
+)
 
 /** 是否為平台物流 */
-const isPlatform = computed(() => props.deliveryMethod === DeliveryMethod.PLATFORM)
+const isPlatform = computed(
+  () => props.deliveryMethod === DeliveryMethod.PLATFORM
+)
 
 /**
  * 收件方式變更時重置收件資訊
  */
-watch(() => props.deliveryMethod, (newMethod) => {
-  switch (newMethod) {
-    case DeliveryMethod.PICKUP:
-      emit("update:deliveryInfo", { type: "PICKUP", pickupLocation: "", pickupTime: "" })
-      break
-    case DeliveryMethod.HOME_DELIVERY:
-      emit("update:deliveryInfo", { type: "HOME_DELIVERY", recipientName: "", recipientPhone: "", recipientAddress: "" })
-      break
-    case DeliveryMethod.STORE_PICKUP:
-      emit("update:deliveryInfo", { type: "STORE_PICKUP", storeInfo: "", recipientName: "", recipientPhone: "" })
-      break
-    case DeliveryMethod.PLATFORM:
-      emit("update:deliveryInfo", { type: "PLATFORM" })
-      break
+watch(
+  () => props.deliveryMethod,
+  (newMethod) => {
+    switch (newMethod) {
+      case DeliveryMethod.PICKUP:
+        emit("update:deliveryInfo", {
+          type: "PICKUP",
+          pickupLocation: "",
+          pickupTime: ""
+        })
+        break
+      case DeliveryMethod.HOME_DELIVERY:
+        emit("update:deliveryInfo", {
+          type: "HOME_DELIVERY",
+          recipientName: "",
+          recipientPhone: "",
+          recipientAddress: ""
+        })
+        break
+      case DeliveryMethod.STORE_PICKUP:
+        emit("update:deliveryInfo", {
+          type: "STORE_PICKUP",
+          storeInfo: "",
+          recipientName: "",
+          recipientPhone: ""
+        })
+        break
+      case DeliveryMethod.PLATFORM:
+        emit("update:deliveryInfo", { type: "PLATFORM" })
+        break
+    }
   }
-})
+)
 
 /**
  * 更新收件資訊欄位
@@ -105,7 +141,7 @@ function handleMethodChange(method: DeliveryMethod) {
 /**
  * 帶入購買人資料至宅配收件資訊
  */
-function fillFromCustomer() {
+async function fillFromCustomer() {
   if (!props.customerInfo) return
   emit("update:deliveryInfo", {
     ...props.deliveryInfo,
@@ -113,6 +149,9 @@ function fillFromCustomer() {
     recipientPhone: props.customerInfo.phone,
     recipientAddress: props.customerInfo.address
   })
+  // 等待 DOM 更新後觸發驗證
+  await nextTick()
+  emit("validateDeliveryFields")
 }
 </script>
 
@@ -141,7 +180,12 @@ function fillFromCustomer() {
         prop="deliveryInfo.pickupLocation"
         :rules="[
           { required: true, message: '請輸入自取地點', trigger: 'blur' },
-          { min: 1, max: 200, message: '自取地點長度為 1-200 字元', trigger: 'blur' },
+          {
+            min: 1,
+            max: 200,
+            message: '自取地點長度為 1-200 字元',
+            trigger: 'blur',
+          },
         ]"
       >
         <ElInput
@@ -156,7 +200,9 @@ function fillFromCustomer() {
       <ElFormItem
         label="自取時間"
         prop="deliveryInfo.pickupTime"
-        :rules="[{ required: true, message: '請選擇自取時間', trigger: 'change' }]"
+        :rules="[
+          { required: true, message: '請選擇自取時間', trigger: 'change' },
+        ]"
       >
         <ElDatePicker
           :model-value="(props.deliveryInfo as any)?.pickupTime"
@@ -187,7 +233,12 @@ function fillFromCustomer() {
         prop="deliveryInfo.recipientName"
         :rules="[
           { required: true, message: '請輸入收件人姓名', trigger: 'blur' },
-          { min: 1, max: 50, message: '收件人姓名長度為 1-50 字元', trigger: 'blur' },
+          {
+            min: 1,
+            max: 50,
+            message: '收件人姓名長度為 1-50 字元',
+            trigger: 'blur',
+          },
         ]"
       >
         <ElInput
@@ -204,7 +255,11 @@ function fillFromCustomer() {
         prop="deliveryInfo.recipientPhone"
         :rules="[
           { required: true, message: '請輸入收件人電話', trigger: 'blur' },
-          { pattern: /^09\d{8}$/, message: '請輸入正確的台灣手機號碼（09 開頭,共 10 碼）', trigger: 'blur' },
+          {
+            pattern: /^09\d{8}$/,
+            message: '請輸入正確的台灣手機號碼（09 開頭,共 10 碼）',
+            trigger: 'blur',
+          },
         ]"
       >
         <ElInput
@@ -221,7 +276,12 @@ function fillFromCustomer() {
         prop="deliveryInfo.recipientAddress"
         :rules="[
           { required: true, message: '請輸入收件地址', trigger: 'blur' },
-          { min: 10, max: 200, message: '收件地址長度為 10-200 字元', trigger: 'blur' },
+          {
+            min: 10,
+            max: 200,
+            message: '收件地址長度為 10-200 字元',
+            trigger: 'blur',
+          },
         ]"
       >
         <ElInput
@@ -229,19 +289,35 @@ function fillFromCustomer() {
           :disabled="props.disabled"
           placeholder="請輸入收件地址"
           maxlength="200"
-          @update:model-value="(v: string) => updateField('recipientAddress', v)"
+          @update:model-value="
+            (v: string) => updateField('recipientAddress', v)
+          "
         />
       </ElFormItem>
     </template>
 
     <!-- 超商取貨 -->
     <template v-if="isStorePickup">
+      <div class="copy-customer-row">
+        <ElButton
+          size="small"
+          :disabled="props.disabled || !props.customerInfo"
+          @click="fillFromCustomer"
+        >
+          同購買人資料
+        </ElButton>
+      </div>
       <ElFormItem
         label="超商門市"
         prop="deliveryInfo.storeInfo"
         :rules="[
           { required: true, message: '請輸入超商門市資訊', trigger: 'blur' },
-          { min: 1, max: 200, message: '超商門市資訊長度為 1-200 字元', trigger: 'blur' },
+          {
+            min: 1,
+            max: 200,
+            message: '超商門市資訊長度為 1-200 字元',
+            trigger: 'blur',
+          },
         ]"
       >
         <ElInput
@@ -258,7 +334,12 @@ function fillFromCustomer() {
         prop="deliveryInfo.recipientName"
         :rules="[
           { required: true, message: '請輸入取貨人姓名', trigger: 'blur' },
-          { min: 1, max: 50, message: '取貨人姓名長度為 1-50 字元', trigger: 'blur' },
+          {
+            min: 1,
+            max: 50,
+            message: '取貨人姓名長度為 1-50 字元',
+            trigger: 'blur',
+          },
         ]"
       >
         <ElInput
@@ -275,7 +356,11 @@ function fillFromCustomer() {
         prop="deliveryInfo.recipientPhone"
         :rules="[
           { required: true, message: '請輸入取貨人電話', trigger: 'blur' },
-          { pattern: /^09\d{8}$/, message: '請輸入正確的台灣手機號碼（09 開頭,共 10 碼）', trigger: 'blur' },
+          {
+            pattern: /^09\d{8}$/,
+            message: '請輸入正確的台灣手機號碼（09 開頭,共 10 碼）',
+            trigger: 'blur',
+          },
         ]"
       >
         <ElInput

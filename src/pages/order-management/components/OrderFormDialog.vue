@@ -139,6 +139,20 @@ function handleCustomerChange(customer: Customer | null) {
 }
 
 /**
+ * 處理收件資訊欄位驗證
+ */
+function handleValidateDeliveryFields() {
+  nextTick(() => {
+    formRef.value?.validateField([
+      "deliveryInfo.recipientName",
+      "deliveryInfo.recipientPhone",
+      "deliveryInfo.recipientAddress",
+      "deliveryInfo.storeInfo"
+    ])
+  })
+}
+
+/**
  * 處理表單提交
  */
 async function handleSubmit() {
@@ -291,6 +305,7 @@ defineExpose({
         :customer-info="customerSelectorRef?.selectedCustomer ? { name: customerSelectorRef.selectedCustomer.name, phone: customerSelectorRef.selectedCustomer.phoneNumber, address: customerSelectorRef.selectedCustomer.residentialAddress } : null"
         @update:delivery-method="handleDeliveryMethodChange"
         @update:delivery-info="(v) => updateFormField('deliveryInfo', v)"
+        @validate-delivery-fields="handleValidateDeliveryFields"
       />
 
       <!-- 運費 -->
