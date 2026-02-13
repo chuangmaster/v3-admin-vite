@@ -62,6 +62,14 @@ export default {
     duplicateRoleName: "Role name already exists",
     concurrentUpdateConflict: "Data has been modified by another user",
     internalError: "System internal error",
-    invalidInterface: "Invalid interface"
+    invalidInterface: "Invalid interface",
+    dailyOrderLimitReached: "Daily order limit reached, please try again tomorrow",
+    dailyOrderLimitWarning: "Daily order count is approaching the limit",
+    invalidCustomer: "Customer does not exist or has been deleted",
+    orderAlreadyCompleted: "Order has been completed and cannot be modified",
+    orderAlreadyCancelled: "Order has been cancelled and cannot be modified",
+    paymentExceedsTotal: "Payment amount exceeds order total",
+    paymentRecordNotFound: "Payment record not found",
+    cannotDeletePaidRecord: "Cannot delete paid record"
   }
 }

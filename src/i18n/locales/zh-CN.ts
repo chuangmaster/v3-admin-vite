@@ -62,6 +62,14 @@ export default {
     duplicateRoleName: "角色名称已存在",
     concurrentUpdateConflict: "数据已被其他使用者修改",
     internalError: "系统内部错误",
-    invalidInterface: "非本系统的接口"
+    invalidInterface: "非本系统的接口",
+    dailyOrderLimitReached: "当日订单已达上限，请明日再试",
+    dailyOrderLimitWarning: "当日订单数接近上限，请留意",
+    invalidCustomer: "客户不存在或已删除",
+    orderAlreadyCompleted: "订单已完成，无法修改",
+    orderAlreadyCancelled: "订单已取消，无法修改",
+    paymentExceedsTotal: "付款金额超过订单总额",
+    paymentRecordNotFound: "付款记录不存在",
+    cannotDeletePaidRecord: "无法删除已付款记录"
   }
 }

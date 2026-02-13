@@ -163,6 +163,31 @@ export const dynamicRoutes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: "/order-management",
+    component: Layouts,
+    redirect: "/order-management/index",
+    name: "OrderManagement",
+    meta: {
+      title: { zhCN: "订单管理", zhTW: "訂單管理", en: "Order Management" },
+      titleKey: "orderManagement",
+      elIcon: "ShoppingCart",
+      alwaysShow: true
+    },
+    children: [
+      {
+        path: "index",
+        component: () => import("@/pages/order-management/index.vue"),
+        name: "OrderManagementList",
+        meta: {
+          title: { zhCN: "订单列表", zhTW: "訂單列表", en: "Order List" },
+          titleKey: "orderList",
+          keepAlive: true,
+          permissions: ["salesOrder.read"]
+        }
+      }
+    ]
+  },
+  {
     path: "/service-order",
     component: Layouts,
     redirect: "/service-order/index",

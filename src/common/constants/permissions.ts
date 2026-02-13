@@ -102,6 +102,22 @@ export const CUSTOMER_PERMISSIONS = {
 } as const
 
 /**
+ * 銷售訂單管理權限常數
+ */
+export const SALES_ORDER_PERMISSIONS = {
+  /** 查看訂單列表（路由權限） */
+  READ: "salesOrder.read",
+  /** 新增訂單（功能權限） */
+  CREATE: "salesOrder.create",
+  /** 修改訂單（功能權限） */
+  UPDATE: "salesOrder.update",
+  /** 刪除訂單（功能權限） */
+  DELETE: "salesOrder.delete",
+  /** 匯出訂單報表（功能權限） */
+  EXPORT: "salesOrder.export"
+} as const
+
+/**
  * 系統所有權限常數集合
  */
 export const SYSTEM_PERMISSIONS = {
@@ -109,5 +125,6 @@ export const SYSTEM_PERMISSIONS = {
   ...PERMISSION_PERMISSIONS,
   ...ROLE_PERMISSIONS,
   ...SERVICE_ORDER_PERMISSIONS,
-  ...CUSTOMER_PERMISSIONS
+  ...CUSTOMER_PERMISSIONS,
+  ...SALES_ORDER_PERMISSIONS
 } as const

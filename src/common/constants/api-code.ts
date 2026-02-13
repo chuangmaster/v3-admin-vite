@@ -68,6 +68,32 @@ export const API_CODE_DUPLICATE_PERMISSION_CODE = "DUPLICATE_PERMISSION_CODE"
 /** 角色名稱已存在 */
 export const API_CODE_DUPLICATE_ROLE_NAME = "DUPLICATE_ROLE_NAME"
 
+// ===== 訂單管理業務邏輯錯誤 =====
+
+/** 當日訂單上限已達 */
+export const API_CODE_DAILY_ORDER_LIMIT_REACHED = "DAILY_ORDER_LIMIT_REACHED"
+
+/** 當日訂單數接近上限（警告） */
+export const API_CODE_DAILY_ORDER_LIMIT_WARNING = "DAILY_ORDER_LIMIT_WARNING"
+
+/** 客戶不存在或已刪除 */
+export const API_CODE_INVALID_CUSTOMER = "INVALID_CUSTOMER"
+
+/** 訂單已完成，無法修改 */
+export const API_CODE_ORDER_ALREADY_COMPLETED = "ORDER_ALREADY_COMPLETED"
+
+/** 訂單已取消，無法修改 */
+export const API_CODE_ORDER_ALREADY_CANCELLED = "ORDER_ALREADY_CANCELLED"
+
+/** 付款金額超過訂單總額 */
+export const API_CODE_PAYMENT_EXCEEDS_TOTAL = "PAYMENT_EXCEEDS_TOTAL"
+
+/** 付款記錄不存在 */
+export const API_CODE_PAYMENT_RECORD_NOT_FOUND = "PAYMENT_RECORD_NOT_FOUND"
+
+/** 無法刪除已付款記錄 */
+export const API_CODE_CANNOT_DELETE_PAID_RECORD = "CANNOT_DELETE_PAID_RECORD"
+
 // ===== 並發控制 (409) =====
 
 /** 並發更新衝突 (資料已被其他使用者修改) */
@@ -114,5 +140,13 @@ export const API_CODE_I18N_KEY_MAP: Record<string, string> = {
   [API_CODE_DUPLICATE_PERMISSION_CODE]: "api.duplicatePermissionCode",
   [API_CODE_DUPLICATE_ROLE_NAME]: "api.duplicateRoleName",
   [API_CODE_CONCURRENT_UPDATE_CONFLICT]: "api.concurrentUpdateConflict",
-  [API_CODE_INTERNAL_ERROR]: "api.internalError"
+  [API_CODE_INTERNAL_ERROR]: "api.internalError",
+  [API_CODE_DAILY_ORDER_LIMIT_REACHED]: "api.dailyOrderLimitReached",
+  [API_CODE_DAILY_ORDER_LIMIT_WARNING]: "api.dailyOrderLimitWarning",
+  [API_CODE_INVALID_CUSTOMER]: "api.invalidCustomer",
+  [API_CODE_ORDER_ALREADY_COMPLETED]: "api.orderAlreadyCompleted",
+  [API_CODE_ORDER_ALREADY_CANCELLED]: "api.orderAlreadyCancelled",
+  [API_CODE_PAYMENT_EXCEEDS_TOTAL]: "api.paymentExceedsTotal",
+  [API_CODE_PAYMENT_RECORD_NOT_FOUND]: "api.paymentRecordNotFound",
+  [API_CODE_CANNOT_DELETE_PAID_RECORD]: "api.cannotDeletePaidRecord"
 }
