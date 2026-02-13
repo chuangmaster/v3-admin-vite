@@ -185,8 +185,10 @@
 - [x] T068 [US4] 在 ShippingLabelPreview.vue 中實作列印樣式優化(使用 @media print CSS 規則隱藏不必要元素、確保出貨單格式符合 A4 紙張規格)
 - [x] T069 [US4] 在 useShippingLabel.ts 中實作下載功能(可選)(使用 html2canvas 或 jsPDF 將出貨單轉換為 PDF 並下載)
 - [x] T069-1 [US4] 在 src/pages/order-management/components/ 中新增 OrderDetailPrint.vue 元件並實作訂單明細列印功能(供內部使用,包含訂單編號/客戶資訊/商品詳情/金額明細/付款狀態/訂單狀態/出貨狀態/操作者等完整資訊,使用 @media print 優化列印樣式)
+- [x] T069-2 [US4] 重構訂單明細列印為保證書列印元件 WarrantyPrint.vue(包含品牌標語、門市資訊、QR Code、銷貨說明等完整保證書格式)
+- [x] T069-3 [US4] 提取品牌標題為共用元件 BrandBanner.vue(包含 REAL YOU 標誌、標語、副標題,供 WarrantyPrint 與 ShippingLabelPreview 共用)
 
-**Checkpoint**: 出貨單與訂單明細列印功能完成
+**Checkpoint**: 出貨單與保證書列印功能完成
 
 ---
 
@@ -329,7 +331,7 @@ Task: "實作驗證邏輯"
 
 ## Task Summary
 
-### 總任務數: 88 個任務
+### 總任務數: 91 個任務
 
 ### 各使用者故事任務數:
 - **Setup (Phase 1)**: 13 個任務
@@ -337,7 +339,7 @@ Task: "實作驗證邏輯"
 - **User Story 1 - 建立新銷售訂單 (P1)**: 12 個任務
 - **User Story 2 - 更新訂單付款與狀態 (P2)**: 16 個任務
 - **User Story 3 - 搜尋與篩選訂單 (P2)**: 8 個任務
-- **User Story 4 - 列印與下載出貨單 (P3)**: 6 個任務(新增 T069-1 訂單明細列印)
+- **User Story 4 - 列印與下載出貨單 (P3)**: 9 個任務(新增 T069-1 訂單明細列印, T069-2 保證書列印, T069-3 品牌橫幅元件)
 - **User Story 5 - 匯出訂單報表 (P3)**: 5 個任務
 - **Polish (Phase 8)**: 13 個任務
 
@@ -378,4 +380,4 @@ Task: "實作驗證邏輯"
 
 ---
 
-**Tasks Generated**: 2026-02-06 | **Author**: GitHub Copilot | **Total**: 88 tasks | **Parallel Opportunities**: 39 tasks | **Last Updated**: 2026-02-06 (Analysis corrections applied)
+**Tasks Generated**: 2026-02-06 | **Author**: GitHub Copilot | **Total**: 91 tasks | **Parallel Opportunities**: 39 tasks | **Last Updated**: 2026-02-13 (補充列印功能重構任務 T069-2, T069-3)

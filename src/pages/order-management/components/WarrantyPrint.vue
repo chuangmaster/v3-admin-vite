@@ -30,6 +30,7 @@ import {
   SHIPPING_STATUS_COLORS,
   SHIPPING_STATUS_LABELS
 } from "@/pages/order-management/types"
+import BrandBanner from "./BrandBanner.vue"
 import "@/common/assets/fonts/fonts.css"
 
 defineOptions({ name: "WarrantyPrint" })
@@ -105,17 +106,7 @@ function handleClose() {
         <div class="order-number-badge">
           {{ props.order.orderNumber }}
         </div>
-        <div class="brand-banner">
-          <h2 class="brand-logo-text">
-            REAL YOU
-          </h2>
-          <p class="brand-slogan">
-            無 懼 追 求 唯 真 世 代
-          </p>
-          <p class="brand-subtitle">
-            — L V M H 集 團 授 權 鑑 定 中 心 —
-          </p>
-        </div>
+        <BrandBanner />
       </div>
 
       <!-- 門市資訊 -->
@@ -325,50 +316,6 @@ function handleClose() {
   font-weight: 400;
   color: var(--el-color-danger);
   letter-spacing: 0.5px;
-}
-
-.brand-banner {
-  padding: 16px 12px 10px;
-  margin-bottom: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: fit-content;
-  margin-inline: auto;
-}
-
-.brand-logo-text {
-  font-family: "AFuturaOrto", sans-serif;
-  font-size: 48px;
-  font-weight: 700;
-  letter-spacing: 6px;
-  margin: 0 0 8px;
-  color: var(--el-text-color-primary);
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.brand-slogan {
-  font-size: 15px;
-  letter-spacing: 8px;
-  margin: 0 0 6px;
-  font-weight: 400;
-  color: var(--el-text-color-primary);
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.brand-subtitle {
-  font-size: 9px;
-  letter-spacing: 3px;
-  margin: 16px 0 0;
-  color: var(--el-text-color-primary);
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .store-info-section {
@@ -673,6 +620,19 @@ function handleClose() {
 
   .product-card-body {
     grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  /* 列印時優化頁面分頁 */
+  .warranty-title-section {
+    margin-top: 12px !important;
+  }
+
+  .sales-notice-section {
+    margin-top: 8px !important;
+  }
+
+  .sales-notice-list {
+    line-height: 1.8 !important;
   }
 }
 </style>
