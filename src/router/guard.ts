@@ -60,15 +60,8 @@ export function registerNavigationGuard(router: Router) {
   // 全局后置钩子
   router.afterEach((to) => {
     setRouteChange(to)
-    // 处理 title 对象或字符串
-    const title = to.meta.title
-    let titleString: string | undefined
-    if (typeof title === "string") {
-      titleString = title
-    } else if (title && typeof title === "object") {
-      titleString = Object.values(title)[0] as string
-    }
-    setTitle(titleString)
+    // 直接傳遞標題物件給 setTitle,讓 watchEffect 根據當前語言自動轉換
+    setTitle(to.meta.title)
     NProgress.done()
   })
 }
