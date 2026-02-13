@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useI18n } from "vue-i18n"
+import i18n from "@/i18n"
 
 interface LanguageItem {
   locale: string
@@ -16,7 +17,9 @@ const languages: LanguageItem[] = [
 
 /** 切換語言 */
 function changeLanguage(selectedLocale: string) {
+  // 同時更新組件和全局的 locale
   locale.value = selectedLocale as any
+  ;(i18n.global.locale as any).value = selectedLocale
   // 保存語言設定到 localStorage
   localStorage.setItem("app-language", selectedLocale)
 }
