@@ -163,6 +163,8 @@ export interface SalesOrderListItem {
   deliveryMethod: DeliveryMethod
   /** 訂單備註 */
   remarks: string | null
+  /** 訂單項目清單 */
+  orderItems: OrderItem[]
   /** 建立時間 */
   createdAt: string
   /** 建立者名稱 */
