@@ -37,7 +37,7 @@ describe("useServiceOrderList", () => {
         brandName: "金品牌",
         style: "項鍊",
         quantity: 1,
-        amount: 50000,
+        totalAmount: 50000,
         status: ServiceOrderStatus.PENDING,
         createdAt: "2025-12-14T10:00:00Z",
         createdBy: "admin",

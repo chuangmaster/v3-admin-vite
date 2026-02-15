@@ -171,11 +171,19 @@ const hasOnlineSignature = computed(() => {
 })
 
 /**
+ * 服務單是否已取消
+ */
+const isOrderCancelled = computed(() => {
+  if (!serviceOrder.value) return false
+  return serviceOrder.value.status === ServiceOrderStatus.TERMINATED
+})
+
+/**
  * 是否可以發送簽章請求（僅在沒有任何簽章紀錄時顯示）
- * 條件：服務單來源為線上 && 沒有線上簽章紀錄
+ * 條件：服務單來源為線上 && 沒有線上簽章紀錄 && 服務單未被取消
  */
 const canSendRequest = computed(() => {
-  return serviceOrder.value?.orderSource === "ONLINE" && !hasOnlineSignature.value
+  return serviceOrder.value?.orderSource === "ONLINE" && !hasOnlineSignature.value && !isOrderCancelled.value
 })
 
 /**
@@ -371,7 +379,7 @@ function getStatusText(status: ServiceOrderStatus) {
     [ServiceOrderStatus.CONFIRMED]: "已確認",
     [ServiceOrderStatus.IN_PROGRESS]: "處理中",
     [ServiceOrderStatus.COMPLETED]: "已完成",
-    [ServiceOrderStatus.CANCELLED]: "已取消"
+    [ServiceOrderStatus.TERMINATED]: "已取消"
   }
   return map[status] || status
 }
@@ -624,7 +632,7 @@ function getRenewalOptionText(option: string) {
                   :attachment-list="idCardAttachments"
                   :limit="2"
                   :readonly="true"
-                  :disabled="serviceOrder.status === ServiceOrderStatus.CANCELLED"
+                  :disabled="isOrderCancelled"
                 />
               </div>
             </el-col>
@@ -642,7 +650,7 @@ function getRenewalOptionText(option: string) {
                   :attachment-list="contractAttachments"
                   :limit="5"
                   :readonly="true"
-                  :disabled="serviceOrder.status === ServiceOrderStatus.CANCELLED"
+                  :disabled="isOrderCancelled"
                 />
               </div>
             </el-col>
@@ -676,10 +684,19 @@ function getRenewalOptionText(option: string) {
                   <el-button
                     type="primary"
                     :loading="signatureLoading"
+                    :disabled="isOrderCancelled"
                     @click="handleStartSign(record)"
                   >
                     預覽並簽署
                   </el-button>
+                  <el-alert
+                    v-if="isOrderCancelled"
+                    type="warning"
+                    :closable="false"
+                    style="margin-top: 12px;"
+                  >
+                    此服務單已取消，無法進行簽署操作
+                  </el-alert>
                 </div>
               </el-card>
             </el-col>
@@ -706,10 +723,21 @@ function getRenewalOptionText(option: string) {
               type="primary"
               :icon="Promotion"
               :loading="onlineSignatureLoading"
+              :disabled="isOrderCancelled"
               @click="handleSendSignatureRequest"
             >
               發送簽章請求
             </el-button>
+          </div>
+
+          <!-- 已取消提示 -->
+          <div v-if="isOrderCancelled && serviceOrder.orderSource === 'ONLINE'" class="send-request-container">
+            <el-alert
+              type="warning"
+              :closable="false"
+            >
+              此服務單已取消，無法進行線上簽章操作
+            </el-alert>
           </div>
 
           <!-- 線上簽章記錄列表 -->
@@ -748,6 +776,7 @@ function getRenewalOptionText(option: string) {
                         size="small"
                         type="primary"
                         :loading="onlineSignatureLoading"
+                        :disabled="isOrderCancelled"
                         @click="handleSendSignatureRequest"
                       >
                         發送簽章請求
@@ -758,6 +787,7 @@ function getRenewalOptionText(option: string) {
                         size="small"
                         type="primary"
                         :loading="onlineSignatureLoading"
+                        :disabled="isOrderCancelled"
                         @click="handleResendSignatureRequest(record)"
                       >
                         重新發送簽章請求
@@ -766,6 +796,7 @@ function getRenewalOptionText(option: string) {
                         v-if="canCopyUrl(record)"
                         :icon="CopyDocument"
                         size="small"
+                        :disabled="isOrderCancelled"
                         @click="handleCopySignatureUrl(record)"
                       >
                         複製簽章連結

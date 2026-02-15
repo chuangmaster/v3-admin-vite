@@ -13,21 +13,49 @@ import { request } from "@/http/axios"
 
 /**
  * 查詢服務單列表
- * @param params - 查詢參數（頁碼、每頁筆數、服務單類型、客戶名稱、日期範圍、狀態）
+ * @param params - 查詢參數（頁碼、每頁筆數、服務單類型、客戶名稱、日期範圍、狀態等）
  * @returns 服務單列表回應
  */
 export async function getServiceOrderList(
   params: ServiceOrderListParams
 ): Promise<PagedApiResponse<ServiceOrderListItem[]>> {
-  // 處理日期範圍參數，將 createdDateRange 轉換為 createdAtStart 和 createdAtEnd
-  const apiParams = { ...params }
-  if (apiParams.createdDateRange && apiParams.createdDateRange.length === 2) {
-    // 轉換為 UTC+0 的 ISO String 格式
-    apiParams.createdAtStart = toUTC0ISOString(apiParams.createdDateRange[0], false)
-    apiParams.createdAtEnd = toUTC0ISOString(apiParams.createdDateRange[1], true)
+  const apiParams: Record<string, unknown> = { ...params }
+
+  // 建立日期範圍 → UTC+0
+  if (apiParams.createdDateRange && (apiParams.createdDateRange as string[]).length === 2) {
+    const range = apiParams.createdDateRange as [string, string]
+    apiParams.createdAtStart = toUTC0ISOString(range[0], false)
+    apiParams.createdAtEnd = toUTC0ISOString(range[1], true)
   }
-  // 移除前端用的 createdDateRange，避免傳給後端
-  delete (apiParams as any).createdDateRange
+  delete apiParams.createdDateRange
+
+  // 服務日期範圍 → UTC+0
+  if (apiParams.serviceDateRange && (apiParams.serviceDateRange as string[]).length === 2) {
+    const range = apiParams.serviceDateRange as [string, string]
+    apiParams.ServiceDateStart = toUTC0ISOString(range[0], false)
+    apiParams.ServiceDateEnd = toUTC0ISOString(range[1], true)
+  }
+  delete apiParams.serviceDateRange
+  delete apiParams.serviceDateStart
+  delete apiParams.serviceDateEnd
+
+  // 將新篩選欄位映射為後端 PascalCase 參數名稱
+  if (apiParams.brandName) {
+    apiParams.BrandName = apiParams.brandName
+    delete apiParams.brandName
+  }
+  if (apiParams.styleName) {
+    apiParams.StyleName = apiParams.styleName
+    delete apiParams.styleName
+  }
+  if (apiParams.minAmount != null) {
+    apiParams.MinAmount = apiParams.minAmount
+    delete apiParams.minAmount
+  }
+  if (apiParams.maxAmount != null) {
+    apiParams.MaxAmount = apiParams.maxAmount
+    delete apiParams.maxAmount
+  }
 
   return request({ url: "/service-orders", method: "GET", params: apiParams })
 }

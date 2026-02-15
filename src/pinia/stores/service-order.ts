@@ -15,11 +15,21 @@ export const useServiceOrderStore = defineStore("service-order", () => {
   const queryParams = ref<ServiceOrderListParams>({
     pageNumber: 1,
     pageSize: 20,
+    orderNumber: undefined,
     orderType: "" as any,
+    orderSource: "" as any,
     customerName: undefined,
+    createdDateRange: undefined,
     createdAtStart: undefined,
     createdAtEnd: undefined,
-    status: "" as any
+    status: "" as any,
+    brandName: undefined,
+    styleName: undefined,
+    minAmount: undefined,
+    maxAmount: undefined,
+    serviceDateRange: undefined,
+    serviceDateStart: undefined,
+    serviceDateEnd: undefined
   })
 
   /** 當前服務單類型篩選（用於 UI 顯示） */
@@ -49,11 +59,21 @@ export const useServiceOrderStore = defineStore("service-order", () => {
     queryParams.value = {
       pageNumber: 1,
       pageSize: 20,
+      orderNumber: undefined,
       orderType: "" as any,
+      orderSource: "" as any,
       customerName: undefined,
+      createdDateRange: undefined,
       createdAtStart: undefined,
       createdAtEnd: undefined,
-      status: "pending" as any
+      status: "" as any,
+      brandName: undefined,
+      styleName: undefined,
+      minAmount: undefined,
+      maxAmount: undefined,
+      serviceDateRange: undefined,
+      serviceDateStart: undefined,
+      serviceDateEnd: undefined
     }
     currentOrderType.value = undefined
     currentStatus.value = undefined
