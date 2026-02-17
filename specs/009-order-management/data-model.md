@@ -202,7 +202,7 @@ export interface PlatformDeliveryInfo {
 ```typescript
 /** 訂單類型 */
 export enum OrderType {
-  /** 代購現貨 */
+  /** 現貨 */
   SPOT_PURCHASE = 'SPOT_PURCHASE',
   /** 預購 */
   PRE_ORDER = 'PRE_ORDER'
