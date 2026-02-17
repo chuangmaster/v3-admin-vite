@@ -3,8 +3,10 @@
  * 服務訂單管理列表頁面
  */
 import { formatDateTime } from "@@/utils/datetime"
-import { Plus, Refresh, Search, View } from "@element-plus/icons-vue"
+import { Download, Plus, Refresh, Search, View } from "@element-plus/icons-vue"
+import { useServiceOrderExport } from "./composables/useServiceOrderExport"
 import { useServiceOrderList } from "./composables/useServiceOrderList"
+import { useServiceOrderStatusUpdate } from "./composables/useServiceOrderStatusUpdate"
 import { ServiceOrderSource, ServiceOrderStatus, ServiceOrderType } from "./types"
 
 defineOptions({
@@ -23,6 +25,14 @@ const {
   refresh,
   resetQuery
 } = useServiceOrderList()
+
+const { updating, handleCancel } = useServiceOrderStatusUpdate(refresh)
+const { exporting, exportServiceOrders } = useServiceOrderExport()
+
+/** 匯出報表 */
+function handleExport() {
+  exportServiceOrders(queryParams.value)
+}
 
 /** 訂單類型選項 */
 const orderTypeOptions = [
@@ -43,7 +53,7 @@ const statusOptions = [
   { label: "全部", value: "" },
   { label: "待確認", value: ServiceOrderStatus.PENDING },
   { label: "已完成", value: ServiceOrderStatus.COMPLETED },
-  { label: "已取消", value: ServiceOrderStatus.CANCELLED }
+  { label: "已取消", value: ServiceOrderStatus.TERMINATED }
 ]
 
 /**
@@ -63,7 +73,7 @@ function getStatusTag(status: ServiceOrderStatus) {
     [ServiceOrderStatus.CONFIRMED]: "success",
     [ServiceOrderStatus.IN_PROGRESS]: "primary",
     [ServiceOrderStatus.COMPLETED]: "success",
-    [ServiceOrderStatus.CANCELLED]: "danger"
+    [ServiceOrderStatus.TERMINATED]: "danger"
   }
   return map[status] || "info"
 }
@@ -80,7 +90,7 @@ function getStatusText(status: ServiceOrderStatus | string) {
     confirmed: "已確認",
     in_progress: "處理中",
     completed: "已完成",
-    cancelled: "已取消"
+    terminated: "已取消"
   }
   return map[normalizedStatus] || status
 }
@@ -118,6 +128,14 @@ function getOrderSourceTag(source: ServiceOrderSource | string) {
         <div class="card-header">
           <span class="title">服務訂單管理</span>
           <div>
+            <el-button
+              type="success"
+              :icon="Download"
+              :loading="exporting"
+              @click="handleExport"
+            >
+              匯出報表
+            </el-button>
             <el-button
               type="primary"
               :icon="Plus"
@@ -201,9 +219,47 @@ function getOrderSourceTag(source: ServiceOrderSource | string) {
             />
           </el-form-item>
 
-          <el-form-item label="建立日期">
+          <el-form-item label="品牌名稱">
+            <el-input
+              v-model="queryParams.brandName"
+              placeholder="請輸入品牌名稱"
+              clearable
+              @clear="refresh"
+            />
+          </el-form-item>
+
+          <el-form-item label="款式">
+            <el-input
+              v-model="queryParams.styleName"
+              placeholder="請輸入款式"
+              clearable
+              @clear="refresh"
+            />
+          </el-form-item>
+
+          <el-form-item label="金額範圍">
+            <div class="amount-range">
+              <el-input-number
+                v-model="queryParams.minAmount"
+                :min="0"
+                :controls="false"
+                placeholder="最小金額"
+                style="width: 130px"
+              />
+              <span class="range-separator">至</span>
+              <el-input-number
+                v-model="queryParams.maxAmount"
+                :min="0"
+                :controls="false"
+                placeholder="最大金額"
+                style="width: 130px"
+              />
+            </div>
+          </el-form-item>
+
+          <el-form-item label="服務單建立時間">
             <el-date-picker
-              v-model="queryParams.createdDateRange"
+              v-model="queryParams.serviceDateRange"
               type="daterange"
               range-separator="至"
               start-placeholder="開始日期"
@@ -261,13 +317,13 @@ function getOrderSourceTag(source: ServiceOrderSource | string) {
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="createdAt" label="建立時間" width="180">
+        <el-table-column prop="createdAt" label="服務單建立時間" width="180">
           <template #default="{ row }">
             {{ formatDateTime(row.createdAt) }}
           </template>
         </el-table-column>
         <el-table-column prop="createdByName" label="建立人" width="120" />
-        <el-table-column label="操作" width="150" fixed="right">
+        <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button
               v-permission="['serviceOrder.buyback.read', 'serviceOrder.consignment.read']"
@@ -278,6 +334,17 @@ function getOrderSourceTag(source: ServiceOrderSource | string) {
               @click="viewDetail(row.id)"
             >
               查看
+            </el-button>
+            <el-button
+              v-if="row.status === ServiceOrderStatus.PENDING"
+              v-permission="['serviceOrder.buyback.update', 'serviceOrder.consignment.update']"
+              type="danger"
+              link
+              size="small"
+              :loading="updating"
+              @click="handleCancel(row)"
+            >
+              取消
             </el-button>
           </template>
         </el-table-column>
@@ -314,6 +381,16 @@ function getOrderSourceTag(source: ServiceOrderSource | string) {
 
   .filter-container {
     margin-bottom: 20px;
+
+    .amount-range {
+      display: flex;
+      align-items: center;
+
+      .range-separator {
+        margin: 0 8px;
+        color: var(--el-text-color-regular);
+      }
+    }
   }
 
   .el-pagination {

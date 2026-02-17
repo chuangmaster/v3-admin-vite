@@ -30,8 +30,8 @@ export enum ServiceOrderStatus {
   IN_PROGRESS = "IN_PROGRESS",
   /** 已完成 */
   COMPLETED = "COMPLETED",
-  /** 已取消 */
-  CANCELLED = "CANCELLED"
+  /** 已終止/已取消 */
+  TERMINATED = "TERMINATED"
 }
 
 /** 續約設定 */
@@ -351,6 +351,8 @@ export interface ServiceOrderListItem {
   customerId: string
   /** 客戶名稱 */
   customerName: string
+  /** 客戶電話 */
+  customerPhone?: string
   /** 品牌名稱（第一件商品） */
   brandName: string
   /** 款式（第一件商品） */
@@ -360,15 +362,21 @@ export interface ServiceOrderListItem {
   /** 商品數量 */
   quantity: number
   /** 總金額 */
-  amount: number
+  totalAmount: number
   /** 服務單狀態 */
   status: ServiceOrderStatus
+  /** 服務日期（ISO 8601, UTC） */
+  serviceDate?: string
   /** 建立時間（ISO 8601, UTC） */
   createdAt: string
   /** 建立者（使用者 ID） */
   createdBy: string
+  /** 建立者姓名 */
+  createdByName?: string
   /** 版本號（樂觀鎖） */
   version: number
+  /** 商品項目列表（匯出時使用） */
+  productItems?: ProductItem[]
 }
 
 /** API 商品項目（建立訂單用） */
@@ -525,12 +533,14 @@ export interface UpdateServiceOrderRequest {
   version: number
 }
 
-/** 更新服務單狀態請求 */
+/** 更新服務單狀態請求（對齊 Swagger UpdateServiceOrderStatusRequest） */
 export interface UpdateStatusRequest {
-  /** 目標狀態 */
-  status: ServiceOrderStatus
-  /** 版本號（樂觀鎖） */
-  version: number
+  /** 目標狀態 (PENDING/COMPLETED/TERMINATED) */
+  status: string
+  /** 預期版本號（樂觀鎖） */
+  expectedVersion: number
+  /** 備註（如取消原因） */
+  remarks?: string
 }
 
 /** 服務單列表查詢參數 */
@@ -547,14 +557,32 @@ export interface ServiceOrderListParams {
   customerName?: string
   /** 單號（模糊搜尋，可選） */
   orderNumber?: string
-  /** 日期範圍（可選，用於前端篩選） */
+  /** 建立日期範圍（前端用） */
   createdDateRange?: [string, string]
-  /** 建立日期起始（ISO 8601，可選） */
+  /** 建立日期起始（ISO 8601，UTC+0） */
   createdAtStart?: string
-  /** 建立日期結束（ISO 8601，可選） */
+  /** 建立日期結束（ISO 8601，UTC+0） */
   createdAtEnd?: string
   /** 服務單狀態（可選） */
   status?: ServiceOrderStatus
+  /** 品牌名稱（模糊搜尋，可選） */
+  brandName?: string
+  /** 款式（模糊搜尋，可選） */
+  styleName?: string
+  /** 最小金額（可選） */
+  minAmount?: number
+  /** 最大金額（可選） */
+  maxAmount?: number
+  /** 服務日期範圍（前端用） */
+  serviceDateRange?: [string, string]
+  /** 服務日期起始（ISO 8601，UTC+0） */
+  serviceDateStart?: string
+  /** 服務日期結束（ISO 8601，UTC+0） */
+  serviceDateEnd?: string
+  /** 排序欄位（可選） */
+  sortBy?: string
+  /** 排序方向 ASC/DESC（可選） */
+  sortDirection?: string
 }
 
 /** 客戶搜尋參數 */
