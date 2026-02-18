@@ -7,14 +7,14 @@
 
 ## Summary
 
-本功能實現商品訂購單文件的前端產生與預覽功能。業務人員可從商品訂單管理頁面點擊「產生訂購單」按鈕，系統將從訂單資料中組裝訂購人資訊、商品明細、付款紀錄和定金須知，在 ElDialog 彈出視窗中預覽完整文件，並支援瀏覽器列印或儲存為 PDF。實作方式參考現有的 ShippingLabelPreview.vue 元件，遵循相同的排版格式與列印樣式。
+本功能實現商品訂購單文件的前端產生與預覽功能。業務人員可從商品訂單管理頁面點擊「產生訂購單」按鈕，系統將從訂單資料中組裝訂購人資訊、商品明細、付款紀錄和定金須知，在 ElDialog 彈出視窗中預覽完整文件，並支援瀏覽器列印或儲存為 PDF。實作方式參考現有的 ShippingLabelPreview.vue 元件，遵循相同的排版格式與列印樣式。本功能將整合至現有的 order-management/index.vue 頁面（新增「產生訂購單」按鈕與對話框實例化）。
 
 ## Technical Context
 
 **Language/Version**: TypeScript 5.x + Vue 3.5+  
 **Primary Dependencies**: Vue 3 (Composition API), Element Plus, Vite 7+, UnoCSS, SCSS  
 **Storage**: N/A（純前端文件產生，無資料持久化）  
-**Testing**: Vitest（單元測試）  
+**Testing**: Vitest（單元測試，覆蓋率目標 ≥80%）  
 **Target Platform**: 現代瀏覽器（Chrome、Edge、Firefox、Safari）  
 **Project Type**: Web（單頁應用程式）  
 **Performance Goals**: 訂購單產生與預覽在 5 秒內完成  
