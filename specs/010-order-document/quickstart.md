@@ -73,8 +73,6 @@ export interface OrderDocumentData {
   customerPhone: string
   /** 訂購人 Line ID（可選） */
   customerLineId: string | null
-  /** 訂購人銀行帳號末五碼（可選） */
-  customerBankAccountLast5: string | null
   /** 商品明細列表 */
   orderItems: OrderDocumentItem[]
   /** 付款紀錄列表 */
@@ -103,22 +101,16 @@ export interface OrderDocumentItem {
   unitPrice: number
 }
 
-/** 商品預購定金須知（固定內容） */
-export const DEPOSIT_TERMS = `
-確認訂購後 REALYOU 將收取 50% 訂購金額為定金（支付定金方不履行契約時，無權請求返還）。
-
-唯獨在 REALYOU 無法如期交付商品時退還，除因物流或其他不可抗因素（天災/疫情/戰爭/政治等因素）所造成之延誤，與 REALYOU 無關。
-
-溢品與作品多為手工製作，難免有些許不完美之處：些許溢膠、皮紋皺摺、線頭收尾，皆不影響正常使用！
-
-商品經由專業人員鑑定完成，保證正品，唯商品本身並無提供保固，致商品保固及維修問題，請洽品牌專櫃或可由廠商代送處理。
-
-定金一旦支付，僅在第二條條文情形下才會退還，支付前請務必三思。
-
-通知商品到貨日起逾 2 週內仍未支付尾款，視為「違約棄單」，REALYOU 得解除契約並沒收定金。
-
-下定前請詳閱 REALYOU 官網下方 > 常見問題 > 購物須知，匯款完成即代表同意「商品預購定金須知」。
-` as const
+/** 商品預購定金須知（固定內容，每筆為一條條文） */
+export const DEPOSIT_TERMS = [
+  "確認訂購後 REALYOU 將收取 50% 訂購金額為定金（支付定金方不履行契約時，無權請求返還）。",
+  "唯獨在 REALYOU 無法如期交付商品時退還，除因物流或其他不可抗因素（天災/疫情/戰爭/政治等因素）所造成之延誤，與 REALYOU 無關。",
+  "溢品與作品多為手工製作，難免有些許不完美之處：些許溢膠、皮紋皺摺、線頭收尾，皆不影響正常使用！",
+  "商品經由專業人員鑑定完成，保證正品，唯商品本身並無提供保固，致商品保固及維修問題，請洽品牌專櫃或可由廠商代送處理。",
+  "定金一旦支付，僅在第二條條文情形下才會退還，支付前請務必三思。",
+  "通知商品到貨日起逾 2 週內仍未支付尾款，視為「違約棄單」，REALYOU 得解除契約並沒收定金。",
+  "下定前請詳閱 REALYOU 官網下方 > 常見問題 > 購物須知，匯款完成即代表同意「商品預購定金須知」。"
+] as const
 ```
 
 ---
@@ -157,7 +149,6 @@ export function useOrderDocumentPreview() {
       customerName: order.customerName,
       customerPhone: order.customerPhone,
       customerLineId: order.customerLineId || null,
-      customerBankAccountLast5: order.customerBankAccountLast5 || null,
       orderItems: order.orderItems.map(item => ({
         id: item.id,
         brandName: item.brandName,
@@ -171,7 +162,8 @@ export function useOrderDocumentPreview() {
         id: record.id,
         paymentDate: record.paymentDate,
         paymentAmount: record.paymentAmount,
-        paymentMethod: record.paymentMethod
+        paymentMethod: record.paymentMethod,
+        bankAccountLastFive: record.bankAccountLastFive
       })),
       totalAmount: order.totalAmount,
       paidAmount: order.paidAmount
@@ -296,9 +288,6 @@ function handleClose() {
         <ElDescriptionsItem label="Line ID">
           {{ props.data.customerLineId || '-' }}
         </ElDescriptionsItem>
-        <ElDescriptionsItem label="銀行帳號末五碼">
-          {{ props.data.customerBankAccountLast5 || '-' }}
-        </ElDescriptionsItem>
       </ElDescriptions>
 
       <!-- 3. 商品明細 -->
@@ -325,7 +314,11 @@ function handleClose() {
       <!-- 5. 定金須知 -->
       <div class="terms-section">
         <h3 class="section-title">商品預購定金須知</h3>
-        <pre class="terms-content">{{ DEPOSIT_TERMS }}</pre>
+        <ol class="terms-content">
+          <li v-for="(term, index) in DEPOSIT_TERMS" :key="index" class="terms-item">
+            {{ term }}
+          </li>
+        </ol>
       </div>
     </div>
 
@@ -491,7 +484,6 @@ describe('OrderDocumentPreview', () => {
     customerName: '測試客戶',
     customerPhone: '0912-345-678',
     customerLineId: 'test_line',
-    customerBankAccountLast5: '12345',
     orderItems: [
       {
         id: 'item-001',

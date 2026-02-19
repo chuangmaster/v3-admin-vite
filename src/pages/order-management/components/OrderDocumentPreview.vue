@@ -135,7 +135,7 @@ function handleClose() {
         <ElDescriptionsItem label="訂購人電話">
           {{ props.data.customerPhone }}
         </ElDescriptionsItem>
-        <ElDescriptionsItem label="Line ID">
+        <ElDescriptionsItem label="Line ID" data-label="Line ID">
           {{ props.data.customerLineId || '-' }}
         </ElDescriptionsItem>
       </ElDescriptions>

@@ -138,30 +138,26 @@ export interface PaymentRecordSummary {
 **來源**: 根據功能規格 FR-006 定義的條款文字
 
 ```typescript
-/** 商品預購定金須知（固定內容） */
-export const DEPOSIT_TERMS = `
-確認訂購後 REALYOU 將收取 50% 訂購金額為定金（支付定金方不履行契約時，無權請求返還）。
-
-唯獨在 REALYOU 無法如期交付商品時退還，除因物流或其他不可抗因素（天災/疫情/戰爭/政治等因素）所造成之延誤，與 REALYOU 無關。
-
-溢品與作品多為手工製作，難免有些許不完美之處：些許溢膠、皮紋皺摺、線頭收尾，皆不影響正常使用！
-
-商品經由專業人員鑑定完成，保證正品，唯商品本身並無提供保固，致商品保固及維修問題，請洽品牌專櫃或可由廠商代送處理。
-
-定金一旦支付，僅在第二條條文情形下才會退還，支付前請務必三思。
-
-通知商品到貨日起逾 2 週內仍未支付尾款，視為「違約棄單」，REALYOU 得解除契約並沒收定金。
-
-下定前請詳閱 REALYOU 官網下方 > 常見問題 > 購物須知，匯款完成即代表同意「商品預購定金須知」。
-` as const
+/** 商品預購定金須知（固定內容，每筆為一條條文） */
+export const DEPOSIT_TERMS = [
+  "確認訂購後 REALYOU 將收取 50% 訂購金額為定金（支付定金方不履行契約時，無權請求返還）。",
+  "唯獨在 REALYOU 無法如期交付商品時退還，除因物流或其他不可抗因素（天災/疫情/戰爭/政治等因素）所造成之延誤，與 REALYOU 無關。",
+  "溢品與作品多為手工製作，難免有些許不完美之處：些許溢膠、皮紋皺摺、線頭收尾，皆不影響正常使用！",
+  "商品經由專業人員鑑定完成，保證正品，唯商品本身並無提供保固，致商品保固及維修問題，請洽品牌專櫃或可由廠商代送處理。",
+  "定金一旦支付，僅在第二條條文情形下才會退還，支付前請務必三思。",
+  "通知商品到貨日起逾 2 週內仍未支付尾款，視為「違約棄單」，REALYOU 得解除契約並沒收定金。",
+  "下定前請詳閱 REALYOU 官網下方 > 常見問題 > 購物須知，匯款完成即代表同意「商品預購定金須知」。"
+] as const
 ```
 
 **使用方式**:
 ```vue
 <template>
-  <div class="terms-content">
-    <pre>{{ DEPOSIT_TERMS }}</pre>
-  </div>
+  <ol class="terms-content">
+    <li v-for="(term, index) in DEPOSIT_TERMS" :key="index" class="terms-item">
+      {{ term }}
+    </li>
+  </ol>
 </template>
 
 <script setup lang="ts">
@@ -286,8 +282,8 @@ export const DEPOSIT_TERMS = `...` as const
 │ - brandName: string             │   │ - paymentDate: string      │
 │ - productName: string           │   │ - paymentAmount: number    │
 │ - productStyle: string          │   │ - paymentMethod: enum      │
-│ - accessories: string[] | null  │   └────────────────────────────┘
-│ - quantity: number              │
+│ - accessories: string[] | null  │   │ - bankAccountLastFive: ?   │
+│ - quantity: number              │   └────────────────────────────┘
 │ - unitPrice: number             │
 └─────────────────────────────────┘
 

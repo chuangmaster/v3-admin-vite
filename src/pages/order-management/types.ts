@@ -101,6 +101,8 @@ export interface SalesOrder {
   customerName: string
   /** 客戶電話 */
   customerPhone: string
+  /** 客戶 Line ID（可選） */
+  customerLineId: string | null
   /** 商品小計（所有訂單項目金額總和） */
   subtotalAmount: number
   /** 運費 */

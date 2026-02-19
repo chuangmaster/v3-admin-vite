@@ -31,7 +31,7 @@ export function useOrderDocumentPreview() {
       orderType: order.orderType,
       customerName: order.customerName,
       customerPhone: order.customerPhone,
-      customerLineId: null,
+      customerLineId: order.customerLineId || null,
       orderItems: order.orderItems.map(item => ({
         id: item.id,
         brandName: item.brandName,

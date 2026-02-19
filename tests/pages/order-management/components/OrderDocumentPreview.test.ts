@@ -151,8 +151,10 @@ describe("orderDocumentPreview", () => {
     const data = createMockData()
     const wrapper = await mountComponent({ visible: true, data })
 
-    expect(wrapper.text()).toContain("商品預購定金須知")
-    expect(wrapper.text()).toContain("REALYOU")
+    expect(wrapper.text()).toContain("訂購須知")
+    expect(wrapper.text()).toContain("確認訂購後 REALYOU 將收取 50% 訂購金額為定金（支付定金方不履行契約時，無權請求返還）。")
+    expect(wrapper.text()).toContain("定金一旦支付，僅在第二條條文情形下才會退還，支付前請務必三思。")
+    expect(wrapper.text()).toContain("下定前請詳閱 REALYOU 官網下方 > 常見問題 > 購物須知，匯款完成即代表同意「商品預購定金須知」。")
   })
 
   it("應正確顯示金額摘要", async () => {
