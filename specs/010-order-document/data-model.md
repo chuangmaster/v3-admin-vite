@@ -41,9 +41,6 @@ export interface OrderDocumentData {
   /** 訂購人 Line ID（可選） */
   customerLineId: string | null
   
-  /** 訂購人銀行帳號末五碼（可選） */
-  customerBankAccountLast5: string | null
-  
   /** 商品明細列表 */
   orderItems: OrderDocumentItem[]
   
@@ -59,7 +56,7 @@ export interface OrderDocumentData {
 ```
 
 **欄位說明**:
-- `customerLineId` 和 `customerBankAccountLast5` 為選填欄位，空值時在文件上顯示「-」
+- `customerLineId` 為選填欄位，空值時在文件上顯示「-」
 - `orderType` 決定商品明細的欄位顯示（預購不顯示配件）
 - `paymentRecords` 包含完整的付款記錄列表，支援多筆付款
 
@@ -123,6 +120,8 @@ export interface PaymentRecordSummary {
   
   /** 付款方式 */
   paymentMethod: PaymentMethod
+  /** 銀行帳戶末五碼（選填，僅現金匯款時使用） */
+  bankAccountLastFive: string | null
 }
 ```
 
@@ -269,7 +268,6 @@ export const DEPOSIT_TERMS = `...` as const
 │ - customerName: string                      │
 │ - customerPhone: string                     │
 │ - customerLineId: string | null             │
-│ - customerBankAccountLast5: string | null   │
 │ - orderItems: OrderDocumentItem[]          │───┐
 │ - paymentRecords: PaymentRecordSummary[]   │───┼─┐
 │ - totalAmount: number                       │   │ │
@@ -315,7 +313,6 @@ export const DEPOSIT_TERMS = `...` as const
 
 2. **選填欄位處理**:
    - `customerLineId` 為 `null` 或空字串時，顯示「-」
-   - `customerBankAccountLast5` 為 `null` 或空字串時，顯示「-」
 
 3. **金額驗證**:
    - `totalAmount` 必須 ≥ 0
@@ -392,7 +389,6 @@ const preOrderDocument: OrderDocumentData = {
   customerName: '王小明',
   customerPhone: '0912-345-678',
   customerLineId: 'wang_xiaoming',
-  customerBankAccountLast5: '12345',
   orderItems: [
     {
       id: 'item-001',
@@ -409,7 +405,8 @@ const preOrderDocument: OrderDocumentData = {
       id: 'payment-001',
       paymentDate: '2026-02-18T11:00:00Z',
       paymentAmount: 125000,
-      paymentMethod: PaymentMethod.BANK_TRANSFER
+      paymentMethod: PaymentMethod.BANK_TRANSFER,
+      bankAccountLastFive: '12345'
     }
   ],
   totalAmount: 250000,
@@ -427,7 +424,6 @@ const spotOrderDocument: OrderDocumentData = {
   customerName: '李小華',
   customerPhone: '0922-333-444',
   customerLineId: null, // 客戶未提供 Line ID
-  customerBankAccountLast5: null, // 客戶未提供銀行帳號
   orderItems: [
     {
       id: 'item-002',
@@ -444,7 +440,8 @@ const spotOrderDocument: OrderDocumentData = {
       id: 'payment-002',
       paymentDate: '2026-02-18T14:30:00Z',
       paymentAmount: 180000,
-      paymentMethod: PaymentMethod.ONLINE_CARD
+      paymentMethod: PaymentMethod.ONLINE_CARD,
+      bankAccountLastFive: null
     }
   ],
   totalAmount: 180000,
@@ -464,7 +461,6 @@ const spotOrderDocument: OrderDocumentData = {
 | `customerName` | `SalesOrder.customerName` | 直接映射 |
 | `customerPhone` | `SalesOrder.customerPhone` | 直接映射 |
 | `customerLineId` | `SalesOrder.customerLineId` | 空字串轉 `null` |
-| `customerBankAccountLast5` | `SalesOrder.customerBankAccountLast5` | 空字串轉 `null` |
 | `orderItems` | `SalesOrder.orderItems` | 轉換為 `OrderDocumentItem[]` |
 | `paymentRecords` | `SalesOrder.paymentRecords` | 簡化為 `PaymentRecordSummary[]` |
 | `totalAmount` | `SalesOrder.totalAmount` | 直接映射 |
