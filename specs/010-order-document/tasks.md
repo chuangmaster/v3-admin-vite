@@ -1,8 +1,8 @@
 # Tasks: 商品訂購單文件產生
 
-**Feature Branch**: `010-order-document`  
-**Input**: Design documents from `/specs/010-order-document/`  
-**Prerequisites**: plan.md ✅, spec.md ✅, research.md ✅, data-model.md ✅, quickstart.md ✅  
+**Feature Branch**: `010-order-document`
+**Input**: Design documents from `/specs/010-order-document/`
+**Prerequisites**: plan.md ✅, spec.md ✅, research.md ✅, data-model.md ✅, quickstart.md ✅
 **Tests**: 包含單元測試任務 (根據 quickstart.md 第 5 步驟)
 
 **Organization**: 任務按 User Story 組織,確保每個 Story 可以獨立實作與測試
@@ -21,9 +21,9 @@
 
 **Note**: 本功能為現有專案擴充,無需建立新專案
 
-- [ ] T001 確認 Vue 3.5+、TypeScript 5+、Element Plus、Vite 7+ 環境正常運作
-- [ ] T002 確認 ESLint 與 Vitest 配置可用
-- [ ] T003 建立功能分支 `010-order-document`
+- [x] T001 確認 Vue 3.5+、TypeScript 5+、Element Plus、Vite 7+ 環境正常運作
+- [x] T002 確認 ESLint 與 Vitest 配置可用
+- [x] T003 建立功能分支 `010-order-document`
 
 ---
 
@@ -33,9 +33,9 @@
 
 **⚠️ CRITICAL**: 必須完成此階段才能開始任何 User Story 實作
 
-- [ ] T004 擴充 `OrderDocumentData` 介面至 src/pages/order-management/types.ts
-- [ ] T005 [P] 擴充 `OrderDocumentItem` 介面至 src/pages/order-management/types.ts
-- [ ] T006 [P] 新增 `DEPOSIT_TERMS` 常數至 src/pages/order-management/types.ts
+- [x] T004 擴充 `OrderDocumentData` 介面至 src/pages/order-management/types.ts
+- [x] T005 [P] 擴充 `OrderDocumentItem` 介面至 src/pages/order-management/types.ts
+- [x] T006 [P] 新增 `DEPOSIT_TERMS` 常數至 src/pages/order-management/types.ts
 
 **Checkpoint**: 型別定義完成 - User Story 實作可以開始
 
@@ -49,29 +49,29 @@
 
 ### 實作 User Story 1
 
-- [ ] T007 [P] [US1] 建立組合式函式 useOrderDocumentPreview.ts 於 src/pages/order-management/composables/useOrderDocumentPreview.ts
-- [ ] T008 [US1] 實作 transformToOrderDocument 函式於 src/pages/order-management/composables/useOrderDocumentPreview.ts
-- [ ] T009 [US1] 實作 openPreview、closePreview 函式於 src/pages/order-management/composables/useOrderDocumentPreview.ts
-- [ ] T010 [P] [US1] 建立 OrderDocumentPreview.vue 元件骨架於 src/pages/order-management/components/OrderDocumentPreview.vue
-- [ ] T011 [US1] 實作 OrderDocumentPreview 元件的品牌標的(整合 BrandBanner.vue)與訂單基本資訊區塊於 src/pages/order-management/components/OrderDocumentPreview.vue
-- [ ] T012 [US1] 實作 OrderDocumentPreview 元件的商品明細區塊(含動態配件欄位邏輯)於 src/pages/order-management/components/OrderDocumentPreview.vue
-- [ ] T013 [US1] 實作 OrderDocumentPreview 元件的付款紀錄列表區塊(無紀錄時顯示「尚無付款紀錄」)於 src/pages/order-management/components/OrderDocumentPreview.vue
-- [ ] T014 [US1] 實作 OrderDocumentPreview 元件的定金須知區塊於 src/pages/order-management/components/OrderDocumentPreview.vue
-- [ ] T015 [US1] 新增格式化函式於 src/pages/order-management/components/OrderDocumentPreview.vue:複用 formatDateTime(來自 @@/utils/datetime.ts)、參考 useOrderExport.ts 實作 formatCurrency 與 formatAccessories(含空值與異常處理)
-- [ ] T016 [US1] 實作 OrderDocumentPreview 元件的 scoped 樣式(參考 ShippingLabelPreview.vue)於 src/pages/order-management/components/OrderDocumentPreview.vue
-- [ ] T017 [US1] 在 src/pages/order-management/index.vue 匯入 OrderDocumentPreview 元件與 useOrderDocumentPreview 組合式函式
-- [ ] T018 [US1] 在 src/pages/order-management/index.vue 初始化組合式函式並新增事件處理函式(handleGenerateOrderDocument 呼叫 openPreview 開啟預覽對話框)
-- [ ] T019 [US1] 在 src/pages/order-management/index.vue 表格操作欄新增「產生訂購單」按鈕(參考出貨單按鈕位置,點擊後開啟預覽對話框而非直接列印)
-- [ ] T020 [US1] 在 src/pages/order-management/index.vue 模板底部加入 OrderDocumentPreview 對話框元件(使用 v-model:visible 與 :data props,參考 ShippingLabelPreview 結構)
+- [x] T007 [P] [US1] 建立組合式函式 useOrderDocumentPreview.ts 於 src/pages/order-management/composables/useOrderDocumentPreview.ts
+- [x] T008 [US1] 實作 transformToOrderDocument 函式於 src/pages/order-management/composables/useOrderDocumentPreview.ts
+- [x] T009 [US1] 實作 openPreview、closePreview 函式於 src/pages/order-management/composables/useOrderDocumentPreview.ts
+- [x] T010 [P] [US1] 建立 OrderDocumentPreview.vue 元件骨架於 src/pages/order-management/components/OrderDocumentPreview.vue
+- [x] T011 [US1] 實作 OrderDocumentPreview 元件的品牌標的(整合 BrandBanner.vue)與訂單基本資訊區塊於 src/pages/order-management/components/OrderDocumentPreview.vue
+- [x] T012 [US1] 實作 OrderDocumentPreview 元件的商品明細區塊(含動態配件欄位邏輯)於 src/pages/order-management/components/OrderDocumentPreview.vue
+- [x] T013 [US1] 實作 OrderDocumentPreview 元件的付款紀錄列表區塊(無紀錄時顯示「尚無付款紀錄」)於 src/pages/order-management/components/OrderDocumentPreview.vue
+- [x] T014 [US1] 實作 OrderDocumentPreview 元件的定金須知區塊於 src/pages/order-management/components/OrderDocumentPreview.vue
+- [x] T015 [US1] 新增格式化函式於 src/pages/order-management/components/OrderDocumentPreview.vue:複用 formatDateTime(來自 @@/utils/datetime.ts)、參考 useOrderExport.ts 實作 formatCurrency 與 formatAccessories(含空值與異常處理)
+- [x] T016 [US1] 實作 OrderDocumentPreview 元件的 scoped 樣式(參考 ShippingLabelPreview.vue)於 src/pages/order-management/components/OrderDocumentPreview.vue
+- [x] T017 [US1] 在 src/pages/order-management/index.vue 匯入 OrderDocumentPreview 元件與 useOrderDocumentPreview 組合式函式
+- [x] T018 [US1] 在 src/pages/order-management/index.vue 初始化組合式函式並新增事件處理函式(handleGenerateOrderDocument 呼叫 openPreview 開啟預覽對話框)
+- [x] T019 [US1] 在 src/pages/order-management/index.vue 表格操作欄新增「產生訂購單」按鈕(參考出貨單按鈕位置,點擊後開啟預覽對話框而非直接列印)
+- [x] T020 [US1] 在 src/pages/order-management/index.vue 模板底部加入 OrderDocumentPreview 對話框元件(使用 v-model:visible 與 :data props,參考 ShippingLabelPreview 結構)
 
 ### 測試 User Story 1
 
-- [ ] T021 [P] [US1] 建立單元測試檔案 tests/pages/order-management/components/OrderDocumentPreview.test.ts
-- [ ] T022 [P] [US1] 撰寫測試案例: 正確渲染訂購人資訊於 tests/pages/order-management/components/OrderDocumentPreview.test.ts
-- [ ] T023 [P] [US1] 撰寫測試案例: 預購訂單不顯示配件欄位於 tests/pages/order-management/components/OrderDocumentPreview.test.ts
-- [ ] T024 [P] [US1] 撰寫測試案例: 現貨訂單顯示配件欄位於 tests/pages/order-management/components/OrderDocumentPreview.test.ts
-- [ ] T025 [P] [US1] 撰寫測試案例: Line ID 與銀行帳號為空時顯示「-」於 tests/pages/order-management/components/OrderDocumentPreview.test.ts
-- [ ] T026 [US1] 執行所有 User Story 1 單元測試並確保通過
+- [x] T021 [P] [US1] 建立單元測試檔案 tests/pages/order-management/components/OrderDocumentPreview.test.ts
+- [x] T022 [P] [US1] 撰寫測試案例: 正確渲染訂購人資訊於 tests/pages/order-management/components/OrderDocumentPreview.test.ts
+- [x] T023 [P] [US1] 撰寫測試案例: 預購訂單不顯示配件欄位於 tests/pages/order-management/components/OrderDocumentPreview.test.ts
+- [x] T024 [P] [US1] 撰寫測試案例: 現貨訂單顯示配件欄位於 tests/pages/order-management/components/OrderDocumentPreview.test.ts
+- [x] T025 [P] [US1] 撰寫測試案例: Line ID 與銀行帳號為空時顯示「-」於 tests/pages/order-management/components/OrderDocumentPreview.test.ts
+- [x] T026 [US1] 執行所有 User Story 1 單元測試並確保通過
 
 **Checkpoint**: User Story 1 完成 - 訂購單預覽功能已可獨立運作並測試
 
@@ -85,18 +85,18 @@
 
 ### 實作 User Story 2
 
-- [ ] T027 [US2] 在 useOrderDocumentPreview.ts 新增 printDocument 函式(呼叫 window.print)於 src/pages/order-management/composables/useOrderDocumentPreview.ts
-- [ ] T028 [US2] 實作 OrderDocumentPreview 元件的列印按鈕事件處理於 src/pages/order-management/components/OrderDocumentPreview.vue
-- [ ] T029 [US2] 新增列印專用樣式(@media print)於 src/pages/order-management/components/OrderDocumentPreview.vue
-- [ ] T030 [US2] 設定 @page 規則(A4 紙張、邊界 15mm)於 src/pages/order-management/components/OrderDocumentPreview.vue
-- [ ] T031 [US2] 隱藏非必要元素(dialog header/footer)於列印樣式於 src/pages/order-management/components/OrderDocumentPreview.vue
-- [ ] T032 [US2] 實作商品項目與定金須知的 break-inside: avoid 樣式於 src/pages/order-management/components/OrderDocumentPreview.vue
-- [ ] T033 [US2] 設定品牌標的與區段標題的 print-color-adjust: exact 樣式於 src/pages/order-management/components/OrderDocumentPreview.vue
-- [ ] T034 [US2] 確保列印時只顯示訂購單對話框(使用 :has() 選擇器)於 src/pages/order-management/components/OrderDocumentPreview.vue
+- [x] T027 [US2] 在 useOrderDocumentPreview.ts 新增 printDocument 函式(呼叫 window.print)於 src/pages/order-management/composables/useOrderDocumentPreview.ts
+- [x] T028 [US2] 實作 OrderDocumentPreview 元件的列印按鈕事件處理於 src/pages/order-management/components/OrderDocumentPreview.vue
+- [x] T029 [US2] 新增列印專用樣式(@media print)於 src/pages/order-management/components/OrderDocumentPreview.vue
+- [x] T030 [US2] 設定 @page 規則(A4 紙張、邊界 15mm)於 src/pages/order-management/components/OrderDocumentPreview.vue
+- [x] T031 [US2] 隱藏非必要元素(dialog header/footer)於列印樣式於 src/pages/order-management/components/OrderDocumentPreview.vue
+- [x] T032 [US2] 實作商品項目與定金須知的 break-inside: avoid 樣式於 src/pages/order-management/components/OrderDocumentPreview.vue
+- [x] T033 [US2] 設定品牌標的與區段標題的 print-color-adjust: exact 樣式於 src/pages/order-management/components/OrderDocumentPreview.vue
+- [x] T034 [US2] 確保列印時只顯示訂購單對話框(使用 :has() 選擇器)於 src/pages/order-management/components/OrderDocumentPreview.vue
 
 ### 測試 User Story 2
 
-- [ ] T035 [P] [US2] 撰寫測試案例: 點擊列印按鈕觸發 print 事件於 tests/pages/order-management/components/OrderDocumentPreview.test.ts
+- [x] T035 [P] [US2] 撰寫測試案例: 點擊列印按鈕觸發 print 事件於 tests/pages/order-management/components/OrderDocumentPreview.test.ts
 - [ ] T036 [US2] 手動測試: 在 Chrome 中驗證列印預覽符合 A4 格式
 - [ ] T037 [US2] 手動測試: 在 Edge 中驗證列印預覽符合 A4 格式
 - [ ] T038 [US2] 手動測試: 驗證商品明細過長時自動分頁且項目不跨頁
@@ -110,12 +110,12 @@
 
 **Purpose**: 跨 User Story 的優化與最終驗證
 
-- [ ] T040 [P] 確認所有程式碼符合 ESLint 規範(執行 pnpm lint)
-- [ ] T041 [P] 確認 TypeScript 編譯無錯誤(執行 pnpm type-check)
-- [ ] T042 執行完整測試套件(執行 pnpm test)
+- [x] T040 [P] 確認所有程式碼符合 ESLint 規範(執行 pnpm lint)
+- [x] T041 [P] 確認 TypeScript 編譯無錯誤(執行 pnpm type-check)
+- [x] T042 執行完整測試套件(執行 pnpm test)
 - [ ] T043 [P] 執行 quickstart.md 手動測試檢查清單(基本顯示、動態欄位、列印功能、響應式、邊界案例,含 SC-006 排版一致性六項檢查清單)
-- [ ] T044 程式碼審查: 確認所有 JSDoc 註解完整
-- [ ] T045 程式碼審查: 確認元件與檔案命名符合專案規範
+- [x] T044 程式碼審查: 確認所有 JSDoc 註解完整
+- [x] T045 程式碼審查: 確認元件與檔案命名符合專案規範
 - [ ] T046 [P] 在平板裝置(768x1024)測試預覽視窗響應式顯示
 - [ ] T047 [P] 在桌機裝置(1920x1080)測試預覽視窗顯示
 - [ ] T048 執行邊界案例測試: 無付款紀錄(顯示「尚無付款紀錄」)、必要欄位缺失(錯誤訊息)、長商品名稱、超過 10 項商品明細

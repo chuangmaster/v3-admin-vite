@@ -753,3 +753,74 @@ export const PAYMENT_RECORD_RULES: FormRules = {
     { pattern: /^\d{5}$/, message: "銀行末五碼必須為 5 位數字", trigger: "blur" }
   ]
 }
+
+// ============================================================================
+// Order Document Types (訂購單文件型別)
+// ============================================================================
+
+/** 訂購單文件資料 */
+export interface OrderDocumentData {
+  /** 訂單編號（格式: RYO + YYYYMMDD + 流水號） */
+  orderNumber: string
+  /** 訂單日期（ISO 8601, UTC） */
+  orderDate: string
+  /** 訂單類型（預購 or 現貨） */
+  orderType: OrderType
+  /** 訂購人姓名 */
+  customerName: string
+  /** 訂購人電話 */
+  customerPhone: string
+  /** 訂購人 Line ID（可選） */
+  customerLineId: string | null
+  /** 商品明細列表 */
+  orderItems: OrderDocumentItem[]
+  /** 付款紀錄列表 */
+  paymentRecords: PaymentRecordSummary[]
+  /** 總金額 */
+  totalAmount: number
+  /** 已付金額 */
+  paidAmount: number
+}
+
+/** 訂購單商品項目 */
+export interface OrderDocumentItem {
+  /** 商品項目唯一識別碼（UUID） */
+  id: string
+  /** 品牌名稱 */
+  brandName: string
+  /** 商品名稱 */
+  productName: string
+  /** 款式 */
+  productStyle: string
+  /** 配件列表（僅現貨訂單顯示，預購訂單此欄位為 null） */
+  accessories: string[] | null
+  /** 數量 */
+  quantity: number
+  /** 單價 */
+  unitPrice: number
+}
+
+/** 付款紀錄摘要 */
+export interface PaymentRecordSummary {
+  /** 付款紀錄唯一識別碼（UUID） */
+  id: string
+  /** 付款日期（ISO 8601, UTC） */
+  paymentDate: string
+  /** 付款金額 */
+  paymentAmount: number
+  /** 付款方式 */
+  paymentMethod: PaymentMethod
+  /** 銀行帳戶末五碼（選填，僅現金匯款時使用） */
+  bankAccountLastFive: string | null
+}
+
+/** 商品預購定金須知（固定內容，每筆為一條條文） */
+export const DEPOSIT_TERMS = [
+  "確認訂購後 REALYOU 將收取 50% 訂購金額為定金（支付定金方不履行契約時，無權請求返還）。",
+  "唯獨在 REALYOU 無法如期交付商品時退還，除因物流或其他不可抗因素（天災/疫情/戰爭/政治等因素）所造成之延誤，與 REALYOU 無關。",
+  "溢品與作品多為手工製作，難免有些許不完美之處：些許溢膠、皮紋皺摺、線頭收尾，皆不影響正常使用！",
+  "商品經由專業人員鑑定完成，保證正品，唯商品本身並無提供保固，致商品保固及維修問題，請洽品牌專櫃或可由廠商代送處理。",
+  "定金一旦支付，僅在第二條條文情形下才會退還，支付前請務必三思。",
+  "通知商品到貨日起逾 2 週內仍未支付尾款，視為「違約棄單」，REALYOU 得解除契約並沒收定金。",
+  "下定前請詳閱 REALYOU 官網下方 > 常見問題 > 購物須知，匯款完成即代表同意「商品預購定金須知」。"
+] as const
