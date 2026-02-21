@@ -17,6 +17,8 @@ import {
 import { computed } from "vue"
 import {
   ACCESSORY_OPTIONS,
+  DEPOSIT_HEADERS,
+  DEPOSIT_LINKS,
   DEPOSIT_TERMS,
   OrderType,
   PAYMENT_METHOD_LABELS,
@@ -230,11 +232,31 @@ function handleClose() {
         <h3 class="section-title">
           訂購須知
         </h3>
+        <div class="terms-headers">
+          <p v-for="(header, index) in DEPOSIT_HEADERS" :key="`header-${index}`" class="terms-header-item">
+            {{ header }}
+          </p>
+        </div>
         <ol class="terms-content">
           <li v-for="(term, index) in DEPOSIT_TERMS" :key="index" class="terms-item">
             {{ term }}
           </li>
         </ol>
+        <div class="terms-more">
+          <p class="terms-more-label">
+            想看更多細節：
+          </p>
+          <a
+            v-for="(link, index) in DEPOSIT_LINKS"
+            :key="`link-${index}`"
+            :href="link.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="terms-link"
+          >
+            {{ link.label }}<br>
+          </a>
+        </div>
       </div>
     </div>
 
@@ -410,6 +432,18 @@ function handleClose() {
   }
 }
 
+.terms-headers {
+  margin-bottom: 8px;
+}
+
+.terms-header-item {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+  margin: 0;
+  line-height: 1.8;
+}
+
 .terms-content {
   font-size: 13px;
   line-height: 1.8;
@@ -427,6 +461,24 @@ function handleClose() {
   & + & {
     margin-top: 6px;
   }
+}
+
+.terms-more {
+  margin-top: 10px;
+}
+
+.terms-more-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+  margin: 0 0 4px;
+}
+
+.terms-link {
+  font-size: 13px;
+  color: var(--el-text-color-primary);
+  margin: 0;
+  line-height: 1.8;
 }
 
 /* 平板響應式 */
