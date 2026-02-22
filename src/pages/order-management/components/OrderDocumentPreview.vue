@@ -115,7 +115,7 @@ function handleClose() {
     @close="handleClose"
   >
     <div v-if="props.data" class="order-document-content">
-      <!-- 品牌標的 -->
+      <!-- 品牌標誌 -->
       <div class="document-header">
         <BrandBanner />
         <h2 class="document-title">
