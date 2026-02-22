@@ -13,7 +13,7 @@ import type { FormRules } from "element-plus"
 
 /** 訂單類型 */
 export enum OrderType {
-  /** 代購現貨 */
+  /** 現貨 */
   SPOT_PURCHASE = "SPOT_PURCHASE",
   /** 預購 */
   PRE_ORDER = "PRE_ORDER"
@@ -609,7 +609,7 @@ export const ACCESSORY_OPTIONS = [
 
 /** 訂單類型標籤 */
 export const ORDER_TYPE_LABELS: Record<OrderType, string> = {
-  [OrderType.SPOT_PURCHASE]: "代購現貨",
+  [OrderType.SPOT_PURCHASE]: "現貨",
   [OrderType.PRE_ORDER]: "預購"
 }
 

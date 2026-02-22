@@ -108,6 +108,13 @@ const totalAmount = computed(() => {
 })
 
 /**
+ * 處理訂單類型變更
+ */
+function handleOrderTypeChange(v: OrderType) {
+  updateFormField("orderType", v)
+}
+
+/**
  * 處理收件方式變更並更新運費預設值
  */
 function handleDeliveryMethodChange(method: DeliveryMethod) {
@@ -263,7 +270,7 @@ defineExpose({
           :model-value="props.formData.orderType"
           :disabled="props.mode === 'edit'"
           placeholder="請選擇訂單類型"
-          @update:model-value="(v: OrderType) => updateFormField('orderType', v)"
+          @update:model-value="handleOrderTypeChange"
         >
           <ElOption
             v-for="(label, key) in ORDER_TYPE_LABELS"
@@ -292,6 +299,7 @@ defineExpose({
       <!-- 商品項目（獨立區塊,不包在 ElFormItem 內避免溢出） -->
       <OrderItemsForm
         :model-value="props.formData.orderItems"
+        :order-type="props.formData.orderType"
         :disabled="coreFieldsDisabled || props.mode === 'edit'"
         :readonly="props.mode === 'edit'"
         @update:model-value="(v) => updateFormField('orderItems', v)"

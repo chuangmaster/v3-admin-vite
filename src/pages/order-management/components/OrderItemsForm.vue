@@ -19,11 +19,7 @@ import {
   ElSelect
 } from "element-plus"
 import { computed } from "vue"
-import {
-  ACCESSORY_OPTIONS,
-  PRODUCT_SOURCE_LABELS,
-  ProductSource
-} from "@/pages/order-management/types"
+import { ACCESSORY_OPTIONS, OrderType, PRODUCT_SOURCE_LABELS, ProductSource } from "@/pages/order-management/types"
 
 defineOptions({ name: "OrderItemsForm" })
 
@@ -37,6 +33,8 @@ const emit = defineEmits<Emits>()
 interface Props {
   /** 訂單項目列表 */
   modelValue: OrderItemFormData[]
+  /** 訂單類型（預購時磐石編碼與 Serial ID 為非必填） */
+  orderType?: OrderType
   /** 是否禁用所有欄位（終結狀態） */
   disabled?: boolean
   /** 是否禁止新增/刪除項目（編輯模式） */
@@ -95,6 +93,9 @@ function queryBrandSearch(queryString: string, cb: (results: Array<{ value: stri
     : BRAND_OPTIONS.map(brand => ({ value: brand }))
   cb(results)
 }
+
+/** 是否為預購訂單（預購時磐石編碼與 Serial ID 為非必填） */
+const isPreOrder = computed(() => props.orderType === OrderType.PRE_ORDER)
 
 /** 商品小計 */
 const subtotal = computed(() => {
@@ -247,9 +248,10 @@ function formatCurrency(amount: number): string {
         <!-- 磐石編碼 -->
         <ElCol :xs="24" :sm="12" :md="8">
           <ElFormItem
+            :key="`panshiCode-${index}-${isPreOrder}`"
             label="磐石編碼"
             :prop="`orderItems.${index}.panshiCode`"
-            :rules="[{ required: true, message: '請輸入磐石編碼', trigger: 'blur' }]"
+            :rules="[{ required: !isPreOrder, message: '請輸入磐石編碼', trigger: 'blur' }]"
           >
             <ElInput
               :model-value="item.panshiCode"
@@ -264,9 +266,10 @@ function formatCurrency(amount: number): string {
         <!-- Serial ID -->
         <ElCol :xs="24" :sm="12" :md="8">
           <ElFormItem
+            :key="`serialId-${index}-${isPreOrder}`"
             label="Serial ID"
             :prop="`orderItems.${index}.serialId`"
-            :rules="[{ required: true, message: '請輸入Serial ID', trigger: 'blur' }]"
+            :rules="[{ required: !isPreOrder, message: '請輸入Serial ID', trigger: 'blur' }]"
           >
             <ElInput
               :model-value="item.serialId"
