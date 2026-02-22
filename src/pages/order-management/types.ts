@@ -101,6 +101,8 @@ export interface SalesOrder {
   customerName: string
   /** 客戶電話 */
   customerPhone: string
+  /** 客戶 Line ID（可選） */
+  customerLineId: string | null
   /** 商品小計（所有訂單項目金額總和） */
   subtotalAmount: number
   /** 運費 */
@@ -753,3 +755,91 @@ export const PAYMENT_RECORD_RULES: FormRules = {
     { pattern: /^\d{5}$/, message: "銀行末五碼必須為 5 位數字", trigger: "blur" }
   ]
 }
+
+// ============================================================================
+// Order Document Types (訂購單文件型別)
+// ============================================================================
+
+/** 訂購單文件資料 */
+export interface OrderDocumentData {
+  /** 訂單編號（格式: RYO + YYYYMMDD + 流水號） */
+  orderNumber: string
+  /** 訂單日期（ISO 8601, UTC） */
+  orderDate: string
+  /** 訂單類型（預購 or 現貨） */
+  orderType: OrderType
+  /** 訂購人姓名 */
+  customerName: string
+  /** 訂購人電話 */
+  customerPhone: string
+  /** 訂購人 Line ID（可選） */
+  customerLineId: string | null
+  /** 商品明細列表 */
+  orderItems: OrderDocumentItem[]
+  /** 付款紀錄列表 */
+  paymentRecords: PaymentRecordSummary[]
+  /** 總金額 */
+  totalAmount: number
+  /** 已付金額 */
+  paidAmount: number
+}
+
+/** 訂購單商品項目 */
+export interface OrderDocumentItem {
+  /** 商品項目唯一識別碼（UUID） */
+  id: string
+  /** 品牌名稱 */
+  brandName: string
+  /** 商品名稱 */
+  productName: string
+  /** 款式 */
+  productStyle: string
+  /** 配件列表（僅現貨訂單顯示，預購訂單此欄位為 null） */
+  accessories: string[] | null
+  /** 數量 */
+  quantity: number
+  /** 單價 */
+  unitPrice: number
+}
+
+/** 付款紀錄摘要 */
+export interface PaymentRecordSummary {
+  /** 付款紀錄唯一識別碼（UUID） */
+  id: string
+  /** 付款日期（ISO 8601, UTC） */
+  paymentDate: string
+  /** 付款金額 */
+  paymentAmount: number
+  /** 付款方式 */
+  paymentMethod: PaymentMethod
+  /** 銀行帳戶末五碼（選填，僅現金匯款時使用） */
+  bankAccountLastFive: string | null
+}
+
+/** 商品預購定金須知標頭（REAL YOU 品牌宣言） */
+export const DEPOSIT_HEADERS = [
+  "◼ REAL YOU 的堅持｜正品安心購- 為精品保值，也為您的消費選擇負責",
+  "◼ REAL YOU 的堅持｜嚴格進貨與上架流程- 從鑑定開始把關"
+] as const
+
+/** 商品預購定金須知（固定內容，每筆為一條條文） */
+export const DEPOSIT_TERMS = [
+  "確認訂購後 REALYOU 將收取 50% 訂購金額為定金。若訂購方因個人因素取消或拒絕履約，定金不予退還。",
+  "定金僅於本公司無法交付商品時退還。若因物流延誤或其他不可抗力因素（如天災、疫情、戰爭、政府管制或其他非可歸責於任一方之事由）致交付延遲，交期得順延，定金不因此退還。",
+  "精品品牌多為手工製作，並非工廠大量量產；因此即使是同款商品，也難免在溢膠、色澤、皮質觸感、紋理、厚度與縫線細節上出現些許差異。高標準客人建議先仔細檢視實拍圖細節，確認可接受再下單，謝謝理解。",
+  "REALYOU所有商品皆由專業團隊完成鑑定，並留存鑑定重點與紀錄，確保商品為正品。若日後對真偽有疑義，經提供品牌官方或具公信力之第三方鑑定證明文件確認非正品者，本公司將依原付款方式辦理全額退費，並負責相關處理。",
+  "現貨商品應於訂購日起一週內付清尾款。訂購方已付訂金後，如無正當理由逾期未付尾款或拒絕履約，視為違約，本公司得解除契約，並沒收定金。",
+  "下定前請詳閱REALYOU官網下方>常見問題> REALYOU購物須知，匯款完成即代表同意『商品預購訂金須知』。"
+] as const
+
+/** 商品預購定金須知延伸閱讀連結 */
+export const DEPOSIT_LINKS = [
+  {
+    label: "➊ realyou.com.tw/blogs/精品服務/realyou-product_listing",
+    url: "https://realyou.com.tw/blogs/精品服務/realyou-product_listing"
+  },
+  {
+    label: "➋ realyou.com.tw/blogs/精品服務/realyou-safe_shopping",
+    url: "https://realyou.com.tw/blogs/精品服務/realyou-safe_shopping"
+  }
+] as const

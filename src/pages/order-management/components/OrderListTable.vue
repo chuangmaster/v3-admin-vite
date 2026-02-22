@@ -49,6 +49,7 @@ interface Emits {
   (e: "delete", order: SalesOrderListItem): void
   (e: "printShipping", order: SalesOrderListItem): void
   (e: "printOrder", order: SalesOrderListItem): void
+  (e: "printOrderDocument", order: SalesOrderListItem): void
 }
 
 /**
@@ -171,6 +172,7 @@ function formatCurrency(amount: number): string {
             trigger="click" @command="(cmd: string) => {
               if (cmd === 'printShipping') emit('printShipping', row)
               if (cmd === 'printOrder') emit('printOrder', row)
+              if (cmd === 'printOrderDocument') emit('printOrderDocument', row)
             }"
           >
             <ElButton :icon="Printer" size="small" link>
@@ -183,6 +185,9 @@ function formatCurrency(amount: number): string {
                 </ElDropdownItem>
                 <ElDropdownItem command="printOrder">
                   保證書
+                </ElDropdownItem>
+                <ElDropdownItem command="printOrderDocument">
+                  訂購單
                 </ElDropdownItem>
               </ElDropdownMenu>
             </template>

@@ -11,10 +11,12 @@ import { Download, Plus } from "@element-plus/icons-vue"
 import { ElButton, ElCard, ElPagination } from "element-plus"
 import { ref } from "vue"
 import { useOrderDetail } from "@/pages/order-management/composables/useOrderDetail"
+import { useOrderDocumentPreview } from "@/pages/order-management/composables/useOrderDocumentPreview"
 import { useOrderExport } from "@/pages/order-management/composables/useOrderExport"
 import { useOrderForm } from "@/pages/order-management/composables/useOrderForm"
 import { useOrderList } from "@/pages/order-management/composables/useOrderList"
 import { useShippingLabel } from "@/pages/order-management/composables/useShippingLabel"
+import OrderDocumentPreview from "./components/OrderDocumentPreview.vue"
 import OrderFormDialog from "./components/OrderFormDialog.vue"
 import OrderListTable from "./components/OrderListTable.vue"
 import OrderSearchForm from "./components/OrderSearchForm.vue"
@@ -63,6 +65,13 @@ const {
   openPreview: openShippingPreview,
   handlePrint: handleShippingPrint
 } = useShippingLabel()
+
+const {
+  dialogVisible: orderDocDialogVisible,
+  orderDocumentData,
+  openPreview: openOrderDocPreview,
+  printDocument: printOrderDocument
+} = useOrderDocumentPreview()
 
 /** 保證書列印對話框狀態 */
 const printVisible = ref(false)
@@ -140,6 +149,24 @@ async function handlePrintOrder(order: SalesOrderListItem) {
     printVisible.value = true
   }
 }
+
+/**
+ * 處理產生訂購單
+ * @param order - 訂單列表項目
+ */
+async function handleGenerateOrderDocument(order: SalesOrderListItem) {
+  const detail = await fetchOrderDetail(order.id)
+  if (detail) {
+    openOrderDocPreview(detail)
+  }
+}
+
+/**
+ * 處理列印訂購單
+ */
+function handlePrintOrderDocument() {
+  printOrderDocument()
+}
 </script>
 
 <template>
@@ -184,6 +211,7 @@ async function handlePrintOrder(order: SalesOrderListItem) {
         @delete="handleDeleteOrder"
         @print-shipping="handlePrintShippingLabel"
         @print-order="handlePrintOrder"
+        @print-order-document="handleGenerateOrderDocument"
       />
 
       <!-- 分頁 -->
@@ -215,6 +243,13 @@ async function handlePrintOrder(order: SalesOrderListItem) {
       v-model:visible="shippingPreviewVisible"
       :data="shippingLabel"
       @print="handleShippingPrint"
+    />
+
+    <!-- 訂購單預覽 -->
+    <OrderDocumentPreview
+      v-model:visible="orderDocDialogVisible"
+      :data="orderDocumentData"
+      @print="handlePrintOrderDocument"
     />
 
     <!-- 保證書列印 -->
