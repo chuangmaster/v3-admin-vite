@@ -74,7 +74,7 @@ export function useCustomerSearch() {
    */
   async function quickAddCustomer(data: CreateCustomerRequest): Promise<boolean> {
     try {
-      const response = await customerApi.create(data)
+      const response = await customerApi.create({ ...data, requestSource: "sales-order" })
 
       if (response.success && response.data) {
         const newCustomer = response.data

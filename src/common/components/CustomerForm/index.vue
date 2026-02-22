@@ -14,7 +14,8 @@ import { customerApi } from "@/pages/customer-management/apis/customer"
 defineOptions({ name: "CustomerForm" })
 
 const props = withDefaults(defineProps<Props>(), {
-  isOnlineOrder: false
+  isOnlineOrder: false,
+  isSalesOrder: false
 })
 
 const emit = defineEmits<{
@@ -27,6 +28,8 @@ const emit = defineEmits<{
 interface Props {
   /** 是否為線上訂單（線上訂單 email 為必填） */
   isOnlineOrder?: boolean
+  /** 是否為銷售訂單（銷售訂單居住地址為選填） */
+  isSalesOrder?: boolean
 }
 
 const formRef = ref<FormInstance>()
@@ -39,7 +42,8 @@ const formData = reactive<CreateCustomerRequest>({
   email: "",
   idNumber: "",
   residentialAddress: "",
-  lineId: ""
+  lineId: "",
+  requestSource: "sales-order"
 })
 
 /** 表單驗證規則 */
@@ -65,7 +69,7 @@ const rules = computed<FormRules>(() => ({
     }
   ],
   idNumber: [
-    { required: true, message: "請輸入身分證字號", trigger: "blur" },
+    ...(!props.isSalesOrder ? [{ required: true, message: "請輸入身分證字號", trigger: "blur" }] : []),
     {
       validator: (_rule: unknown, value: string, callback: (error?: Error) => void) => {
         const taiwanIdPattern = /^[A-Z]\d{9}$/
@@ -86,7 +90,7 @@ const rules = computed<FormRules>(() => ({
     }
   ],
   residentialAddress: [
-    { required: true, message: "請輸入居住地址", trigger: "blur" },
+    ...(!props.isSalesOrder ? [{ required: true, message: "請輸入居住地址", trigger: "blur" }] : []),
     { min: 5, max: 200, message: "地址長度為 5-200 字元", trigger: "blur" }
   ],
   lineId: [
@@ -193,10 +197,10 @@ defineExpose({
       />
     </el-form-item>
 
-    <el-form-item label="身分證字號" prop="idNumber">
+    <el-form-item label="身分證字號" prop="idNumber" :required="!isSalesOrder">
       <el-input
         v-model="formData.idNumber"
-        placeholder="請輸入身分證字號"
+        :placeholder="isSalesOrder ? '請輸入身分證字號（選填）' : '請輸入身分證字號'"
         maxlength="11"
         @input="formData.idNumber = formData.idNumber.toUpperCase()"
       >
@@ -211,10 +215,10 @@ defineExpose({
       </el-input>
     </el-form-item>
 
-    <el-form-item label="居住地址" prop="residentialAddress">
+    <el-form-item label="居住地址" prop="residentialAddress" :required="!isSalesOrder">
       <el-input
         v-model="formData.residentialAddress"
-        placeholder="請輸入居住地址"
+        :placeholder="isSalesOrder ? '請輸入居住地址（選填）' : '請輸入居住地址'"
         maxlength="200"
         show-word-limit
       />

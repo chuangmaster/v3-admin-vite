@@ -61,7 +61,8 @@ describe("customerApi", () => {
         phoneNumber: "0912345678",
         email: "test@example.com",
         residentialAddress: "台北市信義區",
-        lineId: "test_line"
+        lineId: "test_line",
+        requestSource: "customer-management"
       }
 
       const mockResponse = {

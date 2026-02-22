@@ -33,7 +33,8 @@ const formData = reactive<CreateCustomerRequest>({
   email: "",
   idNumber: "",
   residentialAddress: "",
-  lineId: ""
+  lineId: "",
+  requestSource: "service-order"
 })
 
 /** 表單驗證規則 */

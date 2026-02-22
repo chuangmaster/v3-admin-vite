@@ -158,6 +158,14 @@ export interface Customer {
 }
 
 /**
+ * 新增客戶請求來源
+ * - sales-order: 銷售訂單
+ * - service-order: 服務訂單
+ * - customer-management: 客戶管理
+ */
+export type CustomerRequestSource = "sales-order" | "service-order" | "customer-management"
+
+/**
  * 新增客戶請求模型
  * 對應後端 API: POST /api/customers
  */
@@ -179,6 +187,9 @@ export interface CreateCustomerRequest {
 
   /** LINE ID（選填，最多 50 字元） */
   lineId?: string
+
+  /** 請求來源，標識觸發建立客戶的業務場景 */
+  requestSource: CustomerRequestSource
 }
 
 /**

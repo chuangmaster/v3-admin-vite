@@ -121,7 +121,8 @@ async function handleSubmit() {
         email: formData.value.email || undefined,
         idNumber: formData.value.idNumber,
         residentialAddress: formData.value.residentialAddress,
-        lineId: formData.value.lineId || undefined
+        lineId: formData.value.lineId || undefined,
+        requestSource: "customer-management"
       }
       emit("submit", submitData)
     } else {

@@ -223,6 +223,7 @@ defineExpose({
         <el-tab-pane label="手動輸入" name="manual">
           <CustomerForm
             ref="customerFormRef"
+            :is-sales-order="true"
             @success="handleCustomerCreated"
             @cancel="showCustomerDialog = false"
           />
