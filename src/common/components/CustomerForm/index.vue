@@ -30,6 +30,8 @@ interface Props {
   isOnlineOrder?: boolean
   /** 是否為銷售訂單（銷售訂單居住地址為選填） */
   isSalesOrder?: boolean
+  /** 請求來源（銷售訂單：sales-order，服務訂單：service-order，客戶管理：customer-management） */
+  requestSource: "sales-order" | "service-order" | "customer-management"
 }
 
 const formRef = ref<FormInstance>()
@@ -43,7 +45,7 @@ const formData = reactive<CreateCustomerRequest>({
   idNumber: "",
   residentialAddress: "",
   lineId: "",
-  requestSource: "sales-order"
+  requestSource: props.requestSource
 })
 
 /** 表單驗證規則 */
@@ -144,6 +146,7 @@ function resetForm() {
   formData.idNumber = ""
   formData.residentialAddress = ""
   formData.lineId = ""
+  formData.requestSource = props.requestSource
 }
 
 /**

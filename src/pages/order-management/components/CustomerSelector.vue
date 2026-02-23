@@ -224,6 +224,7 @@ defineExpose({
           <CustomerForm
             ref="customerFormRef"
             :is-sales-order="true"
+            request-source="sales-order"
             @success="handleCustomerCreated"
             @cancel="showCustomerDialog = false"
           />
