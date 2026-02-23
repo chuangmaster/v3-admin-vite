@@ -4,7 +4,7 @@ import { formatDateTime } from "@@/utils/datetime"
 /**
  * 服務訂單詳情頁面
  */
-import { ArrowLeft, CopyDocument, DocumentChecked, Goods, Promotion, Refresh, Upload } from "@element-plus/icons-vue"
+import { ArrowLeft, DocumentChecked, Goods, Promotion, Refresh, Upload } from "@element-plus/icons-vue"
 import { ElMessage } from "element-plus"
 import { useTagsViewStore } from "@/pinia/stores/tags-view"
 import { getAttachmentList } from "./apis/attachment"
@@ -102,12 +102,10 @@ const {
   loading: onlineSignatureLoading,
   sendSignatureRequest,
   resendSignatureRequest,
-  copySignatureUrl,
   getStatusText: getOnlineSignatureStatusText,
   getStatusType: getOnlineSignatureStatusType,
   canSend,
-  canResend,
-  canCopyUrl
+  canResend
 } = useOnlineSignature()
 
 const showSignatureDialog = ref(false)
@@ -331,16 +329,6 @@ async function handleResendSignatureRequest(_record: SignatureRecord): Promise<v
 
   if (success) {
     handleOnlineSignatureSuccess()
-  }
-}
-
-/**
- * 處理複製簽章連結
- */
-function handleCopySignatureUrl(record: SignatureRecord): void {
-  const url = record.dropboxSignUrl || record.signatureUrl
-  if (url) {
-    copySignatureUrl(url)
   }
 }
 
@@ -791,15 +779,6 @@ function getRenewalOptionText(option: string) {
                         @click="handleResendSignatureRequest(record)"
                       >
                         重新發送簽章請求
-                      </el-button>
-                      <el-button
-                        v-if="canCopyUrl(record)"
-                        :icon="CopyDocument"
-                        size="small"
-                        :disabled="isOrderCancelled"
-                        @click="handleCopySignatureUrl(record)"
-                      >
-                        複製簽章連結
                       </el-button>
                     </div>
                   </div>

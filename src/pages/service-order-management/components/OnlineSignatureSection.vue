@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ServiceOrder, SignatureRecord } from "../types"
 import { formatDateTime } from "@@/utils/datetime"
-import { CopyDocument, DocumentChecked, Promotion, Refresh } from "@element-plus/icons-vue"
+import { DocumentChecked, Promotion, Refresh } from "@element-plus/icons-vue"
 import { computed } from "vue"
 import { useOnlineSignature } from "../composables/useOnlineSignature"
 import { SignatureType } from "../types"
@@ -23,11 +23,9 @@ const {
   loading,
   sendSignatureRequest,
   resendSignatureRequest,
-  copySignatureUrl,
   getStatusText,
   getStatusType,
-  canResend,
-  canCopyUrl
+  canResend
 } = useOnlineSignature()
 
 /**
@@ -79,16 +77,6 @@ async function handleResend(_record: SignatureRecord): Promise<void> {
 
   if (success) {
     emit("success")
-  }
-}
-
-/**
- * 處理複製簽章連結
- */
-function handleCopyUrl(record: SignatureRecord): void {
-  const url = record.dropboxSignUrl || record.signatureUrl
-  if (url) {
-    copySignatureUrl(url)
   }
 }
 </script>
@@ -178,14 +166,6 @@ function handleCopyUrl(record: SignatureRecord): void {
                   @click="handleResend(record)"
                 >
                   重新發送簽章請求
-                </el-button>
-                <el-button
-                  v-if="canCopyUrl(record) && record.statusKey !== 'SIGNED'"
-                  :icon="CopyDocument"
-                  size="small"
-                  @click="handleCopyUrl(record)"
-                >
-                  複製簽章連結
                 </el-button>
               </div>
             </div>

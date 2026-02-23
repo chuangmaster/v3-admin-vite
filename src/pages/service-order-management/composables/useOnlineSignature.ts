@@ -74,20 +74,6 @@ export function useOnlineSignature() {
   }
 
   /**
-   * 複製簽章連結
-   * @param signatureUrl - 簽章 URL
-   */
-  async function copySignatureUrl(signatureUrl: string): Promise<void> {
-    try {
-      await navigator.clipboard.writeText(signatureUrl)
-      ElMessage.success("連結已複製")
-    } catch (error) {
-      console.error("複製失敗:", error)
-      ElMessage.error("複製失敗，請手動複製")
-    }
-  }
-
-  /**
    * 取得簽章狀態文字
    * @param status - 簽章狀態
    * @returns 狀態文字
@@ -157,7 +143,6 @@ export function useOnlineSignature() {
     loading,
     sendSignatureRequest,
     resendSignatureRequest,
-    copySignatureUrl,
     getStatusText,
     getStatusType,
     canSend,
