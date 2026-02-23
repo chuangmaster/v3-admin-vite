@@ -609,6 +609,8 @@ export interface CreateCustomerRequest {
   residentialAddress: string
   /** Line ID(可選) */
   lineId?: string
+  /** 請求來源，標識觸發建立客戶的業務場景 */
+  requestSource: "sales-order" | "service-order" | "customer-management"
 }
 
 /** 附件上傳狀態 */

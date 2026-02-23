@@ -689,6 +689,7 @@ function handleIdCardBackUploaded(data: { base64: string, contentType: string, f
           <CustomerForm
             ref="customerFormRef"
             :is-online-order="formData.orderSource === ServiceOrderSource.ONLINE"
+            request-source="service-order"
             @success="handleCustomerCreated"
             @cancel="showCustomerDialog = false"
           />
