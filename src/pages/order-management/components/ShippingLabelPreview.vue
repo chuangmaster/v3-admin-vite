@@ -567,7 +567,7 @@ function handleClose() {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 15mm;
+    margin: 10mm;
   }
 
   /* 隱藏頁面所有內容（#app 及其他非 overlay 元素） */
@@ -624,6 +624,47 @@ function handleClose() {
   .shipping-label-content {
     padding: 0 !important;
     width: 100% !important;
+    /* 整體縮放至 80%，確保所有內容收納於單頁 A4 */
+    zoom: 0.8;
+  }
+
+  /* 壓縮 header 間距 */
+  .label-header {
+    margin-bottom: 10px !important;
+  }
+
+  /* 壓縮各區塊間距 */
+  .label-info,
+  .delivery-section,
+  .items-section {
+    margin-bottom: 8px !important;
+  }
+
+  .section-title {
+    font-size: 12px !important;
+    margin-bottom: 4px !important;
+    padding-bottom: 2px !important;
+  }
+
+  /* 壓縮 ElDescriptions 單元格 padding */
+  .el-descriptions__cell {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+
+  /* 壓縮收件資訊文字 */
+  .delivery-info-text {
+    font-size: 12px !important;
+    line-height: 1.6 !important;
+    padding: 5px 8px !important;
+    background-color: #f5f5f5 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* 壓縮商品卡片間距 */
+  .product-cards {
+    gap: 6px !important;
   }
 
   /* 列印時卡片樣式 */
@@ -633,15 +674,39 @@ function handleClose() {
   }
 
   .product-card-header {
+    padding: 4px 8px !important;
+    font-size: 12px !important;
     background-color: #f5f5f5 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
-  .delivery-info-text {
-    background-color: #f5f5f5 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+  .product-field {
+    padding: 4px 8px !important;
+  }
+
+  .field-label {
+    font-size: 10px !important;
+    margin-bottom: 1px !important;
+  }
+
+  .field-value {
+    font-size: 11px !important;
+  }
+
+  /* 壓縮付款記錄間距 */
+  .payment-record {
+    margin-bottom: 4px !important;
+  }
+
+  /* 壓縮簽名欄 */
+  .signature-section {
+    margin-top: 12px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .signature-fields {
+    margin-top: 8px !important;
   }
 
   /* 列印時簽名欄位 */

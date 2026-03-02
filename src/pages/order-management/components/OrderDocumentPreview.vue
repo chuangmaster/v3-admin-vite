@@ -534,7 +534,7 @@ function handleClose() {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 15mm;
+    margin: 10mm;
   }
 
   /* 隱藏頁面所有內容 */
@@ -590,6 +590,43 @@ function handleClose() {
   .order-document-content {
     padding: 0 !important;
     width: 100% !important;
+    /* 整體縮放至 80%，確保所有內容收納於單頁 A4 */
+    zoom: 0.8;
+  }
+
+  /* 壓縮 header 間距 */
+  .document-header {
+    margin-bottom: 10px !important;
+  }
+
+  .document-title {
+    font-size: 15px !important;
+    margin: 6px 0 0 !important;
+  }
+
+  /* 壓縮各區塊間距 */
+  .document-info,
+  .items-section,
+  .payment-section,
+  .amount-section {
+    margin-bottom: 8px !important;
+  }
+
+  .section-title {
+    font-size: 12px !important;
+    margin-bottom: 4px !important;
+    padding-bottom: 2px !important;
+  }
+
+  /* 壓縮 ElDescriptions 單元格 padding */
+  .el-descriptions__cell {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+
+  /* 壓縮商品卡片間距 */
+  .product-cards {
+    gap: 6px !important;
   }
 
   /* 列印時卡片樣式 */
@@ -600,38 +637,38 @@ function handleClose() {
   }
 
   .order-document-dialog .product-card-header {
+    padding: 4px 8px !important;
+    font-size: 12px !important;
     background-color: #f5f5f5 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
-  /* 定金須知不跨頁 */
-  .order-document-dialog .terms-section {
-    break-inside: avoid;
-    page-break-inside: avoid;
+  .order-document-dialog .product-field {
+    padding: 4px 8px !important;
   }
 
-  /* 區段標題與內容不分離 */
-  .order-document-dialog .section-title {
-    break-after: avoid;
-    page-break-after: avoid;
+  .order-document-dialog .field-label {
+    font-size: 10px !important;
+    margin-bottom: 1px !important;
   }
 
-  /* 保留背景顏色 */
-  .order-document-dialog .terms-content {
-    background-color: #f5f5f5 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+  .order-document-dialog .field-value {
+    font-size: 11px !important;
   }
 
-  /* 付款紀錄表格列印樣式 */
+  /* 壓縮付款紀錄表格 */
   .order-document-dialog .payment-table {
+    font-size: 11px !important;
+
     th,
     td {
+      padding: 4px 8px !important;
       border-color: #ddd !important;
     }
 
     th {
+      font-size: 10px !important;
       background-color: #f5f5f5 !important;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
@@ -642,6 +679,46 @@ function handleClose() {
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
+  }
+
+  /* 訂購須知壓縮 */
+  .order-document-dialog .terms-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .order-document-dialog .terms-content {
+    font-size: 11px !important;
+    line-height: 1.6 !important;
+    padding: 6px 12px 6px 24px !important;
+    background-color: #f5f5f5 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .order-document-dialog .terms-item + .terms-item {
+    margin-top: 3px !important;
+  }
+
+  .order-document-dialog .terms-header-item {
+    font-size: 11px !important;
+    line-height: 1.5 !important;
+  }
+
+  .order-document-dialog .terms-more {
+    margin-top: 6px !important;
+  }
+
+  .order-document-dialog .terms-link,
+  .order-document-dialog .terms-more-label {
+    font-size: 11px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* 區段標題與內容不分離 */
+  .order-document-dialog .section-title {
+    break-after: avoid;
+    page-break-after: avoid;
   }
 }
 </style>

@@ -543,7 +543,7 @@ function handleClose() {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 15mm;
+    margin: 10mm;
   }
 
   /* 隱藏頁面所有內容（#app 及其他非 overlay 元素） */
@@ -600,19 +600,59 @@ function handleClose() {
   .warranty-print {
     padding: 0 !important;
     width: 100% !important;
+    /* 整體縮放至 80%，確保所有內容收納於單頁 A4 */
+    zoom: 0.8;
   }
 
-  .print-title {
-    font-size: 24px !important;
+  /* 壓縮 header 間距 */
+  .print-header {
+    margin-bottom: 10px !important;
+  }
+
+  /* 壓縮門市資訊 */
+  .store-info-section {
+    padding: 6px 10px !important;
+    margin-bottom: 10px !important;
+    font-size: 11px !important;
+    gap: 8px !important;
+    line-height: 1.5 !important;
+  }
+
+  .store-info-qrcode {
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  /* 壓縮各區塊間距 */
+  .section {
+    margin-bottom: 8px !important;
+  }
+
+  .section-title {
+    font-size: 12px !important;
+    margin-bottom: 4px !important;
+    padding-bottom: 2px !important;
+  }
+
+  /* 壓縮 ElDescriptions 單元格 padding */
+  .el-descriptions__cell {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
   }
 
   /* 列印時卡片樣式 */
+  .product-cards {
+    gap: 6px !important;
+  }
+
   .product-card {
     break-inside: avoid;
     border-color: #ddd !important;
   }
 
   .product-card-header {
+    padding: 4px 8px !important;
+    font-size: 12px !important;
     background-color: #f5f5f5 !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
@@ -622,17 +662,39 @@ function handleClose() {
     grid-template-columns: repeat(4, 1fr) !important;
   }
 
-  /* 列印時優化頁面分頁 */
-  .warranty-title-section {
-    margin-top: 12px !important;
+  .product-field {
+    padding: 4px 8px !important;
   }
 
+  .field-label {
+    font-size: 10px !important;
+    margin-bottom: 1px !important;
+  }
+
+  .field-value {
+    font-size: 11px !important;
+  }
+
+  /* 壓縮保證書標題區 */
+  .warranty-title-section {
+    margin-top: 10px !important;
+    padding-top: 8px !important;
+  }
+
+  .warranty-title {
+    font-size: 15px !important;
+    letter-spacing: 10px !important;
+  }
+
+  /* 壓縮銷貨說明 */
   .sales-notice-section {
-    margin-top: 8px !important;
+    margin-top: 6px !important;
   }
 
   .sales-notice-list {
-    line-height: 1.8 !important;
+    font-size: 11px !important;
+    line-height: 1.6 !important;
+    padding-left: 16px !important;
   }
 }
 </style>
