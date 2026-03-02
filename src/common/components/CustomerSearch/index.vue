@@ -8,6 +8,8 @@
 import type { Customer } from "@/pages/customer-management/types"
 import { useCustomerKeywordSearch } from "@@/composables/useCustomerKeywordSearch"
 import { Search } from "@element-plus/icons-vue"
+import { onClickOutside } from "@vueuse/core"
+import { ref } from "vue"
 
 defineOptions({ name: "CustomerSearch" })
 
@@ -19,6 +21,13 @@ const emit = defineEmits<{
 }>()
 
 const { keyword, customers, loading, clearResults } = useCustomerKeywordSearch()
+
+const searchRef = ref<HTMLElement>()
+
+onClickOutside(searchRef, () => {
+  clearResults()
+  keyword.value = ""
+})
 
 /**
  * 處理客戶選擇
@@ -37,7 +46,7 @@ function handleCreate() {
 </script>
 
 <template>
-  <div class="customer-search">
+  <div ref="searchRef" class="customer-search">
     <div class="search-input-wrapper">
       <el-input
         v-model="keyword"
