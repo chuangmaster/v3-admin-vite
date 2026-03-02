@@ -4,6 +4,7 @@
  */
 import { formatDateTime } from "@@/utils/datetime"
 import { Download, Plus, Refresh, Search, View } from "@element-plus/icons-vue"
+import { computed } from "vue"
 import { useServiceOrderExport } from "./composables/useServiceOrderExport"
 import { useServiceOrderList } from "./composables/useServiceOrderList"
 import { useServiceOrderStatusUpdate } from "./composables/useServiceOrderStatusUpdate"
@@ -28,6 +29,11 @@ const {
 
 const { updating, handleCancel } = useServiceOrderStatusUpdate(refresh)
 const { exporting, exportServiceOrders } = useServiceOrderExport()
+
+/** 當前頁列表累計總金額 */
+const totalAmountSum = computed(() =>
+  serviceOrders.value.reduce((sum, order) => sum + (order.totalAmount || 0), 0)
+)
 
 /** 匯出報表 */
 function handleExport() {
@@ -360,6 +366,12 @@ function getOrderSourceTag(source: ServiceOrderSource | string) {
         @current-change="handlePageChange"
         @size-change="handleSizeChange"
       />
+
+      <!-- 累計總金額 -->
+      <div class="total-amount-bar">
+        <span class="total-amount-label">本頁累計總金額：</span>
+        <span class="total-amount-value">NT$ {{ totalAmountSum.toLocaleString() }}</span>
+      </div>
     </el-card>
   </div>
 </template>
@@ -396,6 +408,22 @@ function getOrderSourceTag(source: ServiceOrderSource | string) {
   .el-pagination {
     margin-top: 20px;
     justify-content: flex-end;
+  }
+
+  .total-amount-bar {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 16px;
+
+    .total-amount-label {
+      color: var(--el-text-color-regular);
+    }
+
+    .total-amount-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--el-color-danger);
+    }
   }
 }
 </style>
