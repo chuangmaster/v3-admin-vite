@@ -9,6 +9,8 @@ import type {
   AddPaymentRecordRequest,
   CreateSalesOrderRequest,
   OrderExportParams,
+  PaymentRecordReportItem,
+  PaymentRecordReportParams,
   SalesOrder,
   SalesOrderExportDto,
   SalesOrderListItem,
@@ -201,6 +203,19 @@ export const orderApi = {
     return request<ApiResponse<ShippingLabelResponse>>({
       url: `/sales-orders/${id}/shipping-label`,
       method: "get"
+    })
+  },
+
+  /**
+   * 取得付款紀錄報表（依建立時間區間篩選）
+   * @param params - 查詢參數（createdAtStart、createdAtEnd 必填）
+   * @returns 付款紀錄列表
+   */
+  async getPaymentRecords(params: PaymentRecordReportParams): Promise<ApiResponse<PaymentRecordReportItem[]>> {
+    return request<ApiResponse<PaymentRecordReportItem[]>>({
+      url: "/payment-records",
+      method: "get",
+      params
     })
   }
 }
