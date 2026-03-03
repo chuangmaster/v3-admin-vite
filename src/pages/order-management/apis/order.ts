@@ -22,6 +22,7 @@ import type {
   UpdateSalesOrderRequest,
   UpdateShippingStatusRequest
 } from "@/pages/order-management/types"
+import { toUTC0ISOString } from "@@/utils/datetime"
 import { request } from "@/http/axios"
 
 /**
@@ -212,10 +213,16 @@ export const orderApi = {
    * @returns 付款紀錄列表
    */
   async getPaymentRecords(params: PaymentRecordReportParams): Promise<ApiResponse<PaymentRecordReportItem[]>> {
+    const utcParams: PaymentRecordReportParams = {
+      ...params,
+      createdAtStart: toUTC0ISOString(params.createdAtStart, false),
+      createdAtEnd: toUTC0ISOString(params.createdAtEnd, true)
+    }
+
     return request<ApiResponse<PaymentRecordReportItem[]>>({
-      url: "/payment-records",
+      url: "/sales-orders/payment-records/export",
       method: "get",
-      params
+      params: utcParams
     })
   }
 }

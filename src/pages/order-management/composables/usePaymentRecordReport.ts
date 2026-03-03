@@ -2,14 +2,20 @@
  * 付款紀錄報表 Composable
  *
  * @module order-management/composables/usePaymentRecordReport
- * @description 提供付款紀錄報表的資料查詢、日期區間篩選、付款方式篩選、列印功能
+ * @description 提供付款紀錄報表的資料查詢、日期區間篩選、付款方式篩選、匯出功能
  */
 
 import type { PaymentMethod, PaymentRecordReportItem, PaymentRecordReportParams } from "@/pages/order-management/types"
+import { getRecentDateRange } from "@@/utils/datetime"
 import { ElMessage } from "element-plus"
 import { computed, ref } from "vue"
 import { orderApi } from "@/pages/order-management/apis/order"
 import { PAYMENT_METHOD_LABELS } from "@/pages/order-management/types"
+
+/** 預設日期區間：今日往前兩週 */
+function getDefaultDateRange(): [string, string] {
+  return getRecentDateRange(14)
+}
 
 export function usePaymentRecordReport() {
   /** 付款紀錄列表 */
@@ -22,7 +28,7 @@ export function usePaymentRecordReport() {
   const exporting = ref(false)
 
   /** 日期區間篩選（[起始日, 結束日]，YYYY-MM-DD） */
-  const dateRange = ref<[string, string] | null>(null)
+  const dateRange = ref<[string, string] | null>(getDefaultDateRange())
 
   /** 付款方式篩選 */
   const paymentMethodFilter = ref<PaymentMethod | "">("")
@@ -32,7 +38,7 @@ export function usePaymentRecordReport() {
     records.value.reduce((sum, r) => sum + r.paymentAmount, 0)
   )
 
-  /** 是否已有搜尋結果可供列印 */
+  /** 是否已有搜尋結果可供匯出 */
   const hasRecords = computed(() => records.value.length > 0)
 
   /**
@@ -81,16 +87,9 @@ export function usePaymentRecordReport() {
    * 重設搜尋條件與結果
    */
   function handleReset() {
-    dateRange.value = null
+    dateRange.value = getDefaultDateRange()
     paymentMethodFilter.value = ""
     records.value = []
-  }
-
-  /**
-   * 觸發瀏覽器列印
-   */
-  function handlePrint() {
-    window.print()
   }
 
   /**
@@ -108,6 +107,7 @@ export function usePaymentRecordReport() {
 
       const formattedData = records.value.map(r => ({
         訂單編號: r.orderNumber,
+        購買人名稱: r.customerName,
         付款方式: PAYMENT_METHOD_LABELS[r.paymentMethod as PaymentMethod] ?? r.paymentMethod,
         付款金額: r.paymentAmount,
         銀行末五碼: r.bankAccountLastFive ?? "",
@@ -125,6 +125,7 @@ export function usePaymentRecordReport() {
       // 新增合計列
       formattedData.push({
         訂單編號: "合計",
+        購買人名稱: "",
         付款方式: "",
         付款金額: totalAmount.value,
         銀行末五碼: "",
@@ -135,6 +136,7 @@ export function usePaymentRecordReport() {
 
       worksheet["!cols"] = [
         { wch: 20 }, // 訂單編號
+        { wch: 20 }, // 購買人名稱
         { wch: 14 }, // 付款方式
         { wch: 14 }, // 付款金額
         { wch: 14 }, // 銀行末五碼
@@ -166,7 +168,6 @@ export function usePaymentRecordReport() {
     hasRecords,
     handleSearch,
     handleReset,
-    handlePrint,
     handleExport
   }
 }
