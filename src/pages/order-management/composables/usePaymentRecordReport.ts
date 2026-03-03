@@ -33,13 +33,26 @@ export function usePaymentRecordReport() {
   /** 付款方式篩選 */
   const paymentMethodFilter = ref<PaymentMethod | "">("")
 
+  /** 客戶名稱前端關鍵字篩選 */
+  const customerNameKeyword = ref("")
+
+  /** 前端過濾後的付款紀錄 */
+  const filteredRecords = computed(() => {
+    const keyword = customerNameKeyword.value.trim().toLowerCase()
+    if (!keyword) return records.value
+
+    return records.value.filter(record =>
+      record.customerName.toLowerCase().includes(keyword)
+    )
+  })
+
   /** 付款金額合計 */
   const totalAmount = computed(() =>
-    records.value.reduce((sum, r) => sum + r.paymentAmount, 0)
+    filteredRecords.value.reduce((sum, r) => sum + r.paymentAmount, 0)
   )
 
   /** 是否已有搜尋結果可供匯出 */
-  const hasRecords = computed(() => records.value.length > 0)
+  const hasRecords = computed(() => filteredRecords.value.length > 0)
 
   /**
    * 查詢付款紀錄
@@ -89,6 +102,7 @@ export function usePaymentRecordReport() {
   function handleReset() {
     dateRange.value = getDefaultDateRange()
     paymentMethodFilter.value = ""
+    customerNameKeyword.value = ""
     records.value = []
   }
 
@@ -96,7 +110,7 @@ export function usePaymentRecordReport() {
    * 匯出付款紀錄為 Excel
    */
   async function handleExport() {
-    if (records.value.length === 0) {
+    if (filteredRecords.value.length === 0) {
       ElMessage.warning("無資料可匯出，請先搜尋付款紀錄")
       return
     }
@@ -105,7 +119,7 @@ export function usePaymentRecordReport() {
     try {
       const XLSX = await import("xlsx")
 
-      const formattedData = records.value.map(r => ({
+      const formattedData = filteredRecords.value.map(r => ({
         訂單編號: r.orderNumber,
         購買人名稱: r.customerName,
         付款方式: PAYMENT_METHOD_LABELS[r.paymentMethod as PaymentMethod] ?? r.paymentMethod,
@@ -149,7 +163,7 @@ export function usePaymentRecordReport() {
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)
       XLSX.writeFile(workbook, `付款紀錄_${timestamp}.xlsx`)
 
-      ElMessage.success(`已匯出 ${records.value.length} 筆付款紀錄`)
+      ElMessage.success(`已匯出 ${filteredRecords.value.length} 筆付款紀錄`)
     } catch (error) {
       console.error("handleExport error:", error)
       ElMessage.error("匯出失敗，請稍後再試")
@@ -164,6 +178,8 @@ export function usePaymentRecordReport() {
     exporting,
     dateRange,
     paymentMethodFilter,
+    customerNameKeyword,
+    filteredRecords,
     totalAmount,
     hasRecords,
     handleSearch,

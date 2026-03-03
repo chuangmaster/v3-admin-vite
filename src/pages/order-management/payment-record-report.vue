@@ -13,6 +13,7 @@ import {
   ElDatePicker,
   ElForm,
   ElFormItem,
+  ElInput,
   ElOption,
   ElSelect,
   ElTable,
@@ -25,12 +26,13 @@ import "@/common/assets/fonts/fonts.css"
 defineOptions({ name: "PaymentRecordReport" })
 
 const {
-  records,
+  filteredRecords,
   loading,
   exporting,
   dateRange,
   paymentMethodFilter,
   totalAmount,
+  customerNameKeyword,
   hasRecords,
   handleSearch,
   handleReset,
@@ -99,6 +101,15 @@ function formatCurrency(amount: number): string {
         </ElFormItem>
 
         <ElFormItem>
+          <ElFormItem label="客戶名稱">
+            <ElInput
+              v-model="customerNameKeyword"
+              clearable
+              placeholder="輸入客戶名稱"
+              style="width: 180px"
+            />
+          </ElFormItem>
+
           <ElButton
             type="primary"
             :icon="Search"
@@ -127,7 +138,7 @@ function formatCurrency(amount: number): string {
     <ElCard shadow="never" class="mt-4">
       <ElTable
         v-loading="loading"
-        :data="records"
+        :data="filteredRecords"
         border
         stripe
         show-summary
