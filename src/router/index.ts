@@ -184,6 +184,17 @@ export const dynamicRoutes: RouteRecordRaw[] = [
           keepAlive: true,
           permissions: ["salesOrder.read"]
         }
+      },
+      {
+        path: "payment-records",
+        component: () => import("@/pages/order-management/payment-record-report.vue"),
+        name: "PaymentRecordReport",
+        meta: {
+          title: { zhCN: "付款记录", zhTW: "付款紀錄", en: "Payment Records" },
+          titleKey: "paymentRecords",
+          keepAlive: false,
+          permissions: ["salesOrder.read"]
+        }
       }
     ]
   },

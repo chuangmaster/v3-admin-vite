@@ -9,6 +9,8 @@ import type {
   AddPaymentRecordRequest,
   CreateSalesOrderRequest,
   OrderExportParams,
+  PaymentRecordReportItem,
+  PaymentRecordReportParams,
   SalesOrder,
   SalesOrderExportDto,
   SalesOrderListItem,
@@ -20,6 +22,7 @@ import type {
   UpdateSalesOrderRequest,
   UpdateShippingStatusRequest
 } from "@/pages/order-management/types"
+import { toUTC0ISOString } from "@@/utils/datetime"
 import { request } from "@/http/axios"
 
 /**
@@ -201,6 +204,25 @@ export const orderApi = {
     return request<ApiResponse<ShippingLabelResponse>>({
       url: `/sales-orders/${id}/shipping-label`,
       method: "get"
+    })
+  },
+
+  /**
+   * 取得付款紀錄報表（依建立時間區間篩選）
+   * @param params - 查詢參數（createdAtStart、createdAtEnd 必填）
+   * @returns 付款紀錄列表
+   */
+  async getPaymentRecords(params: PaymentRecordReportParams): Promise<ApiResponse<PaymentRecordReportItem[]>> {
+    const utcParams: PaymentRecordReportParams = {
+      ...params,
+      createdAtStart: toUTC0ISOString(params.createdAtStart, false),
+      createdAtEnd: toUTC0ISOString(params.createdAtEnd, true)
+    }
+
+    return request<ApiResponse<PaymentRecordReportItem[]>>({
+      url: "/sales-orders/payment-records/export",
+      method: "get",
+      params: utcParams
     })
   }
 }

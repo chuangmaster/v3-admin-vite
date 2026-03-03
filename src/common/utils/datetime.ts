@@ -33,3 +33,23 @@ export function toUTC0ISOString(dateString: string, endOfDay: boolean = false): 
   // 使用 dayjs 解析日期並設定為 UTC+0
   return dayjs.utc(`${dateString} ${time}`, "YYYY-MM-DD HH:mm:ss").toISOString()
 }
+
+/**
+ * 將日期格式化為 YYYY-MM-DD（本地時區）
+ * @param date - 日期（Date、ISO 字串或時間戳）
+ * @returns YYYY-MM-DD
+ */
+export function formatDateOnly(date: string | number | Date): string {
+  return dayjs(date).format("YYYY-MM-DD")
+}
+
+/**
+ * 取得「今天往前 N 天」的日期區間（YYYY-MM-DD）
+ * @param daysBack - 往前天數
+ * @returns [startDate, endDate]
+ */
+export function getRecentDateRange(daysBack: number): [string, string] {
+  const end = dayjs()
+  const start = end.subtract(daysBack, "day")
+  return [start.format("YYYY-MM-DD"), end.format("YYYY-MM-DD")]
+}

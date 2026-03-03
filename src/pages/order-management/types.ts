@@ -701,6 +701,42 @@ export function isPlatformDeliveryInfo(info: DeliveryInfo): info is PlatformDeli
 }
 
 // ============================================================================
+// PaymentRecordReport (付款紀錄報表)
+// ============================================================================
+
+/** 付款紀錄報表項目（包含所屬訂單資訊） */
+export interface PaymentRecordReportItem {
+  /** 付款記錄唯一識別碼 */
+  id: string
+  /** 所屬訂單編號 */
+  orderNumber: string
+  /** 訂單日期（ISO 8601, UTC） */
+  orderDate: string
+  /** 客戶姓名 */
+  customerName: string
+  /** 付款日期（ISO 8601, UTC） */
+  paymentDate: string
+  /** 付款金額 */
+  paymentAmount: number
+  /** 付款方式 */
+  paymentMethod: PaymentMethod
+  /** 銀行帳戶末五碼（僅現金匯款時使用） */
+  bankAccountLastFive: string | null
+  /** 建立時間（ISO 8601, UTC） */
+  createdAt: string
+}
+
+/** 付款紀錄報表查詢參數 */
+export interface PaymentRecordReportParams {
+  /** 建立時間起始（YYYY-MM-DD，必填） */
+  createdAtStart: string
+  /** 建立時間結束（YYYY-MM-DD，必填） */
+  createdAtEnd: string
+  /** 付款方式篩選（選填） */
+  paymentMethod?: PaymentMethod
+}
+
+// ============================================================================
 // Validation Rules (驗證規則)
 // ============================================================================
 
