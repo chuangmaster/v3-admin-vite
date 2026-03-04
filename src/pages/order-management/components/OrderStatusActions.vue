@@ -6,11 +6,9 @@
  * @description 提供訂單狀態、付款狀態、出貨狀態的下拉選單即時更新
  */
 import type {
-  OrderStatus,
   PaymentStatus,
   SalesOrder,
   ShippingStatus,
-  UpdateOrderStatusRequest,
   UpdatePaymentStatusRequest,
   UpdateShippingStatusRequest
 } from "@/pages/order-management/types"
@@ -43,42 +41,6 @@ interface Emits {
 
 /** 更新中狀態 */
 const updating = ref(false)
-
-/**
- * 更新訂單狀態
- * @param status - 新訂單狀態
- */
-async function handleOrderStatusChange(status: OrderStatus) {
-  const currentLabel = ORDER_STATUS_LABELS[props.order.orderStatus]
-  const newLabel = ORDER_STATUS_LABELS[status]
-
-  try {
-    await ElMessageBox.confirm(
-      `確定要將訂單狀態從「${currentLabel}」變更為「${newLabel}」嗎？`,
-      "變更訂單狀態",
-      { confirmButtonText: "確定", cancelButtonText: "取消", type: "warning" }
-    )
-  } catch {
-    return
-  }
-
-  updating.value = true
-  try {
-    const request: UpdateOrderStatusRequest = { orderStatus: status }
-    const response = await orderApi.updateOrderStatus(props.order.id, request)
-
-    if (response.success && response.data) {
-      ElMessage.success(`訂單狀態已更新為「${newLabel}」`)
-      emit("update", response.data)
-    } else {
-      handleStatusError(response)
-    }
-  } catch (error) {
-    console.error("handleOrderStatusChange error:", error)
-  } finally {
-    updating.value = false
-  }
-}
 
 /**
  * 更新付款狀態
@@ -151,48 +113,15 @@ async function handleShippingStatusChange(status: ShippingStatus) {
     updating.value = false
   }
 }
-
-/**
- * 處理狀態更新錯誤
- */
-function handleStatusError(response: any) {
-  const code = response?.code || response?.apiCode
-
-  switch (code) {
-    case "ORDER_ALREADY_COMPLETED":
-      ElMessage.error("訂單已完成,無法再變更狀態")
-      break
-    case "ORDER_ALREADY_CANCELLED":
-      ElMessage.error("訂單已取消,無法再變更狀態")
-      break
-    default:
-      ElMessage.error(response?.message || "更新狀態失敗")
-  }
-}
 </script>
 
 <template>
   <div class="order-status-actions">
     <ElDescriptions :column="3" border size="small">
       <ElDescriptionsItem label="訂單狀態">
-        <ElSelect
-          :model-value="props.order.orderStatus"
-          :disabled="updating"
-          size="small"
-          style="width: 130px"
-          @change="handleOrderStatusChange"
-        >
-          <ElOption
-            v-for="(label, key) in ORDER_STATUS_LABELS"
-            :key="key"
-            :label="label"
-            :value="key"
-          />
-        </ElSelect>
         <ElTag
           :type="ORDER_STATUS_COLORS[props.order.orderStatus]"
           size="small"
-          style="margin-left: 8px"
         >
           {{ ORDER_STATUS_LABELS[props.order.orderStatus] }}
         </ElTag>
