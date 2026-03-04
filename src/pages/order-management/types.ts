@@ -71,14 +71,24 @@ export enum ProductSource {
 
 /** 付款方式 */
 export enum PaymentMethod {
-  /** 門市現金 */
-  STORE_CASH = "STORE_CASH",
+  /** 面交現金 */
+  FACE_TO_FACE_CASH = "FACE_TO_FACE_CASH",
   /** 現金匯款 */
   BANK_TRANSFER = "BANK_TRANSFER",
+  /** 中租 */
+  CHUNG_RENT = "CHUNG_RENT",
+  /** 和潤 */
+  HO_RUN = "HO_RUN",
   /** 線上刷卡 */
   ONLINE_CARD = "ONLINE_CARD",
-  /** 無卡分期 */
-  INSTALLMENT = "INSTALLMENT"
+  /** 綠界 */
+  ECPAY = "ECPAY",
+  /** 萬事達 */
+  MASTERCARD = "MASTERCARD",
+  /** 門市刷卡 */
+  STORE_CARD = "STORE_CARD",
+  /** 門市置換 */
+  STORE_EXCHANGE = "STORE_EXCHANGE"
 }
 
 // ============================================================================
@@ -650,10 +660,15 @@ export const PRODUCT_SOURCE_LABELS: Record<ProductSource, string> = {
 
 /** 付款方式標籤 */
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
-  [PaymentMethod.STORE_CASH]: "門市現金",
+  [PaymentMethod.FACE_TO_FACE_CASH]: "面交現金",
   [PaymentMethod.BANK_TRANSFER]: "現金匯款",
+  [PaymentMethod.CHUNG_RENT]: "中租",
+  [PaymentMethod.HO_RUN]: "和潤",
   [PaymentMethod.ONLINE_CARD]: "線上刷卡",
-  [PaymentMethod.INSTALLMENT]: "無卡分期"
+  [PaymentMethod.ECPAY]: "綠界",
+  [PaymentMethod.MASTERCARD]: "萬事達",
+  [PaymentMethod.STORE_CARD]: "門市刷卡",
+  [PaymentMethod.STORE_EXCHANGE]: "門市置換"
 }
 
 /** 訂單狀態顏色（Element Plus Tag type） */
