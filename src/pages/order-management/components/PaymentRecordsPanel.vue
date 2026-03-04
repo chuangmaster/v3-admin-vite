@@ -83,7 +83,7 @@ const addFormRef = ref<FormInstance>()
 const addFormData = ref<PaymentRecordFormData>({
   paymentDate: "",
   paymentAmount: 0,
-  paymentMethod: PaymentMethod.STORE_CASH,
+  paymentMethod: PaymentMethod.FACE_TO_FACE_CASH,
   bankAccountLastFive: ""
 })
 
@@ -102,7 +102,7 @@ function resetAddForm() {
   addFormData.value = {
     paymentDate: "",
     paymentAmount: 0,
-    paymentMethod: PaymentMethod.STORE_CASH,
+    paymentMethod: PaymentMethod.FACE_TO_FACE_CASH,
     bankAccountLastFive: ""
   }
   addFormRef.value?.resetFields()
