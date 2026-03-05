@@ -277,6 +277,7 @@ export const dynamicRoutes: RouteRecordRaw[] = [
         meta: {
           title: { zhCN: "推播通知", zhTW: "推播通知", en: "Push Notification" },
           titleKey: "notificationPush",
+          elIcon: "Bell",
           keepAlive: true,
           permissions: ["notification.push"]
         }
