@@ -8,12 +8,14 @@
 
 import type {
   CreateOrderItemRequest,
+  CreateSalesOrderPaymentRequest,
   CreateSalesOrderRequest,
   DeliveryInfo,
   OrderFormData,
   SalesOrder,
   UpdateSalesOrderRequest
 } from "@/pages/order-management/types"
+import { toUTC0ISOString } from "@@/utils/datetime"
 import { ElMessage, ElMessageBox, ElNotification } from "element-plus"
 import { ref } from "vue"
 import { orderApi } from "@/pages/order-management/apis/order"
@@ -107,6 +109,16 @@ export function useOrderForm() {
    * 將表單資料轉換為建立訂單 API 請求
    */
   function toCreateRequest(data: OrderFormData): CreateSalesOrderRequest {
+    let payment: CreateSalesOrderPaymentRequest | undefined
+    if (data.payment) {
+      payment = {
+        paymentDate: toUTC0ISOString(data.payment.paymentDate as string),
+        paymentAmount: data.payment.paymentAmount,
+        paymentMethod: data.payment.paymentMethod,
+        bankAccountLastFive: data.payment.bankAccountLastFive || undefined
+      }
+    }
+
     return {
       orderType: data.orderType,
       customerId: data.customerId,
@@ -124,7 +136,8 @@ export function useOrderForm() {
       deliveryMethod: data.deliveryMethod,
       deliveryInfo: data.deliveryInfo as DeliveryInfo,
       shippingFee: data.shippingFee,
-      remarks: data.remarks || undefined
+      remarks: data.remarks || undefined,
+      payment
     }
   }
 

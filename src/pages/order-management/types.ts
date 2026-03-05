@@ -280,6 +280,18 @@ export interface PlatformDeliveryInfo {
 // Request DTOs (請求資料傳輸物件)
 // ============================================================================
 
+/** 建立銷售訂單時附帶的付款記錄請求 */
+export interface CreateSalesOrderPaymentRequest {
+  /** 付款日期（ISO 8601 格式） */
+  paymentDate: string
+  /** 付款金額（必須大於 0） */
+  paymentAmount: number
+  /** 付款方式 */
+  paymentMethod: PaymentMethod
+  /** 銀行帳戶末五碼（選填,僅現金匯款時使用） */
+  bankAccountLastFive?: string
+}
+
 /** 建立銷售訂單請求 */
 export interface CreateSalesOrderRequest {
   /** 訂單類型 */
@@ -296,6 +308,8 @@ export interface CreateSalesOrderRequest {
   shippingFee?: number
   /** 訂單備註（選填,最多 1000 字元） */
   remarks?: string
+  /** 初始付款記錄（選填） */
+  payment?: CreateSalesOrderPaymentRequest
 }
 
 /** 建立訂單項目請求 */
@@ -516,6 +530,8 @@ export interface OrderFormData {
   remarks: string
   /** 版本號（編輯時使用） */
   version?: number
+  /** 初始付款記錄（選填,僅新增時使用） */
+  payment?: PaymentRecordFormData | null
 }
 
 /** 訂單項目表單資料 */

@@ -9,10 +9,14 @@ import type { FormInstance } from "element-plus"
  */
 import type { Customer } from "@/pages/customer-management/types"
 import type { DialogMode } from "@/pages/order-management/composables/useOrderForm"
-import type { DeliveryMethod, OrderFormData, OrderType, SalesOrder } from "@/pages/order-management/types"
+import type { DeliveryMethod, OrderFormData, OrderType, PaymentRecordFormData, SalesOrder } from "@/pages/order-management/types"
+import { formatDateOnly } from "@@/utils/datetime"
 import {
   ElButton,
+  ElCheckbox,
+  ElDatePicker,
   ElDialog,
+  ElDivider,
   ElForm,
   ElFormItem,
   ElInput,
@@ -27,6 +31,8 @@ import { orderApi } from "@/pages/order-management/apis/order"
 import {
   ORDER_TYPE_LABELS,
   OrderStatus,
+  PAYMENT_METHOD_LABELS,
+  PaymentMethod,
   SHIPPING_FEE_CONFIG,
   ShippingStatus
 } from "@/pages/order-management/types"
@@ -94,6 +100,44 @@ const isShipped = computed(() => {
   if (!props.currentOrder) return false
   return props.currentOrder.shippingStatus === ShippingStatus.SHIPPED
 })
+
+/** 新增模式：是否勾選新增付款記錄 */
+const enableInitialPayment = ref(false)
+
+/** 付款方式選項 */
+const paymentMethodOptions = Object.entries(PAYMENT_METHOD_LABELS).map(([value, label]) => ({
+  value,
+  label
+}))
+
+/** 是否顯示銀行末五碼欄位 */
+const showBankField = computed(() => {
+  return props.formData.payment?.paymentMethod === PaymentMethod.BANK_TRANSFER
+})
+
+/**
+ * 切換初始付款記錄開關
+ */
+function handleTogglePayment(enabled: boolean | string | number) {
+  if (enabled) {
+    updateFormField("payment", {
+      paymentDate: "",
+      paymentAmount: 0,
+      paymentMethod: PaymentMethod.FACE_TO_FACE_CASH,
+      bankAccountLastFive: ""
+    } as PaymentRecordFormData)
+  } else {
+    updateFormField("payment", null)
+  }
+}
+
+/**
+ * 更新付款記錄表單欄位
+ */
+function updatePaymentField<K extends keyof PaymentRecordFormData>(field: K, value: PaymentRecordFormData[K]) {
+  if (!props.formData.payment) return
+  updateFormField("payment", { ...props.formData.payment, [field]: value })
+}
 
 /** 商品小計 */
 const subtotalAmount = computed(() => {
@@ -210,6 +254,7 @@ async function handlePaymentUpdate() {
 function handleClose() {
   emit("update:visible", false)
   emit("close")
+  enableInitialPayment.value = false
   nextTick(() => {
     formRef.value?.resetFields()
   })
@@ -353,6 +398,92 @@ defineExpose({
           @update:model-value="(v: string) => updateFormField('remarks', v)"
         />
       </ElFormItem>
+
+      <!-- 新增模式：初始付款記錄 -->
+      <template v-if="props.mode === 'create'">
+        <ElDivider content-position="left">
+          <ElCheckbox
+            v-model="enableInitialPayment"
+            label="同時新增一筆付款記錄（選填）"
+            @change="handleTogglePayment"
+          />
+        </ElDivider>
+
+        <template v-if="enableInitialPayment && props.formData.payment">
+          <!-- 付款日期 -->
+          <ElFormItem
+            label="付款日期"
+            prop="payment.paymentDate"
+            :rules="[{ required: true, message: '請選擇付款日期', trigger: 'change' }]"
+          >
+            <ElDatePicker
+              :model-value="props.formData.payment.paymentDate as string"
+              type="date"
+              placeholder="選擇付款日期"
+              format="YYYY-MM-DD"
+              style="width: 200px"
+              @update:model-value="(v: Date | string | null) => updatePaymentField('paymentDate', v ? formatDateOnly(v) : '')"
+            />
+          </ElFormItem>
+
+          <!-- 付款金額 -->
+          <ElFormItem
+            label="付款金額"
+            prop="payment.paymentAmount"
+            :rules="[
+              { required: true, message: '請輸入付款金額', trigger: 'blur' },
+              { type: 'number', min: 0.01, message: '付款金額必須大於 0', trigger: 'blur' },
+            ]"
+          >
+            <ElInputNumber
+              :model-value="props.formData.payment.paymentAmount"
+              :min="0"
+              :precision="0"
+              :controls="false"
+              placeholder="請輸入付款金額"
+              style="width: 200px"
+              @update:model-value="(v: number | undefined) => updatePaymentField('paymentAmount', v ?? 0)"
+            />
+          </ElFormItem>
+
+          <!-- 付款方式 -->
+          <ElFormItem
+            label="付款方式"
+            prop="payment.paymentMethod"
+            :rules="[{ required: true, message: '請選擇付款方式', trigger: 'change' }]"
+          >
+            <ElSelect
+              :model-value="props.formData.payment.paymentMethod"
+              placeholder="請選擇付款方式"
+              style="width: 200px"
+              @update:model-value="(v: string) => updatePaymentField('paymentMethod', v as PaymentMethod)"
+            >
+              <ElOption
+                v-for="opt in paymentMethodOptions"
+                :key="opt.value"
+                :label="opt.label"
+                :value="opt.value"
+              />
+            </ElSelect>
+          </ElFormItem>
+
+          <!-- 銀行末五碼（現金匯款才顯示） -->
+          <ElFormItem
+            v-if="showBankField"
+            label="銀行末五碼"
+            prop="payment.bankAccountLastFive"
+            :rules="[{ pattern: /^\d{5}$/, message: '銀行末五碼必須為 5 位數字', trigger: 'blur' }]"
+          >
+            <ElInput
+              :model-value="props.formData.payment.bankAccountLastFive"
+              maxlength="5"
+              placeholder="請輸入銀行末五碼"
+              style="width: 200px"
+              @update:model-value="(v: string) => updatePaymentField('bankAccountLastFive', v)"
+            />
+          </ElFormItem>
+        </template>
+      </template>
     </ElForm>
 
     <!-- 編輯模式：訂單狀態操作 -->
