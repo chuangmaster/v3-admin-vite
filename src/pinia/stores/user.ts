@@ -1,4 +1,5 @@
 import { getCurrentUserApi } from "@@/apis/users"
+import { useSignalR } from "@@/composables/useSignalR"
 import { setToken as _setToken, getToken, removeToken } from "@@/utils/cache/cookies"
 import { pinia } from "@/pinia"
 import { resetRouter } from "@/router"
@@ -55,6 +56,8 @@ export const useUserStore = defineStore("user", () => {
 
   // 登出
   const logout = () => {
+    const { stopConnection } = useSignalR()
+    stopConnection()
     removeToken()
     token.value = ""
     roles.value = []

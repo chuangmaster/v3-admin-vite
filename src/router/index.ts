@@ -260,6 +260,30 @@ export const dynamicRoutes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: "/notification",
+    component: Layouts,
+    redirect: "/notification/push",
+    name: "NotificationManagement",
+    meta: {
+      title: { zhCN: "通知管理", zhTW: "通知管理", en: "Notification" },
+      titleKey: "notificationManagement",
+      elIcon: "Bell"
+    },
+    children: [
+      {
+        path: "push",
+        component: () => import("@/pages/notification/index.vue"),
+        name: "NotificationPush",
+        meta: {
+          title: { zhCN: "推播通知", zhTW: "推播通知", en: "Push Notification" },
+          titleKey: "notificationPush",
+          keepAlive: true,
+          permissions: ["notification.push"]
+        }
+      }
+    ]
+  },
+  {
     path: "/permission",
     component: Layouts,
     redirect: "/permission/page-level",

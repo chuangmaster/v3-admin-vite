@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "2.3.2",
+    "@microsoft/signalr": "10.0.0",
     "axios": "1.12.2",
     "dayjs": "1.11.18",
     "element-plus": "2.11.2",
