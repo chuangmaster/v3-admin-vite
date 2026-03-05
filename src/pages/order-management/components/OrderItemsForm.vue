@@ -207,23 +207,6 @@ function formatCurrency(amount: number): string {
       </div>
 
       <ElRow :gutter="12">
-        <!-- 商品名稱 -->
-        <ElCol :xs="24" :sm="12" :md="8">
-          <ElFormItem
-            label="商品名稱"
-            :prop="`orderItems.${index}.productName`"
-            :rules="[{ required: true, message: '請輸入商品名稱', trigger: 'blur' }]"
-          >
-            <ElInput
-              :model-value="item.productName"
-              :disabled="props.disabled"
-              placeholder="商品名稱"
-              maxlength="200"
-              @update:model-value="(v: string) => updateItem(index, 'productName', v)"
-            />
-          </ElFormItem>
-        </ElCol>
-
         <!-- 品牌 -->
         <ElCol :xs="24" :sm="12" :md="8">
           <ElFormItem
@@ -241,6 +224,23 @@ function formatCurrency(amount: number): string {
               :trigger-on-focus="true"
               style="width: 100%;"
               @update:model-value="(v: string | number) => updateItem(index, 'brandName', String(v))"
+            />
+          </ElFormItem>
+        </ElCol>
+
+        <!-- 商品名稱 -->
+        <ElCol :xs="24" :sm="12" :md="8">
+          <ElFormItem
+            label="商品名稱"
+            :prop="`orderItems.${index}.productName`"
+            :rules="[{ required: true, message: '請輸入商品名稱', trigger: 'blur' }]"
+          >
+            <ElInput
+              :model-value="item.productName"
+              :disabled="props.disabled"
+              placeholder="商品名稱"
+              maxlength="200"
+              @update:model-value="(v: string) => updateItem(index, 'productName', v)"
             />
           </ElFormItem>
         </ElCol>
