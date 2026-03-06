@@ -1,4 +1,5 @@
 export interface NotifyItem {
+  id?: string
   avatar?: string
   title: string
   datetime?: string

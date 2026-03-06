@@ -1,5 +1,6 @@
 import type { Router } from "vue-router"
 import { setRouteChange } from "@@/composables/useRouteListener"
+import { useSignalR } from "@@/composables/useSignalR"
 import { useTitle } from "@@/composables/useTitle"
 import { getToken } from "@@/utils/cache/cookies"
 import { ElMessage } from "element-plus"
@@ -40,6 +41,9 @@ export function registerNavigationGuard(router: Router) {
     // 否则要重新获取权限角色
     try {
       await userStore.getInfo()
+      // 登入後啟動 SignalR 連線
+      const { startConnection } = useSignalR()
+      startConnection()
       // 注意：permissions 必須是一個陣列！例如: ["account.read", "account.create", "account.update", "account.delete"]
       const permissions = userStore.permissions
 
