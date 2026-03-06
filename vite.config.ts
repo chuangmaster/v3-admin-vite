@@ -40,8 +40,13 @@ export default defineConfig(({ mode }) => {
         "/api": {
           target: "http://localhost:5176",
           // 是否为 WebSocket
-          ws: false,
+          ws: true,
           // 是否允许跨域
+          changeOrigin: true
+        },
+        "/hubs": {
+          target: "http://localhost:5176",
+          ws: true,
           changeOrigin: true
         }
       },

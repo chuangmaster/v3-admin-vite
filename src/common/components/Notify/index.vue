@@ -1,15 +1,18 @@
 <script lang="ts" setup>
 import type { TabPaneName } from "element-plus"
+import type { DataItem } from "./store"
 import { Bell } from "@element-plus/icons-vue"
 import { useI18n } from "vue-i18n"
+import { useNotificationStore } from "@/pinia/stores/notification"
+import { messageData, todoData } from "./data"
 import List from "./List.vue"
-import { useNotifyStore } from "./store"
 
 const { t } = useI18n()
-const notifyStore = useNotifyStore()
+
+const notificationStore = useNotificationStore()
 
 /** 角標目前數量 */
-const badgeValue = computed(() => notifyStore.badgeValue)
+const badgeValue = computed(() => notificationStore.notifications.length + messageData.length + todoData.length)
 
 /** 角標最大值 */
 const badgeMax = 99
@@ -21,7 +24,26 @@ const popoverWidth = 350
 const activeName = ref<TabPaneName>("notification")
 
 /** 全部資料 */
-const data = computed(() => notifyStore.data)
+const data = computed<DataItem[]>(() => [
+  // 通知資料（來自 SignalR 推播）
+  {
+    name: "notification",
+    type: "primary",
+    list: notificationStore.notifications
+  },
+  // 訊息資料
+  {
+    name: "message",
+    type: "danger",
+    list: messageData
+  },
+  // 待辦資料
+  {
+    name: "todo",
+    type: "warning",
+    list: todoData
+  }
+])
 
 function handleHistory() {
   const label = t(`components.notify.${activeName.value}`)
@@ -49,7 +71,11 @@ function handleHistory() {
               <el-badge :value="item.list.length" :max="badgeMax" :type="item.type" />
             </template>
             <el-scrollbar height="400px">
-              <List :data="item.list" />
+              <List
+                :data="item.list"
+                :removable="item.name === 'notification'"
+                @remove="notificationStore.removeNotification"
+              />
             </el-scrollbar>
           </el-tab-pane>
         </el-tabs>

@@ -6,9 +6,9 @@ import type { NotifyItem } from "./type"
  * 提供全域通知管理,支援從任何模組動態新增通知
  */
 import { defineStore } from "pinia"
-import { messageData, notifyData, todoData } from "./data"
+import { messageData, todoData } from "./data"
 
-interface DataItem {
+export interface DataItem {
   name: TabPaneName
   type: "primary" | "success" | "warning" | "danger" | "info"
   list: NotifyItem[]
@@ -17,7 +17,7 @@ interface DataItem {
 export const useNotifyStore = defineStore("notify", () => {
   /** 通知資料 */
   const data = ref<DataItem[]>([
-    { name: "notification", type: "primary", list: [...notifyData] },
+    { name: "notification", type: "primary", list: [] },
     { name: "message", type: "danger", list: [...messageData] },
     { name: "todo", type: "warning", list: [...todoData] }
   ])

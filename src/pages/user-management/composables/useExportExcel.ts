@@ -5,7 +5,6 @@
 
 import type { User, UserExportData } from "../types"
 import { formatDateTime } from "@@/utils/datetime"
-import dayjs from "dayjs"
 import * as XLSX from "xlsx"
 
 /**
@@ -50,7 +49,7 @@ export function useExportExcel() {
     XLSX.utils.book_append_sheet(workbook, worksheet, "用戶列表")
 
     // 生成檔名（包含時間戳）
-    const filename = `用戶列表_${dayjs().format("YYYYMMDD_HHmmss")}.xlsx`
+    const filename = `用戶列表_${formatDateTime(new Date(), "YYYYMMDD_HHmmss")}.xlsx`
 
     // 下載檔案
     XLSX.writeFile(workbook, filename)
