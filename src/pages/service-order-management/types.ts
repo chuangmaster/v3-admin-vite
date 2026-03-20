@@ -66,6 +66,22 @@ export enum DocumentType {
   BUYBACK_CONTRACT_WITH_ONE_TIME_TRADE = "BUYBACK_CONTRACT_WITH_ONE_TIME_TRADE"
 }
 
+/** 批次下載文件類型 */
+export enum DownloadDocumentType {
+  /** 身分證正面 */
+  ID_CARD_FRONT = "ID_CARD_FRONT",
+  /** 身分證反面 */
+  ID_CARD_BACK = "ID_CARD_BACK",
+  /** 收購合約 */
+  BUYBACK_CONTRACT = "BUYBACK_CONTRACT",
+  /** 寄賣合約 */
+  CONSIGNMENT_CONTRACT = "CONSIGNMENT_CONTRACT",
+  /** 一次性交易 */
+  ONE_TIME_TRADE = "ONE_TIME_TRADE",
+  /** 收購合約與一次性交易 */
+  BUYBACK_CONTRACT_WITH_ONE_TIME_TRADE = "BUYBACK_CONTRACT_WITH_ONE_TIME_TRADE"
+}
+
 /** 線上簽章狀態 */
 export enum OnlineSignatureStatus {
   /** 未發送 */
@@ -727,4 +743,44 @@ export interface SendOnlineSignatureResponse {
   expiresAt: string
   /** 訊息 */
   message?: string
+}
+
+/** 建立批次下載任務請求 */
+export interface CreateDownloadTaskRequest {
+  /** 篩選起始日期（ISO 8601） */
+  startDate: string
+  /** 篩選結束日期（ISO 8601） */
+  endDate: string
+  /** 服務單類型（BUYBACK / CONSIGNMENT） */
+  orderType: ServiceOrderType
+  /** 指定要下載的文件類型清單；不填則依服務單類型使用預設值 */
+  documentTypes?: DownloadDocumentType[]
+}
+
+/** 批次下載任務 */
+export interface DownloadTask {
+  /** 任務唯一識別碼 */
+  taskId: string
+  /** 服務單類型（BUYBACK / CONSIGNMENT） */
+  orderType?: string
+  /** 指定下載的文件類型清單 */
+  documentTypes?: string[]
+  /** 篩選起始日期 */
+  startDate: string
+  /** 篩選結束日期 */
+  endDate: string
+  /** 任務狀態 */
+  status: string
+  /** Azure Blob SAS 下載連結 */
+  downloadUrl?: string
+  /** 打包失敗的文件筆數 */
+  failedCount: number
+  /** 打包失敗的服務單編號 */
+  failedOrderNumbers?: string[]
+  /** 任務建立時間 */
+  createdAt: string
+  /** 下載連結過期時間 */
+  expiresAt?: string
+  /** 系統層級錯誤訊息 */
+  errorMessage?: string
 }

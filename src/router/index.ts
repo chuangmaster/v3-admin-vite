@@ -247,6 +247,17 @@ export const dynamicRoutes: RouteRecordRaw[] = [
         }
       },
       {
+        path: "batch-download",
+        component: () => import("@/pages/service-order-management/batch-download.vue"),
+        name: "ServiceOrderBatchDownload",
+        meta: {
+          title: { zhCN: "批次下载文件", zhTW: "批次下載文件", en: "Batch Download" },
+          titleKey: "serviceOrderBatchDownload",
+          keepAlive: false,
+          permissions: ["serviceOrder.buyback.read", "serviceOrder.consignment.read"]
+        }
+      },
+      {
         path: "create",
         component: () => import("@/pages/service-order-management/create.vue"),
         name: "ServiceOrderCreate",

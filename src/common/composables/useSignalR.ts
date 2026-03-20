@@ -5,6 +5,14 @@ import { useNotificationStore } from "@/pinia/stores/notification"
 
 let connection: signalR.HubConnection | null = null
 
+export interface SignalRNotificationPayload {
+  title: string
+  message: string
+  severity: number
+}
+
+const notificationListeners = new Set<(payload: SignalRNotificationPayload) => void>()
+
 /** 嚴重程度對應 ElNotification 類型 */
 const SEVERITY_TYPE_MAP: Record<number, "info" | "warning" | "error"> = {
   0: "info",
@@ -31,15 +39,25 @@ function registerListeners(conn: signalR.HubConnection) {
       [title, message, severity] = args
     }
 
+    const payload: SignalRNotificationPayload = {
+      title,
+      message,
+      severity
+    }
+
     // 寫入 Pinia Store（通知面板顯示）
     const notificationStore = useNotificationStore()
-    notificationStore.addNotification(title, message, severity)
+    notificationStore.addNotification(payload.title, payload.message, payload.severity)
+
+    notificationListeners.forEach((listener) => {
+      listener(payload)
+    })
 
     // 同時彈出 ElNotification
     ElNotification({
-      title,
-      message,
-      type: SEVERITY_TYPE_MAP[severity] ?? "info",
+      title: payload.title,
+      message: payload.message,
+      type: SEVERITY_TYPE_MAP[payload.severity] ?? "info",
       duration: 5000
     })
   })
@@ -86,6 +104,14 @@ function getConnection() {
   return connection
 }
 
+function onNotification(listener: (payload: SignalRNotificationPayload) => void) {
+  notificationListeners.add(listener)
+
+  return () => {
+    notificationListeners.delete(listener)
+  }
+}
+
 export function useSignalR() {
-  return { startConnection, stopConnection, getConnection }
+  return { startConnection, stopConnection, getConnection, onNotification }
 }
