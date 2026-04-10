@@ -125,6 +125,15 @@ export function usePaymentRecordReport() {
         付款方式: PAYMENT_METHOD_LABELS[r.paymentMethod as PaymentMethod] ?? r.paymentMethod,
         付款金額: r.paymentAmount,
         銀行末五碼: r.bankAccountLastFive ?? "",
+        付款時間: r.paymentDate
+          ? new Date(r.paymentDate).toLocaleString("zh-TW", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit"
+            })
+          : "",
         建立時間: r.createdAt
           ? new Date(r.createdAt).toLocaleString("zh-TW", {
               year: "numeric",
@@ -143,6 +152,7 @@ export function usePaymentRecordReport() {
         付款方式: "",
         付款金額: totalAmount.value,
         銀行末五碼: "",
+        付款時間: "",
         建立時間: ""
       })
 
@@ -154,6 +164,7 @@ export function usePaymentRecordReport() {
         { wch: 14 }, // 付款方式
         { wch: 14 }, // 付款金額
         { wch: 14 }, // 銀行末五碼
+        { wch: 20 }, // 付款時間
         { wch: 20 } // 建立時間
       ]
 
