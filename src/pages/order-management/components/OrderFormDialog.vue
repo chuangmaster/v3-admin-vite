@@ -386,6 +386,18 @@ defineExpose({
         </div>
       </ElFormItem>
 
+      <!-- 訂單來源 -->
+      <ElFormItem label="訂單來源" prop="orderSource">
+        <ElInput
+          :model-value="props.formData.orderSource"
+          clearable
+          placeholder="選填"
+          maxlength="30"
+          show-word-limit
+          @update:model-value="(v: string) => updateFormField('orderSource', v)"
+        />
+      </ElFormItem>
+
       <!-- 備註 -->
       <ElFormItem label="備註" prop="remarks">
         <ElInput

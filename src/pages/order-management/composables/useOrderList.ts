@@ -37,6 +37,7 @@ export function useOrderList() {
     orderStatus: "",
     paymentStatus: "",
     shippingStatus: "",
+    orderSource: "",
     dateRange: null
   })
 
@@ -69,6 +70,9 @@ export function useOrderList() {
       }
       if (filters.value.shippingStatus) {
         params.shippingStatus = filters.value.shippingStatus as any
+      }
+      if (filters.value.orderSource) {
+        params.orderSource = filters.value.orderSource
       }
       if (filters.value.dateRange && filters.value.dateRange[0]) {
         params.orderDateStart = filters.value.dateRange[0]
@@ -110,6 +114,7 @@ export function useOrderList() {
       orderStatus: "",
       paymentStatus: "",
       shippingStatus: "",
+      orderSource: "",
       dateRange: null
     }
     searchParams.value = {

@@ -155,6 +155,18 @@ function handleReset() {
         </ElSelect>
       </ElFormItem>
 
+      <ElFormItem label="訂單來源">
+        <ElInput
+          :model-value="props.filters.orderSource"
+          placeholder="請輸入訂單來源"
+          clearable
+          style="width: 140px"
+          @update:model-value="(v: string) => updateFilter('orderSource', v)"
+          @keyup.enter="handleSearch"
+          @clear="handleSearch"
+        />
+      </ElFormItem>
+
       <ElFormItem label="訂單日期">
         <ElDatePicker
           :model-value="props.filters.dateRange"
