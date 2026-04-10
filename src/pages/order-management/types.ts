@@ -129,6 +129,8 @@ export interface SalesOrder {
   deliveryMethod: DeliveryMethod
   /** 收件資訊（依 deliveryMethod 而異） */
   deliveryInfo: DeliveryInfo
+  /** 訂單來源（選填,最多 30 字元） */
+  orderSource: string | null
   /** 訂單備註（最多 1000 字元） */
   remarks: string | null
   /** 訂單項目清單 */
@@ -173,6 +175,8 @@ export interface SalesOrderListItem {
   shippingStatus: ShippingStatus
   /** 收件方式 */
   deliveryMethod: DeliveryMethod
+  /** 訂單來源（選填,最多 30 字元） */
+  orderSource: string | null
   /** 訂單備註 */
   remarks: string | null
   /** 訂單項目清單 */
@@ -306,6 +310,8 @@ export interface CreateSalesOrderRequest {
   deliveryInfo: DeliveryInfo
   /** 運費（選填,未提供則使用系統預設值） */
   shippingFee?: number
+  /** 訂單來源（選填,最多 30 字元） */
+  orderSource?: string
   /** 訂單備註（選填,最多 1000 字元） */
   remarks?: string
   /** 初始付款記錄（選填） */
@@ -454,6 +460,8 @@ export interface SalesOrderExportDto {
   orderStatus: string
   /** 出貨狀態 */
   shippingStatus: string
+  /** 訂單來源 */
+  orderSource?: string
   /** 建立日期 */
   createdAt: string
   /** 操作者 */
@@ -482,6 +490,8 @@ export interface SalesOrderListParams {
   paymentStatus?: PaymentStatus
   /** 出貨狀態篩選（選填） */
   shippingStatus?: ShippingStatus
+  /** 訂單來源（模糊搜尋,選填） */
+  orderSource?: string
   /** 訂單日期起始（選填,YYYY-MM-DD） */
   orderDateStart?: string
   /** 訂單日期結束（選填,YYYY-MM-DD） */
@@ -502,6 +512,8 @@ export interface OrderExportParams {
   paymentStatus?: PaymentStatus
   /** 出貨狀態篩選（選填） */
   shippingStatus?: ShippingStatus
+  /** 訂單來源篩選（選填） */
+  orderSource?: string
   /** 訂單日期起始（選填） */
   orderDateStart?: string
   /** 訂單日期結束（選填） */
@@ -526,6 +538,8 @@ export interface OrderFormData {
   deliveryInfo: Partial<DeliveryInfo>
   /** 運費 */
   shippingFee: number
+  /** 訂單來源（選填,最多 30 字元） */
+  orderSource?: string
   /** 訂單備註 */
   remarks: string
   /** 版本號（編輯時使用） */
@@ -598,6 +612,8 @@ export interface SearchFilters {
   paymentStatus: PaymentStatus | ""
   /** 出貨狀態 */
   shippingStatus: ShippingStatus | ""
+  /** 訂單來源 */
+  orderSource: string
   /** 日期範圍 */
   dateRange: [string, string] | null
 }

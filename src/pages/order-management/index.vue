@@ -128,6 +128,7 @@ function handleExport() {
     orderStatus: filters.value.orderStatus || undefined,
     paymentStatus: filters.value.paymentStatus || undefined,
     shippingStatus: filters.value.shippingStatus || undefined,
+    orderSource: filters.value.orderSource || undefined,
     orderDateStart: filters.value.dateRange?.[0] || undefined,
     orderDateEnd: filters.value.dateRange?.[1] || undefined
   }

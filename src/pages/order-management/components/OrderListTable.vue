@@ -146,6 +146,12 @@ function formatCurrency(amount: number): string {
       </template>
     </ElTableColumn>
 
+    <ElTableColumn prop="orderSource" label="訂單來源" min-width="110" show-overflow-tooltip>
+      <template #default="{ row }">
+        {{ row.orderSource || "—" }}
+      </template>
+    </ElTableColumn>
+
     <ElTableColumn prop="createdByName" label="操作者" min-width="90" show-overflow-tooltip />
 
     <ElTableColumn label="操作" width="200" align="center" fixed="right">

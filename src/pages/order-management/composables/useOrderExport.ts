@@ -178,7 +178,8 @@ export function useOrderExport() {
               訂單狀態: formatOrderStatus(order.orderStatus),
               出貨狀態: formatShippingStatus(order.shippingStatus),
               建立日期: formatDate(order.createdAt),
-              承辦人員: order.createdByName
+              承辦人員: order.createdByName,
+              訂單來源: order.orderSource || ""
             })
           })
         } else {
@@ -202,7 +203,8 @@ export function useOrderExport() {
             訂單狀態: formatOrderStatus(order.orderStatus),
             出貨狀態: formatShippingStatus(order.shippingStatus),
             建立日期: formatDate(order.createdAt),
-            承辦人員: order.createdByName
+            承辦人員: order.createdByName,
+            訂單來源: order.orderSource || ""
           })
         }
       })
@@ -230,7 +232,8 @@ export function useOrderExport() {
         { wch: 12 }, // 訂單狀態
         { wch: 12 }, // 出貨狀態
         { wch: 12 }, // 建立日期
-        { wch: 12 } // 承辦人員
+        { wch: 12 }, // 承辦人員
+        { wch: 15 } // 訂單來源
       ]
 
       // 設定表頭樣式（第一列）
@@ -240,7 +243,7 @@ export function useOrderExport() {
         alignment: { horizontal: "center", vertical: "center" }
       }
 
-      // 取得表頭範圍（A1 到 S1，共19欄）
+      // 取得表頭範圍（A1 到 T1，共20欄）
       const headerCells = [
         "A1",
         "B1",
@@ -260,7 +263,8 @@ export function useOrderExport() {
         "P1",
         "Q1",
         "R1",
-        "S1"
+        "S1",
+        "T1"
       ]
       headerCells.forEach((cell) => {
         if (worksheet[cell]) {

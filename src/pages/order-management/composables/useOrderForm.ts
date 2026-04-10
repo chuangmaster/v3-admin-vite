@@ -46,6 +46,7 @@ export function useOrderForm() {
       deliveryMethod: DeliveryMethod.PICKUP,
       deliveryInfo: { type: "PICKUP", pickupLocation: "", pickupTime: "" },
       shippingFee: 0,
+      orderSource: "",
       remarks: ""
     }
   }
@@ -89,6 +90,7 @@ export function useOrderForm() {
       deliveryMethod: order.deliveryMethod,
       deliveryInfo: { ...order.deliveryInfo },
       shippingFee: order.shippingFee,
+      orderSource: order.orderSource || "",
       remarks: order.remarks || "",
       version: order.version
     }
@@ -136,6 +138,7 @@ export function useOrderForm() {
       deliveryMethod: data.deliveryMethod,
       deliveryInfo: data.deliveryInfo as DeliveryInfo,
       shippingFee: data.shippingFee,
+      orderSource: data.orderSource || undefined,
       remarks: data.remarks || undefined,
       payment
     }
