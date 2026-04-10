@@ -142,7 +142,7 @@ function formatCurrency(amount: number): string {
         border
         stripe
         show-summary
-        :summary-method="() => ['合計', '', '', formatCurrency(totalAmount), '', '']"
+        :summary-method="() => ['合計', '', '', formatCurrency(totalAmount), '', '', '']"
         empty-text="暫無資料，請輸入日期區間後點擊搜尋"
       >
         <ElTableColumn label="訂單編號" prop="orderNumber" min-width="160" />
@@ -160,6 +160,11 @@ function formatCurrency(amount: number): string {
         <ElTableColumn label="銀行末五碼" prop="bankAccountLastFive" min-width="110" align="center">
           <template #default="{ row }">
             {{ row.bankAccountLastFive ?? "—" }}
+          </template>
+        </ElTableColumn>
+        <ElTableColumn label="付款時間" min-width="160">
+          <template #default="{ row }">
+            {{ formatDateTime(row.paymentDate) }}
           </template>
         </ElTableColumn>
         <ElTableColumn label="建立時間" min-width="160">
