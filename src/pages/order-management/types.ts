@@ -350,6 +350,8 @@ export interface UpdateSalesOrderRequest {
   deliveryInfo?: DeliveryInfo
   /** 運費（選填） */
   shippingFee?: number
+  /** 訂單來源（選填,最多 30 字元） */
+  orderSource?: string
   /** 訂單備註（選填） */
   remarks?: string
   /** 當前版本號（必填,用於樂觀鎖定） */

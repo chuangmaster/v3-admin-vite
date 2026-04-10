@@ -163,6 +163,7 @@ export function useOrderForm() {
       deliveryMethod: data.deliveryMethod,
       deliveryInfo: data.deliveryInfo as DeliveryInfo,
       shippingFee: data.shippingFee,
+      orderSource: data.orderSource || undefined,
       remarks: data.remarks || undefined,
       version: data.version!
     }
