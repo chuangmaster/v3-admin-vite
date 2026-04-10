@@ -518,7 +518,7 @@ function handleClose() {
 }
 
 /* 平板響應式 */
-@media (max-width: 860px) {
+@media screen and (max-width: 860px) {
   .shipping-label-content {
     padding: 0 8px;
   }
