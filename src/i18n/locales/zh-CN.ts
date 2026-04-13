@@ -71,5 +71,16 @@ export default {
     paymentExceedsTotal: "付款金额超过订单总额",
     paymentRecordNotFound: "付款记录不存在",
     cannotDeletePaidRecord: "无法删除已付款记录"
+  },
+  login: {
+    accountPlaceholder: "用户名",
+    passwordPlaceholder: "密码",
+    loginButton: "登 录",
+    validation: {
+      accountRequired: "请输入用户名",
+      passwordRequired: "请输入密码",
+      passwordLength: "长度在 8 到 16 个字符",
+      formInvalid: "表单校验不通过"
+    }
   }
 }
