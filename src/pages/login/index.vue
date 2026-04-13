@@ -2,7 +2,7 @@
 import type { FormRules } from "element-plus"
 import type { LoginRequestData } from "./apis/type"
 import ThemeSwitch from "@@/components/ThemeSwitch/index.vue"
-import { Key, Loading, Lock, Picture, User } from "@element-plus/icons-vue"
+import { Lock, User } from "@element-plus/icons-vue"
 import { useSettingsStore } from "@/pinia/stores/settings"
 import { useUserStore } from "@/pinia/stores/user"
 import { loginApi } from "./apis"
@@ -25,13 +25,10 @@ const loginFormRef = useTemplateRef("loginFormRef")
 /** 登录按钮 Loading */
 const loading = ref(false)
 
-/** 验证码图片 URL */
-const codeUrl = ref("")
-
 /** 登录表单数据 */
 const loginFormData: LoginRequestData = reactive({
-  account: "admin",
-  password: "Admin@12345",
+  account: "",
+  password: "",
   code: ""
 })
 
@@ -68,21 +65,6 @@ function handleLogin() {
     })
   })
 }
-
-/** 创建验证码 */
-function createCode() {
-  // 清空已输入的验证码
-  loginFormData.code = ""
-  // 清空验证图片
-  codeUrl.value = ""
-  // 获取验证码图片
-  // getCaptchaApi().then((res) => {
-  //   codeUrl.value = res.data
-  // })
-}
-
-// 初始化验证码
-createCode()
 </script>
 
 <template>
@@ -117,34 +99,6 @@ createCode()
               @blur="handleBlur"
               @focus="handleFocus"
             />
-          </el-form-item>
-          <el-form-item prop="code">
-            <el-input
-              v-model.trim="loginFormData.code"
-              placeholder="验证码"
-              type="text"
-              tabindex="3"
-              :prefix-icon="Key"
-              maxlength="7"
-              size="large"
-              @blur="handleBlur"
-              @focus="handleFocus"
-            >
-              <template #append>
-                <el-image :src="codeUrl" draggable="false" @click="createCode">
-                  <template #placeholder>
-                    <el-icon>
-                      <Picture />
-                    </el-icon>
-                  </template>
-                  <template #error>
-                    <el-icon>
-                      <Loading />
-                    </el-icon>
-                  </template>
-                </el-image>
-              </template>
-            </el-input>
           </el-form-item>
           <el-button :loading="loading" type="primary" size="large" @click.prevent="handleLogin">
             登 录
