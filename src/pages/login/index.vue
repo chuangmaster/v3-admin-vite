@@ -2,12 +2,15 @@
 import type { FormRules } from "element-plus"
 import type { LoginRequestData } from "./apis/type"
 import ThemeSwitch from "@@/components/ThemeSwitch/index.vue"
-import { Key, Loading, Lock, Picture, User } from "@element-plus/icons-vue"
+import { Lock, User } from "@element-plus/icons-vue"
+import { useI18n } from "vue-i18n"
 import { useSettingsStore } from "@/pinia/stores/settings"
 import { useUserStore } from "@/pinia/stores/user"
 import { loginApi } from "./apis"
 import Owl from "./components/Owl.vue"
 import { useFocus } from "./composables/useFocus"
+
+const { t } = useI18n()
 
 const route = useRoute()
 
@@ -25,35 +28,32 @@ const loginFormRef = useTemplateRef("loginFormRef")
 /** 登录按钮 Loading */
 const loading = ref(false)
 
-/** 验证码图片 URL */
-const codeUrl = ref("")
-
 /** 登录表单数据 */
 const loginFormData: LoginRequestData = reactive({
-  account: "admin",
-  password: "Admin@12345",
+  account: "",
+  password: "",
   code: ""
 })
 
 /** 登录表单校验规则 */
-const loginFormRules: FormRules = {
+const loginFormRules = computed<FormRules>(() => ({
   account: [
-    { required: true, message: "请输入用户名", trigger: "blur" }
+    { required: true, message: t("login.validation.accountRequired"), trigger: "blur" }
   ],
   password: [
-    { required: true, message: "请输入密码", trigger: "blur" },
-    { min: 8, max: 16, message: "长度在 8 到 16 个字符", trigger: "blur" }
+    { required: true, message: t("login.validation.passwordRequired"), trigger: "blur" },
+    { min: 8, max: 16, message: t("login.validation.passwordLength"), trigger: "blur" }
   ],
   code: [
-    { required: false, message: "请输入验证码", trigger: "blur" }
+    { required: false, message: "", trigger: "blur" }
   ]
-}
+}))
 
 /** 登录 */
 function handleLogin() {
   loginFormRef.value?.validate((valid) => {
     if (!valid) {
-      ElMessage.error("表单校验不通过")
+      ElMessage.error(t("login.validation.formInvalid"))
       return
     }
     loading.value = true
@@ -68,21 +68,6 @@ function handleLogin() {
     })
   })
 }
-
-/** 创建验证码 */
-function createCode() {
-  // 清空已输入的验证码
-  loginFormData.code = ""
-  // 清空验证图片
-  codeUrl.value = ""
-  // 获取验证码图片
-  // getCaptchaApi().then((res) => {
-  //   codeUrl.value = res.data
-  // })
-}
-
-// 初始化验证码
-createCode()
 </script>
 
 <template>
@@ -98,7 +83,7 @@ createCode()
           <el-form-item prop="username">
             <el-input
               v-model.trim="loginFormData.account"
-              placeholder="用户名"
+              :placeholder="t('login.accountPlaceholder')"
               type="text"
               tabindex="1"
               :prefix-icon="User"
@@ -108,7 +93,7 @@ createCode()
           <el-form-item prop="password">
             <el-input
               v-model.trim="loginFormData.password"
-              placeholder="密码"
+              :placeholder="t('login.passwordPlaceholder')"
               type="password"
               tabindex="2"
               :prefix-icon="Lock"
@@ -118,36 +103,8 @@ createCode()
               @focus="handleFocus"
             />
           </el-form-item>
-          <el-form-item prop="code">
-            <el-input
-              v-model.trim="loginFormData.code"
-              placeholder="验证码"
-              type="text"
-              tabindex="3"
-              :prefix-icon="Key"
-              maxlength="7"
-              size="large"
-              @blur="handleBlur"
-              @focus="handleFocus"
-            >
-              <template #append>
-                <el-image :src="codeUrl" draggable="false" @click="createCode">
-                  <template #placeholder>
-                    <el-icon>
-                      <Picture />
-                    </el-icon>
-                  </template>
-                  <template #error>
-                    <el-icon>
-                      <Loading />
-                    </el-icon>
-                  </template>
-                </el-image>
-              </template>
-            </el-input>
-          </el-form-item>
           <el-button :loading="loading" type="primary" size="large" @click.prevent="handleLogin">
-            登 录
+            {{ t('login.loginButton') }}
           </el-button>
         </el-form>
       </div>

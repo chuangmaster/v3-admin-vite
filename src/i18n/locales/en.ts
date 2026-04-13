@@ -71,5 +71,16 @@ export default {
     paymentExceedsTotal: "Payment amount exceeds order total",
     paymentRecordNotFound: "Payment record not found",
     cannotDeletePaidRecord: "Cannot delete paid record"
+  },
+  login: {
+    accountPlaceholder: "Username",
+    passwordPlaceholder: "Password",
+    loginButton: "Login",
+    validation: {
+      accountRequired: "Please enter username",
+      passwordRequired: "Please enter password",
+      passwordLength: "Length must be between 8 and 16 characters",
+      formInvalid: "Form validation failed"
+    }
   }
 }

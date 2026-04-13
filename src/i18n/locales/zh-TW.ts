@@ -141,5 +141,16 @@ export default {
       noDataToExport: "目前無資料可匯出",
       dataTooLarge: "資料量過大，建議縮小篩選範圍"
     }
+  },
+  login: {
+    accountPlaceholder: "帳號",
+    passwordPlaceholder: "密碼",
+    loginButton: "登 入",
+    validation: {
+      accountRequired: "請輸入帳號",
+      passwordRequired: "請輸入密碼",
+      passwordLength: "長度在 8 到 16 個字元",
+      formInvalid: "表單驗證不通過"
+    }
   }
 }
