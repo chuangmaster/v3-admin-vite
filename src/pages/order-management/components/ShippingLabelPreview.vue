@@ -7,7 +7,7 @@
  *              支援列印友善樣式
  */
 import type { ShippingLabelResponse } from "@/pages/order-management/types"
-import { Printer } from "@element-plus/icons-vue"
+import { Picture, Printer } from "@element-plus/icons-vue"
 import {
   ElButton,
   ElDescriptions,
@@ -15,6 +15,8 @@ import {
   ElDialog,
   ElTag
 } from "element-plus"
+import { ref } from "vue"
+import { useImageDownload } from "@/pages/order-management/composables/useImageDownload"
 import {
   ACCESSORY_OPTIONS,
   DELIVERY_METHOD_LABELS,
@@ -37,6 +39,9 @@ defineOptions({ name: "ShippingLabelPreview" })
 const props = defineProps<Props>()
 
 const emit = defineEmits<Emits>()
+
+const contentRef = ref<HTMLElement | null>(null)
+const { downloading, downloadAsImage } = useImageDownload()
 
 interface Props {
   /** 對話框是否顯示 */
@@ -113,6 +118,14 @@ function handlePrint() {
 }
 
 /**
+ * 處理下載圖片
+ */
+function handleDownloadImage() {
+  if (!contentRef.value || !props.data) return
+  downloadAsImage(contentRef.value, `出貨單_${props.data.orderNumber}`)
+}
+
+/**
  * 處理關閉
  */
 function handleClose() {
@@ -130,7 +143,7 @@ function handleClose() {
     :close-on-click-modal="false"
     @close="handleClose"
   >
-    <div v-if="props.data" class="shipping-label-content">
+    <div v-if="props.data" ref="contentRef" class="shipping-label-content">
       <div class="label-header">
         <BrandBanner />
       </div>
@@ -337,6 +350,9 @@ function handleClose() {
     <template #footer>
       <ElButton @click="handleClose">
         關閉
+      </ElButton>
+      <ElButton :icon="Picture" :loading="downloading" @click="handleDownloadImage">
+        下載圖片
       </ElButton>
       <ElButton type="primary" :icon="Printer" @click="handlePrint">
         列印

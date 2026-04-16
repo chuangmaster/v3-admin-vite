@@ -7,14 +7,15 @@
  *              支援列印友善樣式
  */
 import type { OrderDocumentData } from "../types"
-import { Printer } from "@element-plus/icons-vue"
+import { Picture, Printer } from "@element-plus/icons-vue"
 import {
   ElButton,
   ElDescriptions,
   ElDescriptionsItem,
   ElDialog
 } from "element-plus"
-import { computed } from "vue"
+import { computed, ref } from "vue"
+import { useImageDownload } from "../composables/useImageDownload"
 import {
   ACCESSORY_OPTIONS,
   DEPOSIT_HEADERS,
@@ -32,6 +33,9 @@ defineOptions({ name: "OrderDocumentPreview" })
 const props = defineProps<Props>()
 
 const emit = defineEmits<Emits>()
+
+const contentRef = ref<HTMLElement | null>(null)
+const { downloading, downloadAsImage } = useImageDownload()
 
 interface Props {
   /** 對話框是否顯示 */
@@ -97,6 +101,14 @@ function handlePrint() {
 }
 
 /**
+ * 處理下載圖片
+ */
+function handleDownloadImage() {
+  if (!contentRef.value || !props.data) return
+  downloadAsImage(contentRef.value, `訂購單_${props.data.orderNumber}`)
+}
+
+/**
  * 處理關閉
  */
 function handleClose() {
@@ -114,7 +126,7 @@ function handleClose() {
     :close-on-click-modal="false"
     @close="handleClose"
   >
-    <div v-if="props.data" class="order-document-content">
+    <div v-if="props.data" ref="contentRef" class="order-document-content">
       <!-- 品牌標誌 -->
       <div class="document-header">
         <BrandBanner />
@@ -263,6 +275,9 @@ function handleClose() {
     <template #footer>
       <ElButton @click="handleClose">
         關閉
+      </ElButton>
+      <ElButton :icon="Picture" :loading="downloading" @click="handleDownloadImage">
+        下載圖片
       </ElButton>
       <ElButton type="primary" :icon="Printer" data-testid="print-button" @click="handlePrint">
         列印
