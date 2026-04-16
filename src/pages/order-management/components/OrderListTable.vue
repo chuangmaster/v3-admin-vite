@@ -182,7 +182,7 @@ function formatCurrency(amount: number): string {
             }"
           >
             <ElButton :icon="Printer" size="small" link>
-              列印
+              匯出
             </ElButton>
             <template #dropdown>
               <ElDropdownMenu>
