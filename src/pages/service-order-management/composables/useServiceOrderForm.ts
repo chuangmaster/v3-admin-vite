@@ -158,15 +158,14 @@ export function useServiceOrderForm() {
       return { valid: false, message: "請至少新增一項商品" }
     }
 
-    // 身分證明文件驗證（僅收購單需要）
+    // 身分證明文件驗證（收購單需要正反面）
     if (formData.orderType === ServiceOrderType.BUYBACK) {
       if (!idCardFrontUploaded.value) {
         return { valid: false, message: "收購單需要上傳身分證正面影本" }
       }
 
-      // 線下流程需要反面
-      if (formData.orderSource === ServiceOrderSource.OFFLINE && !idCardBackUploaded.value) {
-        return { valid: false, message: "收購單的線下流程需要上傳身分證反面影本" }
+      if (!idCardBackUploaded.value) {
+        return { valid: false, message: "收購單需要上傳身分證反面影本" }
       }
     }
 
