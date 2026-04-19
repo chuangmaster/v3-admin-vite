@@ -596,7 +596,7 @@ function handleClose() {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 15mm;
+    margin: 0;
   }
 
   /* 隱藏頁面所有內容（#app 及其他非 overlay 元素） */
@@ -651,8 +651,9 @@ function handleClose() {
   }
 
   .order-detail-print {
-    padding: 0 !important;
+    padding: 15mm !important;
     width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .print-title {

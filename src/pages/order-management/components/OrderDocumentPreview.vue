@@ -549,7 +549,7 @@ function handleClose() {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 10mm;
+    margin: 0;
   }
 
   /* 隱藏頁面所有內容 */
@@ -603,8 +603,9 @@ function handleClose() {
   }
 
   .order-document-content {
-    padding: 0 !important;
+    padding: 10mm !important;
     width: 100% !important;
+    box-sizing: border-box !important;
     /* 整體縮放至 80%，確保所有內容收納於單頁 A4 */
     zoom: 0.8;
   }
